@@ -47,6 +47,7 @@ export default function MarketingNav() {
           </div>
 
           <div className="hidden items-center gap-3 md:flex">
+            <Link to="/free-audit" className="rounded-lg border border-lime-400/50 px-4 py-2 text-sm font-semibold text-lime-400 transition-all hover:bg-lime-400 hover:text-black">Free Audit</Link>
             <Link to="/dashboard" className="text-sm font-medium text-white/70 hover:text-lime-400">Client Portal</Link>
             <Link to="/pricing" className="rounded-lg bg-lime-400 px-4 py-2 text-sm font-semibold text-black transition-all hover:bg-lime-300 hover:shadow-lg hover:shadow-lime-400/40">Get Started</Link>
           </div>
@@ -63,6 +64,7 @@ export default function MarketingNav() {
           </div>
           <div className="flex flex-col gap-1 px-4 py-6">
             {LINKS.map((l) => <a key={l.label} href={l.to} onClick={() => setOpen(false)} className="rounded-lg px-3 py-3 text-base font-medium text-white/80 hover:bg-lime-400/10 hover:text-lime-400">{l.label}</a>)}
+            <Link to="/free-audit" onClick={() => setOpen(false)} className="rounded-lg px-3 py-3 text-base font-medium text-lime-400 hover:bg-lime-400/10">Free AI Audit</Link>
             <Link to="/dashboard" onClick={() => setOpen(false)} className="rounded-lg px-3 py-3 text-base font-medium text-white/80 hover:bg-lime-400/10">Client Portal</Link>
             <Link to="/pricing" onClick={() => setOpen(false)} className="mt-2 rounded-lg bg-lime-400 px-3 py-3 text-center text-base font-semibold text-black">Get Started</Link>
           </div>

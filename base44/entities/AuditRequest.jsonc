@@ -1,0 +1,59 @@
+{
+  "name": "AuditRequest",
+  "type": "object",
+  "properties": {
+    "website": {
+      "type": "string"
+    },
+    "name": {
+      "type": "string"
+    },
+    "email": {
+      "type": "string"
+    },
+    "phone": {
+      "type": "string"
+    },
+    "overall_score": {
+      "type": "number"
+    },
+    "seo_score": {
+      "type": "number"
+    },
+    "aeo_score": {
+      "type": "number"
+    },
+    "conversion_score": {
+      "type": "number"
+    },
+    "performance_score": {
+      "type": "number"
+    },
+    "mobile_score": {
+      "type": "number"
+    },
+    "trust_score": {
+      "type": "number"
+    },
+    "report": {
+      "type": "string"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "new",
+        "completed",
+        "emailed",
+        "converted"
+      ],
+      "default": "new"
+    },
+    "source": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "website",
+    "email"
+  ]
+}
