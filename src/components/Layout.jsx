@@ -11,7 +11,7 @@ import { Image } from "@/components/ui/image";
 import { cn } from "@/lib/utils";
 
 const NAV = [
-  { to: "/", label: "Command Center", icon: LayoutDashboard, end: true },
+  { to: "/dashboard", label: "Command Center", icon: LayoutDashboard, end: true },
   { section: "Discovery" },
   { to: "/discovery", label: "Business Discovery", icon: Search },
   { to: "/prospects", label: "Prospects", icon: Users },

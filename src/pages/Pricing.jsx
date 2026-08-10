@@ -3,15 +3,25 @@ import PricingSection from "@/components/marketing/PricingSection";
 import Contact from "@/components/marketing/Contact";
 import MarketingFooter from "@/components/marketing/MarketingFooter";
 import { motion } from "framer-motion";
-import { Check } from "lucide-react";
+import { Check, Loader2, ArrowRight } from "lucide-react";
+import { useState } from "react";
+import { startCheckout } from "@/lib/checkout";
 
 const ADDONS = [
-  { name: "AI Tools", desc: "Buy individual AI chatbots, calculators, estimators, and lead tools.", price: "From $99" },
-  { name: "Web Packs", desc: "Complete website packages — design, build, SEO, and launch.", price: "From $2,500" },
-  { name: "App Packs", desc: "Custom web apps, client portals, and internal tools.", price: "From $5,000" },
+  { name: "AI Tools", desc: "Buy individual AI chatbots, calculators, estimators, and lead tools.", price: "From $99", productId: "ai-tool" },
+  { name: "Web Packs", desc: "Complete website packages — design, build, SEO, and launch.", price: "From $2,500", productId: "web-pack" },
+  { name: "App Packs", desc: "Custom web apps, client portals, and internal tools.", price: "From $5,000", productId: "app-pack" },
 ];
 
 export default function Pricing() {
+  const [loading, setLoading] = useState(null);
+
+  const handleCheckout = async (productId, name) => {
+    setLoading(name);
+    try { await startCheckout(productId); } catch (e) { alert(e.message || "Checkout failed."); }
+    setLoading(null);
+  };
+
   return (
     <div className="min-h-screen bg-white">
       <MarketingNav />
@@ -48,6 +58,10 @@ export default function Pricing() {
                     <li className="flex items-center gap-2"><Check className="h-4 w-4 text-lime-600" /> Instant dashboard access</li>
                     <li className="flex items-center gap-2"><Check className="h-4 w-4 text-lime-600" /> Approval-gated delivery</li>
                   </ul>
+                  <button onClick={() => handleCheckout(a.productId, a.name)} disabled={loading === a.name}
+                    className="mt-5 inline-flex w-full items-center justify-center gap-1.5 rounded-xl bg-black px-4 py-3 text-sm font-bold text-white transition-all hover:bg-lime-400 hover:text-black disabled:opacity-50">
+                    {loading === a.name ? <Loader2 className="h-4 w-4 animate-spin" /> : <>Buy Now <ArrowRight className="h-4 w-4" /></>}
+                  </button>
                 </motion.div>
               ))}
             </div>

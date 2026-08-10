@@ -82,15 +82,28 @@ Deno.serve(async (req: Request) => {
     if (!Number.isInteger(quantity) || quantity < 1) {
       return new Response(JSON.stringify({ error: "Invalid quantity" }), { status: 400 });
     }
-    // Example — replace with your real trusted product source:
-    //   const product = (await base44.asServiceRole.entities.Product.filter({ id: productId }))[0];
-    //   if (!product) return new Response(JSON.stringify({ error: "Unknown product" }), { status: 400 });
-    //   const productName = product.name; const price = String(product.price); const currency = product.currency ?? "USD";
-    const productName = "Purchase"; // TODO: from your trusted product source
-    const price = "0.00";           // TODO: authoritative per-unit price (major units), resolved server-side
+    // Server-side product catalog — authoritative prices, never trust client-sent price.
+    const PRODUCTS: Record<string, { name: string; price: string; subscription?: { frequency: string } }> = {
+      "pro-monthly":   { name: "Pro Plan (Monthly)",   price: "499.00",   subscription: { frequency: "MONTH" } },
+      "pro-annual":    { name: "Pro Plan (Annual)",    price: "4990.00",  subscription: { frequency: "YEAR" } },
+      "elite-monthly": { name: "Elite Plan (Monthly)", price: "1499.00",  subscription: { frequency: "MONTH" } },
+      "elite-annual":  { name: "Elite Plan (Annual)",  price: "14990.00", subscription: { frequency: "YEAR" } },
+      "ai-tool":       { name: "AI Tool",              price: "99.00" },
+      "web-pack":      { name: "Web Pack",             price: "2500.00" },
+      "app-pack":      { name: "App Pack",             price: "5000.00" },
+      "deposit":       { name: "Done-For-You Service Deposit", price: "500.00" },
+    };
+    const product = PRODUCTS[productId];
+    if (!product) {
+      return new Response(JSON.stringify({ error: "Unknown product" }), { status: 400 });
+    }
+    const productName = product.name;
+    const price = product.price;
     const currency = "USD";
     // For a SUBSCRIPTION set this to Wix's subscriptionInfo; leave null for a one-time payment.
-    const subscriptionInfo = null;
+    const subscriptionInfo = product.subscription
+      ? { subscriptionSettings: { frequency: product.subscription.frequency }, title: product.name, description: product.name }
+      : null;
     // Where Wix returns the buyer. Both MUST be real, PUBLICLY reachable routes in this app: the
     // returning buyer is often anonymous, so a missing or login-gated route strands a paid customer.
     // Match your router exactly — `/ThankYou`, not `/thank-you`.

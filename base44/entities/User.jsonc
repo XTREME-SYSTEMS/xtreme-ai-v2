@@ -7,6 +7,21 @@
         "admin",
         "user"
       ]
+    },
+    "plan": {
+      "type": "string",
+      "description": "The subscription plan the user has purchased",
+      "enum": [
+        "free",
+        "pro",
+        "elite",
+        "enterprise"
+      ],
+      "default": "free"
+    },
+    "has_paid": {
+      "type": "boolean",
+      "default": false
     }
   },
   "required": [

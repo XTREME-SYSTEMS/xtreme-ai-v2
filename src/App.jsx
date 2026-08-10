@@ -37,6 +37,9 @@ import Approvals from '@/pages/Approvals';
 import Receipts from '@/pages/Receipts';
 import Connectors from '@/pages/Connectors';
 import Settings from '@/pages/Settings';
+import Marketing from '@/pages/Marketing';
+import Pricing from '@/pages/Pricing';
+import ThankYou from '@/pages/ThankYou';
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
@@ -64,9 +67,12 @@ const AuthenticatedApp = () => {
   // Render the main app
   return (
     <Routes>
+      <Route path="/" element={<Marketing />} />
+      <Route path="/pricing" element={<Pricing />} />
+      <Route path="/ThankYou" element={<ThankYou />} />
       <Route element={<ProtectedRoute unauthenticatedElement={<Navigate to="/login" replace />} />}>
         <Route element={<Layout />}>
-          <Route path="/" element={<CommandCenter />} />
+          <Route path="/dashboard" element={<CommandCenter />} />
           <Route path="/discovery" element={<BusinessDiscovery />} />
           <Route path="/prospects" element={<Prospects />} />
           <Route path="/prospects/:id" element={<ProspectDetail />} />
