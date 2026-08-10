@@ -1,0 +1,75 @@
+{
+  "name": "ValidationResult",
+  "type": "object",
+  "properties": {
+    "phase_id": {
+      "type": "string"
+    },
+    "plan_id": {
+      "type": "string"
+    },
+    "iteration": {
+      "type": "number"
+    },
+    "overall_score": {
+      "type": "number"
+    },
+    "completeness_score": {
+      "type": "number"
+    },
+    "correctness_score": {
+      "type": "number"
+    },
+    "integration_score": {
+      "type": "number"
+    },
+    "security_score": {
+      "type": "number"
+    },
+    "performance_score": {
+      "type": "number"
+    },
+    "autonomy_score": {
+      "type": "number"
+    },
+    "checks_passed": {
+      "type": "number",
+      "default": 0
+    },
+    "checks_total": {
+      "type": "number",
+      "default": 0
+    },
+    "failures": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "check": {
+            "type": "string"
+          },
+          "severity": {
+            "type": "string"
+          },
+          "detail": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "passed": {
+      "type": "boolean",
+      "default": false
+    },
+    "summary": {
+      "type": "string"
+    },
+    "recommendation": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "phase_id",
+    "overall_score"
+  ]
+}

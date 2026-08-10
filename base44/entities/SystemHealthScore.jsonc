@@ -1,0 +1,64 @@
+{
+  "name": "SystemHealthScore",
+  "type": "object",
+  "properties": {
+    "plan_id": {
+      "type": "string"
+    },
+    "overall_score": {
+      "type": "number"
+    },
+    "completeness_score": {
+      "type": "number"
+    },
+    "correctness_score": {
+      "type": "number"
+    },
+    "integration_score": {
+      "type": "number"
+    },
+    "security_score": {
+      "type": "number"
+    },
+    "performance_score": {
+      "type": "number"
+    },
+    "autonomy_score": {
+      "type": "number"
+    },
+    "qa_pass_rate": {
+      "type": "number"
+    },
+    "phases_passed": {
+      "type": "number",
+      "default": 0
+    },
+    "phases_total": {
+      "type": "number",
+      "default": 0
+    },
+    "open_repair_tasks": {
+      "type": "number",
+      "default": 0
+    },
+    "trend": {
+      "type": "string",
+      "enum": [
+        "improving",
+        "stable",
+        "declining"
+      ],
+      "default": "stable"
+    },
+    "last_audited_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "active_remediation": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "overall_score"
+  ]
+}

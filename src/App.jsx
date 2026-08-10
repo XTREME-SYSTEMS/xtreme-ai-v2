@@ -60,6 +60,7 @@ import SignPortal from '@/pages/esign/SignPortal';
 import Invoices from '@/pages/billing/Invoices';
 import Expenses from '@/pages/billing/Expenses';
 import BillingDashboard from '@/pages/billing/BillingDashboard';
+import AutonomousSystem from '@/pages/AutonomousSystem';
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
@@ -140,6 +141,7 @@ const AuthenticatedApp = () => {
           <Route path="/esign/documents" element={<EsignDocuments />} />
           <Route path="/billing/invoices" element={<Invoices />} />
           <Route path="/billing/expenses" element={<Expenses />} />
+          <Route path="/autonomous-system" element={<AutonomousSystem />} />
         </Route>
       </Route>
       <Route path="*" element={<PageNotFound />} />

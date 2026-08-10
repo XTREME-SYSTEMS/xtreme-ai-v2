@@ -1,0 +1,65 @@
+{
+  "name": "ImplementationPlan",
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string"
+    },
+    "description": {
+      "type": "string"
+    },
+    "source_system": {
+      "type": "string",
+      "description": "The reference system this plan is derived from (e.g. Faultline AI)"
+    },
+    "total_phases": {
+      "type": "number",
+      "default": 0
+    },
+    "completed_phases": {
+      "type": "number",
+      "default": 0
+    },
+    "overall_score": {
+      "type": "number",
+      "default": 0
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "draft",
+        "active",
+        "paused",
+        "complete",
+        "failed"
+      ],
+      "default": "draft"
+    },
+    "autonomous_mode": {
+      "type": "boolean",
+      "default": true
+    },
+    "target_score": {
+      "type": "number",
+      "default": 100
+    },
+    "max_iterations_per_phase": {
+      "type": "number",
+      "default": 5
+    },
+    "current_phase_id": {
+      "type": "string"
+    },
+    "started_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "completed_at": {
+      "type": "string",
+      "format": "date-time"
+    }
+  },
+  "required": [
+    "name"
+  ]
+}

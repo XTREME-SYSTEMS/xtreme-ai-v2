@@ -1,0 +1,40 @@
+{
+  "name": "Auto Heal Loop",
+  "description": "When a phase enters reflecting status, triggers the reflection engine to analyze failures and regenerate the spec for the next iteration.",
+  "trigger": {
+    "config": {
+      "trigger_type": "entity",
+      "entity_name": "ImplementationPhase",
+      "events": [
+        "update"
+      ]
+    },
+    "condition": "${ .trigger.data.status == \"reflecting\" and .trigger.old_data.status != \"reflecting\" }"
+  },
+  "definition": {
+    "document": {
+      "dsl": "1.0.0",
+      "name": "auto_heal_loop",
+      "version": "1.0",
+      "namespace": "base44"
+    },
+    "do": [
+      {
+        "reflect": {
+          "call": "invoke_backend_function",
+          "with": {
+            "function_name": "sentinelReflect",
+            "args": {
+              "phase_id": "${ .trigger.entity_id }"
+            }
+          },
+          "then": "end",
+          "x-base44": {
+            "title": "Reflect & repair",
+            "description": "Analyze failures and queue fixes"
+          }
+        }
+      }
+    ]
+  }
+}

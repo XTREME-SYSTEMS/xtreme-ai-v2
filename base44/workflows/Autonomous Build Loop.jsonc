@@ -1,0 +1,83 @@
+{
+  "name": "Autonomous Build Loop",
+  "trigger": {
+    "condition": null,
+    "config": {
+      "trigger_type": "scheduled",
+      "events": [],
+      "schedule_mode": "interval",
+      "cron_expression": null,
+      "one_time_date": null,
+      "timezone": "UTC",
+      "interval_value": 10,
+      "interval_unit": "minutes",
+      "interval_anchor": null,
+      "ends_type": "never",
+      "ends_on_date": null,
+      "ends_after_count": null
+    }
+  },
+  "description": "Self-driving build loop \u2014 picks the next pending phase, generates code, validates, reflects on failures, and repeats until 100% or max iterations. Runs every 10 minutes.",
+  "definition": {
+    "document": {
+      "dsl": "1.0.0",
+      "name": "autonomous_build_loop",
+      "version": "1.0",
+      "namespace": "base44"
+    },
+    "do": [
+      {
+        "run_build": {
+          "call": "invoke_backend_function",
+          "with": {
+            "function_name": "runAutonomousBuild",
+            "args": {}
+          },
+          "then": "check_result",
+          "x-base44": {
+            "title": "Run autonomous build",
+            "description": "Generate + validate + reflect on next phase"
+          }
+        }
+      },
+      {
+        "check_result": {
+          "switch": [
+            {
+              "when": "${ .run_build.ok == true and .run_build.validation.passed == true }",
+              "then": "compute_score"
+            },
+            {
+              "when": "${ .run_build.ok == true }",
+              "then": "end"
+            },
+            {
+              "when": "${ true }",
+              "then": "end"
+            }
+          ],
+          "x-base44": {
+            "title": "Check build result",
+            "description": "Branch on pass/fail"
+          }
+        }
+      },
+      {
+        "compute_score": {
+          "call": "invoke_backend_function",
+          "with": {
+            "function_name": "computeSystemScore",
+            "args": {
+              "plan_id": "${ .run_build.plan_id }"
+            }
+          },
+          "then": "end",
+          "x-base44": {
+            "title": "Update system score",
+            "description": "Recompute health after a phase passes"
+          }
+        }
+      }
+    ]
+  }
+}

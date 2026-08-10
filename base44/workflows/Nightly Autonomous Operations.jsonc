@@ -1,0 +1,59 @@
+{
+  "name": "Nightly Autonomous Operations",
+  "trigger": {
+    "condition": null,
+    "config": {
+      "trigger_type": "scheduled",
+      "events": [],
+      "schedule_mode": "recurring",
+      "cron_expression": "0 2 * * *",
+      "one_time_date": null,
+      "timezone": "America/New_York",
+      "interval_value": null,
+      "interval_unit": null,
+      "interval_anchor": null,
+      "ends_type": "never",
+      "ends_on_date": null,
+      "ends_after_count": null
+    }
+  },
+  "description": "Every night at 2am \u2014 runs a deep forensic audit of the entire autonomous system, applies hardening actions, and recomputes the system health score.",
+  "definition": {
+    "document": {
+      "dsl": "1.0.0",
+      "name": "nightly_autonomous_ops",
+      "version": "1.0",
+      "namespace": "base44"
+    },
+    "do": [
+      {
+        "forensic_audit": {
+          "call": "invoke_backend_function",
+          "with": {
+            "function_name": "forensicAuditAndHarden",
+            "args": {}
+          },
+          "then": "compute_score",
+          "x-base44": {
+            "title": "Forensic audit",
+            "description": "Deep audit + auto-harden"
+          }
+        }
+      },
+      {
+        "compute_score": {
+          "call": "invoke_backend_function",
+          "with": {
+            "function_name": "computeSystemScore",
+            "args": {}
+          },
+          "then": "end",
+          "x-base44": {
+            "title": "Recompute health",
+            "description": "Update system score after audit"
+          }
+        }
+      }
+    ]
+  }
+}

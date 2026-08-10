@@ -1,0 +1,60 @@
+{
+  "name": "RepairTask",
+  "type": "object",
+  "properties": {
+    "phase_id": {
+      "type": "string"
+    },
+    "plan_id": {
+      "type": "string"
+    },
+    "validation_id": {
+      "type": "string"
+    },
+    "area": {
+      "type": "string",
+      "description": "Which part of the system needs repair (entity, function, page, workflow)"
+    },
+    "check_name": {
+      "type": "string"
+    },
+    "description": {
+      "type": "string"
+    },
+    "fix_strategy": {
+      "type": "string",
+      "description": "AI-proposed fix from the reflection step"
+    },
+    "severity": {
+      "type": "string",
+      "enum": [
+        "critical",
+        "high",
+        "medium",
+        "low"
+      ],
+      "default": "medium"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "open",
+        "in_progress",
+        "resolved",
+        "wont_fix"
+      ],
+      "default": "open"
+    },
+    "resolved_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "resolution_notes": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "phase_id",
+    "description"
+  ]
+}

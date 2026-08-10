@@ -1,0 +1,105 @@
+{
+  "name": "ImplementationPhase",
+  "type": "object",
+  "properties": {
+    "plan_id": {
+      "type": "string"
+    },
+    "phase_number": {
+      "type": "number"
+    },
+    "title": {
+      "type": "string"
+    },
+    "module": {
+      "type": "string",
+      "description": "Faultline module this phase implements (e.g. Forensic Audit, Clone Engine)"
+    },
+    "objective": {
+      "type": "string"
+    },
+    "deliverables": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "entities_required": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "functions_required": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "pages_required": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "implementation_spec": {
+      "type": "string",
+      "description": "AI-generated detailed implementation spec (entities, functions, code outline)"
+    },
+    "generated_code": {
+      "type": "string",
+      "description": "AI-generated code / file contents for this phase"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "pending",
+        "specifying",
+        "generating",
+        "validating",
+        "reflecting",
+        "passed",
+        "failed",
+        "blocked"
+      ],
+      "default": "pending"
+    },
+    "score": {
+      "type": "number",
+      "default": 0
+    },
+    "iteration": {
+      "type": "number",
+      "default": 0
+    },
+    "max_iterations": {
+      "type": "number",
+      "default": 5
+    },
+    "validation_summary": {
+      "type": "string"
+    },
+    "reflection_notes": {
+      "type": "string"
+    },
+    "gaps": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "started_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "completed_at": {
+      "type": "string",
+      "format": "date-time"
+    }
+  },
+  "required": [
+    "plan_id",
+    "phase_number",
+    "title"
+  ]
+}
