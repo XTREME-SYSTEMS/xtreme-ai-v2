@@ -9,6 +9,7 @@ import ScrollToTop from './components/ScrollToTop';
 import ProtectedRoute from '@/components/ProtectedRoute';
 import Layout from '@/components/Layout';
 import CommandCenter from '@/pages/CommandCenter';
+import Dashboard from '@/pages/Dashboard';
 import BusinessDiscovery from '@/pages/BusinessDiscovery';
 import Prospects from '@/pages/Prospects';
 import ProspectDetail from '@/pages/ProspectDetail';
@@ -78,7 +79,7 @@ const AuthenticatedApp = () => {
       <Route path="/free-audit" element={<FreeAuditPage />} />
       <Route element={<ProtectedRoute unauthenticatedElement={<Navigate to="/login" replace />} />}>
         <Route element={<Layout />}>
-          <Route path="/dashboard" element={<CommandCenter />} />
+          <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/discovery" element={<BusinessDiscovery />} />
           <Route path="/prospects" element={<Prospects />} />
           <Route path="/prospects/:id" element={<ProspectDetail />} />

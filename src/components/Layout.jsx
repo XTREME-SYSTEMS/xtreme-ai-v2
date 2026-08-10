@@ -47,6 +47,16 @@ const NAV = [
   { to: "/settings", label: "Settings", icon: Settings },
 ];
 
+const CLIENT_NAV = [
+  { to: "/dashboard", label: "My Dashboard", icon: LayoutDashboard, end: true },
+  { section: "Workflow" },
+  { to: "/approvals", label: "Approvals", icon: CheckCircle },
+  { to: "/proposals", label: "My Proposals", icon: FileText },
+  { to: "/receipts", label: "Activity", icon: ScrollText },
+  { section: "Account" },
+  { to: "/settings", label: "Settings", icon: Settings },
+];
+
 export default function Layout() {
   const [open, setOpen] = useState(false);
   const [user, setUser] = useState(null);
@@ -77,12 +87,12 @@ export default function Layout() {
           />
           <div className="leading-tight">
             <div className="text-sm font-semibold text-white">Lead Gen Near You</div>
-            <div className="text-[10px] uppercase tracking-wider text-lime-400">Growth Factory</div>
+            <div className="text-[10px] uppercase tracking-wider text-lime-400">{user?.role === "admin" ? "Growth Factory" : "Client Portal"}</div>
           </div>
           <button onClick={() => setOpen(false)} className="ml-auto lg:hidden text-white/50 hover:text-white"><X className="h-5 w-5" /></button>
         </div>
         <nav className="h-[calc(100vh-3.5rem)] overflow-y-auto px-2 py-3">
-          {NAV.map((item, i) => {
+          {(user?.role === "admin" ? NAV : CLIENT_NAV).map((item, i) => {
             if (item.section) {
               return <div key={i} className="mt-4 mb-1 px-2 text-[10px] font-semibold uppercase tracking-wider text-white">{item.section}</div>;
             }
@@ -113,8 +123,8 @@ export default function Layout() {
         <header className="flex h-14 items-center gap-3 border-b border-white/10 bg-black/80 px-4 backdrop-blur">
           <button onClick={() => setOpen(true)} className="lg:hidden text-white/50 hover:text-white"><Menu className="h-5 w-5" /></button>
           <div className="flex items-center gap-2 text-xs">
-            <span className="rounded-md border border-lime-400/30 bg-lime-400/10 px-2 py-1 font-mono text-lime-300">THROW THE BOOK AT IT</span>
-            <span className="hidden text-white/40 sm:inline">Architecture → Preview Build · Production locked</span>
+            <span className="rounded-md border border-lime-400/30 bg-lime-400/10 px-2 py-1 font-mono text-lime-300">{user?.role === "admin" ? "THROW THE BOOK AT IT" : "CLIENT PORTAL"}</span>
+            <span className="hidden text-white/40 sm:inline">{user?.role === "admin" ? "Architecture → Preview Build · Production locked" : "Approval-gated workflow"}</span>
           </div>
           <div className="ml-auto flex items-center gap-3">
             <span className="hidden text-xs text-white/50 sm:inline">{user?.email || ""}</span>
