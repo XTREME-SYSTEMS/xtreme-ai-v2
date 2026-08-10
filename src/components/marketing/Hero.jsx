@@ -38,11 +38,7 @@ export default function Hero() {
         <motion.h1 initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3, duration: 0.6 }}
           className="text-4xl font-black leading-[1.05] tracking-tight text-white sm:text-6xl lg:text-7xl">
           We Throw The Book<br />
-          <span className="relative inline-block">
-            <span className="relative z-10">At Your Growth.</span>
-            <motion.span className="absolute bottom-1 left-0 h-4 w-full bg-lime-400 sm:h-6"
-              initial={{ scaleX: 0 }} animate={{ scaleX: 1 }} transition={{ delay: 0.8, duration: 0.5 }} style={{ originX: 0 }} />
-          </span>
+          <span className="relative inline-block">At Your Growth.</span>
         </motion.h1>
 
         <motion.p initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5, duration: 0.6 }}
