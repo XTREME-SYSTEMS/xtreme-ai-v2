@@ -1,0 +1,45 @@
+{
+  "definition": {
+    "document": {
+      "dsl": "1.0.0",
+      "name": "five_minute_heartbeat",
+      "version": "1.0",
+      "namespace": "base44"
+    },
+    "do": [
+      {
+        "process_queue": {
+          "call": "invoke_backend_function",
+          "with": {
+            "function_name": "heartbeat",
+            "args": {}
+          },
+          "then": "end",
+          "x-base44": {
+            "title": "Process due queue jobs",
+            "description": "Picks up queued GenerationJobs that are due and processes them with retries + receipts"
+          }
+        }
+      }
+    ]
+  },
+  "trigger": {
+    "condition": null,
+    "config": {
+      "trigger_type": "scheduled",
+      "events": [],
+      "schedule_mode": "recurring",
+      "cron_expression": "*/5 * * * *",
+      "one_time_date": null,
+      "timezone": "America/New_York",
+      "interval_value": null,
+      "interval_unit": null,
+      "interval_anchor": null,
+      "ends_type": "never",
+      "ends_on_date": null,
+      "ends_after_count": null
+    }
+  },
+  "description": "Processes due GenerationJob queue entries every 5 minutes \u2014 idempotency, retries, exponential backoff, dead-letter, receipts. Production locks enforced.",
+  "name": "5-Minute Heartbeat"
+}

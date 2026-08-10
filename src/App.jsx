@@ -23,6 +23,7 @@ import MarketingLab from '@/pages/MarketingLab';
 import CapabilityRegistry from '@/pages/CapabilityRegistry';
 import GeneratorRegistry from '@/pages/GeneratorRegistry';
 import SourceRegistry from '@/pages/SourceRegistry';
+import VisualizerHub from '@/pages/VisualizerHub';
 import BuildQueue from '@/pages/BuildQueue';
 import PreviewFactory from '@/pages/PreviewFactory';
 import QARepair from '@/pages/QARepair';
@@ -80,6 +81,7 @@ const AuthenticatedApp = () => {
           <Route path="/capabilities" element={<CapabilityRegistry />} />
           <Route path="/generators" element={<GeneratorRegistry />} />
           <Route path="/sources" element={<SourceRegistry />} />
+          <Route path="/visualizer-hub" element={<VisualizerHub />} />
           <Route path="/build-queue" element={<BuildQueue />} />
           <Route path="/preview-factory" element={<PreviewFactory />} />
           <Route path="/qa-repair" element={<QARepair />} />

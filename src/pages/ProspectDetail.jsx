@@ -9,13 +9,15 @@ import CustomerTab from "@/components/prospect/CustomerTab";
 import GenericListTab from "@/components/prospect/GenericListTab";
 import PacksTab from "@/components/prospect/PacksTab";
 import BuildTab from "@/components/prospect/BuildTab";
+import DisplayTab from "@/components/prospect/DisplayTab";
+import QATab from "@/components/prospect/QATab";
 import {
   findCompetitors, buildIntent, findSearchOpportunities, generateDomains, throwTheBook, inventConcepts,
   generateBrandPacks, generateWebsitePacks, generateMarketingPacks, logReceipt,
 } from "@/lib/lgny";
 import { Star, Globe, Phone, MapPin, ChevronRight } from "lucide-react";
 
-const TABS = ["Overview","Audit","Customer","Competitors","Intent","Search","Domains","Tactics","Concepts","Brand","Website","Marketing","Build","Receipts"];
+const TABS = ["Overview","Audit","Customer","Competitors","Intent","Search","Domains","Tactics","Concepts","Brand","Website","Marketing","Generators","Build","QA","Proposal","Experiments","Receipts"];
 
 export default function ProspectDetail() {
   const { id } = useParams();
@@ -108,7 +110,76 @@ export default function ProspectDetail() {
       {tab === "Brand" && <PacksTab businessId={id} businessName={prospect.name} mode="brand" entity="BrandPack" generateFn={generateBrandPacks} accent="text-pink-400" />}
       {tab === "Website" && <PacksTab businessId={id} businessName={prospect.name} mode="website" entity="WebsitePack" generateFn={generateWebsitePacks} accent="text-cyan-400" />}
       {tab === "Marketing" && <PacksTab businessId={id} businessName={prospect.name} mode="marketing" entity="MarketingPack" generateFn={generateMarketingPacks} accent="text-amber-400" />}
+      {tab === "Generators" && (
+        <DisplayTab businessId={id} entity="BuildProject" title="Generator Chain Compositions"
+          columns={[
+            { key: "status", label: "Status", render: (it) => <StatusBadge status={it.status} /> },
+            { key: "generator_chain", label: "Chain", render: (it) => (
+              <span className="text-xs text-white/70">{(it.generator_chain || []).join(" → ")}</span>
+            )},
+            { key: "preview_url", label: "Preview", render: (it) => it.preview_url ? <a href={it.preview_url} target="_blank" rel="noreferrer" className="text-lime-400 hover:underline">Open ↗</a> : "—" },
+          ]}
+          renderPanel={(items) => (
+            <Panel title="Generator Chain Compositions">
+              {items.length === 0 ? <p className="text-sm text-white/40">No build projects yet. Use the Build tab to compose a generator chain.</p> : (
+                <div className="space-y-3">
+                  {items.map((b) => (
+                    <div key={b.id} className="rounded-lg border border-white/10 bg-zinc-950 p-3">
+                      <div className="flex items-center gap-2"><StatusBadge status={b.status} /><span className="text-xs text-white/40">{new Date(b.created_date).toLocaleString()}</span></div>
+                      <div className="mt-2 flex flex-wrap items-center gap-1.5">
+                        {(b.generator_chain || []).map((g, i) => (
+                          <span key={i} className="inline-flex items-center gap-1.5 rounded-md border border-white/15 bg-white/5 px-2 py-1 text-xs text-white/70">{g}{i < (b.generator_chain || []).length - 1 && <span className="text-white/30">→</span>}</span>
+                        ))}
+                      </div>
+                      {b.preview_url && <a href={b.preview_url} target="_blank" rel="noreferrer" className="mt-2 inline-block text-xs text-lime-400 hover:underline">Open preview ↗</a>}
+                    </div>
+                  ))}
+                </div>
+              )}
+            </Panel>
+          )}
+        />
+      )}
       {tab === "Build" && <BuildTab businessId={id} businessName={prospect.name} />}
+      {tab === "QA" && <QATab businessId={id} />}
+      {tab === "Proposal" && (
+        <DisplayTab businessId={id} entity="ProposalPackage" title="Proposal Packages"
+          columns={[
+            { key: "status", label: "Status", render: (it) => <StatusBadge status={it.status} /> },
+            { key: "audit_summary", label: "Audit Summary", render: (it) => <span className="text-xs text-white/60">{(it.audit_summary || "").slice(0, 120)}…</span> },
+            { key: "opportunity_summary", label: "Opportunity", render: (it) => <span className="text-xs text-white/60">{(it.opportunity_summary || "").slice(0, 120)}…</span> },
+          ]}
+          renderPanel={(items) => (
+            <Panel title="Proposal Packages">
+              {items.length === 0 ? <p className="text-sm text-white/40">No proposals yet. Use the Build tab → Generate Proposal.</p> : (
+                <div className="space-y-3">
+                  {items.map((p) => (
+                    <div key={p.id} className="rounded-lg border border-white/10 bg-zinc-950 p-3">
+                      <div className="flex items-center gap-2"><StatusBadge status={p.status} /><span className="text-xs text-white/40">{new Date(p.created_date).toLocaleString()}</span></div>
+                      <div className="mt-2"><div className="text-xs font-semibold uppercase text-white/40">Audit Summary</div><p className="text-sm text-white/70">{p.audit_summary}</p></div>
+                      <div className="mt-2"><div className="text-xs font-semibold uppercase text-white/40">Opportunity Summary</div><p className="text-sm text-white/70">{p.opportunity_summary}</p></div>
+                      {(p.offer_options || []).length > 0 && (
+                        <div className="mt-2"><div className="text-xs font-semibold uppercase text-white/40">Offer Options</div><ul className="mt-1 space-y-0.5">{p.offer_options.map((o,i)=><li key={i} className="text-sm text-white/70">• {o}</li>)}</ul></div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              )}
+            </Panel>
+          )}
+        />
+      )}
+      {tab === "Experiments" && (
+        <DisplayTab businessId={id} entity="Experiment" title="Experiments"
+          columns={[
+            { key: "hypothesis", label: "Hypothesis" },
+            { key: "tactic_name", label: "Tactic" },
+            { key: "channel", label: "Channel" },
+            { key: "status", label: "Status", render: (it) => <StatusBadge status={it.status} /> },
+            { key: "verdict", label: "Verdict", render: (it) => <span className="text-xs text-white/60">{it.verdict || "—"}</span> },
+          ]}
+        />
+      )}
 
       {tab === "Receipts" && (
         <Panel title="Receipts for this prospect">

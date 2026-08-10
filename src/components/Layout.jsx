@@ -28,6 +28,7 @@ const NAV = [
   { to: "/capabilities", label: "Capability Registry", icon: Boxes },
   { to: "/generators", label: "Generator Registry", icon: Factory },
   { to: "/sources", label: "Scraper / Source Registry", icon: Database },
+  { to: "/visualizer-hub", label: "Visualizer Hub", icon: Eye },
   { section: "Build & QA" },
   { to: "/build-queue", label: "Build Queue", icon: Hammer },
   { to: "/preview-factory", label: "Preview Factory", icon: Eye },
