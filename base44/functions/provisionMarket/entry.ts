@@ -40,22 +40,22 @@ export default async function(req) {
       const files = generateSiteFiles(market, seo);
 
       await log("Provisioning GitHub repo + pushing site…");
-      const gh = await provisionGithub(base44, market, files);
+      const gh = await provisionGithub(base44, market, files, record.github_repo);
       await patch({ github_repo: gh.repo, github_repo_url: gh.repo_url, step: "drive" });
       await log(`GitHub: ${gh.repo}`);
 
       await log("Provisioning Google Drive folder…");
-      const drive = await provisionDrive(base44, market);
+      const drive = record.drive_folder_id ? { folder_id: record.drive_folder_id, folder_url: record.drive_folder_url } : await provisionDrive(base44, market);
       await patch({ drive_folder_id: drive.folder_id, drive_folder_url: drive.folder_url, step: "supabase" });
       await log(`Drive: ${drive.folder_id}`);
 
       await log("Provisioning Supabase project…");
-      const supa = await provisionSupabase(market);
+      const supa = record.supabase_project_id ? { project_id: record.supabase_project_id, project_url: record.supabase_project_url } : await provisionSupabase(market);
       await patch({ supabase_project_id: supa.project_id, supabase_project_url: supa.project_url, step: "vercel" });
       await log(`Supabase: ${supa.project_id}`);
 
       await log("Provisioning Vercel project + deploy…");
-      const vercel = await provisionVercel(market, gh.repo);
+      const vercel = await provisionVercel(market, gh.repo, files);
       await patch({ vercel_project_id: vercel.project_id, vercel_url: vercel.url, status: "provisioned", step: "done" });
       await log(`Vercel: ${vercel.url}`);
 

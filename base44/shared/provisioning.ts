@@ -120,23 +120,29 @@ ${footer}`;
 }
 
 // ---- GitHub -----------------------------------------------------------------
-export async function provisionGithub(base44, market, files) {
+export async function provisionGithub(base44, market, files, existingRepo) {
   const { accessToken } = await base44.asServiceRole.connectors.getConnection("github");
   const headers = { Authorization: `Bearer ${accessToken}`, Accept: "application/vnd.github+json", "X-GitHub-Api-Version": "2022-11-28", "User-Agent": "leadgennearyou-factory" };
   const repoName = `site-${market.slug || slugify(market.state + "-" + market.city)}`.slice(0, 40);
 
   let repo, owner;
-  const createRes = await fetch("https://api.github.com/user/repos", { method: "POST", headers, body: JSON.stringify({ name: repoName, private: true, auto_init: true }) });
-  if (createRes.ok) { repo = await createRes.json(); owner = repo.owner.login; }
-  else if (createRes.status === 422) {
-    // repo already exists — find it among the authenticated user's own repos
-    const listRes = await fetch("https://api.github.com/user/repos?per_page=100&affiliation=owner", { headers });
-    if (!listRes.ok) throw new Error(`GitHub list repos failed: ${listRes.status}`);
-    const list = await listRes.json();
-    repo = (list || []).find((r) => r.name === repoName);
-    if (!repo) throw new Error(`GitHub repo "${repoName}" not found among your repos`);
-    owner = repo.owner.login;
-  } else throw new Error(`GitHub create repo failed: ${createRes.status} ${await createRes.text()}`);
+  if (existingRepo) {
+    // Reuse the repo from a prior run — avoids re-listing (which can be flaky).
+    const parts = existingRepo.split("/");
+    owner = parts[0]; repo = { name: parts[1], html_url: `https://github.com/${existingRepo}`, owner: { login: owner } };
+  } else {
+    const createRes = await fetch("https://api.github.com/user/repos", { method: "POST", headers, body: JSON.stringify({ name: repoName, private: true, auto_init: true }) });
+    if (createRes.ok) { repo = await createRes.json(); owner = repo.owner.login; }
+    else if (createRes.status === 422) {
+      // repo already exists — find it among the authenticated user's own repos
+      const listRes = await fetch("https://api.github.com/user/repos?per_page=100&affiliation=owner", { headers });
+      if (!listRes.ok) throw new Error(`GitHub list repos failed: ${listRes.status}`);
+      const list = await listRes.json();
+      repo = (list || []).find((r) => r.name === repoName);
+      if (!repo) throw new Error(`GitHub repo "${repoName}" not found among your repos`);
+      owner = repo.owner.login;
+    } else throw new Error(`GitHub create repo failed: ${createRes.status} ${await createRes.text()}`);
+  }
 
   for (const [path, content] of Object.entries(files)) {
     const checkRes = await fetch(`https://api.github.com/repos/${owner}/${repoName}/contents/${path}`, { headers });
@@ -182,13 +188,14 @@ export async function provisionSupabase(market) {
 }
 
 // ---- Vercel -----------------------------------------------------------------
-export async function provisionVercel(market, repoFullName) {
+export async function provisionVercel(market, repoFullName, files) {
   const token = process.env.VERCEL_TOKEN;
   const team = process.env.VERCEL_TEAM_ID;
   if (!token) throw new Error("Vercel token missing (VERCEL_TOKEN)");
   const qs = team ? `?teamId=${team}` : "";
   const name = (market.slug || slugify(market.state + "-" + market.city)).replace(/[^a-z0-9-]/g, "-").slice(0, 40);
 
+  // Create or reuse the project (git-linked for history).
   let project;
   const createRes = await fetch(`https://api.vercel.com/v10/projects${qs}`, {
     method: "POST",
@@ -199,15 +206,23 @@ export async function provisionVercel(market, repoFullName) {
   else if (createRes.status === 409) { const r = await fetch(`https://api.vercel.com/v9/projects/${name}${qs}`, { headers: { Authorization: `Bearer ${token}` } }); if (!r.ok) throw new Error(`Vercel project lookup failed: ${r.status}`); project = await r.json(); }
   else throw new Error(`Vercel create project failed: ${createRes.status} ${await createRes.text()}`);
 
+  // Direct file-upload deployment to production — reliable, does not require the
+  // Vercel GitHub app to be installed (git auto-deploy would otherwise never fire).
+  const fileList = Object.entries(files).map(([path, content]) => ({ file: path, data: b64(content), encoding: "base64" }));
+  const deployRes = await fetch(`https://api.vercel.com/v13/deployments${qs}`, {
+    method: "POST",
+    headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
+    body: JSON.stringify({ name, files: fileList, target: "production", projectSettings: { framework: null } }),
+  });
+  if (!deployRes.ok) throw new Error(`Vercel deploy failed: ${deployRes.status} ${await deployRes.text()}`);
+  const d = await deployRes.json();
+  // Public production URL: {name}-{teamSlug}.vercel.app for team projects, {name}.vercel.app otherwise.
   let url = `https://${name}.vercel.app`;
-  try {
-    const deployRes = await fetch(`https://api.vercel.com/v13/deployments${qs}`, {
-      method: "POST",
-      headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
-      body: JSON.stringify({ gitSource: { type: "github", repo: repoFullName, ref: "main" }, target: "production", projectId: project.id }),
-    });
-    if (deployRes.ok) { const d = await deployRes.json(); if (d.url) url = `https://${d.url}`; }
-  } catch (e) { /* deploy trigger optional — auto-deploy from repo link may handle it */ }
-
+  if (team) {
+    try {
+      const teamRes = await fetch(`https://api.vercel.com/v2/teams/${team}`, { headers: { Authorization: `Bearer ${token}` } });
+      if (teamRes.ok) { const t = await teamRes.json(); if (t.slug) url = `https://${name}-${t.slug}.vercel.app`; }
+    } catch (e) { /* fall back to default */ }
+  }
   return { project_id: project.id, url };
 }
