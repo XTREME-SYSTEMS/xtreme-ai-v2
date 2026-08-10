@@ -1,0 +1,54 @@
+{
+  "name": "Expense",
+  "type": "object",
+  "properties": {
+    "vendor": {
+      "type": "string"
+    },
+    "category": {
+      "type": "string",
+      "enum": [
+        "advertising",
+        "software",
+        "contractors",
+        "travel",
+        "office",
+        "utilities",
+        "other"
+      ],
+      "default": "other"
+    },
+    "amount": {
+      "type": "number"
+    },
+    "date": {
+      "type": "string",
+      "format": "date"
+    },
+    "account_id": {
+      "type": "string"
+    },
+    "deal_id": {
+      "type": "string"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "pending",
+        "approved",
+        "paid"
+      ],
+      "default": "pending"
+    },
+    "receipt_url": {
+      "type": "string"
+    },
+    "notes": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "vendor",
+    "amount"
+  ]
+}

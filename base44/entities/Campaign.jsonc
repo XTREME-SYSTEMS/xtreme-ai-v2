@@ -1,0 +1,56 @@
+{
+  "name": "Campaign",
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string"
+    },
+    "channel": {
+      "type": "string",
+      "enum": [
+        "email",
+        "social",
+        "paid",
+        "organic",
+        "referral",
+        "event"
+      ],
+      "default": "email"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "planned",
+        "active",
+        "paused",
+        "complete"
+      ],
+      "default": "planned"
+    },
+    "start_date": {
+      "type": "string",
+      "format": "date"
+    },
+    "end_date": {
+      "type": "string",
+      "format": "date"
+    },
+    "budget": {
+      "type": "number"
+    },
+    "leads_generated": {
+      "type": "number",
+      "default": 0
+    },
+    "deals_won": {
+      "type": "number",
+      "default": 0
+    },
+    "description": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "name"
+  ]
+}

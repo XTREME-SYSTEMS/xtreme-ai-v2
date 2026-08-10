@@ -49,6 +49,17 @@ import ThankYou from '@/pages/ThankYou';
 import SeoLanding from '@/pages/SeoLanding';
 import CouponPage from '@/pages/CouponPage';
 import FreeAuditPage from '@/pages/FreeAuditPage';
+import Contacts from '@/pages/crm/Contacts';
+import Accounts from '@/pages/crm/Accounts';
+import Deals from '@/pages/crm/Deals';
+import Activities from '@/pages/crm/Activities';
+import Campaigns from '@/pages/crm/Campaigns';
+import Quotes from '@/pages/crm/Quotes';
+import EsignDocuments from '@/pages/esign/EsignDocuments';
+import SignPortal from '@/pages/esign/SignPortal';
+import Invoices from '@/pages/billing/Invoices';
+import Expenses from '@/pages/billing/Expenses';
+import BillingDashboard from '@/pages/billing/BillingDashboard';
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
@@ -82,6 +93,7 @@ const AuthenticatedApp = () => {
       <Route path="/seo/:slug" element={<SeoLanding />} />
       <Route path="/coupon" element={<CouponPage />} />
       <Route path="/free-audit" element={<FreeAuditPage />} />
+      <Route path="/sign/:token" element={<SignPortal />} />
       <Route element={<ProtectedRoute unauthenticatedElement={<Navigate to="/login" replace />} />}>
         <Route element={<Layout />}>
           <Route path="/dashboard" element={<Dashboard />} />
@@ -118,6 +130,16 @@ const AuthenticatedApp = () => {
           <Route path="/receipts" element={<Receipts />} />
           <Route path="/connectors" element={<Connectors />} />
           <Route path="/settings" element={<Settings />} />
+          <Route path="/business-suite" element={<BillingDashboard />} />
+          <Route path="/crm/contacts" element={<Contacts />} />
+          <Route path="/crm/accounts" element={<Accounts />} />
+          <Route path="/crm/deals" element={<Deals />} />
+          <Route path="/crm/activities" element={<Activities />} />
+          <Route path="/crm/campaigns" element={<Campaigns />} />
+          <Route path="/crm/quotes" element={<Quotes />} />
+          <Route path="/esign/documents" element={<EsignDocuments />} />
+          <Route path="/billing/invoices" element={<Invoices />} />
+          <Route path="/billing/expenses" element={<Expenses />} />
         </Route>
       </Route>
       <Route path="*" element={<PageNotFound />} />

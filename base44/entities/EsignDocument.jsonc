@@ -1,0 +1,77 @@
+{
+  "name": "EsignDocument",
+  "type": "object",
+  "properties": {
+    "title": {
+      "type": "string"
+    },
+    "body": {
+      "type": "string"
+    },
+    "deal_id": {
+      "type": "string"
+    },
+    "deal_name": {
+      "type": "string"
+    },
+    "account_id": {
+      "type": "string"
+    },
+    "account_name": {
+      "type": "string"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "draft",
+        "sent",
+        "viewed",
+        "signed",
+        "declined",
+        "expired"
+      ],
+      "default": "draft"
+    },
+    "signers": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          },
+          "signed": {
+            "type": "boolean",
+            "default": false
+          },
+          "signed_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "signature": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "share_token": {
+      "type": "string"
+    },
+    "expires_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "signed_pdf_url": {
+      "type": "string"
+    },
+    "owner_name": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "title"
+  ]
+}

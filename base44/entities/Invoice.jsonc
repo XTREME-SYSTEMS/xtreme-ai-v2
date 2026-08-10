@@ -1,0 +1,97 @@
+{
+  "name": "Invoice",
+  "type": "object",
+  "properties": {
+    "number": {
+      "type": "string"
+    },
+    "account_id": {
+      "type": "string"
+    },
+    "account_name": {
+      "type": "string"
+    },
+    "deal_id": {
+      "type": "string"
+    },
+    "contact_id": {
+      "type": "string"
+    },
+    "contact_name": {
+      "type": "string"
+    },
+    "issue_date": {
+      "type": "string",
+      "format": "date"
+    },
+    "due_date": {
+      "type": "string",
+      "format": "date"
+    },
+    "lines": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "description": {
+            "type": "string"
+          },
+          "qty": {
+            "type": "number"
+          },
+          "unit_price": {
+            "type": "number"
+          },
+          "total": {
+            "type": "number"
+          }
+        }
+      }
+    },
+    "subtotal": {
+      "type": "number",
+      "default": 0
+    },
+    "tax_rate": {
+      "type": "number",
+      "default": 0
+    },
+    "tax": {
+      "type": "number",
+      "default": 0
+    },
+    "total": {
+      "type": "number",
+      "default": 0
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "draft",
+        "sent",
+        "paid",
+        "overdue",
+        "void"
+      ],
+      "default": "draft"
+    },
+    "amount_paid": {
+      "type": "number",
+      "default": 0
+    },
+    "paid_date": {
+      "type": "string",
+      "format": "date"
+    },
+    "notes": {
+      "type": "string"
+    },
+    "ai_generated": {
+      "type": "boolean",
+      "default": false
+    }
+  },
+  "required": [
+    "number"
+  ]
+}

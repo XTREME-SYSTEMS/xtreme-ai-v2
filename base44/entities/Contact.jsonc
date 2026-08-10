@@ -1,0 +1,58 @@
+{
+  "name": "Contact",
+  "type": "object",
+  "properties": {
+    "first_name": {
+      "type": "string"
+    },
+    "last_name": {
+      "type": "string"
+    },
+    "email": {
+      "type": "string"
+    },
+    "phone": {
+      "type": "string"
+    },
+    "title": {
+      "type": "string"
+    },
+    "account_id": {
+      "type": "string"
+    },
+    "account_name": {
+      "type": "string"
+    },
+    "owner_name": {
+      "type": "string"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "new",
+        "contacted",
+        "qualified",
+        "won",
+        "lost"
+      ],
+      "default": "new"
+    },
+    "lead_score": {
+      "type": "number",
+      "default": 0
+    },
+    "source": {
+      "type": "string"
+    },
+    "notes": {
+      "type": "string"
+    },
+    "last_contacted": {
+      "type": "string",
+      "format": "date-time"
+    }
+  },
+  "required": [
+    "first_name"
+  ]
+}

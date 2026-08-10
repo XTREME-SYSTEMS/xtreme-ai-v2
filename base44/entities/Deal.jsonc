@@ -1,0 +1,57 @@
+{
+  "name": "Deal",
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string"
+    },
+    "account_id": {
+      "type": "string"
+    },
+    "account_name": {
+      "type": "string"
+    },
+    "contact_id": {
+      "type": "string"
+    },
+    "contact_name": {
+      "type": "string"
+    },
+    "value": {
+      "type": "number",
+      "default": 0
+    },
+    "stage": {
+      "type": "string",
+      "enum": [
+        "lead",
+        "qualified",
+        "proposal",
+        "negotiation",
+        "won",
+        "lost"
+      ],
+      "default": "lead"
+    },
+    "probability": {
+      "type": "number",
+      "default": 10
+    },
+    "close_date": {
+      "type": "string",
+      "format": "date"
+    },
+    "owner_name": {
+      "type": "string"
+    },
+    "source": {
+      "type": "string"
+    },
+    "notes": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "name"
+  ]
+}

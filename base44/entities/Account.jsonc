@@ -1,0 +1,55 @@
+{
+  "name": "Account",
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string"
+    },
+    "website": {
+      "type": "string"
+    },
+    "industry": {
+      "type": "string"
+    },
+    "phone": {
+      "type": "string"
+    },
+    "email": {
+      "type": "string"
+    },
+    "address": {
+      "type": "string"
+    },
+    "city": {
+      "type": "string"
+    },
+    "state": {
+      "type": "string"
+    },
+    "description": {
+      "type": "string"
+    },
+    "owner_name": {
+      "type": "string"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "lead",
+        "active",
+        "customer",
+        "churned"
+      ],
+      "default": "lead"
+    },
+    "annual_revenue": {
+      "type": "number"
+    },
+    "employees": {
+      "type": "number"
+    }
+  },
+  "required": [
+    "name"
+  ]
+}
