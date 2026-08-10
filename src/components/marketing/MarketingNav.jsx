@@ -5,9 +5,12 @@ import { cn } from "@/lib/utils";
 
 const LINKS = [
   { to: "/#services", label: "Services" },
+  { to: "/#industries", label: "Industries" },
+  { to: "/#methodology", label: "Method" },
   { to: "/#pricing", label: "Pricing" },
   { to: "/#process", label: "Process" },
   { to: "/#about", label: "About" },
+  { to: "/#faq", label: "FAQ" },
   { to: "/#contact", label: "Contact" },
 ];
 

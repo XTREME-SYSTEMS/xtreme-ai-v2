@@ -2,9 +2,38 @@ import { MapPin, Phone } from "lucide-react";
 import { Link } from "react-router-dom";
 
 const COLS = [
-  { title: "Services", links: ["AI Services", "AI Consulting", "Website Creation", "SEO", "AEO", "Marketing"] },
-  { title: "Company", links: ["About", "Process", "Pricing", "Contact", "Careers"] },
-  { title: "Portal", links: ["Client Login", "Book a Call", "Support", "Approvals"] },
+  {
+    title: "Services",
+    links: [
+      { label: "AI Services", to: "/#services" },
+      { label: "AI Consulting", to: "/#services" },
+      { label: "Website Creation", to: "/#services" },
+      { label: "SEO Services", to: "/#services" },
+      { label: "AEO Services", to: "/#services" },
+      { label: "Marketing", to: "/#services" },
+    ],
+  },
+  {
+    title: "Company",
+    links: [
+      { label: "About", to: "/#about" },
+      { label: "Methodology", to: "/#methodology" },
+      { label: "Industries", to: "/#industries" },
+      { label: "Process", to: "/#process" },
+      { label: "Pricing", to: "/pricing" },
+      { label: "FAQ", to: "/#faq" },
+      { label: "Contact", to: "/#contact" },
+    ],
+  },
+  {
+    title: "Portal",
+    links: [
+      { label: "Client Login", to: "/dashboard" },
+      { label: "Book a Call", to: "/#contact" },
+      { label: "AI Tools", to: "/#ai-tools" },
+      { label: "Get Started", to: "/pricing" },
+    ],
+  },
 ];
 
 export default function MarketingFooter() {
@@ -27,14 +56,19 @@ export default function MarketingFooter() {
             <div key={c.title}>
               <div className="text-sm font-bold text-black">{c.title}</div>
               <ul className="mt-3 space-y-2">
-                {c.links.map((l) => <li key={l}><a href="#" className="text-sm text-black/60 transition-colors hover:text-lime-600">{l}</a></li>)}
+                {c.links.map((l) => <li key={l.label}><Link to={l.to} className="text-sm text-black/60 transition-colors hover:text-lime-600">{l.label}</Link></li>)}
               </ul>
             </div>
           ))}
         </div>
-        <div className="mt-10 flex flex-col items-center justify-between gap-3 border-t border-black/10 pt-6 sm:flex-row">
-          <p className="text-xs text-black/40">© {new Date().getFullYear()} Lead Generation Near You. All rights reserved.</p>
-          <p className="text-xs text-black/40">Powered by AI · Built by Chris Lavin & Jeremy Bensen</p>
+        <div className="mt-10 border-t border-black/10 pt-6">
+          <p className="text-center text-xs text-black/40">
+            Lead Generation Near You — AI-powered lead generation services, AI consulting, website creation, SEO, and AEO for local businesses in Pompano Beach, Fort Lauderdale, Miami, and nationwide. We throw the book at your growth.
+          </p>
+          <div className="mt-3 flex flex-col items-center justify-between gap-3 sm:flex-row">
+            <p className="text-xs text-black/40">© {new Date().getFullYear()} Lead Generation Near You. All rights reserved.</p>
+            <p className="text-xs text-black/40">Powered by AI · Built by Chris Lavin & Jeremy Bensen</p>
+          </div>
         </div>
       </div>
     </footer>
