@@ -1,8 +1,10 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.40';
+import { dispatch } from '../../shared/generation.ts';
 
 // 5-Minute Heartbeat — processes due GenerationJob queue entries.
-// Per VERCEL_5MIN_WORKFLOW.md: process due jobs (not blindly run every integration),
-// idempotency, max retries, exponential backoff, dead-letter queue, every run writes a receipt.
+// Dispatches each job by job_type to the shared generation engine, which runs the
+// AI work, persists results, enqueues the next phase, and writes a receipt.
+// Queue mechanics: idempotency, max retries, exponential backoff, dead-letter queue.
 // Production locks: never bypasses gates for domain purchase, DNS, deploy, paid media, messaging, payments, secrets.
 
 export default async function(req) {
@@ -33,19 +35,15 @@ export default async function(req) {
         // Mark as running
         await sr.entities.GenerationJob.update(job.id, { status: "running", attempt_count: attempt });
 
-        // Write receipt for this processing step
-        await sr.entities.Receipt.create({
-          agent_or_workflow: "5min_heartbeat",
-          action: `process_${job.job_type || "job"}`,
-          entity_type: "GenerationJob",
-          entity_id: job.id,
-          status: "success",
-          inputs: JSON.stringify({ job_type: job.job_type, attempt, idempotency_key: job.idempotency_key }).slice(0, 2000),
-          outputs: JSON.stringify({ status: "complete" }).slice(0, 500),
-        });
+        // Execute the actual generation work for this job_type
+        const result = await dispatch(job, base44);
 
-        // Mark complete
-        await sr.entities.GenerationJob.update(job.id, { status: "complete", error: "" });
+        // Mark complete and store a trimmed output summary
+        await sr.entities.GenerationJob.update(job.id, {
+          status: "complete",
+          error: "",
+          output_ref: JSON.stringify(result).slice(0, 2000),
+        });
         completed++;
       } catch (e) {
         const errMsg = String(e).slice(0, 500);
