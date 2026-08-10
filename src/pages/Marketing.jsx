@@ -1,5 +1,6 @@
 import MarketingNav from "@/components/marketing/MarketingNav";
 import Hero from "@/components/marketing/Hero";
+import AITools from "@/components/marketing/AITools";
 import Services from "@/components/marketing/Services";
 import PricingSection from "@/components/marketing/PricingSection";
 import About from "@/components/marketing/About";
@@ -13,6 +14,7 @@ export default function Marketing() {
       <MarketingNav />
       <main>
         <Hero />
+        <AITools />
         <Services />
         <PricingSection />
         <Process />
