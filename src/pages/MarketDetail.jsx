@@ -3,7 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { base44 } from "@/api/base44Client";
 import { PageHeader, Panel, EmptyState } from "@/components/ui";
 import { useToast } from "@/components/ui/use-toast";
-import { MapPin, Sparkles, Loader2, Save, ArrowLeft, CheckCircle } from "lucide-react";
+import { MapPin, Sparkles, Loader2, Save, ArrowLeft, CheckCircle, Rocket, ExternalLink } from "lucide-react";
 
 export default function MarketDetail() {
   const { id } = useParams();
@@ -15,15 +15,18 @@ export default function MarketDetail() {
   const [loading, setLoading] = useState(true);
   const [gen, setGen] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [provisioning, setProvisioning] = useState(false);
+  const [provRec, setProvRec] = useState(null);
   const [form, setForm] = useState({});
 
   const loadAll = async () => {
-    const [m, seoList, jobList] = await Promise.all([
+    const [m, seoList, jobList, provList] = await Promise.all([
       base44.entities.Market.get(id),
       base44.entities.MarketSeo.filter({ market_id: id }),
       base44.entities.GenerationJob.filter({ market_id: id }),
+      base44.entities.ProvisioningRecord.filter({ market_id: id }),
     ]);
-    setMarket(m); setSeo(seoList[0] || null); setJobs(jobList); setForm(m || {});
+    setMarket(m); setSeo(seoList[0] || null); setJobs(jobList); setProvRec(provList[0] || null); setForm(m || {});
   };
 
   useEffect(() => { loadAll().finally(() => setLoading(false)); }, [id]);
@@ -42,6 +45,13 @@ export default function MarketDetail() {
     setSaving(false);
   };
 
+  const provision = async () => {
+    setProvisioning(true);
+    try { await base44.functions.invoke("provisionMarket", { market_id: id }); await loadAll(); toast({ title: "Site provisioned", description: "Repo, Drive, Supabase & Vercel created." }); }
+    catch (e) { toast({ title: "Provisioning failed", description: String(e.message || e), variant: "destructive" }); }
+    setProvisioning(false);
+  };
+
   if (loading) return <div className="flex items-center justify-center py-20"><Loader2 className="h-8 w-8 animate-spin text-lime-400" /></div>;
   if (!market) return <EmptyState icon={MapPin} title="Market not found" />;
 
@@ -50,7 +60,10 @@ export default function MarketDetail() {
   return (
     <div>
       <PageHeader title={market.public_business_name || market.brand_name || "Market"} subtitle={`${market.city}, ${market.state} · ${market.status} · /${market.slug}`}>
-        <button onClick={() => navigate("/markets")} className="inline-flex items-center gap-1 rounded-lg border border-white/15 px-3 py-2 text-sm text-white/70 hover:bg-white/5"><ArrowLeft className="h-4 w-4" /> Markets</button>
+        <div className="flex flex-wrap items-center gap-2">
+          <button onClick={provision} disabled={provisioning} className="inline-flex items-center gap-1.5 rounded-lg bg-lime-400 px-3.5 py-2 text-sm font-semibold text-black hover:bg-lime-300 disabled:opacity-50">{provisioning ? <Loader2 className="h-4 w-4 animate-spin" /> : <Rocket className="h-4 w-4" />} Provision Site</button>
+          <button onClick={() => navigate("/markets")} className="inline-flex items-center gap-1 rounded-lg border border-white/15 px-3 py-2 text-sm text-white/70 hover:bg-white/5"><ArrowLeft className="h-4 w-4" /> Markets</button>
+        </div>
       </PageHeader>
 
       <div className="grid gap-4 lg:grid-cols-2">
@@ -110,6 +123,36 @@ export default function MarketDetail() {
           )}
         </Panel>
       </div>
+
+      <div className="mt-4">
+        <Panel title="Auto-Provisioning" action={provRec?.status === "provisioned" ? <span className="inline-flex items-center gap-1 text-xs text-lime-400"><CheckCircle className="h-3.5 w-3.5" /> Provisioned</span> : <span className="text-xs text-white/40">{provRec?.status || "not started"}</span>}>
+          {!provRec ? <EmptyState icon={Rocket} title="Not provisioned yet" subtitle="Click Provision Site to auto-create the GitHub repo, Drive folder, Supabase project, and Vercel deployment." /> : (
+            <div className="space-y-3">
+              <div className="grid gap-3 sm:grid-cols-2">
+                <ProvisionLink label="GitHub repo" url={provRec.github_repo_url} value={provRec.github_repo} />
+                <ProvisionLink label="Drive folder" url={provRec.drive_folder_url} value={provRec.drive_folder_id} />
+                <ProvisionLink label="Supabase project" url={provRec.supabase_project_url} value={provRec.supabase_project_id} />
+                <ProvisionLink label="Vercel deployment" url={provRec.vercel_url} value={provRec.vercel_url} />
+              </div>
+              {provRec.error && <div className="rounded-lg border border-rose-500/30 bg-rose-500/10 p-3 text-sm text-rose-300">{provRec.error}</div>}
+              {provRec.logs && provRec.logs.length > 0 && (
+                <div><div className="mb-1 text-xs font-semibold uppercase tracking-wider text-white/40">Logs</div>
+                  <pre className="max-h-48 overflow-auto rounded-lg border border-white/10 bg-black p-3 text-xs text-white/50">{provRec.logs.join("\n")}</pre>
+                </div>
+              )}
+            </div>
+          )}
+        </Panel>
+      </div>
+    </div>
+  );
+}
+
+function ProvisionLink({ label, url, value }) {
+  return (
+    <div className="rounded-lg border border-white/10 bg-black p-3">
+      <div className="text-xs text-white/40">{label}</div>
+      {url ? <a href={url} target="_blank" rel="noreferrer" className="mt-0.5 inline-flex items-center gap-1 text-sm text-lime-300 hover:underline">{value || url} <ExternalLink className="h-3 w-3" /></a> : <div className="mt-0.5 text-sm text-white/30">{value || "—"}</div>}
     </div>
   );
 }
