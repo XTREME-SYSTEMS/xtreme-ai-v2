@@ -7,6 +7,7 @@ import {
   Hammer, ShieldCheck, FileText, TrendingUp, FlaskConical, Dna, Network,
   BookMarked, CheckCircle, ScrollText, Plug, Settings, LogOut, Menu, X,
 } from "lucide-react";
+import { Image } from "@/components/ui/image";
 import { cn } from "@/lib/utils";
 
 const NAV = [
@@ -60,24 +61,29 @@ export default function Layout() {
   };
 
   return (
-    <div className="flex h-screen bg-slate-950 text-slate-200">
+    <div className="flex h-screen bg-black text-white">
       {/* Sidebar */}
       <aside className={cn(
-        "fixed inset-y-0 left-0 z-40 w-64 transform border-r border-slate-800 bg-slate-900 transition-transform lg:static lg:translate-x-0",
+        "fixed inset-y-0 left-0 z-40 w-64 transform border-r border-white/10 bg-black transition-transform lg:static lg:translate-x-0",
         open ? "translate-x-0" : "-translate-x-full"
       )}>
-        <div className="flex h-14 items-center gap-2 border-b border-slate-800 px-4">
-          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-cyan-500 to-violet-600 text-sm font-bold text-white">LG</div>
+        <div className="flex h-14 items-center gap-2 border-b border-white/10 px-4">
+          <Image
+            src="https://media.base44.com/images/public/6a79444e821211169a147eee/708cd67ef_ChatGPTImageAug9202611_49_11PM.png"
+            alt="Lead Gen Near You"
+            className="h-8 w-8"
+            fittingType="fit"
+          />
           <div className="leading-tight">
             <div className="text-sm font-semibold text-white">Lead Gen Near You</div>
-            <div className="text-[10px] uppercase tracking-wider text-cyan-400">Growth Factory</div>
+            <div className="text-[10px] uppercase tracking-wider text-lime-400">Growth Factory</div>
           </div>
-          <button onClick={() => setOpen(false)} className="ml-auto lg:hidden text-slate-400 hover:text-white"><X className="h-5 w-5" /></button>
+          <button onClick={() => setOpen(false)} className="ml-auto lg:hidden text-white/50 hover:text-white"><X className="h-5 w-5" /></button>
         </div>
         <nav className="h-[calc(100vh-3.5rem)] overflow-y-auto px-2 py-3">
           {NAV.map((item, i) => {
             if (item.section) {
-              return <div key={i} className="mt-4 mb-1 px-2 text-[10px] font-semibold uppercase tracking-wider text-slate-600">{item.section}</div>;
+              return <div key={i} className="mt-4 mb-1 px-2 text-[10px] font-semibold uppercase tracking-wider text-white/30">{item.section}</div>;
             }
             const Icon = item.icon;
             return (
@@ -88,7 +94,7 @@ export default function Layout() {
                 onClick={() => setOpen(false)}
                 className={({ isActive }) => cn(
                   "flex items-center gap-2.5 rounded-lg px-2.5 py-2 text-sm transition-colors",
-                  isActive ? "bg-cyan-500/10 text-cyan-300 font-medium" : "text-slate-400 hover:bg-slate-800 hover:text-slate-200"
+                  isActive ? "bg-lime-400/10 text-lime-300 font-medium" : "text-white/50 hover:bg-white/5 hover:text-white"
                 )}
               >
                 <Icon className="h-4 w-4 shrink-0" />
@@ -99,19 +105,19 @@ export default function Layout() {
         </nav>
       </aside>
 
-      {open && <div className="fixed inset-0 z-30 bg-black/50 lg:hidden" onClick={() => setOpen(false)} />}
+      {open && <div className="fixed inset-0 z-30 bg-black/70 lg:hidden" onClick={() => setOpen(false)} />}
 
       {/* Main */}
       <div className="flex flex-1 flex-col overflow-hidden">
-        <header className="flex h-14 items-center gap-3 border-b border-slate-800 bg-slate-900/80 px-4 backdrop-blur">
-          <button onClick={() => setOpen(true)} className="lg:hidden text-slate-400 hover:text-white"><Menu className="h-5 w-5" /></button>
+        <header className="flex h-14 items-center gap-3 border-b border-white/10 bg-black/80 px-4 backdrop-blur">
+          <button onClick={() => setOpen(true)} className="lg:hidden text-white/50 hover:text-white"><Menu className="h-5 w-5" /></button>
           <div className="flex items-center gap-2 text-xs">
-            <span className="rounded-md border border-cyan-500/30 bg-cyan-500/10 px-2 py-1 font-mono text-cyan-300">THROW THE BOOK AT IT</span>
-            <span className="hidden text-slate-500 sm:inline">Architecture → Preview Build · Production locked</span>
+            <span className="rounded-md border border-lime-400/30 bg-lime-400/10 px-2 py-1 font-mono text-lime-300">THROW THE BOOK AT IT</span>
+            <span className="hidden text-white/40 sm:inline">Architecture → Preview Build · Production locked</span>
           </div>
           <div className="ml-auto flex items-center gap-3">
-            <span className="hidden text-xs text-slate-400 sm:inline">{user?.email || ""}</span>
-            <button onClick={logout} className="flex items-center gap-1.5 rounded-lg border border-slate-800 px-2.5 py-1.5 text-xs text-slate-300 hover:bg-slate-800">
+            <span className="hidden text-xs text-white/50 sm:inline">{user?.email || ""}</span>
+            <button onClick={logout} className="flex items-center gap-1.5 rounded-lg border border-white/15 px-2.5 py-1.5 text-xs text-white/80 hover:bg-white/5">
               <LogOut className="h-3.5 w-3.5" /> Sign out
             </button>
           </div>

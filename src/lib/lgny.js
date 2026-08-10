@@ -308,7 +308,7 @@ export async function generateProposal(build) {
 
 export const STATUS_COLORS = {
   discovered: "bg-blue-500/15 text-blue-300 border-blue-500/30",
-  enriched: "bg-cyan-500/15 text-cyan-300 border-cyan-500/30",
+  enriched: "bg-lime-400/15 text-lime-300 border-lime-400/30",
   audited: "bg-violet-500/15 text-violet-300 border-violet-500/30",
   qualified: "bg-amber-500/15 text-amber-300 border-amber-500/30",
   in_build: "bg-orange-500/15 text-orange-300 border-orange-500/30",
@@ -324,7 +324,7 @@ export const STATUS_COLORS = {
   complete: "bg-emerald-500/15 text-emerald-300 border-emerald-500/30",
   failed: "bg-rose-500/15 text-rose-300 border-rose-500/30",
   built: "bg-emerald-500/15 text-emerald-300 border-emerald-500/30",
-  composed: "bg-cyan-500/15 text-cyan-300 border-cyan-500/30",
+  composed: "bg-lime-400/15 text-lime-300 border-lime-400/30",
   validated: "bg-emerald-500/15 text-emerald-300 border-emerald-500/30",
   repairing: "bg-orange-500/15 text-orange-300 border-orange-500/30",
   deployed: "bg-emerald-500/15 text-emerald-300 border-emerald-500/30",

@@ -8,11 +8,11 @@ export default function ScoreBar({ value, max = 100, label, className }) {
     <div className={cn("space-y-1", className)}>
       {label && (
         <div className="flex justify-between text-xs">
-          <span className="text-slate-400">{label}</span>
-          <span className="font-mono text-slate-300">{Math.round(v)}</span>
+          <span className="text-white/50">{label}</span>
+          <span className="font-mono text-white/80">{Math.round(v)}</span>
         </div>
       )}
-      <div className="h-1.5 w-full rounded-full bg-slate-800 overflow-hidden">
+      <div className="h-1.5 w-full rounded-full bg-white/10 overflow-hidden">
         <div className={cn("h-full rounded-full transition-all", color)} style={{ width: `${pct}%` }} />
       </div>
     </div>
