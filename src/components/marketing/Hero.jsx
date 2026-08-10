@@ -1,12 +1,8 @@
 import { motion } from "framer-motion";
-import { MapPin, ArrowRight, Phone, Sparkles, ChevronDown, Bot, Zap } from "lucide-react";
-import { Link } from "react-router-dom";
-import { Image } from "@/components/ui/image";
+import { MapPin, ArrowRight, Phone, Sparkles, ChevronDown } from "lucide-react";
 
-const VIDEO_URL = "https://media.base44.com/videos/public/6a79444e821211169a147eee/6a6ae0fb3_Hero_Background.mp4";
-const IMG_DASHBOARD = "https://media.base44.com/images/public/6a79444e821211169a147eee/3f97873a3_generated_image.png";
-const IMG_PIN = "https://media.base44.com/images/public/6a79444e821211169a147eee/08ed2f21f_generated_image.png";
-const IMG_NEURAL = "https://media.base44.com/images/public/6a79444e821211169a147eee/70da58faa3_generated_image.png";
+const VIDEO_URL = "https://media.base44.com/videos/public/6a79444e821211169a147eee/cd321f311_Lead_Gen_Hero.mp4";
+const POSTER = "https://media.base44.com/images/public/6a79444e821211169a147eee/08ed2f21f_generated_image.png";
 
 const STATS = [
   { value: "50+", label: "Years Combined Experience" },
@@ -17,46 +13,17 @@ const STATS = [
 export default function Hero() {
   return (
     <section className="relative min-h-screen overflow-hidden bg-black">
-      {/* Video background */}
-      <video autoPlay muted loop playsInline className="absolute inset-0 h-full w-full object-cover opacity-40" poster={IMG_PIN}>
+      {/* Full-bleed video background */}
+      <video autoPlay muted loop playsInline className="absolute inset-0 h-full w-full object-cover" poster={POSTER}>
         <source src={VIDEO_URL} type="video/mp4" />
       </video>
-      <div className="absolute inset-0 bg-gradient-to-b from-black/80 via-black/60 to-black" />
-      <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-transparent to-black/80" />
 
-      {/* Floating image cards — desktop only */}
-      <motion.div className="absolute left-6 top-[18%] hidden w-52 lg:block xl:w-64"
-        initial={{ opacity: 0, x: -40 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.6, duration: 0.7 }}>
-        <motion.div animate={{ y: [0, -14, 0] }} transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}>
-          <div className="overflow-hidden rounded-2xl border border-lime-400/30 shadow-2xl shadow-lime-400/10 transition-transform hover:scale-105">
-            <Image src={IMG_DASHBOARD} alt="AI-powered analytics dashboard with growth visualizations" className="aspect-[4/3] w-full" fittingType="fill" />
-          </div>
-          <div className="mt-2 flex items-center gap-1.5 rounded-lg bg-black/60 px-2 py-1 backdrop-blur-sm"><Bot className="h-3.5 w-3.5 text-lime-400" /><span className="text-[10px] font-medium text-white/80">AI Dashboard</span></div>
-        </motion.div>
-      </motion.div>
-
-      <motion.div className="absolute right-6 top-[12%] hidden w-44 lg:block xl:w-56"
-        initial={{ opacity: 0, x: 40 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.8, duration: 0.7 }}>
-        <motion.div animate={{ y: [0, 16, 0] }} transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}>
-          <div className="overflow-hidden rounded-2xl border border-lime-400/30 shadow-2xl shadow-lime-400/10 transition-transform hover:scale-105">
-            <Image src={IMG_PIN} alt="Glowing location pin representing local lead generation" className="aspect-square w-full" fittingType="fill" />
-          </div>
-          <div className="mt-2 flex items-center gap-1.5 rounded-lg bg-black/60 px-2 py-1 backdrop-blur-sm"><MapPin className="h-3.5 w-3.5 text-lime-400" /><span className="text-[10px] font-medium text-white/80">Local Targeting</span></div>
-        </motion.div>
-      </motion.div>
-
-      <motion.div className="absolute bottom-[14%] right-[14%] hidden w-40 lg:block xl:w-52"
-        initial={{ opacity: 0, y: 40 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 1.0, duration: 0.7 }}>
-        <motion.div animate={{ y: [0, -12, 0] }} transition={{ duration: 4.5, repeat: Infinity, ease: "easeInOut", delay: 0.5 }}>
-          <div className="overflow-hidden rounded-2xl border border-lime-400/30 shadow-2xl shadow-lime-400/10 transition-transform hover:scale-105">
-            <Image src={IMG_NEURAL} alt="AI neural network powering the growth operating system" className="aspect-[4/3] w-full" fittingType="fill" />
-          </div>
-          <div className="mt-2 flex items-center gap-1.5 rounded-lg bg-black/60 px-2 py-1 backdrop-blur-sm"><Zap className="h-3.5 w-3.5 text-lime-400" /><span className="text-[10px] font-medium text-white/80">AI Engine</span></div>
-        </motion.div>
-      </motion.div>
+      {/* Darkening overlays for text legibility */}
+      <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/50 to-black" />
+      <div className="absolute inset-0 bg-gradient-to-r from-black/60 via-transparent to-black/60" />
 
       {/* Center content */}
-      <div className="relative z-10 mx-auto flex min-h-screen max-w-3xl flex-col items-center justify-center px-4 py-24 text-center sm:px-6">
+      <div className="relative z-10 mx-auto flex min-h-screen max-w-4xl flex-col items-center justify-center px-4 py-24 text-center sm:px-6">
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}
           className="mb-6 inline-flex items-center gap-2 rounded-full border border-lime-400/30 bg-lime-400/10 px-4 py-1.5 backdrop-blur-sm">
           <Sparkles className="h-3.5 w-3.5 text-lime-400" />
@@ -79,7 +46,7 @@ export default function Hero() {
         </motion.h1>
 
         <motion.p initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5, duration: 0.6 }}
-          className="mt-7 max-w-xl text-lg text-white/70 sm:text-xl">
+          className="mt-7 max-w-xl text-lg text-white/80 sm:text-xl">
           AI services, website creation, SEO, AEO, and marketing — engineered into one approval-gated operating system that delivers real leads, not vanity metrics.
         </motion.p>
 
@@ -105,8 +72,7 @@ export default function Hero() {
       </div>
 
       {/* Scroll indicator */}
-      <motion.div className="absolute bottom-6 left-1/2 -translate-x-1/2"
-        initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1.5 }}>
+      <motion.div className="absolute bottom-6 left-1/2 -translate-x-1/2" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1.5 }}>
         <motion.div animate={{ y: [0, 8, 0] }} transition={{ duration: 1.8, repeat: Infinity }}>
           <ChevronDown className="h-6 w-6 text-white/40" />
         </motion.div>
