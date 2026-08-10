@@ -29,6 +29,7 @@ import BuildQueue from '@/pages/BuildQueue';
 import PreviewFactory from '@/pages/PreviewFactory';
 import QARepair from '@/pages/QARepair';
 import ProposalFactory from '@/pages/ProposalFactory';
+import TestLab from '@/pages/TestLab';
 import SalesPipeline from '@/pages/SalesPipeline';
 import Experiments from '@/pages/Experiments';
 import IndustryDNA from '@/pages/IndustryDNA';
@@ -99,6 +100,7 @@ const AuthenticatedApp = () => {
           <Route path="/preview-factory" element={<PreviewFactory />} />
           <Route path="/qa-repair" element={<QARepair />} />
           <Route path="/proposals" element={<ProposalFactory />} />
+          <Route path="/test-lab" element={<TestLab />} />
           <Route path="/pipeline" element={<SalesPipeline />} />
           <Route path="/experiments" element={<Experiments />} />
           <Route path="/industry-dna" element={<IndustryDNA />} />

@@ -40,6 +40,8 @@ const NAV = [
   { to: "/industry-dna", label: "Industry DNA", icon: Dna },
   { to: "/website-genomes", label: "Website Genome", icon: Network },
   { to: "/playbooks", label: "Playbooks", icon: BookMarked },
+  { section: "Lab" },
+  { to: "/test-lab", label: "Test Lab", icon: FlaskConical },
   { section: "Governance" },
   { to: "/approvals", label: "Approvals", icon: CheckCircle },
   { to: "/receipts", label: "Receipts", icon: ScrollText },
