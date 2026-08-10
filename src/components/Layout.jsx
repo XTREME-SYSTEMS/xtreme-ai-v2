@@ -6,6 +6,7 @@ import {
   Lightbulb, Palette, Monitor, Megaphone, Boxes, Factory, Database, Eye,
   Hammer, ShieldCheck, FileText, TrendingUp, FlaskConical, Dna, Network,
   BookMarked, CheckCircle, ScrollText, Plug, Settings, LogOut, Menu, X,
+  MapPin, Plus,
 } from "lucide-react";
 import { Image } from "@/components/ui/image";
 import { cn } from "@/lib/utils";
@@ -40,6 +41,9 @@ const NAV = [
   { to: "/industry-dna", label: "Industry DNA", icon: Dna },
   { to: "/website-genomes", label: "Website Genome", icon: Network },
   { to: "/playbooks", label: "Playbooks", icon: BookMarked },
+  { section: "Site Factory" },
+  { to: "/markets", label: "Markets", icon: MapPin },
+  { to: "/markets/new", label: "New Market", icon: Plus },
   { section: "Lab" },
   { to: "/test-lab", label: "Test Lab", icon: FlaskConical },
   { section: "Governance" },

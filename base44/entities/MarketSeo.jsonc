@@ -1,0 +1,66 @@
+{
+  "name": "MarketSeo",
+  "type": "object",
+  "properties": {
+    "market_id": {
+      "type": "string"
+    },
+    "meta_title": {
+      "type": "string"
+    },
+    "meta_description": {
+      "type": "string"
+    },
+    "canonical_url": {
+      "type": "string"
+    },
+    "og_title": {
+      "type": "string"
+    },
+    "og_description": {
+      "type": "string"
+    },
+    "json_ld": {
+      "type": "object",
+      "additionalProperties": true
+    },
+    "faq": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "question": {
+            "type": "string"
+          },
+          "answer": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "cost_page_content": {
+      "type": "string"
+    },
+    "location_page_content": {
+      "type": "string"
+    },
+    "how_it_works_content": {
+      "type": "string"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "generating",
+        "ready",
+        "error"
+      ],
+      "default": "generating"
+    },
+    "error": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "market_id"
+  ]
+}

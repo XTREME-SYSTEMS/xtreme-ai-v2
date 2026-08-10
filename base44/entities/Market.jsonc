@@ -1,0 +1,99 @@
+{
+  "name": "Market",
+  "type": "object",
+  "properties": {
+    "slug": {
+      "type": "string"
+    },
+    "city": {
+      "type": "string"
+    },
+    "state": {
+      "type": "string"
+    },
+    "brand_name": {
+      "type": "string"
+    },
+    "public_business_name": {
+      "type": "string"
+    },
+    "phone": {
+      "type": "string"
+    },
+    "email": {
+      "type": "string"
+    },
+    "service_area_description": {
+      "type": "string"
+    },
+    "latitude": {
+      "type": "number"
+    },
+    "longitude": {
+      "type": "number"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "draft",
+        "ready",
+        "published"
+      ],
+      "default": "draft"
+    },
+    "domain": {
+      "type": "string"
+    },
+    "brand_colors": {
+      "type": "object",
+      "properties": {
+        "primary": {
+          "type": "string"
+        },
+        "accent": {
+          "type": "string"
+        }
+      }
+    },
+    "salesperson": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "title": {
+          "type": "string"
+        },
+        "bio": {
+          "type": "string"
+        },
+        "phone": {
+          "type": "string"
+        },
+        "photo_url": {
+          "type": "string"
+        }
+      }
+    },
+    "google_rating": {
+      "type": "number"
+    },
+    "google_review_count": {
+      "type": "number"
+    },
+    "hero_image_url": {
+      "type": "string"
+    },
+    "gallery_images": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    }
+  },
+  "required": [
+    "slug",
+    "city",
+    "state"
+  ]
+}

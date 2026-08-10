@@ -2,50 +2,47 @@
   "name": "GenerationJob",
   "type": "object",
   "properties": {
-    "build_id": {
-      "type": "string"
-    },
-    "generator_id": {
+    "market_id": {
       "type": "string"
     },
     "job_type": {
-      "type": "string"
-    },
-    "idempotency_key": {
-      "type": "string"
+      "type": "string",
+      "enum": [
+        "seo",
+        "pricing",
+        "competitors",
+        "images",
+        "full"
+      ],
+      "default": "full"
     },
     "status": {
       "type": "string",
       "enum": [
         "queued",
         "running",
-        "complete",
-        "failed",
-        "dead_letter"
+        "done",
+        "failed"
       ],
       "default": "queued"
     },
-    "attempt_count": {
-      "type": "number",
-      "default": 0
+    "result_summary": {
+      "type": "string"
     },
-    "next_attempt_at": {
+    "started_at": {
       "type": "string",
       "format": "date-time"
     },
-    "input_ref": {
-      "type": "string"
-    },
-    "output_ref": {
-      "type": "string"
+    "finished_at": {
+      "type": "string",
+      "format": "date-time"
     },
     "error": {
       "type": "string"
     }
   },
   "required": [
-    "build_id",
-    "generator_id",
+    "market_id",
     "job_type"
   ]
 }

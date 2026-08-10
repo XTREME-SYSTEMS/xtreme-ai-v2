@@ -1,0 +1,83 @@
+{
+  "name": "MarketPricing",
+  "type": "object",
+  "properties": {
+    "market_id": {
+      "type": "string"
+    },
+    "systems": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "key": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "price_per_sqft": {
+            "type": "number"
+          }
+        }
+      }
+    },
+    "size_defaults": {
+      "type": "object",
+      "additionalProperties": true
+    },
+    "condition_adjustments": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "key": {
+            "type": "string"
+          },
+          "label": {
+            "type": "string"
+          },
+          "percent": {
+            "type": "number"
+          }
+        }
+      }
+    },
+    "minimum_project_price": {
+      "type": "number"
+    },
+    "range_low_percent": {
+      "type": "number"
+    },
+    "range_high_percent": {
+      "type": "number"
+    },
+    "packages": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "key": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "price_per_sqft": {
+            "type": "number"
+          },
+          "description": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "is_test_pricing": {
+      "type": "boolean",
+      "default": false
+    }
+  },
+  "required": [
+    "market_id"
+  ]
+}

@@ -1,0 +1,57 @@
+{
+  "name": "CompetitorInsight",
+  "type": "object",
+  "properties": {
+    "market_id": {
+      "type": "string"
+    },
+    "type": {
+      "type": "string",
+      "enum": [
+        "competitor",
+        "backlink_opportunity"
+      ],
+      "default": "competitor"
+    },
+    "competitor_name": {
+      "type": "string"
+    },
+    "url": {
+      "type": "string"
+    },
+    "price_per_sqft_low": {
+      "type": "number"
+    },
+    "price_per_sqft_high": {
+      "type": "number"
+    },
+    "services": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "strengths": {
+      "type": "string"
+    },
+    "weaknesses": {
+      "type": "string"
+    },
+    "backlink_targets": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "content_gaps": {
+      "type": "string"
+    },
+    "recommendation": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "market_id",
+    "type"
+  ]
+}
