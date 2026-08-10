@@ -41,6 +41,7 @@ import Marketing from '@/pages/Marketing';
 import Pricing from '@/pages/Pricing';
 import ThankYou from '@/pages/ThankYou';
 import SeoLanding from '@/pages/SeoLanding';
+import CouponPage from '@/pages/CouponPage';
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
@@ -72,6 +73,7 @@ const AuthenticatedApp = () => {
       <Route path="/pricing" element={<Pricing />} />
       <Route path="/ThankYou" element={<ThankYou />} />
       <Route path="/seo/:slug" element={<SeoLanding />} />
+      <Route path="/coupon" element={<CouponPage />} />
       <Route element={<ProtectedRoute unauthenticatedElement={<Navigate to="/login" replace />} />}>
         <Route element={<Layout />}>
           <Route path="/dashboard" element={<CommandCenter />} />

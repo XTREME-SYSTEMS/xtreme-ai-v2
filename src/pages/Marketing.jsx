@@ -9,6 +9,8 @@ import About from "@/components/marketing/About";
 import Process from "@/components/marketing/Process";
 import FAQ from "@/components/marketing/FAQ";
 import Contact from "@/components/marketing/Contact";
+import Partners from "@/components/marketing/Partners";
+import PWAInstallBar from "@/components/marketing/PWAInstallBar";
 import MarketingFooter from "@/components/marketing/MarketingFooter";
 
 export default function Marketing() {
@@ -21,13 +23,16 @@ export default function Marketing() {
         <Services />
         <Methodology />
         <Industries />
+        <Partners />
         <PricingSection />
         <Process />
         <About />
         <FAQ />
         <Contact />
       </main>
+      <div className="h-16" />
       <MarketingFooter />
+      <PWAInstallBar />
     </div>
   );
 }

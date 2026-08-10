@@ -1,0 +1,33 @@
+{
+  "name": "Industry",
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string"
+    },
+    "parent_industry": {
+      "type": "string"
+    },
+    "level": {
+      "type": "string",
+      "enum": [
+        "industry",
+        "sub_industry"
+      ],
+      "default": "industry"
+    },
+    "keywords": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "description": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "name",
+    "level"
+  ]
+}

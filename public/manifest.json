@@ -1,0 +1,15 @@
+{
+  "name": "Lead Generation Near You",
+  "short_name": "Lead Gen Near You",
+  "description": "AI-powered growth operating system — AI services, websites, SEO, AEO, and marketing for local businesses.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#000000",
+  "theme_color": "#000000",
+  "orientation": "portrait-primary",
+  "icons": [
+    { "src": "https://media.base44.com/images/public/6a79444e821211169a147eee/9c09fe1c6_generated_image.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" },
+    { "src": "https://media.base44.com/images/public/6a79444e821211169a147eee/9c09fe1c6_generated_image.png", "sizes": "192x192", "type": "image/png", "purpose": "any" }
+  ]
+}

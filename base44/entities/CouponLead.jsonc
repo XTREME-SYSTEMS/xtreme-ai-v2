@@ -1,0 +1,33 @@
+{
+  "name": "CouponLead",
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string"
+    },
+    "email": {
+      "type": "string"
+    },
+    "phone": {
+      "type": "string"
+    },
+    "coupon_code": {
+      "type": "string"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "new",
+        "emailed",
+        "redeemed"
+      ],
+      "default": "new"
+    },
+    "source": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "email"
+  ]
+}
