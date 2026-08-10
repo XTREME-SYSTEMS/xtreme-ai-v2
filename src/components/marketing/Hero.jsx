@@ -1,8 +1,8 @@
 import { motion } from "framer-motion";
 import { MapPin, ArrowRight, Phone, Sparkles, ChevronDown } from "lucide-react";
 
-const VIDEO_URL = "https://media.base44.com/videos/public/6a79444e821211169a147eee/c3c9895fd_Lead_Gen_Hero_v2.mp4";
-const POSTER = "https://media.base44.com/images/public/6a79444e821211169a147eee/08ed2f21f_generated_image.png";
+const VIDEO_URL = "https://media.base44.com/videos/public/6a79444e821211169a147eee/c3c9895fd_Lead_Gen_Hero_v2.mp4?v=3";
+const POSTER = "https://media.base44.com/images/public/6a79444e821211169a147eee/3ef1d67ff_generated_image.png";
 
 const STATS = [
   { value: "50+", label: "Years Combined Experience" },
