@@ -84,7 +84,7 @@ export default function Layout() {
         <nav className="h-[calc(100vh-3.5rem)] overflow-y-auto px-2 py-3">
           {NAV.map((item, i) => {
             if (item.section) {
-              return <div key={i} className="mt-4 mb-1 px-2 text-[10px] font-semibold uppercase tracking-wider text-white/30">{item.section}</div>;
+              return <div key={i} className="mt-4 mb-1 px-2 text-[10px] font-semibold uppercase tracking-wider text-white">{item.section}</div>;
             }
             const Icon = item.icon;
             return (
@@ -95,7 +95,7 @@ export default function Layout() {
                 onClick={() => setOpen(false)}
                 className={({ isActive }) => cn(
                   "flex items-center gap-2.5 rounded-lg px-2.5 py-2 text-sm transition-colors",
-                  isActive ? "bg-lime-400/10 text-lime-300 font-medium" : "text-white/50 hover:bg-white/5 hover:text-white"
+                  isActive ? "bg-lime-400/10 text-white font-medium" : "text-white hover:bg-white/5"
                 )}
               >
                 <Icon className="h-4 w-4 shrink-0" />
