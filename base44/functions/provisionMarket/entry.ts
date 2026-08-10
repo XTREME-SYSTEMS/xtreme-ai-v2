@@ -11,8 +11,10 @@ import { generateSiteFiles, provisionGithub, provisionDrive, provisionSupabase, 
 export default async function(req) {
   try {
     const base44 = createClientFromRequest(req);
-    const user = await base44.auth.me();
-    if (!user || user.role !== "admin") return Response.json({ error: "Admin only" }, { status: 403 });
+    // Allow admin (dashboard) or system context (workflow trigger has no user session).
+    let user = null;
+    try { user = await base44.auth.me(); } catch (e) { /* workflow context — no user */ }
+    if (user && user.role !== "admin") return Response.json({ error: "Admin only" }, { status: 403 });
     const body = await req.json().catch(() => ({}));
     const { market_id } = body || {};
     if (!market_id) return Response.json({ error: "market_id required" }, { status: 400 });

@@ -1,0 +1,41 @@
+{
+  "name": "Auto-Provision Market",
+  "description": "When a Market is marked ready, automatically provision the GitHub repo, Drive folder, Supabase project, and Vercel deployment via provisionMarket.",
+  "trigger": {
+    "config": {
+      "trigger_type": "entity",
+      "entity_name": "Market",
+      "events": [
+        "create",
+        "update"
+      ]
+    },
+    "condition": "${ .trigger.data.status == \"ready\" and (.trigger.event_type == \"create\" or .trigger.old_data.status != \"ready\") }"
+  },
+  "definition": {
+    "document": {
+      "dsl": "1.0.0",
+      "name": "auto_provision_market",
+      "version": "1.0",
+      "namespace": "base44"
+    },
+    "do": [
+      {
+        "provision": {
+          "call": "invoke_backend_function",
+          "with": {
+            "function_name": "provisionMarket",
+            "args": {
+              "market_id": "${ .trigger.entity_id }"
+            }
+          },
+          "then": "end",
+          "x-base44": {
+            "title": "Provision site",
+            "description": "GitHub + Drive + Supabase + Vercel"
+          }
+        }
+      }
+    ]
+  }
+}
