@@ -33,6 +33,7 @@ import TestLab from '@/pages/TestLab';
 import Markets from '@/pages/Markets';
 import NewMarket from '@/pages/NewMarket';
 import MarketDetail from '@/pages/MarketDetail';
+import SeoLaunchPad from '@/pages/SeoLaunchPad';
 import SalesPipeline from '@/pages/SalesPipeline';
 import Experiments from '@/pages/Experiments';
 import IndustryDNA from '@/pages/IndustryDNA';
@@ -107,6 +108,7 @@ const AuthenticatedApp = () => {
           <Route path="/markets" element={<Markets />} />
           <Route path="/markets/new" element={<NewMarket />} />
           <Route path="/markets/:id" element={<MarketDetail />} />
+          <Route path="/seo-launch-pad" element={<SeoLaunchPad />} />
           <Route path="/pipeline" element={<SalesPipeline />} />
           <Route path="/experiments" element={<Experiments />} />
           <Route path="/industry-dna" element={<IndustryDNA />} />

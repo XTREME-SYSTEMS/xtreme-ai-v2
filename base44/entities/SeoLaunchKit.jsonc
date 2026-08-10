@@ -1,0 +1,97 @@
+{
+  "name": "SeoLaunchKit",
+  "type": "object",
+  "properties": {
+    "market_id": {
+      "type": "string"
+    },
+    "gbp_name": {
+      "type": "string"
+    },
+    "gbp_category": {
+      "type": "string"
+    },
+    "gbp_description": {
+      "type": "string"
+    },
+    "gbp_services": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "gbp_hours": {
+      "type": "string"
+    },
+    "gbp_service_area": {
+      "type": "string"
+    },
+    "gsc_property_url": {
+      "type": "string"
+    },
+    "gsc_verification_meta": {
+      "type": "string"
+    },
+    "sitemap_url": {
+      "type": "string"
+    },
+    "sitemap_xml": {
+      "type": "string"
+    },
+    "robots_txt": {
+      "type": "string"
+    },
+    "ga_measurement_id": {
+      "type": "string"
+    },
+    "ga_tag_snippet": {
+      "type": "string"
+    },
+    "citation_list": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "directory": {
+            "type": "string"
+          },
+          "url": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "launch_checklist": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "task": {
+            "type": "string"
+          },
+          "done": {
+            "type": "boolean"
+          }
+        }
+      }
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "generating",
+        "ready",
+        "error"
+      ],
+      "default": "generating"
+    },
+    "error": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "market_id"
+  ]
+}
