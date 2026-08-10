@@ -27,11 +27,11 @@ export default function Pricing() {
       <MarketingNav />
       <main className="pt-16">
         <section className="relative overflow-hidden bg-black">
-          <video autoPlay muted loop playsInline className="absolute inset-0 h-full w-full object-cover opacity-50"
+          <video autoPlay muted loop playsInline className="absolute inset-0 h-full w-full object-cover opacity-80"
             poster="https://media.base44.com/images/public/6a79444e821211169a147eee/3ef1d67ff_generated_image.png">
             <source src="https://media.base44.com/videos/public/6a79444e821211169a147eee/c3c9895fd_Lead_Gen_Hero_v2.mp4?v=3" type="video/mp4" />
           </video>
-          <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/40 to-black" />
+          <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-black/20 to-black/60" />
           <div className="relative z-10 mx-auto max-w-4xl px-4 py-24 text-center sm:px-6 sm:py-32">
             <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}
               className="mb-5 inline-flex items-center gap-2 rounded-full border border-lime-400/30 bg-lime-400/10 px-4 py-1.5 backdrop-blur-sm">
