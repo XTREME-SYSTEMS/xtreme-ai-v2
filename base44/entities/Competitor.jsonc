@@ -1,0 +1,28 @@
+{
+  "name": "Competitor",
+  "type": "object",
+  "properties": {
+    "business_id": {
+      "type": "string"
+    },
+    "name": {
+      "type": "string"
+    },
+    "domain": {
+      "type": "string"
+    },
+    "location": {
+      "type": "string"
+    },
+    "reason_selected": {
+      "type": "string"
+    },
+    "source": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "business_id",
+    "name"
+  ]
+}

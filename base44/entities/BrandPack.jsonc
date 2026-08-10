@@ -1,0 +1,55 @@
+{
+  "name": "BrandPack",
+  "type": "object",
+  "properties": {
+    "business_id": {
+      "type": "string"
+    },
+    "option_number": {
+      "type": "number"
+    },
+    "positioning": {
+      "type": "string"
+    },
+    "promise": {
+      "type": "string"
+    },
+    "tagline": {
+      "type": "string"
+    },
+    "logo_direction": {
+      "type": "string"
+    },
+    "colors": {
+      "type": "string"
+    },
+    "typography": {
+      "type": "string"
+    },
+    "imagery": {
+      "type": "string"
+    },
+    "voice": {
+      "type": "string"
+    },
+    "hero": {
+      "type": "string"
+    },
+    "score": {
+      "type": "number"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "draft",
+        "approved",
+        "rejected"
+      ],
+      "default": "draft"
+    }
+  },
+  "required": [
+    "business_id",
+    "option_number"
+  ]
+}

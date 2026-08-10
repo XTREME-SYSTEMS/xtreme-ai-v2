@@ -1,0 +1,67 @@
+{
+  "name": "PresenceAudit",
+  "type": "object",
+  "properties": {
+    "business_id": {
+      "type": "string"
+    },
+    "website_score": {
+      "type": "number"
+    },
+    "seo_score": {
+      "type": "number"
+    },
+    "local_seo_score": {
+      "type": "number"
+    },
+    "aeo_score": {
+      "type": "number"
+    },
+    "conversion_score": {
+      "type": "number"
+    },
+    "brand_score": {
+      "type": "number"
+    },
+    "reputation_score": {
+      "type": "number"
+    },
+    "social_score": {
+      "type": "number"
+    },
+    "technical_score": {
+      "type": "number"
+    },
+    "offer_score": {
+      "type": "number"
+    },
+    "lead_capture_score": {
+      "type": "number"
+    },
+    "overall_score": {
+      "type": "number"
+    },
+    "opportunity_gap": {
+      "type": "string"
+    },
+    "evidence_ids": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "pending",
+        "running",
+        "complete",
+        "failed"
+      ],
+      "default": "pending"
+    }
+  },
+  "required": [
+    "business_id"
+  ]
+}

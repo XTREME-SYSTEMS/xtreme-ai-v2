@@ -1,12 +1,41 @@
 import { Toaster } from "@/components/ui/toaster"
 import { QueryClientProvider } from '@tanstack/react-query'
 import { queryClientInstance } from '@/lib/query-client'
-import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
 import PageNotFound from './lib/PageNotFound';
 import { AuthProvider, useAuth } from '@/lib/AuthContext';
 import UserNotRegisteredError from '@/components/UserNotRegisteredError';
 import ScrollToTop from './components/ScrollToTop';
-// Add page imports here
+import ProtectedRoute from '@/components/ProtectedRoute';
+import Layout from '@/components/Layout';
+import CommandCenter from '@/pages/CommandCenter';
+import BusinessDiscovery from '@/pages/BusinessDiscovery';
+import Prospects from '@/pages/Prospects';
+import ProspectDetail from '@/pages/ProspectDetail';
+import Audits from '@/pages/Audits';
+import SearchOpportunities from '@/pages/SearchOpportunities';
+import Domains from '@/pages/Domains';
+import ThrowTheBook from '@/pages/ThrowTheBook';
+import Concepts from '@/pages/Concepts';
+import BrandLab from '@/pages/BrandLab';
+import WebsiteLab from '@/pages/WebsiteLab';
+import MarketingLab from '@/pages/MarketingLab';
+import CapabilityRegistry from '@/pages/CapabilityRegistry';
+import GeneratorRegistry from '@/pages/GeneratorRegistry';
+import SourceRegistry from '@/pages/SourceRegistry';
+import BuildQueue from '@/pages/BuildQueue';
+import PreviewFactory from '@/pages/PreviewFactory';
+import QARepair from '@/pages/QARepair';
+import ProposalFactory from '@/pages/ProposalFactory';
+import SalesPipeline from '@/pages/SalesPipeline';
+import Experiments from '@/pages/Experiments';
+import IndustryDNA from '@/pages/IndustryDNA';
+import WebsiteGenome from '@/pages/WebsiteGenome';
+import Playbooks from '@/pages/Playbooks';
+import Approvals from '@/pages/Approvals';
+import Receipts from '@/pages/Receipts';
+import Connectors from '@/pages/Connectors';
+import Settings from '@/pages/Settings';
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
@@ -34,7 +63,38 @@ const AuthenticatedApp = () => {
   // Render the main app
   return (
     <Routes>
-      {/* Add your page Route elements here */}
+      <Route element={<ProtectedRoute unauthenticatedElement={<Navigate to="/login" replace />} />}>
+        <Route element={<Layout />}>
+          <Route path="/" element={<CommandCenter />} />
+          <Route path="/discovery" element={<BusinessDiscovery />} />
+          <Route path="/prospects" element={<Prospects />} />
+          <Route path="/prospects/:id" element={<ProspectDetail />} />
+          <Route path="/audits" element={<Audits />} />
+          <Route path="/opportunities" element={<SearchOpportunities />} />
+          <Route path="/domains" element={<Domains />} />
+          <Route path="/throw-the-book" element={<ThrowTheBook />} />
+          <Route path="/concepts" element={<Concepts />} />
+          <Route path="/brand-lab" element={<BrandLab />} />
+          <Route path="/website-lab" element={<WebsiteLab />} />
+          <Route path="/marketing-lab" element={<MarketingLab />} />
+          <Route path="/capabilities" element={<CapabilityRegistry />} />
+          <Route path="/generators" element={<GeneratorRegistry />} />
+          <Route path="/sources" element={<SourceRegistry />} />
+          <Route path="/build-queue" element={<BuildQueue />} />
+          <Route path="/preview-factory" element={<PreviewFactory />} />
+          <Route path="/qa-repair" element={<QARepair />} />
+          <Route path="/proposals" element={<ProposalFactory />} />
+          <Route path="/pipeline" element={<SalesPipeline />} />
+          <Route path="/experiments" element={<Experiments />} />
+          <Route path="/industry-dna" element={<IndustryDNA />} />
+          <Route path="/website-genomes" element={<WebsiteGenome />} />
+          <Route path="/playbooks" element={<Playbooks />} />
+          <Route path="/approvals" element={<Approvals />} />
+          <Route path="/receipts" element={<Receipts />} />
+          <Route path="/connectors" element={<Connectors />} />
+          <Route path="/settings" element={<Settings />} />
+        </Route>
+      </Route>
       <Route path="*" element={<PageNotFound />} />
     </Routes>
   );

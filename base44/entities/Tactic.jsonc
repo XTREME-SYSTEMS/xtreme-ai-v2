@@ -1,0 +1,89 @@
+{
+  "name": "Tactic",
+  "type": "object",
+  "properties": {
+    "family": {
+      "type": "string"
+    },
+    "name": {
+      "type": "string"
+    },
+    "description": {
+      "type": "string"
+    },
+    "intent_fit": {
+      "type": "string"
+    },
+    "cost": {
+      "type": "string",
+      "enum": [
+        "free",
+        "low",
+        "medium",
+        "high"
+      ],
+      "default": "low"
+    },
+    "speed": {
+      "type": "string",
+      "enum": [
+        "days",
+        "weeks",
+        "months"
+      ],
+      "default": "weeks"
+    },
+    "effort": {
+      "type": "string",
+      "enum": [
+        "low",
+        "medium",
+        "high"
+      ],
+      "default": "medium"
+    },
+    "measurability": {
+      "type": "string",
+      "enum": [
+        "low",
+        "medium",
+        "high"
+      ],
+      "default": "medium"
+    },
+    "risk": {
+      "type": "string",
+      "enum": [
+        "low",
+        "medium",
+        "high"
+      ],
+      "default": "low"
+    },
+    "legal_constraints": {
+      "type": "string"
+    },
+    "required_assets": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "kpi": {
+      "type": "string"
+    },
+    "automation_potential": {
+      "type": "string",
+      "enum": [
+        "low",
+        "medium",
+        "high"
+      ],
+      "default": "medium"
+    }
+  },
+  "required": [
+    "name",
+    "family"
+  ]
+}

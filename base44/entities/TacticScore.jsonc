@@ -1,0 +1,70 @@
+{
+  "name": "TacticScore",
+  "type": "object",
+  "properties": {
+    "business_id": {
+      "type": "string"
+    },
+    "tactic_name": {
+      "type": "string"
+    },
+    "tactic_family": {
+      "type": "string"
+    },
+    "intent_score": {
+      "type": "number"
+    },
+    "economic_score": {
+      "type": "number"
+    },
+    "business_fit": {
+      "type": "number"
+    },
+    "cost_score": {
+      "type": "number"
+    },
+    "speed_score": {
+      "type": "number"
+    },
+    "measurement_score": {
+      "type": "number"
+    },
+    "evidence_score": {
+      "type": "number"
+    },
+    "geo_score": {
+      "type": "number"
+    },
+    "automation_score": {
+      "type": "number"
+    },
+    "feasibility_score": {
+      "type": "number"
+    },
+    "story_score": {
+      "type": "number"
+    },
+    "risk_penalty": {
+      "type": "number"
+    },
+    "total": {
+      "type": "number"
+    },
+    "blocked_reason": {
+      "type": "string"
+    },
+    "decision": {
+      "type": "string",
+      "enum": [
+        "considered",
+        "selected",
+        "rejected"
+      ],
+      "default": "considered"
+    }
+  },
+  "required": [
+    "business_id",
+    "tactic_name"
+  ]
+}

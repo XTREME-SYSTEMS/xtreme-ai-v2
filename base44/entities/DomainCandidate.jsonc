@@ -1,0 +1,69 @@
+{
+  "name": "DomainCandidate",
+  "type": "object",
+  "properties": {
+    "business_id": {
+      "type": "string"
+    },
+    "domain": {
+      "type": "string"
+    },
+    "availability_status": {
+      "type": "string",
+      "enum": [
+        "UNKNOWN",
+        "AVAILABLE",
+        "REGISTERED",
+        "PREMIUM",
+        "REVIEW_REQUIRED"
+      ],
+      "default": "UNKNOWN"
+    },
+    "checked_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "clarity": {
+      "type": "number"
+    },
+    "memorability": {
+      "type": "number"
+    },
+    "intent_relevance": {
+      "type": "number"
+    },
+    "scalability": {
+      "type": "number"
+    },
+    "collision_risk": {
+      "type": "string",
+      "enum": [
+        "low",
+        "medium",
+        "high",
+        "unknown"
+      ],
+      "default": "unknown"
+    },
+    "trademark_review_status": {
+      "type": "string",
+      "enum": [
+        "not_reviewed",
+        "clear",
+        "review_required",
+        "blocked"
+      ],
+      "default": "not_reviewed"
+    },
+    "score": {
+      "type": "number"
+    },
+    "selected": {
+      "type": "boolean",
+      "default": false
+    }
+  },
+  "required": [
+    "domain"
+  ]
+}

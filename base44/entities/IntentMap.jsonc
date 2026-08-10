@@ -1,0 +1,53 @@
+{
+  "name": "IntentMap",
+  "type": "object",
+  "properties": {
+    "business_id": {
+      "type": "string"
+    },
+    "intent_type": {
+      "type": "string",
+      "enum": [
+        "transactional",
+        "cost",
+        "local",
+        "comparison",
+        "question",
+        "visual",
+        "diagnostic",
+        "eligibility",
+        "informational"
+      ],
+      "default": "informational"
+    },
+    "query_or_question": {
+      "type": "string"
+    },
+    "stage": {
+      "type": "string",
+      "enum": [
+        "awareness",
+        "research",
+        "decision",
+        "action"
+      ],
+      "default": "research"
+    },
+    "commercial_value": {
+      "type": "number"
+    },
+    "priority": {
+      "type": "string",
+      "enum": [
+        "low",
+        "medium",
+        "high"
+      ],
+      "default": "medium"
+    }
+  },
+  "required": [
+    "business_id",
+    "query_or_question"
+  ]
+}

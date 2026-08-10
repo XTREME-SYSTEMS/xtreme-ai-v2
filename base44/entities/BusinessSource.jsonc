@@ -1,0 +1,38 @@
+{
+  "name": "BusinessSource",
+  "type": "object",
+  "properties": {
+    "business_id": {
+      "type": "string"
+    },
+    "provider": {
+      "type": "string"
+    },
+    "source_url": {
+      "type": "string"
+    },
+    "source_timestamp": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "raw_reference": {
+      "type": "string"
+    },
+    "confidence": {
+      "type": "string",
+      "enum": [
+        "low",
+        "medium",
+        "high"
+      ],
+      "default": "medium"
+    },
+    "provenance": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "business_id",
+    "provider"
+  ]
+}

@@ -1,0 +1,46 @@
+{
+  "name": "Receipt",
+  "type": "object",
+  "properties": {
+    "agent_or_workflow": {
+      "type": "string"
+    },
+    "action": {
+      "type": "string"
+    },
+    "entity_type": {
+      "type": "string"
+    },
+    "entity_id": {
+      "type": "string"
+    },
+    "inputs": {
+      "type": "string"
+    },
+    "outputs": {
+      "type": "string"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "success",
+        "failed",
+        "escalated"
+      ],
+      "default": "success"
+    },
+    "evidence": {
+      "type": "string"
+    },
+    "warnings": {
+      "type": "string"
+    },
+    "rollback_ref": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "agent_or_workflow",
+    "action"
+  ]
+}

@@ -1,0 +1,83 @@
+{
+  "name": "MarketingPack",
+  "type": "object",
+  "properties": {
+    "business_id": {
+      "type": "string"
+    },
+    "option_number": {
+      "type": "number"
+    },
+    "channels": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "tactics": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "cost_level": {
+      "type": "string",
+      "enum": [
+        "free",
+        "low",
+        "medium",
+        "high"
+      ],
+      "default": "low"
+    },
+    "speed": {
+      "type": "string",
+      "enum": [
+        "days",
+        "weeks",
+        "months"
+      ],
+      "default": "weeks"
+    },
+    "risk": {
+      "type": "string",
+      "enum": [
+        "low",
+        "medium",
+        "high"
+      ],
+      "default": "low"
+    },
+    "assets": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "measurement": {
+      "type": "string"
+    },
+    "kpis": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "score": {
+      "type": "number"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "draft",
+        "approved",
+        "rejected"
+      ],
+      "default": "draft"
+    }
+  },
+  "required": [
+    "business_id",
+    "option_number"
+  ]
+}

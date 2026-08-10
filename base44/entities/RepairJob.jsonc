@@ -1,0 +1,39 @@
+{
+  "name": "RepairJob",
+  "type": "object",
+  "properties": {
+    "validation_id": {
+      "type": "string"
+    },
+    "build_id": {
+      "type": "string"
+    },
+    "failure_type": {
+      "type": "string"
+    },
+    "target_layer": {
+      "type": "string"
+    },
+    "attempt_count": {
+      "type": "number",
+      "default": 0
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "open",
+        "in_progress",
+        "repaired",
+        "escalated"
+      ],
+      "default": "open"
+    },
+    "notes": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "validation_id",
+    "failure_type"
+  ]
+}

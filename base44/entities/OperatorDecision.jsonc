@@ -1,0 +1,22 @@
+{
+  "name": "OperatorDecision",
+  "type": "object",
+  "properties": {
+    "topic": {
+      "type": "string"
+    },
+    "choice": {
+      "type": "string"
+    },
+    "supersedes": {
+      "type": "string"
+    },
+    "notes": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "topic",
+    "choice"
+  ]
+}

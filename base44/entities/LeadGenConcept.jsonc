@@ -1,0 +1,58 @@
+{
+  "name": "LeadGenConcept",
+  "type": "object",
+  "properties": {
+    "business_id": {
+      "type": "string"
+    },
+    "name": {
+      "type": "string"
+    },
+    "customer_problem": {
+      "type": "string"
+    },
+    "intent": {
+      "type": "string"
+    },
+    "tool_type": {
+      "type": "string"
+    },
+    "value_before_gate": {
+      "type": "string"
+    },
+    "lead_event": {
+      "type": "string"
+    },
+    "seo_opportunity": {
+      "type": "string"
+    },
+    "aeo_opportunity": {
+      "type": "string"
+    },
+    "build_complexity": {
+      "type": "string",
+      "enum": [
+        "low",
+        "medium",
+        "high"
+      ],
+      "default": "medium"
+    },
+    "score": {
+      "type": "number"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "draft",
+        "approved",
+        "built"
+      ],
+      "default": "draft"
+    }
+  },
+  "required": [
+    "business_id",
+    "name"
+  ]
+}

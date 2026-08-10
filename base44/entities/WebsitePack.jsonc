@@ -1,0 +1,58 @@
+{
+  "name": "WebsitePack",
+  "type": "object",
+  "properties": {
+    "business_id": {
+      "type": "string"
+    },
+    "option_number": {
+      "type": "number"
+    },
+    "homepage_concept": {
+      "type": "string"
+    },
+    "primary_tool": {
+      "type": "string"
+    },
+    "cta": {
+      "type": "string"
+    },
+    "pages": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "seo_architecture": {
+      "type": "string"
+    },
+    "aeo_architecture": {
+      "type": "string"
+    },
+    "local_strategy": {
+      "type": "string"
+    },
+    "visual_direction": {
+      "type": "string"
+    },
+    "lead_journey": {
+      "type": "string"
+    },
+    "score": {
+      "type": "number"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "draft",
+        "approved",
+        "rejected"
+      ],
+      "default": "draft"
+    }
+  },
+  "required": [
+    "business_id",
+    "option_number"
+  ]
+}

@@ -1,0 +1,55 @@
+{
+  "name": "ValidationRun",
+  "type": "object",
+  "properties": {
+    "build_id": {
+      "type": "string"
+    },
+    "visual_score": {
+      "type": "number"
+    },
+    "mobile_score": {
+      "type": "number"
+    },
+    "conversion_score": {
+      "type": "number"
+    },
+    "lead_tool_score": {
+      "type": "number"
+    },
+    "seo_score": {
+      "type": "number"
+    },
+    "aeo_score": {
+      "type": "number"
+    },
+    "trust_score": {
+      "type": "number"
+    },
+    "performance_score": {
+      "type": "number"
+    },
+    "accessibility_score": {
+      "type": "number"
+    },
+    "brand_score": {
+      "type": "number"
+    },
+    "total_score": {
+      "type": "number"
+    },
+    "pass": {
+      "type": "boolean",
+      "default": false
+    },
+    "failures": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    }
+  },
+  "required": [
+    "build_id"
+  ]
+}

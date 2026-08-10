@@ -1,0 +1,40 @@
+{
+  "name": "ProposalPackage",
+  "type": "object",
+  "properties": {
+    "business_id": {
+      "type": "string"
+    },
+    "build_id": {
+      "type": "string"
+    },
+    "audit_summary": {
+      "type": "string"
+    },
+    "opportunity_summary": {
+      "type": "string"
+    },
+    "preview_ref": {
+      "type": "string"
+    },
+    "offer_options": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "draft",
+        "sent",
+        "accepted",
+        "rejected"
+      ],
+      "default": "draft"
+    }
+  },
+  "required": [
+    "business_id"
+  ]
+}

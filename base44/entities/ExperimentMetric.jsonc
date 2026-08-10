@@ -1,0 +1,48 @@
+{
+  "name": "ExperimentMetric",
+  "type": "object",
+  "properties": {
+    "experiment_id": {
+      "type": "string"
+    },
+    "spend": {
+      "type": "number"
+    },
+    "impressions": {
+      "type": "number"
+    },
+    "visits": {
+      "type": "number"
+    },
+    "tool_starts": {
+      "type": "number"
+    },
+    "tool_completions": {
+      "type": "number"
+    },
+    "leads": {
+      "type": "number"
+    },
+    "qualified_leads": {
+      "type": "number"
+    },
+    "calls": {
+      "type": "number"
+    },
+    "appointments": {
+      "type": "number"
+    },
+    "proposals": {
+      "type": "number"
+    },
+    "wins": {
+      "type": "number"
+    },
+    "revenue": {
+      "type": "number"
+    }
+  },
+  "required": [
+    "experiment_id"
+  ]
+}

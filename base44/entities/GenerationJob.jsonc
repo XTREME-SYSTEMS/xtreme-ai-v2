@@ -1,0 +1,51 @@
+{
+  "name": "GenerationJob",
+  "type": "object",
+  "properties": {
+    "build_id": {
+      "type": "string"
+    },
+    "generator_id": {
+      "type": "string"
+    },
+    "job_type": {
+      "type": "string"
+    },
+    "idempotency_key": {
+      "type": "string"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "queued",
+        "running",
+        "complete",
+        "failed",
+        "dead_letter"
+      ],
+      "default": "queued"
+    },
+    "attempt_count": {
+      "type": "number",
+      "default": 0
+    },
+    "next_attempt_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "input_ref": {
+      "type": "string"
+    },
+    "output_ref": {
+      "type": "string"
+    },
+    "error": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "build_id",
+    "generator_id",
+    "job_type"
+  ]
+}

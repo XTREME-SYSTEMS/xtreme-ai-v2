@@ -1,0 +1,87 @@
+{
+  "name": "IndustryDNA",
+  "type": "object",
+  "properties": {
+    "industry": {
+      "type": "string"
+    },
+    "geography_scope": {
+      "type": "string"
+    },
+    "best_intents": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "winning_tools": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "winning_generators": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "winning_pages": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "winning_ctas": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "winning_offers": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "winning_domains": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "winning_tactics": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "losing_tactics": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "benchmarks": {
+      "type": "string"
+    },
+    "confidence": {
+      "type": "string",
+      "enum": [
+        "low",
+        "medium",
+        "high"
+      ],
+      "default": "low"
+    },
+    "source_experiments": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    }
+  },
+  "required": [
+    "industry"
+  ]
+}

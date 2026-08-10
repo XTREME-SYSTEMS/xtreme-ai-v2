@@ -1,0 +1,52 @@
+{
+  "name": "SearchOpportunity",
+  "type": "object",
+  "properties": {
+    "business_id": {
+      "type": "string"
+    },
+    "query": {
+      "type": "string"
+    },
+    "cluster": {
+      "type": "string"
+    },
+    "intent": {
+      "type": "string"
+    },
+    "demand_score": {
+      "type": "number"
+    },
+    "commercial_score": {
+      "type": "number"
+    },
+    "serp_weakness_score": {
+      "type": "number"
+    },
+    "local_fit": {
+      "type": "number"
+    },
+    "tool_opportunity": {
+      "type": "string"
+    },
+    "overall_score": {
+      "type": "number"
+    },
+    "evidence": {
+      "type": "string"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "open",
+        "queued",
+        "built",
+        "dismissed"
+      ],
+      "default": "open"
+    }
+  },
+  "required": [
+    "query"
+  ]
+}

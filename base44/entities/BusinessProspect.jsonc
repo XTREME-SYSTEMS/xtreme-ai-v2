@@ -1,0 +1,71 @@
+{
+  "name": "BusinessProspect",
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string"
+    },
+    "category": {
+      "type": "string"
+    },
+    "subcategory": {
+      "type": "string"
+    },
+    "address": {
+      "type": "string"
+    },
+    "city": {
+      "type": "string"
+    },
+    "state": {
+      "type": "string"
+    },
+    "zip": {
+      "type": "string"
+    },
+    "lat": {
+      "type": "number"
+    },
+    "lng": {
+      "type": "number"
+    },
+    "phone": {
+      "type": "string"
+    },
+    "website": {
+      "type": "string"
+    },
+    "rating": {
+      "type": "number"
+    },
+    "review_count": {
+      "type": "number"
+    },
+    "source_ids": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "discovered",
+        "enriched",
+        "audited",
+        "qualified",
+        "in_build",
+        "proposed",
+        "won",
+        "archived"
+      ],
+      "default": "discovered"
+    },
+    "owner": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "name"
+  ]
+}

@@ -1,0 +1,72 @@
+{
+  "name": "WebsiteGenome",
+  "type": "object",
+  "properties": {
+    "build_id": {
+      "type": "string"
+    },
+    "industry": {
+      "type": "string"
+    },
+    "market": {
+      "type": "string"
+    },
+    "brand_pattern": {
+      "type": "string"
+    },
+    "layout_pattern": {
+      "type": "string"
+    },
+    "hero_pattern": {
+      "type": "string"
+    },
+    "cta_pattern": {
+      "type": "string"
+    },
+    "tool_pattern": {
+      "type": "string"
+    },
+    "form_pattern": {
+      "type": "string"
+    },
+    "content_architecture": {
+      "type": "string"
+    },
+    "keyword_map": {
+      "type": "string"
+    },
+    "domain_pattern": {
+      "type": "string"
+    },
+    "creative_system": {
+      "type": "string"
+    },
+    "performance": {
+      "type": "string"
+    },
+    "conversion": {
+      "type": "string"
+    },
+    "ranking_results": {
+      "type": "string"
+    },
+    "lead_quality": {
+      "type": "string"
+    },
+    "sales_results": {
+      "type": "string"
+    },
+    "confidence": {
+      "type": "string",
+      "enum": [
+        "low",
+        "medium",
+        "high"
+      ],
+      "default": "low"
+    }
+  },
+  "required": [
+    "industry"
+  ]
+}

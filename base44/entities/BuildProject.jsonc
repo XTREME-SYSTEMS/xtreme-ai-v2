@@ -1,0 +1,49 @@
+{
+  "name": "BuildProject",
+  "type": "object",
+  "properties": {
+    "business_id": {
+      "type": "string"
+    },
+    "business_name": {
+      "type": "string"
+    },
+    "approved_brand_pack": {
+      "type": "number"
+    },
+    "approved_website_pack": {
+      "type": "number"
+    },
+    "approved_marketing_pack": {
+      "type": "number"
+    },
+    "approved_concept": {
+      "type": "string"
+    },
+    "generator_chain": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "composed",
+        "building",
+        "built",
+        "validated",
+        "repairing",
+        "failed",
+        "deployed"
+      ],
+      "default": "composed"
+    },
+    "preview_url": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "business_id"
+  ]
+}

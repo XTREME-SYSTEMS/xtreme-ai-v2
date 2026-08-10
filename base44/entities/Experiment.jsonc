@@ -1,0 +1,82 @@
+{
+  "name": "Experiment",
+  "type": "object",
+  "properties": {
+    "business_id": {
+      "type": "string"
+    },
+    "hypothesis": {
+      "type": "string"
+    },
+    "tactic_name": {
+      "type": "string"
+    },
+    "audience": {
+      "type": "string"
+    },
+    "geography": {
+      "type": "string"
+    },
+    "offer": {
+      "type": "string"
+    },
+    "asset": {
+      "type": "string"
+    },
+    "channel": {
+      "type": "string"
+    },
+    "start": {
+      "type": "string",
+      "format": "date"
+    },
+    "end": {
+      "type": "string",
+      "format": "date"
+    },
+    "cost": {
+      "type": "string"
+    },
+    "control": {
+      "type": "string"
+    },
+    "tracking": {
+      "type": "string"
+    },
+    "primary_kpi": {
+      "type": "string"
+    },
+    "kill_threshold": {
+      "type": "string"
+    },
+    "scale_threshold": {
+      "type": "string"
+    },
+    "approval_status": {
+      "type": "string",
+      "enum": [
+        "pending",
+        "approved",
+        "rejected"
+      ],
+      "default": "pending"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "planned",
+        "running",
+        "paused",
+        "complete"
+      ],
+      "default": "planned"
+    },
+    "verdict": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "business_id",
+    "hypothesis"
+  ]
+}

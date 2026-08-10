@@ -1,0 +1,48 @@
+{
+  "name": "GeneratorRegistry",
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string"
+    },
+    "category": {
+      "type": "string"
+    },
+    "version": {
+      "type": "string",
+      "default": "1.0"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "proposed",
+        "scaffolded",
+        "active",
+        "deprecated"
+      ],
+      "default": "active"
+    },
+    "manifest_ref": {
+      "type": "string"
+    },
+    "quality_score": {
+      "type": "number"
+    },
+    "fallback_generator_id": {
+      "type": "string"
+    },
+    "origin": {
+      "type": "string",
+      "enum": [
+        "core",
+        "generator_generator",
+        "imported"
+      ],
+      "default": "core"
+    }
+  },
+  "required": [
+    "name",
+    "category"
+  ]
+}

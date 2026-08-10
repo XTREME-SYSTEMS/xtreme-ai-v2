@@ -1,0 +1,51 @@
+{
+  "name": "CustomerProfile",
+  "type": "object",
+  "properties": {
+    "business_id": {
+      "type": "string"
+    },
+    "primary_customer": {
+      "type": "string"
+    },
+    "secondary_customer": {
+      "type": "string"
+    },
+    "problems": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "triggers": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "objections": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "questions": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "journey": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "conversion_event": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "business_id"
+  ]
+}

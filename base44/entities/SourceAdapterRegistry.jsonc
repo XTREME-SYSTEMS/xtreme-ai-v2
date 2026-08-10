@@ -1,0 +1,53 @@
+{
+  "name": "SourceAdapterRegistry",
+  "type": "object",
+  "properties": {
+    "source_name": {
+      "type": "string"
+    },
+    "source_type": {
+      "type": "string",
+      "enum": [
+        "api",
+        "directory",
+        "search",
+        "rdap",
+        "social",
+        "government"
+      ],
+      "default": "api"
+    },
+    "access_method": {
+      "type": "string"
+    },
+    "allowed_data": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "rate_limit": {
+      "type": "string"
+    },
+    "provenance_rules": {
+      "type": "string"
+    },
+    "confidence_rules": {
+      "type": "string"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "connected",
+        "mocked",
+        "unavailable",
+        "disabled"
+      ],
+      "default": "mocked"
+    }
+  },
+  "required": [
+    "source_name",
+    "source_type"
+  ]
+}
