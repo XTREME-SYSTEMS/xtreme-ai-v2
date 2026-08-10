@@ -5,39 +5,51 @@ import StatusBadge from "@/components/StatusBadge";
 import { Bot, ShieldCheck, RefreshCw, Play, Rocket, Activity, AlertTriangle, CheckCircle2, Cpu } from "lucide-react";
 
 export default function AutonomousSystem() {
+  const [plans, setPlans] = useState([]);
   const [plan, setPlan] = useState(null);
   const [phases, setPhases] = useState([]);
   const [health, setHealth] = useState(null);
   const [repairs, setRepairs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [seeding, setSeeding] = useState(false);
+  const [seedingRoadmap, setSeedingRoadmap] = useState(false);
   const [running, setRunning] = useState(false);
   const [auditing, setAuditing] = useState(false);
+
+  const loadPlan = useCallback(async (p) => {
+    if (!p) { setPhases([]); setHealth(null); setRepairs([]); return; }
+    const [phs, hlth, reps] = await Promise.all([
+      base44.entities.ImplementationPhase.filter({ plan_id: p.id }),
+      base44.entities.SystemHealthScore.filter({ plan_id: p.id }, "-created_date", 1),
+      base44.entities.RepairTask.filter({ plan_id: p.id, status: "open" }, "-created_date", 20),
+    ]);
+    setPhases(phs.sort((a, b) => (a.phase_number || 0) - (b.phase_number || 0)));
+    setHealth(hlth[0] || null);
+    setRepairs(reps);
+  }, []);
 
   const load = useCallback(async () => {
     try {
       setLoading(true);
-      const plans = await base44.entities.ImplementationPlan.filter({ status: "active" }, "-created_date", 1);
-      const p = plans[0];
+      const allPlans = await base44.entities.ImplementationPlan.filter({ status: "active" }, "-created_date", 50);
+      setPlans(allPlans);
+      const p = allPlans[0];
       setPlan(p);
-      if (p) {
-        const [phs, hlth, reps] = await Promise.all([
-          base44.entities.ImplementationPhase.filter({ plan_id: p.id }),
-          base44.entities.SystemHealthScore.filter({ plan_id: p.id }, "-created_date", 1),
-          base44.entities.RepairTask.filter({ plan_id: p.id, status: "open" }, "-created_date", 20),
-        ]);
-        setPhases(phs.sort((a, b) => (a.phase_number || 0) - (b.phase_number || 0)));
-        setHealth(hlth[0] || null);
-        setRepairs(reps);
-      }
+      await loadPlan(p);
     } catch (e) {
       console.error(e);
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [loadPlan]);
 
   useEffect(() => { load(); }, [load]);
+
+  const switchPlan = async (planId) => {
+    const p = plans.find((x) => x.id === planId);
+    setPlan(p);
+    await loadPlan(p);
+  };
 
   const seed = async () => {
     try {
@@ -48,6 +60,18 @@ export default function AutonomousSystem() {
       console.error(e);
     } finally {
       setSeeding(false);
+    }
+  };
+
+  const seedRoadmap = async () => {
+    try {
+      setSeedingRoadmap(true);
+      await base44.functions.invoke("seedAiMarketingRoadmap", {});
+      await load();
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setSeedingRoadmap(false);
     }
   };
 
@@ -83,8 +107,11 @@ export default function AutonomousSystem() {
     return (
       <div>
         <PageHeader title="Autonomous Implementation Engine" subtitle="Self-driving integration of the Faultline AI modules — generate → validate → reflect → heal to 100%" />
-        <EmptyState icon={Bot} title="No active implementation plan" subtitle="Seed the plan to bootstrap 8 phases from the Faultline forensic audit. The autonomous build loop will then drive each phase to 100%.">
-          <LoadingButton loading={seeding} onClick={seed}><Rocket className="h-4 w-4" /> Seed Implementation Plan</LoadingButton>
+        <EmptyState icon={Bot} title="No active implementation plan" subtitle="Seed a plan to bootstrap phases. The autonomous build loop will then drive each phase to 100% with the validator checking everything installed.">
+          <div className="flex flex-wrap items-center justify-center gap-2">
+            <LoadingButton loading={seeding} onClick={seed}><Rocket className="h-4 w-4" /> Seed Faultline Plan</LoadingButton>
+            <LoadingButton loading={seedingRoadmap} onClick={seedRoadmap} variant="ghost"><Bot className="h-4 w-4" /> Seed AI Marketing Roadmap</LoadingButton>
+          </div>
         </EmptyState>
       </div>
     );
@@ -93,6 +120,16 @@ export default function AutonomousSystem() {
   return (
     <div>
       <PageHeader title="Autonomous Implementation Engine" subtitle={`Plan: ${plan.name} · Source: ${plan.source_system}`}>
+        {plans.length > 1 && (
+          <select
+            value={plan.id}
+            onChange={(e) => switchPlan(e.target.value)}
+            className="rounded-lg border border-white/15 bg-zinc-950 px-3 py-2 text-sm text-white"
+          >
+            {plans.map((p) => <option key={p.id} value={p.id}>{p.name}</option>)}
+          </select>
+        )}
+        <LoadingButton loading={seedingRoadmap} onClick={seedRoadmap} variant="ghost"><Bot className="h-4 w-4" /> Seed AI Roadmap</LoadingButton>
         <LoadingButton loading={running} onClick={runCycle}><Play className="h-4 w-4" /> Run Cycle</LoadingButton>
         <LoadingButton loading={auditing} onClick={runAudit} variant="ghost"><ShieldCheck className="h-4 w-4" /> Forensic Audit</LoadingButton>
         <LoadingButton onClick={load} variant="ghost"><RefreshCw className="h-4 w-4" /> Refresh</LoadingButton>

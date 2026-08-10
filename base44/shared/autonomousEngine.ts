@@ -118,6 +118,110 @@ export const IMPLEMENTATION_PHASES = [
   }
 ];
 
+// The AI-Enhanced Marketing roadmap — 7 initiatives to turn the factory into a
+// top-tier AI marketing platform. Seeded as a separate ImplementationPlan and
+// driven to 100% by the same autonomous build loop.
+export const AI_MARKETING_PHASES = [
+  {
+    title: "Programmatic SEO at Scale",
+    module: "Programmatic SEO",
+    objective: "Auto-generate hundreds of unique location x service pages per market, each with AI-written unique content, local business schema, and dynamic FAQ to maximize organic lead volume for local service businesses.",
+    deliverables: [
+      "ProgrammaticPage entity (market_id, service, city, slug, content, schema_json, status)",
+      "generateProgrammaticPages backend function — bulk-generates city x service pages via InvokeLLM with unique content per page",
+      "Programmatic SEO dashboard showing page counts per market and generation status",
+      "Workflow to trigger generation when a Market is published"
+    ],
+    entities_required: ["ProgrammaticPage"],
+    functions_required: ["generateProgrammaticPages"],
+    pages_required: ["ProgrammaticSeo"]
+  },
+  {
+    title: "AI Lead Scoring & Enrichment",
+    module: "Lead Intelligence",
+    objective: "Replace the static lead_score field with a real-time LLM scoring engine that scores incoming leads based on intent signals, firmographics, and behavior, then routes hot leads instantly.",
+    deliverables: [
+      "LeadScore entity (contact_id, score, intent_signals, firmographics, recommendation, scored_at)",
+      "scoreLead backend function — LLM scoring with intent + firmographic enrichment",
+      "Lead scoring dashboard with score distribution and hot-lead routing",
+      "Workflow triggered on Contact create to auto-score new leads"
+    ],
+    entities_required: ["LeadScore"],
+    functions_required: ["scoreLead"],
+    pages_required: ["LeadIntelligence"]
+  },
+  {
+    title: "Conversational AI Agent on Every Site",
+    module: "Conversational AI",
+    objective: "Deploy an in-app AI agent on each generated market site that engages visitors, answers questions, qualifies them, and books estimates 24/7 using the existing agent infrastructure.",
+    deliverables: [
+      "SiteAgent entity (market_id, agent_config, conversation_count, lead_count, status)",
+      "deploySiteAgent backend function — configures a per-market conversational agent",
+      "Conversational AI dashboard showing per-market agent performance",
+      "Agent conversation widget component for embedded market sites"
+    ],
+    entities_required: ["SiteAgent"],
+    functions_required: ["deploySiteAgent"],
+    pages_required: ["ConversationalAi"]
+  },
+  {
+    title: "Multi-Channel Orchestration",
+    module: "Orchestration",
+    objective: "Wire Gmail, Google Sheets, Google Calendar, and HubSpot connectors into automated nurture sequences (email -> follow-up -> meeting booking) triggered by lead score changes.",
+    deliverables: [
+      "NurtureSequence entity (contact_id, steps, current_step, status, channel)",
+      "orchestrateNurture backend function — sends email, logs to sheets, books calendar via connectors",
+      "Orchestration dashboard showing active sequences and channel metrics",
+      "Workflow triggered on LeadScore update to start/advance nurture"
+    ],
+    entities_required: ["NurtureSequence"],
+    functions_required: ["orchestrateNurture"],
+    pages_required: ["OrchestrationBoard"]
+  },
+  {
+    title: "Predictive Analytics",
+    module: "Predictive AI",
+    objective: "Churn prediction, LTV forecasting, and next-market-to-launch recommendations based on competitor density and search opportunity data already collected.",
+    deliverables: [
+      "Prediction entity (type, target_id, predicted_value, confidence, factors, created_at)",
+      "runPredictions backend function — churn + LTV + next-market predictions via InvokeLLM",
+      "Predictive analytics dashboard with churn risk, LTV, and market recommendations",
+      "Nightly workflow to refresh predictions"
+    ],
+    entities_required: ["Prediction"],
+    functions_required: ["runPredictions"],
+    pages_required: ["PredictiveAnalytics"]
+  },
+  {
+    title: "AI Creative Generation Pipeline",
+    module: "Creative AI",
+    objective: "Automated hero images, ad creative, and video generation per market using GenerateImage/GenerateVideo integrations, tied to brand colors and industry DNA.",
+    deliverables: [
+      "CreativeAsset entity (market_id, type, prompt, asset_url, status, used_in)",
+      "generateCreativeAssets backend function — bulk hero images + ad creative + video per market",
+      "Creative pipeline dashboard showing asset status and usage",
+      "Workflow triggered on Market publish to generate creative pack"
+    ],
+    entities_required: ["CreativeAsset"],
+    functions_required: ["generateCreativeAssets"],
+    pages_required: ["CreativePipeline"]
+  },
+  {
+    title: "Real-Time Personalization",
+    module: "Personalization",
+    objective: "Dynamic landing page content based on visitor source (Google Ads vs organic vs referral), location, and referral query to maximize conversion rates.",
+    deliverables: [
+      "PersonalizationRule entity (market_id, condition, content_variant, conversion_lift)",
+      "personalizeContent backend function — returns variant based on visitor context",
+      "Personalization dashboard showing variant performance and lift",
+      "Edge widget component for market sites that fetches personalized content"
+    ],
+    entities_required: ["PersonalizationRule"],
+    functions_required: ["personalizeContent"],
+    pages_required: ["PersonalizationBoard"]
+  }
+];
+
 // Validation criteria applied to every phase.
 export const VALIDATION_CRITERIA = [
   { check: "completeness", description: "All declared deliverables, entities, functions, and pages are specified with field-level detail." },
