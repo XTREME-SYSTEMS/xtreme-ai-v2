@@ -38,16 +38,17 @@ export default async function(req) {
       return Response.json({ error: 'Gmail not connected. Authorize the Gmail connector first.' }, { status: 503 });
     }
 
-    // ---- Resolve sender address from the authorized Gmail account ----
-    const profileRes = await fetch('https://gmail.googleapis.com/gmail/v1/users/me/profile', {
+    // ---- Resolve sender address from the authorized Google account ----
+    // gmail.send scope can't read the Gmail profile, so use the userinfo endpoint (email scope)
+    const profileRes = await fetch('https://www.googleapis.com/oauth2/v2/userinfo', {
       headers: { Authorization: `Bearer ${accessToken}` },
     });
     if (!profileRes.ok) {
       const errText = await profileRes.text();
-      return Response.json({ error: `Gmail auth failed: ${profileRes.status} ${errText}` }, { status: 502 });
+      return Response.json({ error: `Google auth failed: ${profileRes.status} ${errText}` }, { status: 502 });
     }
     const profile = await profileRes.json();
-    const fromEmail = profile.emailAddress;
+    const fromEmail = profile.email;
 
     const fromName = body.from_name || 'Lead Gen Near You';
     const subject = body.subject || prospect.outreach_subject || `Partnership opportunity`;
