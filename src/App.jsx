@@ -69,6 +69,10 @@ import CloneStudio from '@/pages/CloneStudio';
 import ClonePipeline from '@/pages/ClonePipeline';
 import RebrandStudio from '@/pages/RebrandStudio';
 import RaceToRank from '@/pages/RaceToRank';
+import Login from '@/pages/Login';
+import Register from '@/pages/Register';
+import ForgotPassword from '@/pages/ForgotPassword';
+import ResetPassword from '@/pages/ResetPassword';
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
@@ -103,6 +107,10 @@ const AuthenticatedApp = () => {
       <Route path="/coupon" element={<CouponPage />} />
       <Route path="/free-audit" element={<FreeAuditPage />} />
       <Route path="/sign/:token" element={<SignPortal />} />
+      <Route path="/login" element={<Login />} />
+      <Route path="/register" element={<Register />} />
+      <Route path="/forgot-password" element={<ForgotPassword />} />
+      <Route path="/reset-password" element={<ResetPassword />} />
       <Route element={<ProtectedRoute unauthenticatedElement={<Navigate to="/login" replace />} />}>
         <Route element={<Layout />}>
           <Route path="/dashboard" element={<Dashboard />} />
