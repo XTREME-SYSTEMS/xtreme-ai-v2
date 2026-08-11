@@ -1,0 +1,104 @@
+{
+  "name": "DomainPortfolio",
+  "type": "object",
+  "properties": {
+    "domain": {
+      "type": "string",
+      "description": "The domain name (e.g. epoxycoatingsnearme.com)"
+    },
+    "tld": {
+      "type": "string",
+      "description": "TLD category: .com, .nearme, .nearyou, .store, .org, etc."
+    },
+    "niche": {
+      "type": "string",
+      "description": "Industry/niche this domain targets"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "acquired",
+        "launching",
+        "deployed",
+        "gsc_submitted",
+        "active",
+        "ranking",
+        "failed"
+      ],
+      "default": "acquired"
+    },
+    "engine_id": {
+      "type": "string",
+      "description": "Linked RankEngine campaign ID"
+    },
+    "project_id": {
+      "type": "string",
+      "description": "Linked CloneProject ID if cloned from a template"
+    },
+    "site_url": {
+      "type": "string",
+      "description": "Deployed site URL (https://...)"
+    },
+    "gsc_property_url": {
+      "type": "string",
+      "description": "GSC property identifier (sc-domain: or https://)"
+    },
+    "gsc_verified": {
+      "type": "boolean",
+      "default": false
+    },
+    "gsc_sitemap_submitted": {
+      "type": "boolean",
+      "default": false
+    },
+    "gsc_indexing_requested": {
+      "type": "boolean",
+      "default": false
+    },
+    "keywords_count": {
+      "type": "number",
+      "default": 0
+    },
+    "pages_count": {
+      "type": "number",
+      "default": 0
+    },
+    "citations_count": {
+      "type": "number",
+      "default": 0
+    },
+    "best_position": {
+      "type": "number",
+      "description": "Best SERP position across tracked keywords (0 = not ranking)"
+    },
+    "page_one_keywords": {
+      "type": "number",
+      "default": 0
+    },
+    "acquired_date": {
+      "type": "string",
+      "format": "date"
+    },
+    "deployed_date": {
+      "type": "string",
+      "format": "date"
+    },
+    "auto_launch": {
+      "type": "boolean",
+      "default": false,
+      "description": "Whether to auto-run the full launch pipeline on creation"
+    },
+    "notes": {
+      "type": "string"
+    },
+    "logs": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    }
+  },
+  "required": [
+    "domain"
+  ]
+}
