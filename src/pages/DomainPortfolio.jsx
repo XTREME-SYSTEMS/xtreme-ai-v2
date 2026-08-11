@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback } from "react";
 import { base44 } from "@/api/base44Client";
 import { PageHeader, Panel, LoadingButton, EmptyState } from "@/components/ui";
 import StatusBadge from "@/components/StatusBadge";
-import { Globe, Plus, Rocket, RefreshCw, Search, CheckCircle, ExternalLink, TrendingUp, Zap, AlertCircle, Radar } from "lucide-react";
+import { Globe, Plus, Rocket, RefreshCw, Search, CheckCircle, ExternalLink, TrendingUp, Zap, AlertCircle, Radar, MapPin } from "lucide-react";
 
 export default function DomainPortfolio() {
   const [domains, setDomains] = useState([]);
@@ -106,6 +106,16 @@ export default function DomainPortfolio() {
     setLaunching(null);
   };
 
+  const buildCitations = async (d) => {
+    setLaunching('cit-' + d.id);
+    setError("");
+    try {
+      await base44.functions.invoke('buildCitationPlan', { portfolio_id: d.id, niche: d.niche });
+      await load();
+    } catch (e) { setError(e.message); }
+    setLaunching(null);
+  };
+
   const stats = {
     total: domains.length,
     acquired: domains.filter(d => d.status === 'acquired').length,
@@ -182,6 +192,7 @@ export default function DomainPortfolio() {
                     {d.gsc_sitemap_submitted && <span className="text-lime-400/70">sitemap</span>}
                     {d.best_position > 0 && <span className="text-cyan-400">#{d.best_position}</span>}
                     {d.engine_id && <span>{d.keywords_count || 0} kw · {d.pages_count || 0} pages</span>}
+                    {d.citations_count > 0 && <span className="text-amber-400 flex items-center gap-0.5"><MapPin className="h-3 w-3" /> {d.citations_count} citations</span>}
                   </div>
                 </div>
                 <div className="flex items-center gap-2 shrink-0">
@@ -190,6 +201,11 @@ export default function DomainPortfolio() {
                     <a href={d.site_url} target="_blank" rel="noopener" className="rounded p-1.5 text-white/40 hover:text-white hover:bg-white/5">
                       <ExternalLink className="h-3.5 w-3.5" />
                     </a>
+                  )}
+                  {d.engine_id && (
+                    <LoadingButton onClick={() => buildCitations(d)} loading={launching === 'cit-' + d.id} variant="ghost" className="px-2.5 py-1 text-xs">
+                      <MapPin className="h-3 w-3" /> Citations
+                    </LoadingButton>
                   )}
                   {d.status === 'acquired' ? (
                     <LoadingButton onClick={() => launchDomain(d)} loading={launching === d.id} variant="primary" className="px-2.5 py-1 text-xs">

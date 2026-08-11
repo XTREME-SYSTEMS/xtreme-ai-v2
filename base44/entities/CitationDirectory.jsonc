@@ -1,0 +1,75 @@
+{
+  "name": "CitationDirectory",
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string",
+      "description": "Directory or platform name (e.g. Yelp, Google Business Profile)"
+    },
+    "url": {
+      "type": "string",
+      "description": "Base URL of the directory"
+    },
+    "submission_url": {
+      "type": "string",
+      "description": "Direct URL to create/list a business"
+    },
+    "category": {
+      "type": "string",
+      "enum": [
+        "directory",
+        "map",
+        "social",
+        "industry",
+        "review",
+        "press",
+        "blog_outreach"
+      ],
+      "default": "directory"
+    },
+    "domain_authority": {
+      "type": "number",
+      "default": 0,
+      "description": "Moz domain authority score (0-100)"
+    },
+    "priority": {
+      "type": "string",
+      "enum": [
+        "tier1",
+        "tier2",
+        "tier3"
+      ],
+      "default": "tier1",
+      "description": "tier1 = highest impact for local SEO"
+    },
+    "requires_gbp": {
+      "type": "boolean",
+      "default": false,
+      "description": "Whether a Google Business Profile is required to list here"
+    },
+    "auto_submittable": {
+      "type": "boolean",
+      "default": false,
+      "description": "Whether we can automate submission via API"
+    },
+    "niche_fit": {
+      "type": "string",
+      "default": "all",
+      "description": "'all' or a specific niche this directory serves"
+    },
+    "notes": {
+      "type": "string"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "active",
+        "inactive"
+      ],
+      "default": "active"
+    }
+  },
+  "required": [
+    "name"
+  ]
+}
