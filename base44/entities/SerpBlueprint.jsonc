@@ -1,0 +1,161 @@
+{
+  "name": "SerpBlueprint",
+  "type": "object",
+  "properties": {
+    "keyword": {
+      "type": "string",
+      "description": "The target keyword searched"
+    },
+    "niche": {
+      "type": "string",
+      "description": "Industry/niche context"
+    },
+    "city": {
+      "type": "string",
+      "description": "Optional city for local search"
+    },
+    "competitor_url": {
+      "type": "string",
+      "description": "The competitor site URL found in SERP"
+    },
+    "competitor_domain": {
+      "type": "string",
+      "description": "Domain name of the competitor"
+    },
+    "competitor_title": {
+      "type": "string",
+      "description": "Page title from SERP"
+    },
+    "serp_position": {
+      "type": "number",
+      "description": "Position in Google SERP (1-10)"
+    },
+    "site_type": {
+      "type": "string",
+      "enum": [
+        "direct_competitor",
+        "authority_site",
+        "directory",
+        "featured_snippet",
+        "ai_cited",
+        "local_pack"
+      ],
+      "default": "direct_competitor",
+      "description": "Type of site to clone for intelligence"
+    },
+    "clone_project_id": {
+      "type": "string",
+      "description": "Linked CloneProject if cloned"
+    },
+    "portfolio_id": {
+      "type": "string",
+      "description": "Linked DomainPortfolio this blueprint applies to"
+    },
+    "blueprint": {
+      "type": "object",
+      "description": "Extracted ranking factors that make this site rank",
+      "properties": {
+        "word_count": {
+          "type": "number"
+        },
+        "content_structure": {
+          "type": "string",
+          "description": "How content is organized (sections, headings)"
+        },
+        "schema_types": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "meta_title": {
+          "type": "string"
+        },
+        "meta_description": {
+          "type": "string"
+        },
+        "heading_structure": {
+          "type": "string",
+          "description": "H1-H3 outline"
+        },
+        "internal_links": {
+          "type": "number"
+        },
+        "external_links": {
+          "type": "number"
+        },
+        "images_count": {
+          "type": "number"
+        },
+        "topics_covered": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "entities_mentioned": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "faq_present": {
+          "type": "boolean"
+        },
+        "video_present": {
+          "type": "boolean"
+        },
+        "table_present": {
+          "type": "boolean"
+        },
+        "content_freshness": {
+          "type": "string",
+          "description": "How current the content appears"
+        },
+        "trust_signals": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Reviews, testimonials, certifications, etc."
+        },
+        "key_strengths": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "content_gaps": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "What they're missing that we can exploit"
+        },
+        "recommendations": {
+          "type": "string",
+          "description": "How to beat this site"
+        }
+      }
+    },
+    "applied_to_portfolio": {
+      "type": "boolean",
+      "default": false,
+      "description": "Whether this blueprint has been applied to a portfolio site"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "identified",
+        "cloned",
+        "analyzed",
+        "applied"
+      ],
+      "default": "identified"
+    }
+  },
+  "required": [
+    "keyword",
+    "competitor_url"
+  ]
+}

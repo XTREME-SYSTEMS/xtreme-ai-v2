@@ -65,6 +65,7 @@ const NAV = [
   { to: "/seo-accelerator", label: "Page 1 Accelerator", icon: Crosshair },
   { to: "/seo-standard", label: "SEO Standard Checklist", icon: ClipboardCheck },
   { to: "/seo-agent", label: "SEO AI Agent", icon: Bot },
+  { to: "/serp-blueprint", label: "SERP Competitor Cloner", icon: Crosshair },
   { to: "/domain-portfolio", label: "Domain Portfolio", icon: Globe },
   { to: "/rank-engine", label: "Rank Engine", icon: TrendingUp },
   { to: "/markets", label: "Markets", icon: MapPin },
