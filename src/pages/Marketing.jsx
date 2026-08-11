@@ -1,15 +1,12 @@
 import MarketingNav from "@/components/marketing/MarketingNav";
 import Hero from "@/components/marketing/Hero";
 import AITools from "@/components/marketing/AITools";
-import Services from "@/components/marketing/Services";
 import Methodology from "@/components/marketing/Methodology";
-import Industries from "@/components/marketing/Industries";
+import Services from "@/components/marketing/Services";
 import PricingSection from "@/components/marketing/PricingSection";
-import About from "@/components/marketing/About";
-import Process from "@/components/marketing/Process";
 import FAQ from "@/components/marketing/FAQ";
-import Contact from "@/components/marketing/Contact";
-import Partners from "@/components/marketing/Partners";
+import Industries from "@/components/marketing/Industries";
+import About from "@/components/marketing/About";
 import PWAInstallBar from "@/components/marketing/PWAInstallBar";
 import MarketingFooter from "@/components/marketing/MarketingFooter";
 
@@ -20,17 +17,13 @@ export default function Marketing() {
       <main>
         <Hero />
         <AITools />
-        <Services />
         <Methodology />
-        <Industries />
-        <Partners />
+        <Services />
         <PricingSection />
-        <Process />
-        <About />
         <FAQ />
-        <Contact />
+        <Industries />
+        <About />
       </main>
-      <div className="h-16" />
       <MarketingFooter />
       <PWAInstallBar />
     </div>

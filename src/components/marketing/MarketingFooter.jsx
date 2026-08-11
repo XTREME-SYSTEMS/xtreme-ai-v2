@@ -3,23 +3,21 @@ import { Link } from "react-router-dom";
 
 const COLS = [
   {
-    title: "Services",
+    title: "Features",
     links: [
-      { label: "AI Services", to: "/#services" },
-      { label: "AI Consulting", to: "/#services" },
-      { label: "Website Creation", to: "/#services" },
-      { label: "SEO Services", to: "/#services" },
-      { label: "AEO Services", to: "/#services" },
-      { label: "Marketing", to: "/#services" },
+      { label: "CRM", to: "/#features" },
+      { label: "Funnels", to: "/#features" },
+      { label: "Marketing", to: "/#features" },
+      { label: "Bookings", to: "/#features" },
+      { label: "Automation", to: "/#features" },
+      { label: "Reputation", to: "/#features" },
     ],
   },
   {
     title: "Company",
     links: [
       { label: "About", to: "/#about" },
-      { label: "Methodology", to: "/#methodology" },
-      { label: "Industries", to: "/#industries" },
-      { label: "Process", to: "/#process" },
+      { label: "Solutions", to: "/#solutions" },
       { label: "Pricing", to: "/pricing" },
       { label: "FAQ", to: "/#faq" },
       { label: "Contact", to: "/#contact" },
@@ -28,46 +26,46 @@ const COLS = [
   {
     title: "Portal",
     links: [
-      { label: "Client Login", to: "/dashboard" },
-      { label: "Book a Call", to: "/#contact" },
-      { label: "AI Tools", to: "/#ai-tools" },
-      { label: "Get Started", to: "/pricing" },
+      { label: "Login", to: "/login" },
+      { label: "Start Free Trial", to: "/register" },
+      { label: "Client Dashboard", to: "/dashboard" },
+      { label: "Free Audit", to: "/free-audit" },
     ],
   },
 ];
 
 export default function MarketingFooter() {
   return (
-    <footer className="border-t border-black/10 bg-white">
+    <footer className="border-t border-white/10 bg-black">
       <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6">
         <div className="grid gap-10 lg:grid-cols-4">
           <div>
             <Link to="/" className="flex items-center gap-2">
-              <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-black"><MapPin className="h-5 w-5 text-lime-400" /></div>
-              <div className="leading-tight"><div className="text-sm font-bold text-black">Lead Generation</div><div className="text-[10px] font-medium uppercase tracking-wider text-black/50">Near You</div></div>
+              <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-lime-400"><MapPin className="h-5 w-5 text-black" /></div>
+              <div className="leading-tight"><div className="text-sm font-bold text-white">Lead Generation Near Me</div><div className="text-[10px] font-medium uppercase tracking-wider text-white/40">LEADGENERATIONNEARME.COM</div></div>
             </Link>
-            <p className="mt-4 max-w-xs text-sm text-black/50">AI-powered growth operating system for local businesses. Throw The Book At It.</p>
-            <div className="mt-4 space-y-1.5 text-sm text-black/60">
-              <div className="flex items-start gap-2"><MapPin className="mt-0.5 h-4 w-4 shrink-0 text-lime-600" /> 2200 NW 32nd St #700, Pompano Beach, FL 33069</div>
-              <div className="flex items-center gap-2"><Phone className="h-4 w-4 text-lime-600" /> (772) 209-0266</div>
+            <p className="mt-4 max-w-xs text-sm text-white/50">The AI-powered business operating system for local service businesses. Capture, nurture, close, and reactivate — all in one platform.</p>
+            <div className="mt-4 space-y-1.5 text-sm text-white/60">
+              <div className="flex items-start gap-2"><MapPin className="mt-0.5 h-4 w-4 shrink-0 text-lime-400" /> 2200 NW 32nd St #700, Pompano Beach, FL 33069</div>
+              <div className="flex items-center gap-2"><Phone className="h-4 w-4 text-lime-400" /> (772) 209-0266</div>
             </div>
           </div>
           {COLS.map((c) => (
             <div key={c.title}>
-              <div className="text-sm font-bold text-black">{c.title}</div>
+              <div className="text-sm font-bold text-white">{c.title}</div>
               <ul className="mt-3 space-y-2">
-                {c.links.map((l) => <li key={l.label}><Link to={l.to} className="text-sm text-black/60 transition-colors hover:text-lime-600">{l.label}</Link></li>)}
+                {c.links.map((l) => <li key={l.label}><Link to={l.to} className="text-sm text-white/50 transition-colors hover:text-lime-400">{l.label}</Link></li>)}
               </ul>
             </div>
           ))}
         </div>
-        <div className="mt-10 border-t border-black/10 pt-6">
-          <p className="text-center text-xs text-black/40">
-            Lead Generation Near You — AI-powered lead generation services, AI consulting, website creation, SEO, and AEO for local businesses in Pompano Beach, Fort Lauderdale, Miami, and nationwide. We throw the book at your growth.
+        <div className="mt-10 border-t border-white/10 pt-6">
+          <p className="text-center text-xs text-white/40">
+            Lead Generation Near Me — AI-powered CRM, funnels, marketing, bookings, and automations for local service businesses in Pompano Beach, Fort Lauderdale, Miami, and nationwide.
           </p>
           <div className="mt-3 flex flex-col items-center justify-between gap-3 sm:flex-row">
-            <p className="text-xs text-black/40">© {new Date().getFullYear()} Lead Generation Near You. All rights reserved.</p>
-            <p className="text-xs text-black/40">Powered by AI · Built by Chris Lavin & Jeremy Bensen</p>
+            <p className="text-xs text-white/40">© {new Date().getFullYear()} Lead Generation Near Me. All rights reserved.</p>
+            <p className="text-xs text-white/40">Powered by AI · Built by Chris Lavin & Jeremy Bensen</p>
           </div>
         </div>
       </div>
