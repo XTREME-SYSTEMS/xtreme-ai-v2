@@ -17,6 +17,8 @@ export default function DomainPortfolio() {
   const [discoverResult, setDiscoverResult] = useState(null);
   const [error, setError] = useState("");
   const [backlinkModal, setBacklinkModal] = useState(null);
+  const [bulkGscLoading, setBulkGscLoading] = useState(null);
+  const [bulkGscResult, setBulkGscResult] = useState(null);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -108,6 +110,19 @@ export default function DomainPortfolio() {
     setLaunching(null);
   };
 
+  const bulkGsc = async (action) => {
+    setBulkGscLoading(action);
+    setError("");
+    setBulkGscResult(null);
+    try {
+      const res = await base44.functions.invoke('bulkSubmitGSC', { action });
+      const data = res?.data || res;
+      setBulkGscResult(data);
+      await load();
+    } catch (e) { setError(e.message); }
+    setBulkGscLoading(null);
+  };
+
   const buildCitations = async (d) => {
     setLaunching('cit-' + d.id);
     setError("");
@@ -144,6 +159,12 @@ export default function DomainPortfolio() {
         </LoadingButton>
         <LoadingButton onClick={() => setShowAdd(true)} variant="primary">
           <Plus className="h-4 w-4" /> Add Domains
+        </LoadingButton>
+        <LoadingButton onClick={() => bulkGsc('get_tokens')} loading={bulkGscLoading === 'get_tokens'} variant="ghost">
+          <Search className="h-4 w-4" /> Bulk GSC Tokens
+        </LoadingButton>
+        <LoadingButton onClick={() => bulkGsc('verify_all')} loading={bulkGscLoading === 'verify_all'} variant="ghost">
+          <CheckCircle className="h-4 w-4" /> Verify All
         </LoadingButton>
         <LoadingButton onClick={launchAll} loading={launchingAll} variant="ghost" disabled={stats.acquired === 0}>
           <Zap className="h-4 w-4" /> Launch All ({stats.acquired})
@@ -271,6 +292,87 @@ export default function DomainPortfolio() {
 
       {backlinkModal && (
         <BacklinkProspectsModal portfolio={backlinkModal} onClose={() => setBacklinkModal(null)} />
+      )}
+
+      {bulkGscResult && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4" onClick={() => setBulkGscResult(null)}>
+          <div className="w-full max-w-3xl rounded-xl border border-white/10 bg-zinc-950 p-6 max-h-[85vh] overflow-y-auto" onClick={e => e.stopPropagation()}>
+            <h3 className="text-lg font-semibold text-white mb-1">Bulk GSC Verification</h3>
+            <p className="text-sm text-white/50 mb-4">
+              {bulkGscResult.summary?.verified > 0
+                ? `${bulkGscResult.summary.verified} verified · ${bulkGscResult.summary.tokens_needed} need DNS · ${bulkGscResult.summary.failed} pending`
+                : `${bulkGscResult.tokens?.length || 0} DNS TXT records to add · ${bulkGscResult.verified?.length || 0} already verified`}
+            </p>
+
+            {bulkGscResult.tokens?.length > 0 && (
+              <div className="mb-4">
+                <div className="text-xs font-semibold uppercase tracking-wider text-lime-400 mb-2">Step 1: Add these TXT records to your DNS (all at once)</div>
+                <div className="space-y-2">
+                  {bulkGscResult.tokens.map((t, i) => (
+                    <div key={i} className="rounded-lg border border-white/10 bg-black p-3">
+                      <div className="flex items-center justify-between mb-1">
+                        <span className="text-sm font-medium text-white">{t.domain}</span>
+                        <button
+                          onClick={() => navigator.clipboard.writeText(t.txt_record || t.meta_tag || '')}
+                          className="rounded border border-lime-400/30 px-2 py-0.5 text-xs text-lime-400 hover:bg-lime-400/10"
+                        >
+                          Copy
+                        </button>
+                      </div>
+                      {t.txt_record ? (
+                        <div className="space-y-1">
+                          <div className="text-xs text-white/40">DNS Record: <span className="text-white/60">@ {t.dns_type}</span></div>
+                          <code className="block text-xs text-lime-300 bg-black rounded p-2 font-mono break-all">{t.txt_record}</code>
+                        </div>
+                      ) : t.meta_tag ? (
+                        <div className="space-y-1">
+                          <div className="text-xs text-white/40">Meta tag (add to &lt;head&gt;):</div>
+                          <code className="block text-xs text-lime-300 bg-black rounded p-2 font-mono break-all">{t.meta_tag}</code>
+                        </div>
+                      ) : null}
+                    </div>
+                  ))}
+                </div>
+                <div className="mt-3 rounded-lg border border-lime-400/20 bg-lime-400/5 p-3 text-xs text-lime-300">
+                  <strong>Next step:</strong> Add all the TXT records above to your DNS provider, then come back and click <strong>"Verify All"</strong> to confirm verification + submit sitemaps to GSC automatically.
+                </div>
+              </div>
+            )}
+
+            {bulkGscResult.verified?.length > 0 && (
+              <div className="mb-4">
+                <div className="text-xs font-semibold uppercase tracking-wider text-lime-400 mb-2">Verified in GSC ({bulkGscResult.verified.length})</div>
+                <div className="flex flex-wrap gap-1.5">
+                  {bulkGscResult.verified.map((v, i) => (
+                    <span key={i} className="rounded border border-lime-400/30 px-2 py-0.5 text-xs text-lime-300">
+                      {v.domain} {v.sitemap_submitted === false ? '(no sitemap)' : ''}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {bulkGscResult.failed?.length > 0 && (
+              <div className="mb-4">
+                <div className="text-xs font-semibold uppercase tracking-wider text-rose-400 mb-2">Not yet verified ({bulkGscResult.failed.length})</div>
+                <div className="space-y-1">
+                  {bulkGscResult.failed.slice(0, 10).map((f, i) => (
+                    <div key={i} className="text-xs text-white/50">{f.domain}: {f.error}</div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            <div className="mt-5 flex justify-end gap-2">
+              <LoadingButton onClick={() => setBulkGscResult(null)} variant="ghost">Close</LoadingButton>
+              {bulkGscResult.tokens?.length > 0 && (
+                <LoadingButton onClick={() => bulkGsc('verify_all')} loading={bulkGscLoading === 'verify_all'} variant="primary">
+                  <CheckCircle className="h-4 w-4" /> Verify All Now
+                </LoadingButton>
+              )}
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );
