@@ -40,27 +40,33 @@ export default function StepSearch({ onSelect, onResume }) {
     setError("");
     setResults([]);
     try {
-      const res = await base44.integrations.Core.InvokeLLM({
-        prompt: `Find ${resultCount} real ${industry} businesses${location ? ` in ${location}` : " in the United States"} that have live websites. For each, return the business name, their website URL (full URL starting with https://), and a 1-sentence description of what they do. Return JSON: { "businesses": [{ "name": string, "url": string, "description": string }] }`,
-        add_context_from_internet: true,
-        model: "gemini_3_flash",
-        response_json_schema: {
-          type: "object",
-          properties: {
-            businesses: {
-              type: "array",
-              items: {
-                type: "object",
-                properties: {
-                  name: { type: "string" },
-                  url: { type: "string" },
-                  description: { type: "string" },
+      const timeoutPromise = new Promise((_, reject) =>
+        setTimeout(() => reject(new Error("Search timed out — try again or enter a URL directly")), 30000)
+      );
+      const res = await Promise.race([
+        base44.integrations.Core.InvokeLLM({
+          prompt: `Find ${resultCount} real ${industry} businesses${location ? ` in ${location}` : " in the United States"} that have live websites. For each, return the business name, their website URL (full URL starting with https://), and a 1-sentence description of what they do. Return JSON: { "businesses": [{ "name": string, "url": string, "description": string }] }`,
+          add_context_from_internet: true,
+          model: "gemini_3_flash",
+          response_json_schema: {
+            type: "object",
+            properties: {
+              businesses: {
+                type: "array",
+                items: {
+                  type: "object",
+                  properties: {
+                    name: { type: "string" },
+                    url: { type: "string" },
+                    description: { type: "string" },
+                  },
                 },
               },
             },
           },
-        },
-      });
+        }),
+        timeoutPromise,
+      ]);
       setResults(res.businesses || []);
     } catch (e) {
       setError(e.message);
