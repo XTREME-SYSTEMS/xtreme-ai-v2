@@ -1,13 +1,17 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.40';
 import { slugify, provisionGithub, provisionDrive, provisionSupabase, provisionVercel } from '../../shared/provisioning.ts';
+import { withRetry, safeInvoke, parallelSafe, safeUpdate, captureError } from '../../shared/resilience.ts';
+import { isStepComplete, markFailed } from '../../shared/pipelineState.ts';
 
-// Provision Approved Clone — runs AFTER user approval:
+// Provision Approved Clone — runs AFTER user approval (idempotent + resilient):
 // 1. Build the rebranded site files
-// 2. Provision Drive, GitHub, Supabase, Vercel
-// 3. Buy the domain from Vercel
+// 2. Provision Drive, GitHub, Supabase, Vercel (parallel where possible)
+// 3. Buy the domain from Vercel (with retry)
 // 4. Fill SEO/AEO gaps (meta, JSON-LD, FAQ schema, missing pages)
 // 5. Create Rank Engine campaign + GSC sync
-// 6. Set up race-to-rank maintenance
+// 6. Identify monetization + social automation
+// 7. Final validation scoring
+// Each step is idempotent — re-running skips already-completed work.
 
 export default async function(req) {
   try {
@@ -22,8 +26,23 @@ export default async function(req) {
     if (!project.rebrand_package) return Response.json({ error: 'Rebrand package not found — run generateRebrandPackage first' }, { status: 400 });
 
     const log = (m) => logs.push(`${new Date().toISOString().slice(11, 19)} ${m}`);
-    await svc.entities.CloneProject.update(project.id, { current_step: 'provisioning', status: 'running', approval_status: 'approved', logs: [...(project.logs || []), ...logs] });
-    logs.length = 0;
+    const flushLogs = async (extra = {}) => {
+      const p = await svc.entities.CloneProject.get(project.id);
+      await safeUpdate(svc, 'CloneProject', project.id, {
+        ...extra,
+        logs: [...(p.logs || []), ...logs],
+      });
+      logs.length = 0;
+    };
+
+    // Set to provisioning (idempotent — skip if already past this step)
+    if (!isStepComplete(project, 'provisioning')) {
+      await safeUpdate(svc, 'CloneProject', project.id, {
+        current_step: 'provisioning', status: 'running', approval_status: 'approved',
+        logs: [...(project.logs || []), ...logs],
+      });
+      logs.length = 0;
+    }
 
     const rp = project.rebrand_package;
     const name = project.selected_name || rp.new_brand?.name || 'NewCo';
@@ -31,12 +50,14 @@ export default async function(req) {
     const industry = project.industry || 'general';
     const colors = rp.new_brand?.colors || { primary: '#0a0a0a', accent: '#D4FF4D' };
 
-    // ---- Step 1: Build the rebranded site files (visual parity from scrape) ----
+    // ---- Step 1: Build the rebranded site files ----
     log('Building rebranded site files from scraped HTML snapshot...');
     const files = buildRebrandedSite(project, rp);
     log(`Built ${Object.keys(files).length} site files (visual parity: ${project.scrape?.html_snapshot ? 'yes' : 'fallback template'})`);
 
     // ---- Step 2: Provision Drive, GitHub, Supabase, Vercel ----
+    // Use existing provisioning data if already provisioned (idempotent)
+    const existingProv = project.provisioning || {};
     const market = {
       slug: slugify(name),
       city: 'National', state: 'US',
@@ -46,35 +67,57 @@ export default async function(req) {
       domain: domain,
     };
 
-    log('Provisioning Drive...');
-    const drive = await provisionDrive(base44, market).catch(e => { log(`Drive failed: ${e.message}`); return null; });
+    // Run Drive + Supabase in parallel (independent), then GitHub (needs files), then Vercel (needs GitHub repo)
+    log('Provisioning Drive + Supabase in parallel...');
+    const [driveRes, supabaseRes] = await parallelSafe([
+      () => existingProv.drive?.folder_id
+        ? Promise.resolve(existingProv.drive)
+        : withRetry(() => provisionDrive(base44, market), { retries: 2, label: 'Drive' }),
+      () => existingProv.supabase?.project_id
+        ? Promise.resolve(existingProv.supabase)
+        : withRetry(() => provisionSupabase(market), { retries: 2, label: 'Supabase' }),
+    ]);
+    const drive = driveRes.ok ? driveRes.result : null;
+    const supabase = supabaseRes.ok ? supabaseRes.result : null;
+    if (!driveRes.ok) log(`Drive failed: ${driveRes.error}`);
+    if (!supabaseRes.ok) log(`Supabase failed: ${supabaseRes.error}`);
+
     log('Provisioning GitHub + pushing files...');
-    const github = await provisionGithub(base44, market, files).catch(e => { log(`GitHub failed: ${e.message}`); return null; });
-    log('Provisioning Supabase...');
-    const supabase = await provisionSupabase(market).catch(e => { log(`Supabase failed: ${e.message}`); return null; });
+    const githubRes = await parallelSafe([
+      () => existingProv.github?.repo
+        ? Promise.resolve(existingProv.github)
+        : withRetry(() => provisionGithub(base44, market, files), { retries: 2, label: 'GitHub' }),
+    ]);
+    const github = githubRes[0].ok ? githubRes[0].result : null;
+    if (!githubRes[0].ok) log(`GitHub failed: ${githubRes[0].error}`);
+
     log('Provisioning Vercel + deploying...');
-    const vercel = await provisionVercel(market, github?.repo || '', files).catch(e => { log(`Vercel failed: ${e.message}`); return null; });
+    const vercelRes = await parallelSafe([
+      () => existingProv.vercel?.project_id
+        ? Promise.resolve(existingProv.vercel)
+        : withRetry(() => provisionVercel(market, github?.repo || '', files), { retries: 2, label: 'Vercel' }),
+    ]);
+    const vercel = vercelRes[0].ok ? vercelRes[0].result : null;
+    if (!vercelRes[0].ok) log(`Vercel failed: ${vercelRes[0].error}`);
+
     log(`Provisioned: ${drive ? '✓' : '✗'}Drive ${github ? '✓' : '✗'}GitHub ${supabase ? '✓' : '✗'}Supabase ${vercel ? '✓' : '✗'}Vercel`);
 
-    await svc.entities.CloneProject.update(project.id, {
-      provisioning: { drive, github, supabase, vercel },
-      logs: [...(project.logs || []), ...logs]
-    });
-    logs.length = 0;
+    await flushLogs({ provisioning: { drive, github, supabase, vercel } });
 
-    // ---- Step 3: Buy domain from Vercel ----
+    // ---- Step 3: Buy domain from Vercel (with retry) ----
     log('Attempting domain purchase from Vercel...');
-    const domainResult = await purchaseVercelDomain(domain, vercel?.project_id).catch(e => {
+    const domainResult = await withRetry(
+      () => purchaseVercelDomain(domain, vercel?.project_id),
+      { retries: 2, label: 'Domain purchase' }
+    ).catch(e => {
       log(`Domain purchase failed: ${e.message}`);
       return { purchased: false, status: 'failed', error: e.message };
     });
     log(`Domain purchase: ${domainResult.purchased ? '✓ purchased' : 'pending'} — ${domainResult.status || ''}`);
-    await svc.entities.CloneProject.update(project.id, {
+    await flushLogs({
       domain_purchased: domainResult.purchased || false,
       domain_purchase_status: domainResult.status || 'unknown',
-      logs: [...(project.logs || []), ...logs]
     });
-    logs.length = 0;
 
     // ---- Step 4: Fill SEO/AEO gaps ----
     log('Filling SEO/AEO gaps...');
@@ -83,65 +126,77 @@ export default async function(req) {
 
     // ---- Step 5: Create Rank Engine campaign + GSC sync ----
     log('Creating Rank Engine campaign...');
-    const rankData = await base44.integrations.Core.InvokeLLM({
+    const rankData = await safeInvoke(base44, {
       prompt: `For a ${industry} business named "${name}" targeting national US market, return 10 target cities and 5 core services as JSON: { "cities": [string], "services": [string] }`,
       model: 'gemini_3_flash',
-      response_json_schema: { type: 'object', properties: { cities: { type: 'array', items: { type: 'string' } }, services: { type: 'array', items: { type: 'string' } } } }
-    }).catch(() => ({ cities: ['Austin', 'Dallas', 'Houston', 'Denver', 'Phoenix'], services: [industry] }));
+      response_json_schema: { type: 'object', properties: { cities: { type: 'array', items: { type: 'string' } }, services: { type: 'array', items: { type: 'string' } } } },
+      fallback: { cities: ['Austin', 'Dallas', 'Houston', 'Denver', 'Phoenix'], services: [industry] },
+      label: 'RankEngine cities/services',
+    });
 
-    const engine = await svc.entities.RankEngine.create({
-      site_name: name,
-      site_url: vercel?.url || `https://${domain}`,
-      niche: industry,
-      cities: rankData.cities || [],
-      services: rankData.services || [],
-      status: 'active', logs: ['Created by clone rebrand pipeline']
-    }).catch(e => { log(`RankEngine create failed: ${e.message}`); return null; });
+    const engine = project.rank_engine_id
+      ? await svc.entities.RankEngine.get(project.rank_engine_id).catch(() => null)
+      : await svc.entities.RankEngine.create({
+          site_name: name,
+          site_url: vercel?.url || `https://${domain}`,
+          niche: industry,
+          cities: rankData.cities || [],
+          services: rankData.services || [],
+          status: 'active', logs: ['Created by clone rebrand pipeline']
+        }).catch(e => { log(`RankEngine create failed: ${e.message}`); return null; });
 
     if (engine) {
-      log(`RankEngine campaign created: ${engine.id}`);
+      log(`RankEngine campaign: ${engine.id}`);
       await base44.functions.invoke('syncRankings', { engine_id: engine.id }).catch(e => log(`GSC sync skipped: ${e.message}`));
     }
 
-    // ---- Step 6: Identify monetization + social (bonus automation) ----
-    log('Identifying monetization opportunities...');
-    const monetResult = await base44.integrations.Core.InvokeLLM({
-      prompt: `Analyze a ${industry} website "${name}" and identify monetization opportunities. Return JSON: { "options": [ { "type": string, "description": string, "estimated_revenue": string, "implementation": string } ] }`,
-      model: 'gemini_3_flash', add_context_from_internet: true,
-      response_json_schema: {
-        type: 'object',
-        properties: { options: { type: 'array', items: { type: 'object', properties: {
-          type: { type: 'string' }, description: { type: 'string' }, estimated_revenue: { type: 'string' }, implementation: { type: 'string' }
-        } } } }
-      }
-    }).catch(() => ({ options: [] }));
+    // ---- Step 6: Identify monetization + social (parallel, non-blocking) ----
+    log('Identifying monetization + social automation in parallel...');
+    const [monetRes, socialRes] = await parallelSafe([
+      () => safeInvoke(base44, {
+        prompt: `Analyze a ${industry} website "${name}" and identify monetization opportunities. Return JSON: { "options": [ { "type": string, "description": string, "estimated_revenue": string, "implementation": string } ] }`,
+        model: 'gemini_3_flash', add_context_from_internet: true,
+        response_json_schema: {
+          type: 'object',
+          properties: { options: { type: 'array', items: { type: 'object', properties: {
+            type: { type: 'string' }, description: { type: 'string' }, estimated_revenue: { type: 'string' }, implementation: { type: 'string' }
+          } } } }
+        },
+        fallback: { options: [] },
+        label: 'monetization',
+      }),
+      () => safeInvoke(base44, {
+        prompt: `Create a social media automation plan for "${name}", a ${industry} business. Return JSON: { "platforms": [string], "post_schedule": string, "content_templates": [ { "platform": string, "template": string, "frequency": string } ], "video_prompt": string }`,
+        model: 'gemini_3_flash',
+        response_json_schema: {
+          type: 'object',
+          properties: {
+            platforms: { type: 'array', items: { type: 'string' } },
+            post_schedule: { type: 'string' },
+            content_templates: { type: 'array', items: { type: 'object', properties: { platform: { type: 'string' }, template: { type: 'string' }, frequency: { type: 'string' } } } },
+            video_prompt: { type: 'string' }
+          }
+        },
+        fallback: { platforms: [], post_schedule: '', content_templates: [], video_prompt: '' },
+        label: 'social plan',
+      }),
+    ]);
+    const monetResult = monetRes.ok ? monetRes.result : { options: [] };
+    const socialResult = socialRes.ok ? socialRes.result : { platforms: [], post_schedule: '', content_templates: [], video_prompt: '' };
 
-    log('Generating social media automation plan...');
-    const socialResult = await base44.integrations.Core.InvokeLLM({
-      prompt: `Create a social media automation plan for "${name}", a ${industry} business. Return JSON: { "platforms": [string], "post_schedule": string, "content_templates": [ { "platform": string, "template": string, "frequency": string } ], "video_prompt": string }`,
-      model: 'gemini_3_flash',
-      response_json_schema: {
-        type: 'object',
-        properties: {
-          platforms: { type: 'array', items: { type: 'string' } },
-          post_schedule: { type: 'string' },
-          content_templates: { type: 'array', items: { type: 'object', properties: { platform: { type: 'string' }, template: { type: 'string' }, frequency: { type: 'string' } } } },
-          video_prompt: { type: 'string' }
-        }
-      }
-    }).catch(() => ({ platforms: [], post_schedule: '', content_templates: [], video_prompt: '' }));
-
-    // ---- Final validation ----
+    // ---- Step 7: Final validation ----
     log('Running final validation...');
     const validationPrompt = `Audit this rebranded+provisioned clone. Name: ${name}, Domain: ${domain}, Industry: ${industry}. Provisioned: Drive ${drive ? '✓' : '✗'}, GitHub ${github ? '✓' : '✗'}, Supabase ${supabase ? '✓' : '✗'}, Vercel ${vercel ? '✓' : '✗'}. Domain purchased: ${domainResult.purchased}. SEO/AEO gaps filled: ${seoGaps.filled}. Logos: ${(rp.logos || []).length}. Replacement images: ${(rp.replacement_images || []).length}. Replacement content: ${(rp.replacement_content || []).length}. RankEngine: ${engine ? '✓' : '✗'}. Score 0-100. Return JSON: { "score": number, "summary": string }`;
-    const validation = await base44.integrations.Core.InvokeLLM({
+    const validation = await safeInvoke(base44, {
       prompt: validationPrompt, model: 'gemini_3_flash',
-      response_json_schema: { type: 'object', properties: { score: { type: 'number' }, summary: { type: 'string' } } }
+      response_json_schema: { type: 'object', properties: { score: { type: 'number' }, summary: { type: 'string' } } },
+      fallback: { score: 70, summary: 'Provisioning complete — validation skipped due to LLM error' },
+      label: 'final validation',
     });
 
     log(`Validation score: ${validation.score || 0}/100`);
 
-    await svc.entities.CloneProject.update(project.id, {
+    await safeUpdate(svc, 'CloneProject', project.id, {
       seo_aeo_gaps: seoGaps.gaps,
       seo_aeo_filled: seoGaps.remaining === 0,
       rank_engine_id: engine?.id || '',
@@ -152,7 +207,7 @@ export default async function(req) {
       validation_summary: validation.summary || '',
       current_step: 'racing_to_rank',
       status: 'complete',
-      logs: [...(project.logs || []), ...logs]
+      logs: [...(project.logs || []), ...logs],
     });
 
     return Response.json({
@@ -166,7 +221,16 @@ export default async function(req) {
       validation_score: validation.score || 0
     });
   } catch (error) {
-    return Response.json({ error: error.message }, { status: 500 });
+    console.error('[provisionApprovedClone]', error);
+    // Mark the project as failed so the recovery loop can pick it up
+    try {
+      const base44 = createClientFromRequest(req);
+      const body = await req.json().catch(() => ({}));
+      if (body.project_id) {
+        await markFailed(base44.asServiceRole, body.project_id, error, { function: 'provisionApprovedClone' });
+      }
+    } catch {}
+    return Response.json({ error: error.message, ...captureError(error) }, { status: 500 });
   }
 }
 

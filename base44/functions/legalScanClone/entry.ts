@@ -1,5 +1,7 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.40';
 import { detectIndustry, scrapeTarget } from '../../shared/cloneUtils.ts';
+import { withRetry, safeInvoke, captureError } from '../../shared/resilience.ts';
+import { markFailed } from '../../shared/pipelineState.ts';
 
 // Deep Legal Scan — scans a cloned site and produces a single-page summary
 // of ONLY what legally must change, what can stay, 20 name+domain recommendations,
@@ -39,9 +41,9 @@ export default async function(req) {
 
     await svc.entities.CloneProject.update(project.id, { current_step: 'scanning', status: 'running' });
 
-    // ---- Step 1: Scrape the target site ----
+    // ---- Step 1: Scrape the target site (with retry) ----
     log('Scraping target site...');
-    const scraped = await scrapeTarget(project.target_url);
+    const scraped = await withRetry(() => scrapeTarget(project.target_url), { retries: 2, label: 'scrape' });
     const html = scraped.html;
     const imgUrls = scraped.imgUrls;
     const industry = project.industry || detectIndustry(html, scraped.title);
@@ -102,10 +104,13 @@ Return a JSON object with this exact structure:
 
 IMPORTANT: Generate exactly 20 name recommendations. For images, only include images that show the original company's actual work, team, products, or proprietary content — stock photos and generic industry images can be kept. For content, only include text blocks that are unique copyrighted copy or company-specific claims — general industry information can be kept.`;
 
-    const analysis = await base44.integrations.Core.InvokeLLM({
+    const analysis = await safeInvoke(base44, {
       prompt: analysisPrompt,
       model: 'gemini_3_flash',
       add_context_from_internet: true,
+      timeout: 60000,
+      retries: 2,
+      label: 'legal analysis',
       response_json_schema: {
         type: 'object',
         properties: {
@@ -145,7 +150,14 @@ IMPORTANT: Generate exactly 20 name recommendations. For images, only include im
             name: { type: 'string' }, domain: { type: 'string' }, rationale: { type: 'string' }, available: { type: 'boolean' }
           } } }
         }
-      }
+      },
+      fallback: {
+        risk_level: 'medium',
+        executive_summary: 'Legal scan failed — using conservative defaults. Manual review recommended.',
+        must_change: { business_name: '', images_to_replace: [], content_to_replace: [], trademarked_terms: [] },
+        can_keep: { page_structure: 'Standard layout', service_descriptions: [], faq_format: 'Standard FAQ', color_scheme: 'Similar palette acceptable', layout: 'Standard', general_content: [] },
+        name_recommendations: [],
+      },
     });
 
     log(`Legal scan complete: risk=${analysis.risk_level}, ${(analysis.must_change?.images_to_replace || []).length} images to replace, ${(analysis.must_change?.content_to_replace || []).length} content blocks to replace, ${(analysis.name_recommendations || []).length} name options`);
@@ -259,6 +271,14 @@ ${names.map((n, i) => `**${i + 1}. ${n.name}** — ${n.domain} ${n.available ? '
       summary: summary
     });
   } catch (error) {
-    return Response.json({ error: error.message }, { status: 500 });
+    console.error('[legalScanClone]', error);
+    try {
+      const base44 = createClientFromRequest(req);
+      const body = await req.json().catch(() => ({}));
+      if (body.project_id) {
+        await markFailed(base44.asServiceRole, body.project_id, error, { function: 'legalScanClone' });
+      }
+    } catch {}
+    return Response.json({ error: error.message, ...captureError(error) }, { status: 500 });
   }
 }

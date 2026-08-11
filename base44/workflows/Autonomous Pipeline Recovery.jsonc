@@ -1,0 +1,44 @@
+{
+  "description": "Every 15 minutes, scans for stuck or failed CloneProjects and automatically recovers them by re-running the appropriate pipeline step. Makes the clone pipeline self-healing.",
+  "definition": {
+    "document": {
+      "dsl": "1.0.0",
+      "name": "autonomous_pipeline_recovery",
+      "version": "1.0",
+      "namespace": "base44"
+    },
+    "do": [
+      {
+        "recover": {
+          "call": "invoke_backend_function",
+          "with": {
+            "function_name": "recoverStuckProjects"
+          },
+          "then": "end",
+          "x-base44": {
+            "title": "Recover stuck projects",
+            "description": "Scan + re-run failed pipeline steps"
+          }
+        }
+      }
+    ]
+  },
+  "name": "Autonomous Pipeline Recovery",
+  "trigger": {
+    "condition": null,
+    "config": {
+      "trigger_type": "scheduled",
+      "events": [],
+      "schedule_mode": "recurring",
+      "cron_expression": "*/15 * * * *",
+      "one_time_date": null,
+      "timezone": "America/New_York",
+      "interval_value": null,
+      "interval_unit": null,
+      "interval_anchor": null,
+      "ends_type": "never",
+      "ends_on_date": null,
+      "ends_after_count": null
+    }
+  }
+}

@@ -1,4 +1,6 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.40';
+import { safeInvoke, parallelSafe, safeUpdate, captureError } from '../../shared/resilience.ts';
+import { markFailed } from '../../shared/pipelineState.ts';
 
 // Rebrand Package Generator — takes a legal scan and generates ALL replacement
 // assets: logos, replacement images (for each identified image), replacement
@@ -18,7 +20,7 @@ export default async function(req) {
     if (!project.legal_scan) return Response.json({ error: 'Legal scan not found — run legalScanClone first' }, { status: 400 });
 
     const log = (m) => logs.push(`${new Date().toISOString().slice(11, 19)} ${m}`);
-    await svc.entities.CloneProject.update(project.id, { current_step: 'generating_rebrand', status: 'running', logs: [...(project.logs || []), ...logs] });
+    await safeUpdate(svc, 'CloneProject', project.id, { current_step: 'generating_rebrand', status: 'running', logs: [...(project.logs || []), ...logs] });
     logs.length = 0;
 
     const mc = project.legal_scan.must_change || {};
@@ -28,7 +30,7 @@ export default async function(req) {
 
     // Update selected name/domain if changed
     if (body.selected_name || body.selected_domain) {
-      await svc.entities.CloneProject.update(project.id, { selected_name: name, selected_domain: domain });
+      await safeUpdate(svc, 'CloneProject', project.id, { selected_name: name, selected_domain: domain });
     }
 
     log(`Generating rebrand package for "${name}" (${domain})...`);
@@ -36,7 +38,7 @@ export default async function(req) {
     // ---- Step 1: Generate new brand identity (colors, tagline, voice) ----
     log('Generating brand identity...');
     const brandPrompt = `Create a new brand identity for "${name}", a ${industry} business replacing "${mc.business_name || 'the original'}". The original tagline "${mc.tagline || ''}" must be replaced. Return JSON: { "tagline": string, "voice": string (brand voice description), "colors": { "primary": hex, "accent": hex } }`;
-    const brand = await base44.integrations.Core.InvokeLLM({
+    const brand = await safeInvoke(base44, {
       prompt: brandPrompt, model: 'gemini_3_flash',
       response_json_schema: {
         type: 'object',
@@ -44,7 +46,9 @@ export default async function(req) {
           tagline: { type: 'string' }, voice: { type: 'string' },
           colors: { type: 'object', properties: { primary: { type: 'string' }, accent: { type: 'string' } } }
         }
-      }
+      },
+      fallback: { tagline: '', voice: 'professional and trustworthy', colors: { primary: '#0a0a0a', accent: '#D4FF4D' } },
+      label: 'brand identity',
     });
 
     // ---- Step 2: Generate 3 logo options in parallel ----
@@ -53,21 +57,22 @@ export default async function(req) {
     const logoPrompts = logoStyles.map(style =>
       `Professional logo for "${name}", a ${industry} company. Style: ${style}. Colors: ${brand.colors?.primary || '#0a0a0a'} and ${brand.colors?.accent || '#D4FF4D'}. Clean, scalable, on white background. Brand name "${name}" integrated into the logo design.`
     );
-    const logoResults = await Promise.all(logoPrompts.map(p =>
-      base44.integrations.Core.GenerateImage({ prompt: p }).catch(e => { log(`Logo gen failed: ${e.message}`); return null; })
+    const logoResults = await parallelSafe(logoPrompts.map(p => () =>
+      base44.integrations.Core.GenerateImage({ prompt: p })
     ));
-    const logos = logoResults.filter(Boolean).map((r, i) => ({ url: r.url, prompt: logoPrompts[i], style: logoStyles[i] }));
+    const logos = logoResults.filter(r => r.ok).map((r, i) => ({ url: r.result.url, prompt: logoPrompts[i], style: logoStyles[i] }));
+    if (logos.length < logoResults.length) log(`${logoResults.length - logos.length} logo(s) failed`);
     log(`Generated ${logos.length} logos`);
 
     // ---- Step 3: Generate replacement images for each identified image ----
     const imagesToReplace = mc.images_to_replace || [];
     log(`Generating ${imagesToReplace.length} replacement images...`);
-    const imageResults = await Promise.all(imagesToReplace.slice(0, 5).map(img =>
+    const imageResults = await parallelSafe(imagesToReplace.slice(0, 5).map(img => () =>
       base44.integrations.Core.GenerateImage({ prompt: img.replacement_prompt || `Professional ${industry} image, high quality, no text` })
         .then(r => ({ original_url: img.url, new_url: r.url, description: img.description, prompt: img.replacement_prompt }))
-        .catch(e => { log(`Image replacement failed: ${e.message}`); return null; })
     ));
-    const replacementImages = imageResults.filter(Boolean);
+    const replacementImages = imageResults.filter(r => r.ok).map(r => r.result);
+    if (replacementImages.length < imageResults.length) log(`${imageResults.length - replacementImages.length} image(s) failed`);
     log(`Generated ${replacementImages.length} replacement images`);
 
     // ---- Step 4: Generate replacement content for each identified block ----
@@ -84,7 +89,7 @@ New brand: ${name}
 New tagline: ${brand.tagline || ''}
 Brand voice: ${brand.voice || ''}`;
 
-      const contentResult = await base44.integrations.Core.InvokeLLM({
+      const contentResult = await safeInvoke(base44, {
         prompt: contentPrompt, model: 'gemini_3_flash',
         response_json_schema: {
           type: 'object',
@@ -93,7 +98,9 @@ Brand voice: ${brand.voice || ''}`;
               section: { type: 'string' }, original_text: { type: 'string' }, new_text: { type: 'string' }
             } } }
           }
-        }
+        },
+        fallback: { replacements: [] },
+        label: 'replacement content',
       });
       replacementContent = contentResult.replacements || [];
       log(`Generated ${replacementContent.length} replacement content blocks`);
@@ -102,7 +109,7 @@ Brand voice: ${brand.voice || ''}`;
     // ---- Step 5: Generate hero content + services + FAQ ----
     log('Generating hero content, services, and FAQ...');
     const heroPrompt = `Generate complete hero section content for "${name}", a ${industry} business. Tagline: ${brand.tagline || ''}. Return JSON: { "headline": string, "subhead": string, "about": string (2 paragraphs), "services": [ { "title": string, "description": string } ], "faq": [ { "question": string, "answer": string } ] }`;
-    const heroResult = await base44.integrations.Core.InvokeLLM({
+    const heroResult = await safeInvoke(base44, {
       prompt: heroPrompt, model: 'gemini_3_flash',
       response_json_schema: {
         type: 'object',
@@ -111,7 +118,9 @@ Brand voice: ${brand.voice || ''}`;
           services: { type: 'array', items: { type: 'object', properties: { title: { type: 'string' }, description: { type: 'string' } } } },
           faq: { type: 'array', items: { type: 'object', properties: { question: { type: 'string' }, answer: { type: 'string' } } } }
         }
-      }
+      },
+      fallback: { headline: name, subhead: '', about: '', services: [], faq: [] },
+      label: 'hero content',
     });
 
     const rebrandPackage = {
