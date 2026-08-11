@@ -1,0 +1,78 @@
+{
+  "name": "Backlink Follow-up Sequence",
+  "description": "Automated drip outreach: when a backlink prospect is sent an email, wait 4 days \u2014 if no reply, send follow-up #1. Wait 7 more days \u2014 if still no reply, send final follow-up #2. Dramatically increases response rates and link acquisition velocity.",
+  "trigger": {
+    "config": {
+      "trigger_type": "entity",
+      "entity_name": "BacklinkProspect",
+      "events": [
+        "update"
+      ]
+    },
+    "condition": "${ .trigger.data.outreach_status == \"sent\" }"
+  },
+  "definition": {
+    "document": {
+      "dsl": "1.0.0",
+      "name": "backlink_followup_sequence",
+      "version": "1.0",
+      "namespace": "base44"
+    },
+    "do": [
+      {
+        "wait_4_days": {
+          "wait": "P4D",
+          "then": "send_followup_1",
+          "x-base44": {
+            "title": "Wait 4 days",
+            "description": "Give the prospect time to reply before first follow-up"
+          }
+        }
+      },
+      {
+        "send_followup_1": {
+          "call": "invoke_backend_function",
+          "with": {
+            "function_name": "sendFollowUp",
+            "args": {
+              "prospect_id": "${ .trigger.entity_id }",
+              "follow_up_number": 1
+            }
+          },
+          "then": "wait_7_days",
+          "x-base44": {
+            "title": "Send follow-up #1",
+            "description": "First follow-up email (skips if prospect already replied)"
+          }
+        }
+      },
+      {
+        "wait_7_days": {
+          "wait": "P7D",
+          "then": "send_followup_2",
+          "x-base44": {
+            "title": "Wait 7 days",
+            "description": "Wait before final follow-up"
+          }
+        }
+      },
+      {
+        "send_followup_2": {
+          "call": "invoke_backend_function",
+          "with": {
+            "function_name": "sendFollowUp",
+            "args": {
+              "prospect_id": "${ .trigger.entity_id }",
+              "follow_up_number": 2
+            }
+          },
+          "then": "end",
+          "x-base44": {
+            "title": "Send final follow-up",
+            "description": "Last follow-up email (skips if prospect already replied)"
+          }
+        }
+      }
+    ]
+  }
+}

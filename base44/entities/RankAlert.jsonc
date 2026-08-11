@@ -1,0 +1,42 @@
+{
+  "name": "RankAlert",
+  "type": "object",
+  "properties": {
+    "engine_id": {
+      "type": "string",
+      "description": "Linked RankEngine campaign"
+    },
+    "keyword": {
+      "type": "string"
+    },
+    "alert_type": {
+      "type": "string",
+      "enum": [
+        "page_one",
+        "top_three",
+        "dropped",
+        "improved",
+        "lost_ranking",
+        "new_traffic"
+      ],
+      "description": "page_one = entered top 10; top_three = entered top 3; dropped = fell 5+ positions; improved = gained 5+ positions; lost_ranking = fell out of top 100; new_traffic = first clicks detected"
+    },
+    "position": {
+      "type": "number"
+    },
+    "previous_position": {
+      "type": "number"
+    },
+    "message": {
+      "type": "string"
+    },
+    "acknowledged": {
+      "type": "boolean",
+      "default": false
+    }
+  },
+  "required": [
+    "engine_id",
+    "alert_type"
+  ]
+}

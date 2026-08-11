@@ -79,6 +79,14 @@
         "type": "string"
       }
     },
+    "competitor_gap_report": {
+      "type": "string",
+      "description": "Detailed markdown report from competitor gap analysis"
+    },
+    "gap_analyzed_at": {
+      "type": "string",
+      "format": "date-time"
+    },
     "last_run_at": {
       "type": "string",
       "format": "date-time"

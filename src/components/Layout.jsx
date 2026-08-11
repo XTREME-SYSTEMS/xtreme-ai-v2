@@ -6,7 +6,7 @@ import {
   Lightbulb, Palette, Monitor, Megaphone, Boxes, Factory, Database, Eye,
   Hammer, ShieldCheck, FileText, TrendingUp, FlaskConical, Dna, Network, BarChart3,
   BookMarked, CheckCircle, ScrollText, Plug, Settings, LogOut, Menu, X,
-  MapPin, Plus, Rocket, Bot, LayoutTemplate, Copy, Wand2,
+  MapPin, Plus, Rocket, Bot, LayoutTemplate, Copy, Wand2, Crosshair,
 } from "lucide-react";
 import { Image } from "@/components/ui/image";
 import { cn } from "@/lib/utils";
@@ -62,6 +62,7 @@ const NAV = [
   { to: "/race-to-rank", label: "Race to Rank", icon: Rocket },
   { to: "/ranking-monitor", label: "Ranking Monitor", icon: TrendingUp },
   { to: "/gsc-traffic", label: "GSC Traffic", icon: BarChart3 },
+  { to: "/seo-accelerator", label: "Page 1 Accelerator", icon: Crosshair },
   { to: "/domain-portfolio", label: "Domain Portfolio", icon: Globe },
   { to: "/rank-engine", label: "Rank Engine", icon: TrendingUp },
   { to: "/markets", label: "Markets", icon: MapPin },

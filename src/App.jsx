@@ -72,6 +72,7 @@ import RaceToRank from '@/pages/RaceToRank';
 import RankingMonitor from '@/pages/RankingMonitor';
 import DomainPortfolio from '@/pages/DomainPortfolio';
 import GscTraffic from '@/pages/GscTraffic';
+import SeoAccelerator from '@/pages/SeoAccelerator';
 import Login from '@/pages/Login';
 import Register from '@/pages/Register';
 import ForgotPassword from '@/pages/ForgotPassword';
@@ -172,6 +173,7 @@ const AuthenticatedApp = () => {
           <Route path="/ranking-monitor" element={<RankingMonitor />} />
           <Route path="/domain-portfolio" element={<DomainPortfolio />} />
           <Route path="/gsc-traffic" element={<GscTraffic />} />
+          <Route path="/seo-accelerator" element={<SeoAccelerator />} />
         </Route>
       </Route>
       <Route path="*" element={<PageNotFound />} />

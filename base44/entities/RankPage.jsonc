@@ -83,6 +83,58 @@
     "last_refreshed": {
       "type": "string",
       "format": "date-time"
+    },
+    "audit_issues": {
+      "type": "array",
+      "description": "Technical SEO audit findings for this page",
+      "items": {
+        "type": "object",
+        "properties": {
+          "check": {
+            "type": "string"
+          },
+          "severity": {
+            "type": "string",
+            "enum": [
+              "critical",
+              "high",
+              "medium",
+              "low"
+            ]
+          },
+          "detail": {
+            "type": "string"
+          },
+          "fix": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "last_audited": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "competitor_gap": {
+      "type": "object",
+      "description": "Gap analysis vs top-ranking competitors for this keyword",
+      "properties": {
+        "competitor_avg_word_count": {
+          "type": "number"
+        },
+        "our_word_count": {
+          "type": "number"
+        },
+        "missing_topics": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "recommendations": {
+          "type": "string"
+        }
+      }
     }
   },
   "required": [

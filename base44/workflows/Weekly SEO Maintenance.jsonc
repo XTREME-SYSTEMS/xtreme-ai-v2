@@ -1,0 +1,45 @@
+{
+  "name": "Weekly SEO Maintenance",
+  "description": "Runs weekly: technical SEO audit + content refresh across all active campaigns. Keeps every site technically clean and content fresh \u2014 Google rewards both for page-1 rankings.",
+  "trigger": {
+    "condition": null,
+    "config": {
+      "trigger_type": "scheduled",
+      "events": [],
+      "schedule_mode": "recurring",
+      "cron_expression": "0 9 * * 1",
+      "one_time_date": null,
+      "timezone": "America/New_York",
+      "interval_value": null,
+      "interval_unit": null,
+      "interval_anchor": null,
+      "ends_type": "never",
+      "ends_on_date": null,
+      "ends_after_count": null
+    }
+  },
+  "definition": {
+    "document": {
+      "dsl": "1.0.0",
+      "name": "weekly_seo_maintenance",
+      "version": "1.0",
+      "namespace": "base44"
+    },
+    "do": [
+      {
+        "run_maintenance": {
+          "call": "invoke_backend_function",
+          "with": {
+            "function_name": "runSeoMaintenance",
+            "args": {}
+          },
+          "then": "end",
+          "x-base44": {
+            "title": "Run SEO Maintenance",
+            "description": "Technical audit + content refresh for all active engines"
+          }
+        }
+      }
+    ]
+  }
+}

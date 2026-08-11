@@ -1,0 +1,45 @@
+{
+  "name": "Rank Alert Checker",
+  "description": "Daily: checks all tracked keywords for significant rank changes (entered page one, top 3, dropped, improved, lost ranking, new traffic) and creates alerts so you can celebrate wins and act on drops immediately.",
+  "trigger": {
+    "condition": null,
+    "config": {
+      "trigger_type": "scheduled",
+      "events": [],
+      "schedule_mode": "recurring",
+      "cron_expression": "30 6 * * *",
+      "one_time_date": null,
+      "timezone": "America/New_York",
+      "interval_value": null,
+      "interval_unit": null,
+      "interval_anchor": null,
+      "ends_type": "never",
+      "ends_on_date": null,
+      "ends_after_count": null
+    }
+  },
+  "definition": {
+    "document": {
+      "dsl": "1.0.0",
+      "name": "rank_alert_checker",
+      "version": "1.0",
+      "namespace": "base44"
+    },
+    "do": [
+      {
+        "check_alerts": {
+          "call": "invoke_backend_function",
+          "with": {
+            "function_name": "checkRankAlerts",
+            "args": {}
+          },
+          "then": "end",
+          "x-base44": {
+            "title": "Check rank alerts",
+            "description": "Detect page-one entries, drops, and new traffic across all keywords"
+          }
+        }
+      }
+    ]
+  }
+}
