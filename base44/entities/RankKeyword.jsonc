@@ -1,0 +1,70 @@
+{
+  "name": "RankKeyword",
+  "type": "object",
+  "properties": {
+    "engine_id": {
+      "type": "string"
+    },
+    "keyword": {
+      "type": "string"
+    },
+    "city": {
+      "type": "string"
+    },
+    "search_intent": {
+      "type": "string",
+      "enum": [
+        "transactional",
+        "commercial",
+        "informational",
+        "navigational"
+      ],
+      "default": "transactional"
+    },
+    "monthly_volume": {
+      "type": "number",
+      "default": 0
+    },
+    "difficulty": {
+      "type": "number",
+      "default": 0
+    },
+    "current_position": {
+      "type": "number",
+      "description": "SERP position (null/0 = not ranking yet)"
+    },
+    "previous_position": {
+      "type": "number"
+    },
+    "target_position": {
+      "type": "number",
+      "default": 10
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "target",
+        "tracking",
+        "ranking",
+        "page_one",
+        "stalled"
+      ],
+      "default": "target"
+    },
+    "page_url": {
+      "type": "string",
+      "description": "The page on the site targeting this keyword"
+    },
+    "page_id": {
+      "type": "string"
+    },
+    "last_checked": {
+      "type": "string",
+      "format": "date-time"
+    }
+  },
+  "required": [
+    "engine_id",
+    "keyword"
+  ]
+}

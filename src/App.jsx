@@ -64,6 +64,7 @@ import AutonomousSystem from '@/pages/AutonomousSystem';
 import WebsiteFactory from '@/pages/WebsiteFactory';
 import TemplateLibrary from '@/pages/TemplateLibrary';
 import PromptLibrary from '@/pages/PromptLibrary';
+import RankEngine from '@/pages/RankEngine';
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
@@ -148,6 +149,7 @@ const AuthenticatedApp = () => {
           <Route path="/website-factory" element={<WebsiteFactory />} />
           <Route path="/template-library" element={<TemplateLibrary />} />
           <Route path="/prompt-library" element={<PromptLibrary />} />
+          <Route path="/rank-engine" element={<RankEngine />} />
         </Route>
       </Route>
       <Route path="*" element={<PageNotFound />} />

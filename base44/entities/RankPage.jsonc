@@ -1,0 +1,92 @@
+{
+  "name": "RankPage",
+  "type": "object",
+  "properties": {
+    "engine_id": {
+      "type": "string"
+    },
+    "page_type": {
+      "type": "string",
+      "enum": [
+        "city_service",
+        "service",
+        "city",
+        "blog",
+        "faq"
+      ],
+      "default": "city_service"
+    },
+    "slug": {
+      "type": "string"
+    },
+    "title": {
+      "type": "string"
+    },
+    "meta_description": {
+      "type": "string"
+    },
+    "headline": {
+      "type": "string"
+    },
+    "body_content": {
+      "type": "string",
+      "description": "Full indexable page body (HTML or markdown)"
+    },
+    "city": {
+      "type": "string"
+    },
+    "service": {
+      "type": "string"
+    },
+    "keyword": {
+      "type": "string"
+    },
+    "json_ld": {
+      "type": "object"
+    },
+    "faq": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "question": {
+            "type": "string"
+          },
+          "answer": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "word_count": {
+      "type": "number",
+      "default": 0
+    },
+    "seo_score": {
+      "type": "number",
+      "default": 0
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "draft",
+        "generated",
+        "deployed",
+        "indexed",
+        "refreshing"
+      ],
+      "default": "draft"
+    },
+    "deployed_url": {
+      "type": "string"
+    },
+    "last_refreshed": {
+      "type": "string",
+      "format": "date-time"
+    }
+  },
+  "required": [
+    "engine_id",
+    "title"
+  ]
+}

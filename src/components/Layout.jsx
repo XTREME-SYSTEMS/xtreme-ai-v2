@@ -56,6 +56,7 @@ const NAV = [
   { to: "/website-factory", label: "Website Factory", icon: Factory },
   { to: "/template-library", label: "Template Library", icon: LayoutTemplate },
   { to: "/prompt-library", label: "Prompt Library", icon: BookOpen },
+  { to: "/rank-engine", label: "Rank Engine", icon: TrendingUp },
   { to: "/markets", label: "Markets", icon: MapPin },
   { to: "/markets/new", label: "New Market", icon: Plus },
   { to: "/seo-launch-pad", label: "SEO Launch Pad", icon: Rocket },

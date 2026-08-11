@@ -1,0 +1,55 @@
+{
+  "name": "RankCitation",
+  "type": "object",
+  "properties": {
+    "engine_id": {
+      "type": "string"
+    },
+    "source_name": {
+      "type": "string",
+      "description": "e.g. Google Business Profile, Yelp, BBB, Angi"
+    },
+    "source_url": {
+      "type": "string"
+    },
+    "category": {
+      "type": "string",
+      "enum": [
+        "directory",
+        "social",
+        "industry",
+        "blog_outreach",
+        "press"
+      ],
+      "default": "directory"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "pending",
+        "submitted",
+        "live",
+        "rejected"
+      ],
+      "default": "pending"
+    },
+    "domain_authority": {
+      "type": "number",
+      "default": 0
+    },
+    "submitted_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "live_url": {
+      "type": "string"
+    },
+    "notes": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "engine_id",
+    "source_name"
+  ]
+}

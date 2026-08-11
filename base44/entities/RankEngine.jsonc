@@ -1,0 +1,100 @@
+{
+  "name": "RankEngine",
+  "type": "object",
+  "properties": {
+    "site_name": {
+      "type": "string",
+      "description": "Business / site the campaign is ranking"
+    },
+    "site_url": {
+      "type": "string"
+    },
+    "niche": {
+      "type": "string"
+    },
+    "cities": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "services": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "target_keywords_count": {
+      "type": "number",
+      "default": 0
+    },
+    "pages_generated": {
+      "type": "number",
+      "default": 0
+    },
+    "citations_built": {
+      "type": "number",
+      "default": 0
+    },
+    "authority_score": {
+      "type": "number",
+      "default": 0
+    },
+    "technical_seo_score": {
+      "type": "number",
+      "default": 0
+    },
+    "content_score": {
+      "type": "number",
+      "default": 0
+    },
+    "overall_rank_readiness": {
+      "type": "number",
+      "default": 0,
+      "description": "0-100 probability estimate for page-one reach"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "draft",
+        "active",
+        "optimizing",
+        "paused",
+        "complete"
+      ],
+      "default": "draft"
+    },
+    "market_id": {
+      "type": "string"
+    },
+    "project_id": {
+      "type": "string"
+    },
+    "audit_summary": {
+      "type": "string"
+    },
+    "gaps": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "last_run_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "next_run_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "logs": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    }
+  },
+  "required": [
+    "site_name"
+  ]
+}
