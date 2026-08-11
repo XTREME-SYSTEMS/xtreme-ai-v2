@@ -1,0 +1,220 @@
+{
+  "name": "WebsiteFactoryProject",
+  "type": "object",
+  "properties": {
+    "business_name": {
+      "type": "string",
+      "description": "Seed input \u2014 the business or niche to build a website for"
+    },
+    "niche": {
+      "type": "string",
+      "description": "Industry / vertical"
+    },
+    "audience": {
+      "type": "string",
+      "description": "Target audience / customer persona"
+    },
+    "current_step": {
+      "type": "string",
+      "enum": [
+        "name",
+        "url",
+        "brand",
+        "brand_review",
+        "logo",
+        "content",
+        "images",
+        "seo_aeo",
+        "final_review",
+        "complete"
+      ],
+      "default": "name"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "pending",
+        "running",
+        "awaiting_approval",
+        "complete",
+        "failed"
+      ],
+      "default": "pending"
+    },
+    "website_name": {
+      "type": "string"
+    },
+    "name_options": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "domain": {
+      "type": "string"
+    },
+    "domain_options": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "brand": {
+      "type": "object",
+      "properties": {
+        "positioning": {
+          "type": "string"
+        },
+        "promise": {
+          "type": "string"
+        },
+        "tagline": {
+          "type": "string"
+        },
+        "colors": {
+          "type": "string"
+        },
+        "typography": {
+          "type": "string"
+        },
+        "voice": {
+          "type": "string"
+        },
+        "logo_direction": {
+          "type": "string"
+        }
+      }
+    },
+    "logo_url": {
+      "type": "string"
+    },
+    "logo_prompt": {
+      "type": "string"
+    },
+    "content": {
+      "type": "object",
+      "properties": {
+        "hero_headline": {
+          "type": "string"
+        },
+        "hero_subhead": {
+          "type": "string"
+        },
+        "about": {
+          "type": "string"
+        },
+        "services": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "title": {
+                "type": "string"
+              },
+              "description": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "faq": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "question": {
+                "type": "string"
+              },
+              "answer": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "cta": {
+          "type": "string"
+        }
+      }
+    },
+    "images": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string"
+          },
+          "url": {
+            "type": "string"
+          },
+          "prompt": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "seo": {
+      "type": "object",
+      "properties": {
+        "meta_title": {
+          "type": "string"
+        },
+        "meta_description": {
+          "type": "string"
+        },
+        "canonical": {
+          "type": "string"
+        },
+        "json_ld": {
+          "type": "object"
+        }
+      }
+    },
+    "aeo": {
+      "type": "object",
+      "properties": {
+        "answer_summary": {
+          "type": "string"
+        },
+        "qa_schema": {
+          "type": "object"
+        },
+        "citation_faq": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "question": {
+                "type": "string"
+              },
+              "answer": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      }
+    },
+    "preview_url": {
+      "type": "string"
+    },
+    "approval_id": {
+      "type": "string"
+    },
+    "final_approval_id": {
+      "type": "string"
+    },
+    "error": {
+      "type": "string"
+    },
+    "logs": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    }
+  },
+  "required": [
+    "business_name"
+  ]
+}

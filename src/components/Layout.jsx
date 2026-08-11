@@ -53,6 +53,7 @@ const NAV = [
   { to: "/billing/invoices", label: "Invoices", icon: ScrollText },
   { to: "/billing/expenses", label: "Expenses", icon: ScrollText },
   { section: "Site Factory" },
+  { to: "/website-factory", label: "Website Factory", icon: Factory },
   { to: "/markets", label: "Markets", icon: MapPin },
   { to: "/markets/new", label: "New Market", icon: Plus },
   { to: "/seo-launch-pad", label: "SEO Launch Pad", icon: Rocket },
