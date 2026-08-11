@@ -13,6 +13,8 @@ const CATEGORY_META = {
   social: { label: "Social Signals", color: "text-pink-400", bg: "bg-pink-400/10", border: "border-pink-400/30" },
   authority: { label: "Authority / E-E-A-T", color: "text-emerald-400", bg: "bg-emerald-400/10", border: "border-emerald-400/30" },
   monitoring: { label: "Monitoring / Analytics", color: "text-orange-400", bg: "bg-orange-400/10", border: "border-orange-400/30" },
+  aeo: { label: "AEO / Answer Engine", color: "text-indigo-400", bg: "bg-indigo-400/10", border: "border-indigo-400/30" },
+  ai_search: { label: "AI Search Engines", color: "text-fuchsia-400", bg: "bg-fuchsia-400/10", border: "border-fuchsia-400/30" },
 };
 
 const PRIORITY_META = {

@@ -17,7 +17,9 @@
         "local",
         "social",
         "authority",
-        "monitoring"
+        "monitoring",
+        "aeo",
+        "ai_search"
       ],
       "description": "SEO pillar category"
     },
