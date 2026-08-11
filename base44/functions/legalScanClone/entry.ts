@@ -56,7 +56,7 @@ export default async function(req) {
         meta_description: scraped.meta_description,
         colors: scraped.colors,
         structure_summary: scraped.headings.join(' | '),
-        html_snapshot: html.slice(0, 80000)
+        html_snapshot: html.slice(0, 15000)
       },
       industry
     });
