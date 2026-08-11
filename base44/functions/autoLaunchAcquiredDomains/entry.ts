@@ -21,11 +21,27 @@ export default async function(req) {
     const results = [];
     for (const p of acquired) {
       try {
-        // Step 1: Launch the domain (creates rank engine + submits to GSC)
-        await base44.functions.invoke('launchDomainPortfolio', {
-          portfolio_id: p.id,
-          niche: p.niche,
-        });
+        // Step 1: Launch the domain (creates rank engine + submits to GSC) — with retry
+        let launchSuccess = false;
+        let lastError = '';
+        for (let attempt = 0; attempt < 3; attempt++) {
+          try {
+            await base44.functions.invoke('launchDomainPortfolio', {
+              portfolio_id: p.id,
+              niche: p.niche,
+            });
+            launchSuccess = true;
+            break;
+          } catch (e) {
+            lastError = e.message;
+            // Exponential backoff before retry
+            await new Promise(r => setTimeout(r, 5000 * (attempt + 1)));
+          }
+        }
+        if (!launchSuccess) {
+          results.push({ domain: p.domain, error: `Launch failed after 3 attempts: ${lastError}` });
+          continue;
+        }
 
         // Step 2: Run the rank engine to generate keywords, pages, and citations
         const updated = await svc.entities.DomainPortfolio.get(p.id);

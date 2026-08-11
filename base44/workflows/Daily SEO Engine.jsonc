@@ -3,7 +3,7 @@
     "document": {
       "dsl": "1.0.0",
       "name": "daily_seo_engine",
-      "version": "1.1",
+      "version": "1.2",
       "namespace": "base44"
     },
     "do": [
@@ -114,10 +114,24 @@
             "function_name": "refreshStaleContent",
             "args": {}
           },
-          "then": "competitor_gaps",
+          "then": "auto_optimize",
           "x-base44": {
             "title": "Refresh Stale Content",
             "description": "Find + update outdated content"
+          }
+        }
+      },
+      {
+        "auto_optimize": {
+          "call": "invoke_backend_function",
+          "with": {
+            "function_name": "autoOptimizeSites",
+            "args": {}
+          },
+          "then": "competitor_gaps",
+          "x-base44": {
+            "title": "AI Metadata + Link Optimization",
+            "description": "Auto-optimize titles, meta descriptions, internal links for every domain"
           }
         }
       },
@@ -212,6 +226,6 @@
       "ends_after_count": null
     }
   },
-  "description": "Master daily automation: live SERP tracking, GSC sync + auto-verify, rank alerts, technical audit, content freshness, competitor gaps, backlink prospecting + outreach sending, follow-ups, IndexNow, technical assets, AI visibility \u2014 runs every morning",
+  "description": "Master daily automation: live SERP tracking, GSC sync + auto-verify, rank alerts, technical audit, content freshness, AI metadata + link optimization, competitor gaps, backlink prospecting + outreach sending, follow-ups, IndexNow, technical assets, AI visibility \u2014 runs every morning",
   "name": "Daily SEO Engine"
 }
