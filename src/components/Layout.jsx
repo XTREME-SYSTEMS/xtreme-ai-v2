@@ -63,6 +63,7 @@ const NAV = [
   { to: "/ranking-monitor", label: "Ranking Monitor", icon: TrendingUp },
   { to: "/gsc-traffic", label: "GSC Traffic", icon: BarChart3 },
   { to: "/seo-accelerator", label: "Page 1 Accelerator", icon: Crosshair },
+  { to: "/seo-standard", label: "SEO Standard Checklist", icon: ClipboardCheck },
   { to: "/domain-portfolio", label: "Domain Portfolio", icon: Globe },
   { to: "/rank-engine", label: "Rank Engine", icon: TrendingUp },
   { to: "/markets", label: "Markets", icon: MapPin },

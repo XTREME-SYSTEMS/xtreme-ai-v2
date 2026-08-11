@@ -1,0 +1,101 @@
+{
+  "name": "SeoStandardChecklist",
+  "type": "object",
+  "properties": {
+    "method_name": {
+      "type": "string",
+      "description": "Name of the SEO method"
+    },
+    "category": {
+      "type": "string",
+      "enum": [
+        "technical",
+        "indexing",
+        "content",
+        "on_page",
+        "off_page",
+        "local",
+        "social",
+        "authority",
+        "monitoring"
+      ],
+      "description": "SEO pillar category"
+    },
+    "subcategory": {
+      "type": "string",
+      "description": "Sub-category for grouping"
+    },
+    "description": {
+      "type": "string",
+      "description": "What this method does and why it matters for rankings"
+    },
+    "priority": {
+      "type": "string",
+      "enum": [
+        "critical",
+        "high",
+        "medium",
+        "low"
+      ],
+      "default": "medium"
+    },
+    "automation_frequency": {
+      "type": "string",
+      "enum": [
+        "one_time",
+        "daily",
+        "weekly",
+        "monthly",
+        "manual",
+        "ongoing"
+      ],
+      "default": "manual",
+      "description": "How often this method should be applied"
+    },
+    "automation_capable": {
+      "type": "boolean",
+      "default": false,
+      "description": "Whether this can be automated in our system"
+    },
+    "function_name": {
+      "type": "string",
+      "description": "Backend function that automates this (if any)"
+    },
+    "implementation_status": {
+      "type": "string",
+      "enum": [
+        "not_started",
+        "in_progress",
+        "complete",
+        "n/a"
+      ],
+      "default": "not_started"
+    },
+    "impact_score": {
+      "type": "number",
+      "default": 5,
+      "description": "1-10 impact on rankings"
+    },
+    "difficulty": {
+      "type": "string",
+      "enum": [
+        "easy",
+        "medium",
+        "hard"
+      ],
+      "default": "medium"
+    },
+    "google_confirmed": {
+      "type": "boolean",
+      "default": false,
+      "description": "Whether Google has confirmed this as a ranking factor"
+    },
+    "notes": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "method_name",
+    "category"
+  ]
+}
