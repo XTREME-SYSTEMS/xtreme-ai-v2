@@ -367,6 +367,73 @@
         }
       }
     },
+    "rebrand_checklist": {
+      "type": "array",
+      "description": "12-element standardized rebrand checklist tracking minimum-action compliance items",
+      "items": {
+        "type": "object",
+        "properties": {
+          "key": {
+            "type": "string",
+            "enum": [
+              "business_name",
+              "domain",
+              "logo",
+              "tagline",
+              "written_copy",
+              "photos",
+              "source_code",
+              "testimonials",
+              "facts_claims",
+              "contact_info",
+              "privacy_terms",
+              "overall_branding"
+            ]
+          },
+          "label": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "pending",
+              "generating",
+              "ready",
+              "approved",
+              "needs_revision",
+              "manual"
+            ],
+            "default": "pending"
+          },
+          "original": {
+            "type": "string"
+          },
+          "replacement": {
+            "type": "string"
+          },
+          "replacement_data": {
+            "type": "object"
+          },
+          "ai_notes": {
+            "type": "string"
+          },
+          "revision_feedback": {
+            "type": "string"
+          },
+          "generated_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "approved_at": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      }
+    },
     "provisioning": {
       "type": "object",
       "properties": {

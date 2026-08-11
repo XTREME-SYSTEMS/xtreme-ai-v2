@@ -5,7 +5,8 @@ import SitePreview from "@/components/rebrand/SitePreview";
 import AIChat from "@/components/rebrand/AIChat";
 import ColorStudio from "@/components/rebrand/ColorStudio";
 import ForensicPanel from "@/components/rebrand/ForensicPanel";
-import { Wand2, RefreshCw, Sparkles, ChevronDown } from "lucide-react";
+import RebrandChecklist from "@/components/rebrand/RebrandChecklist";
+import { Wand2, RefreshCw, Sparkles, ChevronDown, ListChecks, Bot } from "lucide-react";
 
 export default function RebrandStudio() {
   const [projects, setProjects] = useState([]);
@@ -14,6 +15,7 @@ export default function RebrandStudio() {
   const [project, setProject] = useState(null);
   const [selectedElement, setSelectedElement] = useState(null);
   const [showSelector, setShowSelector] = useState(false);
+  const [tab, setTab] = useState("guided");
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -52,7 +54,7 @@ export default function RebrandStudio() {
 
   return (
     <div className="space-y-4">
-      <PageHeader title="Rebrand Studio" subtitle="In-dashboard browser, point-and-click AI, real-time color studio, and deep forensic audit for every clone project.">
+      <PageHeader title="Rebrand Studio" subtitle="AI-guided rebranding with the 12-element minimum-action checklist, real-time preview, and interactive tools.">
         <LoadingButton onClick={load} loading={loading} variant="ghost">
           <RefreshCw className="h-4 w-4" /> Refresh
         </LoadingButton>
@@ -101,27 +103,57 @@ export default function RebrandStudio() {
       {!project ? (
         <EmptyState icon={Wand2} title="No project selected" subtitle="Select a clone project above, or scan a new site in Clone Studio to get started." />
       ) : (
-        <div className="grid gap-4 lg:grid-cols-12">
-          {/* Left: AI Chat */}
-          <div className="lg:col-span-4">
-            <AIChat
-              project={project}
-              selectedElement={selectedElement}
-              onActionExecuted={() => loadProject(selectedId)}
-            />
+        <>
+          {/* Tab switcher */}
+          <div className="flex items-center gap-1 rounded-xl border border-white/10 bg-zinc-950 p-1">
+            <button
+              onClick={() => setTab("guided")}
+              className={`flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium transition-colors ${
+                tab === "guided" ? "bg-lime-400/10 text-lime-300" : "text-white/50 hover:bg-white/5"
+              }`}
+            >
+              <ListChecks className="h-4 w-4" /> Guided Rebrand
+            </button>
+            <button
+              onClick={() => setTab("studio")}
+              className={`flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium transition-colors ${
+                tab === "studio" ? "bg-lime-400/10 text-lime-300" : "text-white/50 hover:bg-white/5"
+              }`}
+            >
+              <Bot className="h-4 w-4" /> AI Studio
+            </button>
           </div>
 
-          {/* Center: Site Preview */}
-          <div className="lg:col-span-5">
-            <SitePreview project={project} onElementClick={setSelectedElement} />
-          </div>
-
-          {/* Right: Color Studio + Forensic Audit */}
-          <div className="lg:col-span-3 space-y-4">
-            <ColorStudio project={project} onUpdated={() => loadProject(selectedId)} />
-            <ForensicPanel project={project} onUpdated={() => loadProject(selectedId)} />
-          </div>
-        </div>
+          {tab === "guided" ? (
+            /* Guided Rebrand: checklist + live site preview side by side */
+            <div className="grid gap-4 lg:grid-cols-12">
+              <div className="lg:col-span-7">
+                <RebrandChecklist project={project} onUpdated={() => loadProject(selectedId)} />
+              </div>
+              <div className="lg:col-span-5">
+                <SitePreview project={project} onElementClick={setSelectedElement} />
+              </div>
+            </div>
+          ) : (
+            /* AI Studio: chat + preview + color/audit */
+            <div className="grid gap-4 lg:grid-cols-12">
+              <div className="lg:col-span-4">
+                <AIChat
+                  project={project}
+                  selectedElement={selectedElement}
+                  onActionExecuted={() => loadProject(selectedId)}
+                />
+              </div>
+              <div className="lg:col-span-5">
+                <SitePreview project={project} onElementClick={setSelectedElement} />
+              </div>
+              <div className="lg:col-span-3 space-y-4">
+                <ColorStudio project={project} onUpdated={() => loadProject(selectedId)} />
+                <ForensicPanel project={project} onUpdated={() => loadProject(selectedId)} />
+              </div>
+            </div>
+          )}
+        </>
       )}
     </div>
   );
