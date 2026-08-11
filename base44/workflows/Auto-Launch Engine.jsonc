@@ -1,0 +1,45 @@
+{
+  "definition": {
+    "document": {
+      "dsl": "1.0.0",
+      "name": "auto_launch_engine",
+      "version": "1.0",
+      "namespace": "base44"
+    },
+    "do": [
+      {
+        "launch_domains": {
+          "call": "invoke_backend_function",
+          "with": {
+            "function_name": "autoLaunchAcquiredDomains",
+            "args": {}
+          },
+          "then": "end",
+          "x-base44": {
+            "title": "Launch All Acquired Domains",
+            "description": "Auto-launch every acquired domain: rank engine + GSC + citations"
+          }
+        }
+      }
+    ]
+  },
+  "trigger": {
+    "condition": null,
+    "config": {
+      "trigger_type": "scheduled",
+      "events": [],
+      "schedule_mode": "recurring",
+      "cron_expression": "0 5 * * *",
+      "one_time_date": null,
+      "timezone": "America/New_York",
+      "interval_value": null,
+      "interval_unit": null,
+      "interval_anchor": null,
+      "ends_type": "never",
+      "ends_on_date": null,
+      "ends_after_count": null
+    }
+  },
+  "description": "Daily: auto-launches all acquired domains in the portfolio \u2014 creates rank engine campaigns, submits to GSC, generates keywords/pages/citations, and builds citation plans with zero manual action",
+  "name": "Auto-Launch Engine"
+}

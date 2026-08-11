@@ -1,10 +1,9 @@
 {
-  "description": "Master daily automation: live SERP tracking, rank tracking, GSC sync, rank alerts, technical audit, content freshness, competitor gaps, backlink prospecting, outreach follow-ups, IndexNow submission, technical asset generation, AI visibility monitoring \u2014 runs every morning",
   "definition": {
     "document": {
       "dsl": "1.0.0",
       "name": "daily_seo_engine",
-      "version": "1.0",
+      "version": "1.1",
       "namespace": "base44"
     },
     "do": [
@@ -29,10 +28,26 @@
             "function_name": "syncRankings",
             "args": {}
           },
-          "then": "check_alerts",
+          "then": "verify_gsc",
           "x-base44": {
             "title": "Sync Rankings + GSC Data",
             "description": "Pull 28-day GSC performance data"
+          }
+        }
+      },
+      {
+        "verify_gsc": {
+          "call": "invoke_backend_function",
+          "with": {
+            "function_name": "bulkSubmitGSC",
+            "args": {
+              "action": "verify_all"
+            }
+          },
+          "then": "check_alerts",
+          "x-base44": {
+            "title": "Auto-Verify GSC Properties",
+            "description": "Verify pending GSC domains + submit sitemaps"
           }
         }
       },
@@ -129,10 +144,24 @@
               "limit": 20
             }
           },
-          "then": "send_followups",
+          "then": "send_outreach",
           "x-base44": {
             "title": "Prospect Backlinks",
             "description": "Find new backlink opportunities"
+          }
+        }
+      },
+      {
+        "send_outreach": {
+          "call": "invoke_backend_function",
+          "with": {
+            "function_name": "sendOutreach",
+            "args": {}
+          },
+          "then": "send_followups",
+          "x-base44": {
+            "title": "Send Outreach Emails",
+            "description": "Auto-send emails to new backlink prospects"
           }
         }
       },
@@ -166,7 +195,6 @@
       }
     ]
   },
-  "name": "Daily SEO Engine",
   "trigger": {
     "condition": null,
     "config": {
@@ -183,5 +211,7 @@
       "ends_on_date": null,
       "ends_after_count": null
     }
-  }
+  },
+  "description": "Master daily automation: live SERP tracking, GSC sync + auto-verify, rank alerts, technical audit, content freshness, competitor gaps, backlink prospecting + outreach sending, follow-ups, IndexNow, technical assets, AI visibility \u2014 runs every morning",
+  "name": "Daily SEO Engine"
 }

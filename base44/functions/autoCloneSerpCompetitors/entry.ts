@@ -86,6 +86,17 @@ export default async function(req) {
             } catch {}
           }
 
+          // Auto-extract ranking blueprint for the #1 competitor
+          try {
+            const topBp = await svc.entities.SerpBlueprint.filter(
+              { keyword: fullQuery, serp_position: 1, status: 'identified' },
+              '-created_date', 1
+            );
+            if (topBp && topBp.length > 0) {
+              await base44.functions.invoke('extractRankingBlueprint', { blueprint_id: topBp[0].id });
+            }
+          } catch {}
+
           results.push({ domain: p.domain, keyword: fullQuery, blueprints_created: created });
         }
       } catch (e) {
