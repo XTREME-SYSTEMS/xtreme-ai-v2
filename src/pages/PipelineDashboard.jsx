@@ -28,6 +28,8 @@ export default function PipelineDashboard() {
   const [stageFilter, setStageFilter] = useState('all');
   const [error, setError] = useState("");
   const [optResult, setOptResult] = useState(null);
+  const [pushing, setPushing] = useState(false);
+  const [pushResult, setPushResult] = useState(null);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -56,6 +58,19 @@ export default function PipelineDashboard() {
     setOptimizing(false);
   };
 
+  const pushAllToMax = async () => {
+    setPushing(true);
+    setError("");
+    setPushResult(null);
+    try {
+      const res = await base44.functions.invoke('pushAllToMax', {});
+      const data = res?.data || res;
+      setPushResult(data);
+      await load();
+    } catch (e) { setError(e.message); }
+    setPushing(false);
+  };
+
   const launchAll = async () => {
     setLaunching(true);
     setError("");
@@ -76,7 +91,10 @@ export default function PipelineDashboard() {
         title="Growth Pipeline"
         subtitle="Track every domain from acquisition to page-one ranking — fully autonomous."
       >
-        <LoadingButton onClick={launchAll} loading={launching} variant="primary">
+        <LoadingButton onClick={pushAllToMax} loading={pushing} variant="primary">
+          <Zap className="h-4 w-4" /> Push All to Max
+        </LoadingButton>
+        <LoadingButton onClick={launchAll} loading={launching} variant="ghost">
           <Zap className="h-4 w-4" /> Auto-Launch All
         </LoadingButton>
         <LoadingButton onClick={runOptimization} loading={optimizing} variant="ghost">
@@ -99,6 +117,15 @@ export default function PipelineDashboard() {
             <CheckCircle className="h-4 w-4" /> Optimization complete — {optResult.optimized} domains optimized, {optResult.pages_optimized || 0} pages updated
           </div>
           <button onClick={() => setOptResult(null)} className="ml-auto text-lime-400/60 hover:text-lime-400">×</button>
+        </div>
+      )}
+
+      {pushResult && (
+        <div className="rounded-lg border border-cyan-400/30 bg-cyan-400/5 px-4 py-3 text-sm text-cyan-300">
+          <div className="flex items-center gap-2 font-medium">
+            <CheckCircle className="h-4 w-4" /> Pipeline push complete — {pushResult.summary?.pushed || 0} domains pushed, {pushResult.summary?.failed || 0} failed
+          </div>
+          <button onClick={() => setPushResult(null)} className="ml-auto text-cyan-400/60 hover:text-cyan-400">×</button>
         </div>
       )}
 
