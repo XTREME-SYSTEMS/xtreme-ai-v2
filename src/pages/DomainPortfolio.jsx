@@ -2,7 +2,8 @@ import React, { useState, useEffect, useCallback } from "react";
 import { base44 } from "@/api/base44Client";
 import { PageHeader, Panel, LoadingButton, EmptyState } from "@/components/ui";
 import StatusBadge from "@/components/StatusBadge";
-import { Globe, Plus, Rocket, RefreshCw, Search, CheckCircle, ExternalLink, TrendingUp, Zap, AlertCircle, Radar, MapPin } from "lucide-react";
+import BacklinkProspectsModal from "@/components/BacklinkProspectsModal";
+import { Globe, Plus, Rocket, RefreshCw, Search, CheckCircle, ExternalLink, TrendingUp, Zap, AlertCircle, Radar, MapPin, Link2 } from "lucide-react";
 
 export default function DomainPortfolio() {
   const [domains, setDomains] = useState([]);
@@ -15,6 +16,7 @@ export default function DomainPortfolio() {
   const [discovering, setDiscovering] = useState(false);
   const [discoverResult, setDiscoverResult] = useState(null);
   const [error, setError] = useState("");
+  const [backlinkModal, setBacklinkModal] = useState(null);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -116,6 +118,16 @@ export default function DomainPortfolio() {
     setLaunching(null);
   };
 
+  const prospectBacklinks = async (d) => {
+    setLaunching('bl-' + d.id);
+    setError("");
+    try {
+      await base44.functions.invoke('prospectBacklinks', { portfolio_id: d.id, niche: d.niche, limit: 15 });
+      await load();
+    } catch (e) { setError(e.message); }
+    setLaunching(null);
+  };
+
   const stats = {
     total: domains.length,
     acquired: domains.filter(d => d.status === 'acquired').length,
@@ -193,6 +205,7 @@ export default function DomainPortfolio() {
                     {d.best_position > 0 && <span className="text-cyan-400">#{d.best_position}</span>}
                     {d.engine_id && <span>{d.keywords_count || 0} kw · {d.pages_count || 0} pages</span>}
                     {d.citations_count > 0 && <span className="text-amber-400 flex items-center gap-0.5"><MapPin className="h-3 w-3" /> {d.citations_count} citations</span>}
+                    {d.backlinks_count > 0 && <span className="text-violet-400 flex items-center gap-0.5"><Link2 className="h-3 w-3" /> {d.backlinks_count} backlinks</span>}
                   </div>
                 </div>
                 <div className="flex items-center gap-2 shrink-0">
@@ -206,6 +219,16 @@ export default function DomainPortfolio() {
                     <LoadingButton onClick={() => buildCitations(d)} loading={launching === 'cit-' + d.id} variant="ghost" className="px-2.5 py-1 text-xs">
                       <MapPin className="h-3 w-3" /> Citations
                     </LoadingButton>
+                  )}
+                  {d.engine_id && (
+                    <LoadingButton onClick={() => prospectBacklinks(d)} loading={launching === 'bl-' + d.id} variant="ghost" className="px-2.5 py-1 text-xs">
+                      <Link2 className="h-3 w-3" /> Backlinks
+                    </LoadingButton>
+                  )}
+                  {d.backlinks_count > 0 && (
+                    <button onClick={() => setBacklinkModal(d)} className="rounded-lg border border-violet-400/30 px-2.5 py-1 text-xs text-violet-300 hover:bg-violet-400/10">
+                      View
+                    </button>
                   )}
                   {d.status === 'acquired' ? (
                     <LoadingButton onClick={() => launchDomain(d)} loading={launching === d.id} variant="primary" className="px-2.5 py-1 text-xs">
@@ -244,6 +267,10 @@ export default function DomainPortfolio() {
             </div>
           </div>
         </div>
+      )}
+
+      {backlinkModal && (
+        <BacklinkProspectsModal portfolio={backlinkModal} onClose={() => setBacklinkModal(null)} />
       )}
     </div>
   );
