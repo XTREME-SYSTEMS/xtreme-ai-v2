@@ -31,10 +31,10 @@ export default async function(req) {
     const industry = project.industry || 'general';
     const colors = rp.new_brand?.colors || { primary: '#0a0a0a', accent: '#D4FF4D' };
 
-    // ---- Step 1: Build the rebranded site files ----
-    log('Building rebranded site files...');
+    // ---- Step 1: Build the rebranded site files (visual parity from scrape) ----
+    log('Building rebranded site files from scraped HTML snapshot...');
     const files = buildRebrandedSite(project, rp);
-    log(`Built ${Object.keys(files).length} site files`);
+    log(`Built ${Object.keys(files).length} site files (visual parity: ${project.scrape?.html_snapshot ? 'yes' : 'fallback template'})`);
 
     // ---- Step 2: Provision Drive, GitHub, Supabase, Vercel ----
     const market = {
@@ -171,6 +171,9 @@ export default async function(req) {
 }
 
 // ---- Build the rebranded site files with max SEO/AEO ----
+// Uses the scraped HTML snapshot for 100% visual/operational parity,
+// applying only the minimum-viable rebrand modifications (name, logo, contact,
+// replacement images). Falls back to a generic template if no snapshot exists.
 function buildRebrandedSite(project, rp) {
   const domain = project.selected_domain || 'example.com';
   const name = project.selected_name || 'NewCo';
@@ -180,6 +183,10 @@ function buildRebrandedSite(project, rp) {
   const faq = rp.faq || [];
   const industry = project.industry || 'general';
   const tagline = rp.new_brand?.tagline || '';
+  const originalName = project.scrape?.title || project.legal_scan?.must_change?.business_name || '';
+  const originalUrl = project.target_url || '';
+  const originalDomain = originalUrl.replace(/^https?:\/\//, '').split('/')[0];
+  const snapshot = project.scrape?.html_snapshot || '';
 
   // JSON-LD for LocalBusiness + FAQPage + Organization
   const jsonLdBusiness = {
@@ -196,10 +203,8 @@ function buildRebrandedSite(project, rp) {
     '@context': 'https://schema.org', '@type': 'Organization',
     name, url: `https://${domain}`, logo: rp.logos?.[0]?.url || ''
   };
-
-  const html = `<!DOCTYPE html><html lang="en"><head>
-<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>${name} | ${industry.charAt(0).toUpperCase() + industry.slice(1)} Services</title>
+  const jsonLdScripts = `<script type="application/ld+json">${JSON.stringify(jsonLdBusiness)}</script>\n<script type="application/ld+json">${JSON.stringify(jsonLdFaq)}</script>\n<script type="application/ld+json">${JSON.stringify(jsonLdOrg)}</script>`;
+  const metaTags = `<title>${name} | ${industry.charAt(0).toUpperCase() + industry.slice(1)} Services</title>
 <meta name="description" content="${(hero.subhead || '').replace(/"/g, '&quot;')}">
 <meta name="keywords" content="${industry}, ${name}, ${services.map(s => s.title).join(', ')}">
 <link rel="canonical" href="https://${domain}/">
@@ -208,10 +213,89 @@ function buildRebrandedSite(project, rp) {
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://${domain}/">
 <meta property="og:image" content="${rp.replacement_images?.[0]?.new_url || rp.logos?.[0]?.url || ''}">
-<meta name="twitter:card" content="summary_large_image">
-<script type="application/ld+json">${JSON.stringify(jsonLdBusiness)}</script>
-<script type="application/ld+json">${JSON.stringify(jsonLdFaq)}</script>
-<script type="application/ld+json">${JSON.stringify(jsonLdOrg)}</script>
+<meta name="twitter:card" content="summary_large_image">`;
+
+  let html;
+
+  if (snapshot) {
+    // === Visual parity path: use the scraped HTML, apply rebrand modifications ===
+    html = snapshot;
+
+    // 1. Add a <base> tag so all relative assets (CSS, JS, images) load from the original site
+    html = html.replace(/<head([^>]*)>/i, `<head$1>\n<base href="https://${originalDomain}/">`);
+
+    // 2. Replace the original business name with the new name (in visible text and title)
+    if (originalName) {
+      // Replace in title tags
+      html = html.replace(new RegExp(originalName.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'gi'), name);
+    }
+
+    // 3. Replace the original <title> tag entirely
+    html = html.replace(/<title[^>]*>[\s\S]*?<\/title>/i, `<title>${name} | ${industry} Services</title>`);
+
+    // 4. Replace logo images (if we have a new logo URL)
+    const newLogoUrl = rp.logos?.[0]?.url;
+    if (newLogoUrl) {
+      // Replace common logo image patterns — target <img> tags that likely contain logos
+      // (alt text containing "logo", or class names containing "logo")
+      html = html.replace(/<img([^>]*)(alt="[^"]*logo[^"]*"|class="[^"]*logo[^"]*")([^>]*)>/gi,
+        `<img$1${newLogoUrl ? ` src="${newLogoUrl}"` : ''}$2$3>`);
+    }
+
+    // 5. Replace replacement images (map original URLs to new URLs)
+    for (const img of (rp.replacement_images || [])) {
+      if (img.original_url && img.new_url) {
+        const oldUrl = img.original_url.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        html = html.replace(new RegExp(oldUrl, 'gi'), img.new_url);
+      }
+    }
+
+    // 6. Replace contact info (phone, email)
+    const mustChangeContact = project.legal_scan?.must_change?.contact_info || {};
+    if (mustChangeContact.phone) {
+      html = html.replace(new RegExp(mustChangeContact.phone.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'gi'), '(555) 123-4567');
+    }
+    if (mustChangeContact.email) {
+      html = html.replace(new RegExp(mustChangeContact.email.replace(/[.*+?^${}()|[\]\\]/g, '\\$&').replace('@', '@'), 'gi'), `info@${domain}`);
+    }
+
+    // 7. Replace original tagline if identified
+    const originalTagline = project.legal_scan?.must_change?.tagline;
+    if (originalTagline && tagline) {
+      html = html.replace(new RegExp(originalTagline.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'gi'), tagline);
+    }
+
+    // 8. Replace trademarked terms
+    for (const term of (project.legal_scan?.must_change?.trademarked_terms || [])) {
+      if (term && term.length > 2) {
+        html = html.replace(new RegExp(term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'gi'), name);
+      }
+    }
+
+    // 9. Replace replacement content sections
+    for (const rc of (rp.replacement_content || [])) {
+      if (rc.original_text && rc.new_text) {
+        const oldText = rc.original_text.slice(0, 100).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        html = html.replace(new RegExp(oldText, 'i'), rc.new_text);
+      }
+    }
+
+    // 10. Inject SEO meta tags and JSON-LD right after <head>
+    html = html.replace(/<head([^>]*)>/i, `<head$1>\n${metaTags}\n${jsonLdScripts}`);
+
+    // 11. Replace the hero headline if we have one
+    if (hero.headline) {
+      // Try to replace the first <h1> tag content
+      html = html.replace(/<h1[^>]*>[\s\S]*?<\/h1>/i, `<h1>${hero.headline}</h1>`);
+    }
+
+    // 12. Add copyright footer update
+    html = html.replace(/&copy;\s*\d{4}\s*[^<]*/gi, `&copy; ${new Date().getFullYear()} ${name}`);
+  } else {
+    // === Fallback: generic template (no visual parity) ===
+    html = `<!DOCTYPE html><html lang="en"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+${metaTags}
 <style>
 *{margin:0;box-sizing:border-box}body{font-family:system-ui,-apple-system,sans-serif;color:#0f172a;background:#fff;line-height:1.6}
 .wrap{max-width:1100px;margin:0 auto;padding:0 20px}
@@ -255,6 +339,7 @@ ${faq.map(f => `<details><summary>${f.question}</summary><p style="margin-top:8p
 </div></section>
 <footer><div class="wrap"><p>&copy; ${new Date().getFullYear()} ${name}. All rights reserved.</p></div></footer>
 </body></html>`;
+  }
 
   const robotsTxt = `User-agent: *\nAllow: /\n\nSitemap: https://${domain}/sitemap.xml`;
   const sitemapXml = `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n  <url><loc>https://${domain}/</loc><changefreq>weekly</changefreq><priority>1.0</priority></url>\n</urlset>`;
@@ -269,7 +354,7 @@ ${faq.map(f => `<details><summary>${f.question}</summary><p style="margin-top:8p
     'robots.txt': robotsTxt,
     'sitemap.xml': sitemapXml,
     'manifest.json': manifestJson,
-    'README.md': `# ${name}\n\n${industry} website — rebranded clone.\n- Domain: https://${domain}\n- Tagline: ${tagline}\n\nAuto-provisioned by XtremeClone rebrand pipeline.\n`
+    'README.md': `# ${name}\n\n${industry} website — rebranded clone.\n- Domain: https://${domain}\n- Tagline: ${tagline}\n- Visual parity: ${snapshot ? 'yes (from scrape)' : 'no (fallback template)'}\n\nAuto-provisioned by XtremeClone rebrand pipeline.\n`
   };
 }
 

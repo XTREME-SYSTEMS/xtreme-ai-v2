@@ -1,0 +1,40 @@
+{
+  "name": "Clone Approval Trigger",
+  "description": "Automatically starts full provisioning (Git, Vercel, Supabase, Drive, domain, SEO) when a CloneProject is launched to provisioning after rebrand approval.",
+  "trigger": {
+    "condition": "${ .trigger.data.current_step == \"provisioning\" and .trigger.old_data.current_step != \"provisioning\" and .trigger.data.approval_status == \"approved\" }",
+    "config": {
+      "trigger_type": "entity",
+      "entity_name": "CloneProject",
+      "events": [
+        "update"
+      ]
+    }
+  },
+  "definition": {
+    "document": {
+      "dsl": "1.0.0",
+      "name": "clone_approval_trigger",
+      "version": "1.0",
+      "namespace": "base44"
+    },
+    "do": [
+      {
+        "provision_clone": {
+          "call": "invoke_backend_function",
+          "with": {
+            "function_name": "provisionApprovedClone",
+            "args": {
+              "project_id": "${ .trigger.entity_id }"
+            }
+          },
+          "then": "end",
+          "x-base44": {
+            "title": "Provision approved clone",
+            "description": "Git + Vercel + Supabase + Drive + domain + SEO"
+          }
+        }
+      }
+    ]
+  }
+}

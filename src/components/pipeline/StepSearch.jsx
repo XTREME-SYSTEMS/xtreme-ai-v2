@@ -12,6 +12,7 @@ export default function StepSearch({ onSelect, onResume }) {
   const [results, setResults] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [resultCount, setResultCount] = useState(10); // amount selector
 
   // Existing projects for resume
   const [existingProjects, setExistingProjects] = useState([]);
@@ -40,7 +41,7 @@ export default function StepSearch({ onSelect, onResume }) {
     setResults([]);
     try {
       const res = await base44.integrations.Core.InvokeLLM({
-        prompt: `Find 10 real ${industry} businesses${location ? ` in ${location}` : " in the United States"} that have live websites. For each, return the business name, their website URL (full URL starting with https://), and a 1-sentence description of what they do. Return JSON: { "businesses": [{ "name": string, "url": string, "description": string }] }`,
+        prompt: `Find ${resultCount} real ${industry} businesses${location ? ` in ${location}` : " in the United States"} that have live websites. For each, return the business name, their website URL (full URL starting with https://), and a 1-sentence description of what they do. Return JSON: { "businesses": [{ "name": string, "url": string, "description": string }] }`,
         add_context_from_internet: true,
         model: "gemini_3_flash",
         response_json_schema: {
@@ -148,7 +149,7 @@ export default function StepSearch({ onSelect, onResume }) {
 
       {mode === "search" ? (
         <div className="space-y-4">
-          <div className="grid gap-3 sm:grid-cols-2">
+          <div className="grid gap-3 sm:grid-cols-3">
             <div>
               <label className="block text-xs font-medium text-white/60 mb-1">Industry *</label>
               <input
@@ -156,7 +157,7 @@ export default function StepSearch({ onSelect, onResume }) {
                 value={industry}
                 onChange={(e) => setIndustry(e.target.value)}
                 onKeyDown={(e) => e.key === "Enter" && searchIndustry()}
-                placeholder="roofing, hvac, dental, landscaping…"
+                placeholder="roofing, hvac, dental…"
               />
             </div>
             <div>
@@ -168,6 +169,23 @@ export default function StepSearch({ onSelect, onResume }) {
                 onKeyDown={(e) => e.key === "Enter" && searchIndustry()}
                 placeholder="Austin, TX or United States"
               />
+            </div>
+            <div>
+              <label className="block text-xs font-medium text-white/60 mb-1">How many results?</label>
+              <div className="flex gap-1">
+                {[5, 10, 15, 20].map((n) => (
+                  <button
+                    key={n}
+                    onClick={() => setResultCount(n)}
+                    className={cn(
+                      "flex-1 rounded-lg border px-2 py-2 text-sm font-medium transition-colors",
+                      resultCount === n ? "border-lime-400 bg-lime-400/10 text-lime-400" : "border-white/15 text-white/60 hover:bg-white/5"
+                    )}
+                  >
+                    {n}
+                  </button>
+                ))}
+              </div>
             </div>
           </div>
           <LoadingButton onClick={searchIndustry} loading={loading} variant="primary">

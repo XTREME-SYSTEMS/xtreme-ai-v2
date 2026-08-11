@@ -2,11 +2,15 @@ import React, { useState, useEffect, useRef } from "react";
 import { base44 } from "@/api/base44Client";
 import { LoadingButton } from "@/components/ui";
 import { Image } from "@/components/ui/image";
-import { Wand2, CheckCircle2, Rocket, ArrowRight, FileText, Image as ImageIcon, Palette, Type } from "lucide-react";
+import { Wand2, CheckCircle2, Rocket, ArrowRight, FileText, Image as ImageIcon, Palette, Type, Lock, Unlock, MessageSquare } from "lucide-react";
+import RebrandChatPanel from "./RebrandChatPanel";
 
-export default function StepRebrandProgress({ project, onNext }) {
+export default function StepRebrandProgress({ project, onLaunch }) {
   const rp = project?.rebrand_package || {};
   const [initing, setIniting] = useState(false);
+  const [approved, setApproved] = useState(project?.approval_status === "approved");
+  const [launching, setLaunching] = useState(false);
+  const [refreshKey, setRefreshKey] = useState(0);
   const checklist = project?.rebrand_checklist || [];
   const initStartedRef = useRef(false);
 
@@ -21,28 +25,88 @@ export default function StepRebrandProgress({ project, onNext }) {
     }
   }, [project?.id, checklist.length]);
 
+  // Sync approved state with project
+  useEffect(() => {
+    setApproved(project?.approval_status === "approved");
+  }, [project?.approval_status]);
+
   const hasPackage = !!rp.new_brand?.name;
   const logos = rp.logos || [];
   const images = rp.replacement_images || [];
-  const content = rp.replacement_content || [];
   const services = rp.services || [];
   const faq = rp.faq || [];
   const hero = rp.hero_content || {};
-
   const ready = hasPackage;
 
+  const handleApprove = async () => {
+    try {
+      await base44.entities.CloneProject.update(project.id, { approval_status: "approved" });
+      setApproved(true);
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
+  const handleLaunch = async () => {
+    setLaunching(true);
+    try {
+      // Set current_step to "provisioning" — the workflow auto-triggers provisionApprovedClone
+      await base44.entities.CloneProject.update(project.id, {
+        current_step: "provisioning",
+        status: "running",
+        approval_status: "approved",
+      });
+      onLaunch();
+    } catch (e) {
+      console.error(e);
+    }
+    setLaunching(false);
+  };
+
+  const onChatUpdated = () => setRefreshKey((k) => k + 1);
+
   return (
-    <div className="space-y-6">
+    <div className="space-y-6" key={refreshKey}>
       <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
         <div>
           <h2 className="text-xl font-semibold text-white">Rebrand Package Generated</h2>
-          <p className="mt-1 text-sm text-white/50">AI has created all replacement assets. Review them, then approve to start autonomous provisioning.</p>
+          <p className="mt-1 text-sm text-white/50">
+            {approved
+              ? "✅ Approved. Customize with AI below, then launch provisioning."
+              : "Review the AI-generated assets, then approve to unlock customization."}
+          </p>
         </div>
-        <LoadingButton onClick={onNext} variant="primary" disabled={!ready}>
-          <Rocket className="h-4 w-4" /> Approve & Provision Everything
-          <ArrowRight className="h-4 w-4" />
-        </LoadingButton>
+        <div className="flex gap-2">
+          {!approved ? (
+            <LoadingButton onClick={handleApprove} variant="primary" disabled={!ready}>
+              <CheckCircle2 className="h-4 w-4" /> Approve Rebrand
+            </LoadingButton>
+          ) : (
+            <LoadingButton onClick={handleLaunch} loading={launching} variant="primary" disabled={!ready}>
+              <Rocket className="h-4 w-4" /> Launch Provisioning
+              <ArrowRight className="h-4 w-4" />
+            </LoadingButton>
+          )}
+        </div>
       </div>
+
+      {/* Approval gate banner */}
+      {!approved && (
+        <div className="flex items-center gap-3 rounded-lg border border-amber-500/30 bg-amber-500/10 px-4 py-3">
+          <Lock className="h-5 w-5 text-amber-400 shrink-0" />
+          <div className="text-sm text-amber-300">
+            Rebrand is locked. Approve to unlock AI customization (change name, colors, copy, images, services).
+          </div>
+        </div>
+      )}
+      {approved && (
+        <div className="flex items-center gap-3 rounded-lg border border-lime-400/30 bg-lime-400/10 px-4 py-3">
+          <Unlock className="h-5 w-5 text-lime-400 shrink-0" />
+          <div className="text-sm text-lime-300">
+            Rebrand approved! Use the AI chat below to customize anything, then click <strong>Launch Provisioning</strong> to deploy.
+          </div>
+        </div>
+      )}
 
       {/* Brand identity */}
       {rp.new_brand && (
@@ -178,6 +242,17 @@ export default function StepRebrandProgress({ project, onNext }) {
               ))}
             </div>
           )}
+        </div>
+      )}
+
+      {/* AI Customization Panel — only visible after approval */}
+      {approved && (
+        <div className="space-y-3">
+          <div className="flex items-center gap-2">
+            <MessageSquare className="h-4 w-4 text-lime-400" />
+            <h3 className="text-sm font-semibold text-white">Customize with AI (Optional)</h3>
+          </div>
+          <RebrandChatPanel project={project} onUpdated={onChatUpdated} />
         </div>
       )}
 

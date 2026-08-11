@@ -127,19 +127,14 @@ export default function ClonePipeline() {
     setBusy(false);
   };
 
-  // === Step 5 → 6: Approve rebrand & provision ===
+  // === Step 5 → 6: Launch provisioning (workflow auto-triggers provisionApprovedClone) ===
   const handleProvision = async () => {
-    setBusy(true);
-    setError("");
-    try {
-      await base44.functions.invoke("provisionApprovedClone", { project_id: project.id });
-      await refreshProject();
-      setStep(6);
-      setMaxReached(Math.max(maxReached, 6));
-    } catch (e) {
-      setError(e.message);
-    }
-    setBusy(false);
+    setStep(6);
+    setMaxReached(Math.max(maxReached, 6));
+    // The Clone Approval Trigger workflow fires provisionApprovedClone automatically
+    // when current_step changes to "provisioning" with approval_status "approved".
+    // StepRebrandProgress already set those fields before calling onLaunch.
+    await refreshProject();
   };
 
   // === Step 6 → 7: Harden ===
@@ -231,7 +226,7 @@ export default function ClonePipeline() {
           )}
 
           {step === 5 && project && (
-            <StepRebrandProgress project={project} onNext={handleProvision} />
+            <StepRebrandProgress project={project} onLaunch={handleProvision} />
           )}
 
           {step === 6 && project && (
