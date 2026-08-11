@@ -66,6 +66,7 @@ import TemplateLibrary from '@/pages/TemplateLibrary';
 import PromptLibrary from '@/pages/PromptLibrary';
 import RankEngine from '@/pages/RankEngine';
 import CloneStudio from '@/pages/CloneStudio';
+import ClonePipeline from '@/pages/ClonePipeline';
 import RebrandStudio from '@/pages/RebrandStudio';
 
 const AuthenticatedApp = () => {
@@ -153,6 +154,7 @@ const AuthenticatedApp = () => {
           <Route path="/prompt-library" element={<PromptLibrary />} />
           <Route path="/rank-engine" element={<RankEngine />} />
           <Route path="/clone-studio" element={<CloneStudio />} />
+          <Route path="/clone-pipeline" element={<ClonePipeline />} />
           <Route path="/rebrand-studio" element={<RebrandStudio />} />
         </Route>
       </Route>
