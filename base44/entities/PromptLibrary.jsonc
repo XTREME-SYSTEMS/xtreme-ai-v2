@@ -1,0 +1,57 @@
+{
+  "name": "PromptLibrary",
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string"
+    },
+    "step": {
+      "type": "string",
+      "enum": [
+        "name",
+        "url",
+        "brand",
+        "logo",
+        "content",
+        "images",
+        "seo_aeo"
+      ]
+    },
+    "niche": {
+      "type": "string",
+      "description": "Niche-specific override ('general' = universal)"
+    },
+    "prompt_text": {
+      "type": "string",
+      "description": "Prompt with {{variables}} placeholders"
+    },
+    "quality_tier": {
+      "type": "string",
+      "enum": [
+        "standard",
+        "premium",
+        "ultra"
+      ],
+      "default": "ultra"
+    },
+    "model_hint": {
+      "type": "string"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "draft",
+        "active"
+      ],
+      "default": "active"
+    },
+    "notes": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "name",
+    "step",
+    "prompt_text"
+  ]
+}

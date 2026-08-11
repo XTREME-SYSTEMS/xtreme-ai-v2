@@ -204,6 +204,16 @@
     "final_approval_id": {
       "type": "string"
     },
+    "template_id": {
+      "type": "string"
+    },
+    "template_name": {
+      "type": "string"
+    },
+    "prompt_ids": {
+      "type": "object",
+      "description": "Map of step -> prompt_id used"
+    },
     "error": {
       "type": "string"
     },

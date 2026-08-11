@@ -1,0 +1,75 @@
+{
+  "name": "TemplateLibrary",
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string"
+    },
+    "niche": {
+      "type": "string",
+      "description": "Industry this template is optimized for ('general' = universal)"
+    },
+    "industry_category": {
+      "type": "string"
+    },
+    "layout_style": {
+      "type": "string",
+      "description": "Design style description"
+    },
+    "sections": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "purpose": {
+            "type": "string"
+          },
+          "guidance": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "design_direction": {
+      "type": "object",
+      "properties": {
+        "colors": {
+          "type": "string"
+        },
+        "typography": {
+          "type": "string"
+        },
+        "spacing": {
+          "type": "string"
+        },
+        "motion": {
+          "type": "string"
+        },
+        "imagery": {
+          "type": "string"
+        }
+      }
+    },
+    "conversion_principles": {
+      "type": "string"
+    },
+    "quality_score": {
+      "type": "number",
+      "default": 95
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "draft",
+        "active"
+      ],
+      "default": "active"
+    }
+  },
+  "required": [
+    "name"
+  ]
+}

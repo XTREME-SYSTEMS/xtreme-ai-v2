@@ -62,6 +62,8 @@ import Expenses from '@/pages/billing/Expenses';
 import BillingDashboard from '@/pages/billing/BillingDashboard';
 import AutonomousSystem from '@/pages/AutonomousSystem';
 import WebsiteFactory from '@/pages/WebsiteFactory';
+import TemplateLibrary from '@/pages/TemplateLibrary';
+import PromptLibrary from '@/pages/PromptLibrary';
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
@@ -144,6 +146,8 @@ const AuthenticatedApp = () => {
           <Route path="/billing/expenses" element={<Expenses />} />
           <Route path="/autonomous-system" element={<AutonomousSystem />} />
           <Route path="/website-factory" element={<WebsiteFactory />} />
+          <Route path="/template-library" element={<TemplateLibrary />} />
+          <Route path="/prompt-library" element={<PromptLibrary />} />
         </Route>
       </Route>
       <Route path="*" element={<PageNotFound />} />
