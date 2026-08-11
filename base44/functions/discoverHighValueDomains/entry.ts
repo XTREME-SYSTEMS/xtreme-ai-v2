@@ -51,7 +51,7 @@ export default async function(req) {
     const base44 = createClientFromRequest(req);
     const svc = base44.asServiceRole;
 
-    const body = typeof req.body === 'string' ? JSON.parse(req.body) : (req.body || {});
+    const body = await req.json().catch(() => ({}));
     const requestedNiches = body.niches;
     const niches = requestedNiches && requestedNiches.length > 0
       ? HIGH_VALUE_NICHES.filter(n => requestedNiches.includes(n.service))

@@ -37,6 +37,8 @@ export default function DomainAcquisition() {
   const [filterNiche, setFilterNiche] = useState("");
   const [filterPriority, setFilterPriority] = useState("");
   const [adding, setAdding] = useState(null);
+  const [checking, setChecking] = useState(false);
+  const [autoChecked, setAutoChecked] = useState(false);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -49,10 +51,36 @@ export default function DomainAcquisition() {
 
   useEffect(() => { load(); }, [load]);
 
+  // Auto-check availability when candidates first load with UNKNOWN status
+  useEffect(() => {
+    if (!loading && !autoChecked && !checking && candidates.length > 0) {
+      const hasUnknown = candidates.some(c => !c.availability_status || c.availability_status === 'UNKNOWN');
+      if (hasUnknown) {
+        setAutoChecked(true);
+        checkAvailability();
+      }
+    }
+  }, [loading, autoChecked, checking, candidates]);
+
+  const checkAvailability = async () => {
+    setChecking(true);
+    setError("");
+    try {
+      const allDomains = candidates.map(c => c.domain);
+      for (let i = 0; i < allDomains.length; i += 20) {
+        const batch = allDomains.slice(i, i + 20);
+        await base44.functions.invoke('checkDomainAvailability', { domains: batch });
+      }
+      await load();
+    } catch (e) { setError(e.message); }
+    setChecking(false);
+  };
+
   const discover = async () => {
     setDiscovering(true);
     setError("");
     setDiscoverResult(null);
+    setAutoChecked(false);
     try {
       const payload = selectedNiches.length > 0 ? { niches: selectedNiches } : {};
       const res = await base44.functions.invoke('discoverHighValueDomains', payload);
@@ -90,9 +118,10 @@ export default function DomainAcquisition() {
 
   const stats = {
     total: candidates.length,
-    buyNow: candidates.filter(c => c.acquisition_priority === 'buy_now').length,
-    strongBuy: candidates.filter(c => c.acquisition_priority === 'strong_buy').length,
-    totalRevenue: candidates.reduce((a, c) => a + (c.estimated_monthly_revenue || 0), 0),
+    available: candidates.filter(c => c.availability_status === 'AVAILABLE').length,
+    registered: candidates.filter(c => c.availability_status === 'REGISTERED').length,
+    buyNow: candidates.filter(c => c.acquisition_priority === 'buy_now' && c.availability_status !== 'REGISTERED').length,
+    totalRevenue: candidates.filter(c => c.availability_status !== 'REGISTERED').reduce((a, c) => a + (c.estimated_monthly_revenue || 0), 0),
     avgSerpWeakness: candidates.length > 0 ? candidates.reduce((a, c) => a + (c.serp_weakness_score || 0), 0) / candidates.length : 0,
   };
 
@@ -108,6 +137,9 @@ export default function DomainAcquisition() {
       >
         <LoadingButton onClick={() => setShowNichePicker(true)} variant="ghost">
           <Filter className="h-4 w-4" /> Select Niches ({selectedNiches.length})
+        </LoadingButton>
+        <LoadingButton onClick={checkAvailability} loading={checking} variant="ghost">
+          <CheckCircle className="h-4 w-4" /> Check Availability
         </LoadingButton>
         <LoadingButton onClick={discover} loading={discovering} variant="primary">
           <Radar className="h-4 w-4" /> Scan SERPs & Score Domains
@@ -141,9 +173,9 @@ export default function DomainAcquisition() {
       {/* Stats */}
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-5">
         <StatCard icon={Target} label="Candidates" value={stats.total} />
+        <StatCard icon={CheckCircle} label="Available" value={stats.available} color="text-lime-400" />
         <StatCard icon={Zap} label="Buy Now" value={stats.buyNow} color="text-rose-400" />
-        <StatCard icon={TrendingUp} label="Strong Buy" value={stats.strongBuy} color="text-amber-400" />
-        <StatCard icon={DollarSign} label="Est. Portfolio Revenue/mo" value={`$${(stats.totalRevenue / 1000).toFixed(1)}k`} color="text-lime-400" />
+        <StatCard icon={DollarSign} label="Est. Revenue/mo" value={`$${(stats.totalRevenue / 1000).toFixed(1)}k`} color="text-lime-400" />
         <StatCard icon={Radar} label="Avg SERP Weakness" value={`${stats.avgSerpWeakness.toFixed(0)}/100`} color="text-cyan-400" />
       </div>
 
@@ -233,6 +265,7 @@ function DomainCard({ candidate: c, onAdd, adding }) {
   const priority = c.acquisition_priority || 'consider';
   return (
     <div className={`rounded-xl border bg-zinc-950 p-4 transition-colors ${
+      c.availability_status === 'REGISTERED' ? 'border-white/10 opacity-50' :
       priority === 'buy_now' ? 'border-rose-500/40' :
       priority === 'strong_buy' ? 'border-amber-500/30' :
       'border-white/10'
@@ -243,9 +276,20 @@ function DomainCard({ candidate: c, onAdd, adding }) {
           <div className="text-sm font-semibold text-white truncate">{c.domain}</div>
           <div className="mt-0.5 text-xs text-white/40">{c.niche} · {c.domain_type}</div>
         </div>
-        <span className={`shrink-0 rounded border px-2 py-0.5 text-[10px] font-bold ${PRIORITY_COLORS[priority]}`}>
-          {PRIORITY_LABELS[priority]}
-        </span>
+        <div className="flex shrink-0 flex-col items-end gap-1">
+          <span className={`rounded border px-2 py-0.5 text-[10px] font-bold ${PRIORITY_COLORS[priority]}`}>
+            {PRIORITY_LABELS[priority]}
+          </span>
+          {c.availability_status === 'AVAILABLE' && (
+            <span className="rounded border border-lime-400/40 bg-lime-400/10 px-2 py-0.5 text-[10px] font-bold text-lime-300">AVAILABLE</span>
+          )}
+          {c.availability_status === 'REGISTERED' && (
+            <span className="rounded border border-rose-500/40 bg-rose-500/10 px-2 py-0.5 text-[10px] font-bold text-rose-300">REGISTERED</span>
+          )}
+          {(!c.availability_status || c.availability_status === 'UNKNOWN') && (
+            <span className="rounded border border-white/20 bg-white/5 px-2 py-0.5 text-[10px] font-bold text-white/40">CHECKING…</span>
+          )}
+        </div>
       </div>
 
       {/* ROI Score */}
@@ -309,14 +353,24 @@ function DomainCard({ candidate: c, onAdd, adding }) {
         >
           {c.selected ? <><CheckCircle className="h-3 w-3" /> In Portfolio</> : <><Plus className="h-3 w-3" /> Add to Portfolio</>}
         </LoadingButton>
-        <a
-          href={c.buy_url}
-          target="_blank"
-          rel="noopener"
-          className="rounded-lg border border-white/15 px-2.5 py-1.5 text-xs text-white/70 hover:bg-white/5 flex items-center gap-1.5"
-        >
-          <ExternalLink className="h-3 w-3" /> Buy
-        </a>
+        {c.availability_status === 'REGISTERED' ? (
+          <span className="rounded-lg border border-rose-500/30 bg-rose-500/5 px-2.5 py-1.5 text-xs text-rose-400/60 flex items-center gap-1.5">
+            <AlertCircle className="h-3 w-3" /> Registered
+          </span>
+        ) : c.availability_status === 'AVAILABLE' ? (
+          <a
+            href={c.buy_url}
+            target="_blank"
+            rel="noopener"
+            className="rounded-lg border border-lime-400/40 bg-lime-400/10 px-2.5 py-1.5 text-xs text-lime-300 hover:bg-lime-400/20 flex items-center gap-1.5"
+          >
+            <ExternalLink className="h-3 w-3" /> Buy
+          </a>
+        ) : (
+          <span className="rounded-lg border border-white/15 px-2.5 py-1.5 text-xs text-white/40 flex items-center gap-1.5">
+            <AlertCircle className="h-3 w-3" /> Checking…
+          </span>
+        )}
       </div>
     </div>
   );
