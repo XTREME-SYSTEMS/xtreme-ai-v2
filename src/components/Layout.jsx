@@ -6,7 +6,7 @@ import {
   Lightbulb, Palette, Monitor, Megaphone, Boxes, Factory, Database, Eye,
   Hammer, ShieldCheck, FileText, TrendingUp, FlaskConical, Dna, Network,
   BookMarked, CheckCircle, ScrollText, Plug, Settings, LogOut, Menu, X,
-  MapPin, Plus, Rocket, Bot, LayoutTemplate, Copy,
+  MapPin, Plus, Rocket, Bot, LayoutTemplate, Copy, Wand2,
 } from "lucide-react";
 import { Image } from "@/components/ui/image";
 import { cn } from "@/lib/utils";
@@ -57,6 +57,7 @@ const NAV = [
   { to: "/template-library", label: "Template Library", icon: LayoutTemplate },
   { to: "/prompt-library", label: "Prompt Library", icon: BookOpen },
   { to: "/clone-studio", label: "Clone Studio", icon: Copy },
+  { to: "/rebrand-studio", label: "Rebrand Studio", icon: Wand2 },
   { to: "/rank-engine", label: "Rank Engine", icon: TrendingUp },
   { to: "/markets", label: "Markets", icon: MapPin },
   { to: "/markets/new", label: "New Market", icon: Plus },

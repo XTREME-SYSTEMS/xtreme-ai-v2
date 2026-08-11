@@ -66,6 +66,7 @@ import TemplateLibrary from '@/pages/TemplateLibrary';
 import PromptLibrary from '@/pages/PromptLibrary';
 import RankEngine from '@/pages/RankEngine';
 import CloneStudio from '@/pages/CloneStudio';
+import RebrandStudio from '@/pages/RebrandStudio';
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
@@ -152,6 +153,7 @@ const AuthenticatedApp = () => {
           <Route path="/prompt-library" element={<PromptLibrary />} />
           <Route path="/rank-engine" element={<RankEngine />} />
           <Route path="/clone-studio" element={<CloneStudio />} />
+          <Route path="/rebrand-studio" element={<RebrandStudio />} />
         </Route>
       </Route>
       <Route path="*" element={<PageNotFound />} />
