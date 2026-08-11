@@ -55,14 +55,18 @@ export default async function(req) {
     const requestedNiches = body.niches;
     const niches = requestedNiches && requestedNiches.length > 0
       ? HIGH_VALUE_NICHES.filter(n => requestedNiches.includes(n.service))
-      : HIGH_VALUE_NICHES.slice(0, 10); // Default: first 10 to avoid timeout
+      : HIGH_VALUE_NICHES; // Default: all niches
 
     const results = [];
 
-    for (const niche of niches) {
-      const domains = generateDomains(niche.service);
+    // Process niches in parallel batches of 5 to speed up all 25 niches
+    const BATCH_SIZE = 5;
+    for (let i = 0; i < niches.length; i += BATCH_SIZE) {
+      const batch = niches.slice(i, i + BATCH_SIZE);
+      const batchResults = await Promise.all(batch.map(async (niche) => {
+        const domains = generateDomains(niche.service);
 
-      const prompt = `You are a domain acquisition expert analyzing whether to buy domains for local SEO domination.
+        const prompt = `You are a domain acquisition expert analyzing whether to buy domains for local SEO domination.
 
 Search phrase: "${niche.service} near me"
 Lead value: $${niche.lead_value} per lead
@@ -97,83 +101,84 @@ Return JSON with this exact structure:
   ]
 }`;
 
-      try {
-        const analysis = await base44.integrations.Core.InvokeLLM({
-          prompt,
-          add_context_from_internet: true,
-          model: 'gemini_3_flash',
-          response_json_schema: {
-            type: "object",
-            properties: {
-              search_volume: { type: "number" },
-              serp_weakness_score: { type: "number" },
-              top_competitors: { type: "array", items: { type: "string" } },
-              content_gap: { type: "string" },
-              domains: {
-                type: "array",
-                items: {
-                  type: "object",
-                  properties: {
-                    domain: { type: "string" },
-                    rankability_score: { type: "number" },
-                    estimated_monthly_leads: { type: "number" },
-                    roi_score: { type: "number" },
-                    reasoning: { type: "string" }
+        try {
+          const analysis = await base44.integrations.Core.InvokeLLM({
+            prompt,
+            add_context_from_internet: true,
+            model: 'gemini_3_flash',
+            response_json_schema: {
+              type: "object",
+              properties: {
+                search_volume: { type: "number" },
+                serp_weakness_score: { type: "number" },
+                top_competitors: { type: "array", items: { type: "string" } },
+                content_gap: { type: "string" },
+                domains: {
+                  type: "array",
+                  items: {
+                    type: "object",
+                    properties: {
+                      domain: { type: "string" },
+                      rankability_score: { type: "number" },
+                      estimated_monthly_leads: { type: "number" },
+                      roi_score: { type: "number" },
+                      reasoning: { type: "string" }
+                    }
                   }
                 }
               }
             }
+          });
+
+          for (const d of analysis.domains) {
+            const estimatedRevenue = Math.round((d.estimated_monthly_leads || 0) * niche.lead_value);
+            const priority = d.roi_score >= 75 ? 'buy_now' : d.roi_score >= 55 ? 'strong_buy' : d.roi_score >= 35 ? 'consider' : 'pass';
+            const domainType = d.domain.includes('nearyou') ? 'nearyou' : 'nearme';
+
+            const record = {
+              niche: niche.service,
+              search_phrase: `${niche.service} near me`,
+              monthly_search_volume: analysis.search_volume,
+              cpc: niche.cpc,
+              lead_value: niche.lead_value,
+              serp_weakness_score: analysis.serp_weakness_score,
+              rankability_score: d.rankability_score,
+              roi_score: d.roi_score,
+              estimated_monthly_leads: d.estimated_monthly_leads,
+              estimated_monthly_revenue: estimatedRevenue,
+              competition_analysis: d.reasoning,
+              top_competitors: analysis.top_competitors,
+              content_gap: analysis.content_gap,
+              domain_type: domainType,
+              acquisition_priority: priority,
+              buy_url: `https://www.namecheap.com/domains/registration/results/?domain=${d.domain}`,
+              checked_at: new Date().toISOString(),
+              score: d.roi_score,
+            };
+
+            const existing = await svc.entities.DomainCandidate.filter({ domain: d.domain }, null, 1);
+            if (existing && existing.length > 0) {
+              await svc.entities.DomainCandidate.update(existing[0].id, record);
+            } else {
+              await base44.entities.DomainCandidate.create({
+                domain: d.domain,
+                ...record,
+              });
+            }
           }
-        });
 
-        for (const d of analysis.domains) {
-          const estimatedRevenue = Math.round((d.estimated_monthly_leads || 0) * niche.lead_value);
-          const priority = d.roi_score >= 75 ? 'buy_now' : d.roi_score >= 55 ? 'strong_buy' : d.roi_score >= 35 ? 'consider' : 'pass';
-          const domainType = d.domain.includes('nearyou') ? 'nearyou' : 'nearme';
-
-          const record = {
+          return {
             niche: niche.service,
-            search_phrase: `${niche.service} near me`,
-            monthly_search_volume: analysis.search_volume,
-            cpc: niche.cpc,
-            lead_value: niche.lead_value,
-            serp_weakness_score: analysis.serp_weakness_score,
-            rankability_score: d.rankability_score,
-            roi_score: d.roi_score,
-            estimated_monthly_leads: d.estimated_monthly_leads,
-            estimated_monthly_revenue: estimatedRevenue,
-            competition_analysis: d.reasoning,
-            top_competitors: analysis.top_competitors,
-            content_gap: analysis.content_gap,
-            domain_type: domainType,
-            acquisition_priority: priority,
-            buy_url: `https://www.namecheap.com/domains/registration/results/?domain=${d.domain}`,
-            checked_at: new Date().toISOString(),
-            score: d.roi_score,
+            search_volume: analysis.search_volume,
+            serp_weakness: analysis.serp_weakness_score,
+            domains_analyzed: analysis.domains.length,
+            top_domain: analysis.domains.sort((a, b) => b.roi_score - a.roi_score)[0]?.domain,
           };
-
-          // Check if already exists
-          const existing = await svc.entities.DomainCandidate.filter({ domain: d.domain }, null, 1);
-          if (existing && existing.length > 0) {
-            await svc.entities.DomainCandidate.update(existing[0].id, record);
-          } else {
-            await base44.entities.DomainCandidate.create({
-              domain: d.domain,
-              ...record,
-            });
-          }
+        } catch (e) {
+          return { niche: niche.service, error: e.message };
         }
-
-        results.push({
-          niche: niche.service,
-          search_volume: analysis.search_volume,
-          serp_weakness: analysis.serp_weakness_score,
-          domains_analyzed: analysis.domains.length,
-          top_domain: analysis.domains.sort((a, b) => b.roi_score - a.roi_score)[0]?.domain,
-        });
-      } catch (e) {
-        results.push({ niche: niche.service, error: e.message });
-      }
+      }));
+      results.push(...batchResults);
     }
 
     return Response.json({
