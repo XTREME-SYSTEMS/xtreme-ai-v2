@@ -68,6 +68,7 @@ import RankEngine from '@/pages/RankEngine';
 import CloneStudio from '@/pages/CloneStudio';
 import ClonePipeline from '@/pages/ClonePipeline';
 import RebrandStudio from '@/pages/RebrandStudio';
+import RaceToRank from '@/pages/RaceToRank';
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
@@ -156,6 +157,7 @@ const AuthenticatedApp = () => {
           <Route path="/clone-studio" element={<CloneStudio />} />
           <Route path="/clone-pipeline" element={<ClonePipeline />} />
           <Route path="/rebrand-studio" element={<RebrandStudio />} />
+          <Route path="/race-to-rank" element={<RaceToRank />} />
         </Route>
       </Route>
       <Route path="*" element={<PageNotFound />} />

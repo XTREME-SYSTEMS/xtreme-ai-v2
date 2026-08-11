@@ -59,6 +59,7 @@ const NAV = [
   { to: "/clone-studio", label: "Clone Studio", icon: Copy },
   { to: "/clone-pipeline", label: "Clone Pipeline", icon: Rocket },
   { to: "/rebrand-studio", label: "Rebrand Studio", icon: Wand2 },
+  { to: "/race-to-rank", label: "Race to Rank", icon: Rocket },
   { to: "/rank-engine", label: "Rank Engine", icon: TrendingUp },
   { to: "/markets", label: "Markets", icon: MapPin },
   { to: "/markets/new", label: "New Market", icon: Plus },

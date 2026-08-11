@@ -1,4 +1,5 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.40';
+import { scrapeTarget, detectIndustry } from '../../shared/cloneUtils.ts';
 
 export default async function(req) {
   try {
@@ -21,6 +22,53 @@ export default async function(req) {
     let engine;
     if (body.engine_id) {
       engine = await svc.entities.RankEngine.get(body.engine_id);
+    } else if (action === 'quick_start') {
+      // Auto-detect everything from just a URL
+      if (!body.site_url) return Response.json({ error: 'site_url required' }, { status: 400 });
+      let cleanUrl = body.site_url.trim();
+      if (!cleanUrl.startsWith('http')) cleanUrl = 'https://' + cleanUrl;
+      log(`Quick-start: scraping ${cleanUrl}`);
+      let scrape, niche = 'general', siteName = '', services = [], cities = body.cities || [];
+      try {
+        scrape = await scrapeTarget(cleanUrl);
+        niche = detectIndustry(scrape.html, scrape.title);
+        siteName = scrape.title ? scrape.title.replace(/\s*[|\-–·]\s*.*/,'').trim() : cleanUrl.replace(/^https?:\/\//,'').split('/')[0];
+        log(`Detected: "${siteName}" / ${niche}`);
+      } catch (e) {
+        log(`Scrape failed (${e.message}) — using URL as name`);
+        siteName = cleanUrl.replace(/^https?:\/\//,'').split('/')[0];
+      }
+      // LLM: detect services + suggest cities from scraped content
+      try {
+        const detectRes = await base44.integrations.Core.InvokeLLM({
+          prompt: `Analyze this website content and return JSON. Business name: "${siteName}". Niche: "${niche}". Title: "${scrape?.title||''}". Meta: "${scrape?.meta_description||''}". Headings: ${JSON.stringify((scrape?.headings||[]).slice(0,10))}. Return: { "services": [3-6 service keywords this business offers], "cities": [3-5 cities/areas they serve, or [] if not local], "business_name": [cleaner version of the business name if detectable, else the provided name] }`,
+          model: 'gemini_3_flash',
+          response_json_schema: {
+            type: 'object',
+            properties: {
+              services: { type: 'array', items: { type: 'string' } },
+              cities: { type: 'array', items: { type: 'string' } },
+              business_name: { type: 'string' }
+            }
+          }
+        });
+        if (detectRes.services?.length) services = detectRes.services;
+        if (!cities.length && detectRes.cities?.length) cities = detectRes.cities;
+        if (detectRes.business_name) siteName = detectRes.business_name;
+        log(`LLM detected: ${services.length} services, ${cities.length} cities`);
+      } catch (e) { log(`LLM detection failed: ${e.message}`); }
+      engine = await svc.entities.RankEngine.create({
+        site_name: siteName,
+        site_url: cleanUrl,
+        niche,
+        cities,
+        services,
+        market_id: body.market_id || '',
+        project_id: body.project_id || '',
+        status: 'active',
+        logs: [`Quick-start campaign created for ${cleanUrl}`]
+      });
+      log(`Campaign created: ${engine.site_name}`);
     } else if (action === 'start') {
       if (!body.site_name) return Response.json({ error: 'site_name required' }, { status: 400 });
       engine = await svc.entities.RankEngine.create({
