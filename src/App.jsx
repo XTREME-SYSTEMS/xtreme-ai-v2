@@ -74,6 +74,7 @@ import DomainPortfolio from '@/pages/DomainPortfolio';
 import GscTraffic from '@/pages/GscTraffic';
 import SeoAccelerator from '@/pages/SeoAccelerator';
 import SeoStandard from '@/pages/SeoStandard';
+import SeoAgent from '@/pages/SeoAgent';
 import Login from '@/pages/Login';
 import Register from '@/pages/Register';
 import ForgotPassword from '@/pages/ForgotPassword';
@@ -176,6 +177,7 @@ const AuthenticatedApp = () => {
           <Route path="/gsc-traffic" element={<GscTraffic />} />
           <Route path="/seo-accelerator" element={<SeoAccelerator />} />
           <Route path="/seo-standard" element={<SeoStandard />} />
+          <Route path="/seo-agent" element={<SeoAgent />} />
         </Route>
       </Route>
       <Route path="*" element={<PageNotFound />} />

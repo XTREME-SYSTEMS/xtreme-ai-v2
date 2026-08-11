@@ -1,0 +1,73 @@
+{
+  "description": "Weekly automation: generate social media content, syndicate to platforms, build citations, run full SEO maintenance \u2014 runs every Monday",
+  "definition": {
+    "document": {
+      "dsl": "1.0.0",
+      "name": "weekly_content_distribution",
+      "version": "1.0",
+      "namespace": "base44"
+    },
+    "do": [
+      {
+        "content_dist": {
+          "call": "invoke_backend_function",
+          "with": {
+            "function_name": "automateContentDistribution",
+            "args": {}
+          },
+          "then": "seo_maintenance",
+          "x-base44": {
+            "title": "Generate Social Content",
+            "description": "Multi-platform content from site pages"
+          }
+        }
+      },
+      {
+        "seo_maintenance": {
+          "call": "invoke_backend_function",
+          "with": {
+            "function_name": "runSeoMaintenance",
+            "args": {}
+          },
+          "then": "citations",
+          "x-base44": {
+            "title": "SEO Maintenance",
+            "description": "Weekly technical + content maintenance"
+          }
+        }
+      },
+      {
+        "citations": {
+          "call": "invoke_backend_function",
+          "with": {
+            "function_name": "buildCitationPlan",
+            "args": {}
+          },
+          "then": "end",
+          "x-base44": {
+            "title": "Build Citations",
+            "description": "Local citation building + directory submission"
+          }
+        }
+      }
+    ]
+  },
+  "trigger": {
+    "condition": null,
+    "config": {
+      "trigger_type": "scheduled",
+      "events": [],
+      "schedule_mode": "recurring",
+      "cron_expression": "0 9 * * 1",
+      "one_time_date": null,
+      "timezone": "America/New_York",
+      "interval_value": null,
+      "interval_unit": null,
+      "interval_anchor": null,
+      "ends_type": "never",
+      "ends_on_date": null,
+      "ends_after_count": null
+    }
+  },
+  "name": "Weekly Content Distribution"
+}

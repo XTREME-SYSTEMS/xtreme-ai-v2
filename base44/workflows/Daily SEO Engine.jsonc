@@ -1,5 +1,5 @@
 {
-  "description": "Master daily automation: rank tracking, GSC sync, rank alerts, technical audit, content freshness, competitor gaps, backlink prospecting, outreach follow-ups \u2014 runs every morning",
+  "description": "Master daily automation: rank tracking, GSC sync, rank alerts, technical audit, content freshness, competitor gaps, backlink prospecting, outreach follow-ups, IndexNow submission, technical asset generation, AI visibility monitoring \u2014 runs every morning",
   "definition": {
     "document": {
       "dsl": "1.0.0",
@@ -29,10 +29,24 @@
             "function_name": "checkRankAlerts",
             "args": {}
           },
-          "then": "tech_audit",
+          "then": "index_now",
           "x-base44": {
             "title": "Check Rank Alerts",
             "description": "Detect page-one entries, drops, improvements"
+          }
+        }
+      },
+      {
+        "index_now": {
+          "call": "invoke_backend_function",
+          "with": {
+            "function_name": "submitIndexNow",
+            "args": {}
+          },
+          "then": "tech_audit",
+          "x-base44": {
+            "title": "IndexNow Submission",
+            "description": "Instant Bing/Yandex indexing"
           }
         }
       },
@@ -43,10 +57,24 @@
             "function_name": "runTechnicalSeoAudit",
             "args": {}
           },
-          "then": "refresh_content",
+          "then": "gen_assets",
           "x-base44": {
             "title": "Technical SEO Audit",
-            "description": "Daily technical monitoring + broken link check"
+            "description": "Daily technical monitoring + broken links"
+          }
+        }
+      },
+      {
+        "gen_assets": {
+          "call": "invoke_backend_function",
+          "with": {
+            "function_name": "generateTechnicalAssets",
+            "args": {}
+          },
+          "then": "refresh_content",
+          "x-base44": {
+            "title": "Generate Technical Assets",
+            "description": "llms.txt + robots.txt with AI bot rules"
           }
         }
       },
@@ -101,10 +129,24 @@
             "function_name": "sendFollowUp",
             "args": {}
           },
-          "then": "end",
+          "then": "ai_visibility",
           "x-base44": {
             "title": "Send Outreach Follow-ups",
             "description": "Follow up on pending backlink outreach"
+          }
+        }
+      },
+      {
+        "ai_visibility": {
+          "call": "invoke_backend_function",
+          "with": {
+            "function_name": "monitorAiVisibility",
+            "args": {}
+          },
+          "then": "end",
+          "x-base44": {
+            "title": "Monitor AI Visibility",
+            "description": "Track brand in ChatGPT, Perplexity, Gemini"
           }
         }
       }
