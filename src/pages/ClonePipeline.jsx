@@ -53,6 +53,15 @@ export default function ClonePipeline() {
     } catch {}
   }, [project?.id]);
 
+  // Polling fallback — if realtime misses an event, poll every 5s while in a transient state
+  useEffect(() => {
+    if (!project?.id) return;
+    const transient = ["scanning", "generating_rebrand", "provisioning", "buying_domain", "seo_aeo_optimizing"];
+    if (!transient.includes(project.current_step)) return;
+    const interval = setInterval(refreshProject, 5000);
+    return () => clearInterval(interval);
+  }, [project?.id, project?.current_step, refreshProject]);
+
   // === Step 1 → 2: User selected a URL ===
   const handleSelectUrl = (url, ind, name) => {
     setTargetUrl(url);
