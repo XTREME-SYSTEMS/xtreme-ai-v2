@@ -8,6 +8,86 @@
     "domain": {
       "type": "string"
     },
+    "niche": {
+      "type": "string",
+      "description": "Service niche (roofing, hvac, plumbing, etc.)"
+    },
+    "search_phrase": {
+      "type": "string",
+      "description": "The exact search phrase this domain targets"
+    },
+    "monthly_search_volume": {
+      "type": "number",
+      "description": "Estimated monthly searches for the target phrase"
+    },
+    "cpc": {
+      "type": "number",
+      "description": "Cost per click in Google Ads (proxy for lead value)"
+    },
+    "lead_value": {
+      "type": "number",
+      "description": "Estimated value per lead in this niche"
+    },
+    "serp_weakness_score": {
+      "type": "number",
+      "description": "0-100, how weak/beatable the top 10 results are"
+    },
+    "rankability_score": {
+      "type": "number",
+      "description": "0-100, how easy to rank #1 with this domain"
+    },
+    "roi_score": {
+      "type": "number",
+      "description": "0-100, overall acquisition priority score"
+    },
+    "estimated_monthly_leads": {
+      "type": "number",
+      "description": "Predicted leads/month if ranked #1"
+    },
+    "estimated_monthly_revenue": {
+      "type": "number",
+      "description": "Predicted monthly revenue if ranked #1"
+    },
+    "competition_analysis": {
+      "type": "string",
+      "description": "AI analysis of why this domain will/won't rank"
+    },
+    "top_competitors": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Top ranking domains for this phrase"
+    },
+    "content_gap": {
+      "type": "string",
+      "description": "What the top results are missing that we can exploit"
+    },
+    "domain_type": {
+      "type": "string",
+      "enum": [
+        "nearme",
+        "nearyou",
+        "expired",
+        "premium",
+        "brandable"
+      ],
+      "default": "nearme"
+    },
+    "acquisition_priority": {
+      "type": "string",
+      "enum": [
+        "buy_now",
+        "strong_buy",
+        "consider",
+        "pass"
+      ],
+      "default": "consider"
+    },
+    "buy_url": {
+      "type": "string",
+      "description": "Direct link to purchase on registrar"
+    },
     "availability_status": {
       "type": "string",
       "enum": [

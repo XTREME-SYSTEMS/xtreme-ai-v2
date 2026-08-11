@@ -6,7 +6,7 @@ import {
   Lightbulb, Palette, Monitor, Megaphone, Boxes, Factory, Database, Eye,
   Hammer, ShieldCheck, FileText, TrendingUp, FlaskConical, Dna, Network, BarChart3,
   BookMarked, CheckCircle, ScrollText, Plug, Settings, LogOut, Menu, X,
-  MapPin, Plus, Rocket, Bot, LayoutTemplate, Copy, Wand2, Crosshair, Activity,
+  MapPin, Plus, Rocket, Bot, LayoutTemplate, Copy, Wand2, Crosshair, Activity, Radar,
 } from "lucide-react";
 import { Image } from "@/components/ui/image";
 import { cn } from "@/lib/utils";
@@ -66,6 +66,7 @@ const NAV = [
   { to: "/seo-standard", label: "SEO Standard Checklist", icon: ClipboardCheck },
   { to: "/seo-agent", label: "SEO AI Agent", icon: Bot },
   { to: "/serp-blueprint", label: "SERP Competitor Cloner", icon: Crosshair },
+  { to: "/domain-acquisition", label: "Domain Acquisition AI", icon: Radar },
   { to: "/pipeline-dashboard", label: "Growth Pipeline", icon: Activity },
   { to: "/domain-portfolio", label: "Domain Portfolio", icon: Globe },
   { to: "/rank-engine", label: "Rank Engine", icon: TrendingUp },

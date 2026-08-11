@@ -77,6 +77,7 @@ import SeoStandard from '@/pages/SeoStandard';
 import SeoAgent from '@/pages/SeoAgent';
 import SerpBlueprint from '@/pages/SerpBlueprint';
 import PipelineDashboard from '@/pages/PipelineDashboard';
+import DomainAcquisition from '@/pages/DomainAcquisition';
 import Login from '@/pages/Login';
 import Register from '@/pages/Register';
 import ForgotPassword from '@/pages/ForgotPassword';
@@ -182,6 +183,7 @@ const AuthenticatedApp = () => {
           <Route path="/seo-agent" element={<SeoAgent />} />
           <Route path="/serp-blueprint" element={<SerpBlueprint />} />
           <Route path="/pipeline-dashboard" element={<PipelineDashboard />} />
+          <Route path="/domain-acquisition" element={<DomainAcquisition />} />
         </Route>
       </Route>
       <Route path="*" element={<PageNotFound />} />
