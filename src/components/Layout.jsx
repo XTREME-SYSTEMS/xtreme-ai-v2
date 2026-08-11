@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import {
   LayoutDashboard, Search, Users, ClipboardCheck, Target, Globe, BookOpen,
   Lightbulb, Palette, Monitor, Megaphone, Boxes, Factory, Database, Eye,
-  Hammer, ShieldCheck, FileText, TrendingUp, FlaskConical, Dna, Network,
+  Hammer, ShieldCheck, FileText, TrendingUp, FlaskConical, Dna, Network, BarChart3,
   BookMarked, CheckCircle, ScrollText, Plug, Settings, LogOut, Menu, X,
   MapPin, Plus, Rocket, Bot, LayoutTemplate, Copy, Wand2,
 } from "lucide-react";
@@ -61,6 +61,7 @@ const NAV = [
   { to: "/rebrand-studio", label: "Rebrand Studio", icon: Wand2 },
   { to: "/race-to-rank", label: "Race to Rank", icon: Rocket },
   { to: "/ranking-monitor", label: "Ranking Monitor", icon: TrendingUp },
+  { to: "/gsc-traffic", label: "GSC Traffic", icon: BarChart3 },
   { to: "/domain-portfolio", label: "Domain Portfolio", icon: Globe },
   { to: "/rank-engine", label: "Rank Engine", icon: TrendingUp },
   { to: "/markets", label: "Markets", icon: MapPin },

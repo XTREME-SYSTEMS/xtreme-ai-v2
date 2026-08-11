@@ -1,0 +1,76 @@
+{
+  "name": "Auto-Deploy New Domain",
+  "description": "Triggers a full site deployment (RankEngine campaign + GSC submission + page generation) as soon as a new domain is added to the portfolio, so every new launch is ready for Google immediately.",
+  "trigger": {
+    "config": {
+      "trigger_type": "entity",
+      "entity_name": "DomainPortfolio",
+      "events": [
+        "create"
+      ]
+    },
+    "condition": "${ .trigger.data.status == \"acquired\" }"
+  },
+  "definition": {
+    "document": {
+      "dsl": "1.0.0",
+      "name": "auto_deploy_new_domain",
+      "version": "1.0",
+      "namespace": "base44"
+    },
+    "do": [
+      {
+        "launch": {
+          "call": "invoke_backend_function",
+          "with": {
+            "function_name": "launchDomainPortfolio",
+            "args": {
+              "portfolio_id": "${ .trigger.entity_id }",
+              "niche": "${ .trigger.data.niche }"
+            }
+          },
+          "then": "check_engine",
+          "x-base44": {
+            "title": "Launch domain",
+            "description": "Create RankEngine campaign + submit to GSC"
+          }
+        }
+      },
+      {
+        "check_engine": {
+          "switch": [
+            {
+              "when": "${ .launch.engine_id != \"\" and .launch.engine_id != null }",
+              "then": "run_engine"
+            },
+            {
+              "when": "${ true }",
+              "then": "end"
+            }
+          ],
+          "x-base44": {
+            "title": "Engine created?",
+            "description": "Check if RankEngine campaign was created"
+          }
+        }
+      },
+      {
+        "run_engine": {
+          "call": "invoke_backend_function",
+          "with": {
+            "function_name": "runRankEngine",
+            "args": {
+              "action": "run",
+              "engine_id": "${ .launch.engine_id }"
+            }
+          },
+          "then": "end",
+          "x-base44": {
+            "title": "Generate pages",
+            "description": "Generate keywords, pages, and citations"
+          }
+        }
+      }
+    ]
+  }
+}
