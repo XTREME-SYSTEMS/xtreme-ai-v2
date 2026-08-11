@@ -1,0 +1,97 @@
+{
+  "name": "BacklinkProspect",
+  "type": "object",
+  "properties": {
+    "engine_id": {
+      "type": "string",
+      "description": "Linked RankEngine campaign ID"
+    },
+    "portfolio_id": {
+      "type": "string",
+      "description": "Linked DomainPortfolio ID"
+    },
+    "target_domain": {
+      "type": "string",
+      "description": "The site we want a backlink from"
+    },
+    "target_url": {
+      "type": "string",
+      "description": "Specific page for outreach (or homepage)"
+    },
+    "page_title": {
+      "type": "string"
+    },
+    "prospect_type": {
+      "type": "string",
+      "enum": [
+        "resource_page",
+        "guest_post",
+        "competitor_link",
+        "directory",
+        "broken_link",
+        "niche_blog",
+        "forum",
+        "press"
+      ],
+      "default": "niche_blog"
+    },
+    "relevance_score": {
+      "type": "number",
+      "default": 0,
+      "description": "0-100 relevance to our niche"
+    },
+    "domain_authority": {
+      "type": "number",
+      "default": 0,
+      "description": "Estimated Moz DA (0-100)"
+    },
+    "contact_email": {
+      "type": "string"
+    },
+    "contact_name": {
+      "type": "string"
+    },
+    "competitor_source": {
+      "type": "string",
+      "description": "Which competitor's backlink revealed this prospect"
+    },
+    "outreach_status": {
+      "type": "string",
+      "enum": [
+        "pending",
+        "drafted",
+        "sent",
+        "replied",
+        "accepted",
+        "rejected",
+        "follow_up",
+        "dead"
+      ],
+      "default": "pending"
+    },
+    "outreach_subject": {
+      "type": "string",
+      "description": "Personalized email subject line"
+    },
+    "outreach_body": {
+      "type": "string",
+      "description": "Personalized email body draft"
+    },
+    "last_contacted": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "follow_up_count": {
+      "type": "number",
+      "default": 0
+    },
+    "notes": {
+      "type": "string",
+      "description": "Outreach angle or context"
+    }
+  },
+  "required": [
+    "target_domain",
+    "prospect_type"
+  ]
+}

@@ -67,6 +67,11 @@
       "type": "number",
       "default": 0
     },
+    "backlinks_count": {
+      "type": "number",
+      "default": 0,
+      "description": "Number of backlink prospects tracked"
+    },
     "best_position": {
       "type": "number",
       "description": "Best SERP position across tracked keywords (0 = not ranking)"
