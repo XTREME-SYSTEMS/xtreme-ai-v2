@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback } from "react";
 import { base44 } from "@/api/base44Client";
 import { PageHeader, Panel, LoadingButton, EmptyState } from "@/components/ui";
 import StatusBadge from "@/components/StatusBadge";
-import { Globe, Plus, Rocket, RefreshCw, Search, CheckCircle, ExternalLink, TrendingUp, Zap, AlertCircle } from "lucide-react";
+import { Globe, Plus, Rocket, RefreshCw, Search, CheckCircle, ExternalLink, TrendingUp, Zap, AlertCircle, Radar } from "lucide-react";
 
 export default function DomainPortfolio() {
   const [domains, setDomains] = useState([]);
@@ -12,6 +12,8 @@ export default function DomainPortfolio() {
   const [bulkNiche, setBulkNiche] = useState("");
   const [launching, setLaunching] = useState(null);
   const [launchingAll, setLaunchingAll] = useState(false);
+  const [discovering, setDiscovering] = useState(false);
+  const [discoverResult, setDiscoverResult] = useState(null);
   const [error, setError] = useState("");
 
   const load = useCallback(async () => {
@@ -82,6 +84,19 @@ export default function DomainPortfolio() {
     setLaunchingAll(false);
   };
 
+  const discoverAssets = async () => {
+    setDiscovering(true);
+    setError("");
+    setDiscoverResult(null);
+    try {
+      const res = await base44.functions.invoke('discoverPortfolioAssets', {});
+      const data = res?.data || res;
+      setDiscoverResult(data);
+      await load();
+    } catch (e) { setError(e.message); }
+    setDiscovering(false);
+  };
+
   const submitGSC = async (d) => {
     setLaunching('gsc-' + d.id);
     try {
@@ -102,6 +117,9 @@ export default function DomainPortfolio() {
   return (
     <div className="space-y-6">
       <PageHeader title="Domain Portfolio" subtitle="Acquire nearme/nearyou domains, auto-launch SEO campaigns, and submit to Google Search Console — at scale.">
+        <LoadingButton onClick={discoverAssets} loading={discovering} variant="ghost">
+          <Radar className="h-4 w-4" /> Auto-Discover
+        </LoadingButton>
         <LoadingButton onClick={() => setShowAdd(true)} variant="primary">
           <Plus className="h-4 w-4" /> Add Domains
         </LoadingButton>
@@ -116,6 +134,22 @@ export default function DomainPortfolio() {
       {error && (
         <div className="rounded-lg border border-rose-500/30 bg-rose-500/10 px-4 py-2 text-sm text-rose-300 flex items-center gap-2">
           <AlertCircle className="h-4 w-4 shrink-0" /> {error}
+        </div>
+      )}
+
+      {discoverResult && (
+        <div className="rounded-lg border border-lime-400/30 bg-lime-400/5 px-4 py-3 text-sm text-lime-300">
+          <div className="flex items-center gap-2 font-medium">
+            <CheckCircle className="h-4 w-4" /> Discovered {discoverResult.discovered?.length || 0} domains · Created {discoverResult.created} new · Linked {discoverResult.existing_linked} existing
+          </div>
+          {discoverResult.discovered?.length > 0 && (
+            <div className="mt-2 flex flex-wrap gap-1.5">
+              {discoverResult.discovered.slice(0, 20).map((d, i) => (
+                <span key={i} className="rounded border border-lime-400/20 px-1.5 py-0.5 text-[10px] text-lime-300/80">{d.domain} <span className="text-lime-400/40">({d.source})</span></span>
+              ))}
+              {discoverResult.discovered.length > 20 && <span className="text-[10px] text-lime-400/50">+{discoverResult.discovered.length - 20} more</span>}
+            </div>
+          )}
         </div>
       )}
 
