@@ -1,4 +1,21 @@
 {
+  "trigger": {
+    "condition": null,
+    "config": {
+      "trigger_type": "scheduled",
+      "events": [],
+      "schedule_mode": "recurring",
+      "cron_expression": "0 6 * * *",
+      "one_time_date": null,
+      "timezone": "America/New_York",
+      "interval_value": null,
+      "interval_unit": null,
+      "interval_anchor": null,
+      "ends_type": "never",
+      "ends_on_date": null,
+      "ends_after_count": null
+    }
+  },
   "definition": {
     "document": {
       "dsl": "1.0.0",
@@ -7,6 +24,20 @@
       "namespace": "base44"
     },
     "do": [
+      {
+        "sync_rankings": {
+          "call": "invoke_backend_function",
+          "with": {
+            "function_name": "syncRankings",
+            "args": {}
+          },
+          "then": "run_engine",
+          "x-base44": {
+            "title": "Sync Real Rankings",
+            "description": "Pull SERP positions from Google Search Console"
+          }
+        }
+      },
       {
         "run_engine": {
           "call": "invoke_backend_function",
@@ -25,23 +56,6 @@
       }
     ]
   },
-  "description": "Runs the autonomous SEO execution engine daily across active campaigns \u2014 keyword discovery, programmatic pages, citations, and technical audits.",
-  "trigger": {
-    "condition": null,
-    "config": {
-      "trigger_type": "scheduled",
-      "events": [],
-      "schedule_mode": "recurring",
-      "cron_expression": "0 6 * * *",
-      "one_time_date": null,
-      "timezone": "America/New_York",
-      "interval_value": null,
-      "interval_unit": null,
-      "interval_anchor": null,
-      "ends_type": "never",
-      "ends_on_date": null,
-      "ends_after_count": null
-    }
-  },
-  "name": "Rank Engine Daily"
+  "name": "Rank Engine Daily",
+  "description": "Runs the autonomous SEO execution engine daily \u2014 syncs real rankings from Google Search Console, then runs keyword discovery, programmatic pages, citations, and technical audits across active campaigns."
 }

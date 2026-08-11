@@ -58,6 +58,21 @@
     "page_id": {
       "type": "string"
     },
+    "impressions": {
+      "type": "number",
+      "default": 0,
+      "description": "Real impressions from Google Search Console (last 28 days)"
+    },
+    "clicks": {
+      "type": "number",
+      "default": 0,
+      "description": "Real clicks from Google Search Console (last 28 days)"
+    },
+    "ctr": {
+      "type": "number",
+      "default": 0,
+      "description": "Click-through rate percentage from Google Search Console"
+    },
     "last_checked": {
       "type": "string",
       "format": "date-time"

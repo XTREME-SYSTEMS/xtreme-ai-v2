@@ -3,7 +3,7 @@ import { base44 } from "@/api/base44Client";
 import { PageHeader, Panel, LoadingButton, EmptyState } from "@/components/ui";
 import StatusBadge from "@/components/StatusBadge";
 import ScoreBar from "@/components/ScoreBar";
-import { Rocket, Target, FileText, Link2, Activity, Plus, RefreshCw, TrendingUp } from "lucide-react";
+import { Rocket, Target, FileText, Link2, Activity, Plus, RefreshCw, TrendingUp, ArrowUp, ArrowDown, Minus, BarChart3 } from "lucide-react";
 
 export default function RankEngine() {
   const [engines, setEngines] = useState([]);
@@ -14,6 +14,7 @@ export default function RankEngine() {
   const [selected, setSelected] = useState(null);
   const [detail, setDetail] = useState(null);
   const [detailLoading, setDetailLoading] = useState(false);
+  const [syncing, setSyncing] = useState(null);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -50,6 +51,16 @@ export default function RankEngine() {
     setRunning(null);
   };
 
+  const syncRankings = async (engineId) => {
+    setSyncing(engineId || 'all');
+    try {
+      await base44.functions.invoke('syncRankings', engineId ? { engine_id: engineId } : {});
+      await load();
+      if (engineId && selected === engineId) await loadDetail(engineId);
+    } catch (e) { alert(e.message); }
+    setSyncing(null);
+  };
+
   const startCampaign = async () => {
     if (!form.site_name) return;
     setRunning('create');
@@ -75,6 +86,9 @@ export default function RankEngine() {
   return (
     <div className="space-y-6">
       <PageHeader title="Rank Engine" subtitle="Autonomous SEO execution — keywords, programmatic pages, citations, technical audits, and rank-readiness scoring per site.">
+        <LoadingButton onClick={() => syncRankings()} loading={syncing === 'all'} variant="ghost">
+          <BarChart3 className="h-4 w-4" /> Sync Rankings
+        </LoadingButton>
         <LoadingButton onClick={() => setShowCreate(true)} variant="primary">
           <Plus className="h-4 w-4" /> New Campaign
         </LoadingButton>
@@ -135,6 +149,11 @@ export default function RankEngine() {
                     <ul className="space-y-1">{active.gaps.map((g, i) => <li key={i} className="text-sm text-white/70 flex gap-2"><span className="text-lime-400">›</span>{g}</li>)}</ul>
                   </div>
                 )}
+                <div className="mt-4 flex justify-end">
+                  <LoadingButton onClick={() => syncRankings(active.id)} loading={syncing === active.id} variant="ghost" className="text-xs">
+                    <BarChart3 className="h-3.5 w-3.5" /> Sync Real Rankings
+                  </LoadingButton>
+                </div>
               </Panel>
 
               {detailLoading ? (
@@ -143,19 +162,7 @@ export default function RankEngine() {
                 <>
                   <Panel title={`Target Keywords (${detail.keywords.length})`}>
                     <div className="max-h-64 overflow-y-auto space-y-1">
-                      {detail.keywords.map(k => (
-                        <div key={k.id} className="flex items-center justify-between rounded-lg border border-white/5 px-3 py-2 text-sm">
-                          <div>
-                            <span className="text-white">{k.keyword}</span>
-                            {k.city && <span className="ml-2 text-xs text-white/40">{k.city}</span>}
-                          </div>
-                          <div className="flex items-center gap-3 text-xs text-white/40">
-                            <span>Vol {k.monthly_volume || 0}</span>
-                            <span>Diff {k.difficulty || 0}</span>
-                            {k.current_position ? <span className="text-lime-400">#{k.current_position}</span> : <span className="text-white/30">—</span>}
-                          </div>
-                        </div>
-                      ))}
+                      {detail.keywords.map(k => <KeywordRow key={k.id} k={k} />)}
                     </div>
                   </Panel>
 
@@ -234,4 +241,36 @@ function StatCard({ icon: Icon, label, value }) {
 
 function Field({ label, children }) {
   return <div><label className="block text-xs font-medium text-white/60 mb-1">{label}</label>{children}</div>;
+}
+
+function KeywordRow({ k }) {
+  const pos = k.current_position;
+  const prev = k.previous_position;
+  let TrendIcon = Minus, trendColor = "text-white/40", trendLabel = "—";
+  if (pos && prev) {
+    if (pos < prev) { TrendIcon = ArrowUp; trendColor = "text-lime-400"; trendLabel = `▲${(prev - pos).toFixed(1)}`; }
+    else if (pos > prev) { TrendIcon = ArrowDown; trendColor = "text-rose-400"; trendLabel = `▼${(pos - prev).toFixed(1)}`; }
+  }
+  return (
+    <div className="flex items-center justify-between rounded-lg border border-white/5 px-3 py-2 text-sm">
+      <div className="min-w-0">
+        <span className="text-white truncate">{k.keyword}</span>
+        {k.city && <span className="ml-2 text-xs text-white/40">{k.city}</span>}
+      </div>
+      <div className="flex items-center gap-3 text-xs text-white/40 shrink-0">
+        {k.impressions ? <span title="Impressions (28d)">👁 {k.impressions}</span> : null}
+        {k.clicks ? <span title="Clicks (28d)" className="text-lime-400/70">►{k.clicks}</span> : null}
+        {pos ? (
+          <span className="flex items-center gap-1">
+            <span className="text-white font-medium">#{pos}</span>
+            <span className={`flex items-center gap-0.5 ${trendColor}`} title={`Previous: ${prev || '—'}`}>
+              <TrendIcon className="h-3 w-3" />{trendLabel !== "—" && trendLabel}
+            </span>
+          </span>
+        ) : (
+          <span className="text-white/30">not ranking</span>
+        )}
+      </div>
+    </div>
+  );
 }
