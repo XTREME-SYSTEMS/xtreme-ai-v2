@@ -1,5 +1,5 @@
 {
-  "description": "Master daily automation: rank tracking, GSC sync, rank alerts, technical audit, content freshness, competitor gaps, backlink prospecting, outreach follow-ups, IndexNow submission, technical asset generation, AI visibility monitoring \u2014 runs every morning",
+  "description": "Master daily automation: live SERP tracking, rank tracking, GSC sync, rank alerts, technical audit, content freshness, competitor gaps, backlink prospecting, outreach follow-ups, IndexNow submission, technical asset generation, AI visibility monitoring \u2014 runs every morning",
   "definition": {
     "document": {
       "dsl": "1.0.0",
@@ -8,6 +8,20 @@
       "namespace": "base44"
     },
     "do": [
+      {
+        "track_live": {
+          "call": "invoke_backend_function",
+          "with": {
+            "function_name": "trackLiveRankings",
+            "args": {}
+          },
+          "then": "sync_rankings",
+          "x-base44": {
+            "title": "Track Live SERP Positions",
+            "description": "Check actual Google rankings for target keywords"
+          }
+        }
+      },
       {
         "sync_rankings": {
           "call": "invoke_backend_function",
@@ -152,6 +166,7 @@
       }
     ]
   },
+  "name": "Daily SEO Engine",
   "trigger": {
     "condition": null,
     "config": {
@@ -168,6 +183,5 @@
       "ends_on_date": null,
       "ends_after_count": null
     }
-  },
-  "name": "Daily SEO Engine"
+  }
 }
