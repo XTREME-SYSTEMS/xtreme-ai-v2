@@ -1,0 +1,131 @@
+{
+  "description": "Master daily automation: rank tracking, GSC sync, rank alerts, technical audit, content freshness, competitor gaps, backlink prospecting, outreach follow-ups \u2014 runs every morning",
+  "definition": {
+    "document": {
+      "dsl": "1.0.0",
+      "name": "daily_seo_engine",
+      "version": "1.0",
+      "namespace": "base44"
+    },
+    "do": [
+      {
+        "sync_rankings": {
+          "call": "invoke_backend_function",
+          "with": {
+            "function_name": "syncRankings",
+            "args": {}
+          },
+          "then": "check_alerts",
+          "x-base44": {
+            "title": "Sync Rankings + GSC Data",
+            "description": "Pull 28-day GSC performance data"
+          }
+        }
+      },
+      {
+        "check_alerts": {
+          "call": "invoke_backend_function",
+          "with": {
+            "function_name": "checkRankAlerts",
+            "args": {}
+          },
+          "then": "tech_audit",
+          "x-base44": {
+            "title": "Check Rank Alerts",
+            "description": "Detect page-one entries, drops, improvements"
+          }
+        }
+      },
+      {
+        "tech_audit": {
+          "call": "invoke_backend_function",
+          "with": {
+            "function_name": "runTechnicalSeoAudit",
+            "args": {}
+          },
+          "then": "refresh_content",
+          "x-base44": {
+            "title": "Technical SEO Audit",
+            "description": "Daily technical monitoring + broken link check"
+          }
+        }
+      },
+      {
+        "refresh_content": {
+          "call": "invoke_backend_function",
+          "with": {
+            "function_name": "refreshStaleContent",
+            "args": {}
+          },
+          "then": "competitor_gaps",
+          "x-base44": {
+            "title": "Refresh Stale Content",
+            "description": "Find + update outdated content"
+          }
+        }
+      },
+      {
+        "competitor_gaps": {
+          "call": "invoke_backend_function",
+          "with": {
+            "function_name": "analyzeCompetitorGaps",
+            "args": {}
+          },
+          "then": "prospect_backlinks",
+          "x-base44": {
+            "title": "Competitor Gap Analysis",
+            "description": "Find content + keyword gaps vs competitors"
+          }
+        }
+      },
+      {
+        "prospect_backlinks": {
+          "call": "invoke_backend_function",
+          "with": {
+            "function_name": "prospectBacklinks",
+            "args": {
+              "limit": 20
+            }
+          },
+          "then": "send_followups",
+          "x-base44": {
+            "title": "Prospect Backlinks",
+            "description": "Find new backlink opportunities"
+          }
+        }
+      },
+      {
+        "send_followups": {
+          "call": "invoke_backend_function",
+          "with": {
+            "function_name": "sendFollowUp",
+            "args": {}
+          },
+          "then": "end",
+          "x-base44": {
+            "title": "Send Outreach Follow-ups",
+            "description": "Follow up on pending backlink outreach"
+          }
+        }
+      }
+    ]
+  },
+  "trigger": {
+    "condition": null,
+    "config": {
+      "trigger_type": "scheduled",
+      "events": [],
+      "schedule_mode": "recurring",
+      "cron_expression": "0 6 * * *",
+      "one_time_date": null,
+      "timezone": "America/New_York",
+      "interval_value": null,
+      "interval_unit": null,
+      "interval_anchor": null,
+      "ends_type": "never",
+      "ends_on_date": null,
+      "ends_after_count": null
+    }
+  },
+  "name": "Daily SEO Engine"
+}

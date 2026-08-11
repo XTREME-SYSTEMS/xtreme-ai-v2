@@ -44,7 +44,7 @@ export default function SeoStandard() {
   const load = useCallback(async () => {
     setLoading(true);
     try {
-      const list = await base44.entities.SeoStandardChecklist.list('-category', 200);
+      const list = await base44.entities.SeoStandardChecklist.list('-category', 500);
       setMethods(list);
     } catch (e) { setError(e.message); setMethods([]); }
     setLoading(false);
