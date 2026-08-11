@@ -143,7 +143,7 @@ Brand voice: ${brand.voice || ''}`;
     };
 
     log('Rebrand package complete');
-    await svc.entities.CloneProject.update(project.id, {
+    await safeUpdate(svc, 'CloneProject', project.id, {
       rebrand_package: rebrandPackage,
       current_step: 'rebrand_ready',
       status: 'awaiting_approval',
@@ -160,6 +160,14 @@ Brand voice: ${brand.voice || ''}`;
       faq: (heroResult.faq || []).length
     });
   } catch (error) {
-    return Response.json({ error: error.message }, { status: 500 });
+    console.error('[generateRebrandPackage]', error);
+    try {
+      const base44 = createClientFromRequest(req);
+      const body = await req.json().catch(() => ({}));
+      if (body.project_id) {
+        await markFailed(base44.asServiceRole, body.project_id, error, { function: 'generateRebrandPackage' });
+      }
+    } catch {}
+    return Response.json({ error: error.message, ...captureError(error) }, { status: 500 });
   }
 }
