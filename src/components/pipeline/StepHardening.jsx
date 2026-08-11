@@ -1,7 +1,8 @@
 import React, { useState } from "react";
 import { base44 } from "@/api/base44Client";
 import { LoadingButton } from "@/components/ui";
-import { ShieldCheck, ArrowRight, CheckCircle2, AlertCircle, Loader2 } from "lucide-react";
+import { ShieldCheck, ArrowRight, CheckCircle2, AlertCircle, Loader2, ChevronDown, ChevronRight } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 export default function StepHardening({ project, onNext }) {
   const [hardening, setHardening] = useState(false);
@@ -15,8 +16,15 @@ export default function StepHardening({ project, onNext }) {
     setHardening(true);
     setError("");
     try {
-      const res = await base44.functions.invoke("forensicAuditAndHarden", {});
-      if (res?.data) setAuditResult(res.data);
+      const res = await base44.functions.invoke("rebrandAssistant", {
+        action: "forensic_audit",
+        project_id: project.id,
+      });
+      if (res?.data) {
+        setAuditResult(res.data);
+      } else if (res?.error) {
+        setError(res.error);
+      }
     } catch (e) {
       setError(e.message);
     }
@@ -44,7 +52,7 @@ export default function StepHardening({ project, onNext }) {
       {/* Validation score */}
       <div className="rounded-xl border border-white/10 bg-zinc-950 p-6">
         <div className="flex items-center gap-4">
-          <div className={`text-5xl font-bold ${score >= 80 ? "text-lime-400" : score >= 50 ? "text-amber-400" : "text-rose-400"}`}>
+          <div className={cn("text-5xl font-bold", score >= 80 ? "text-lime-400" : score >= 50 ? "text-amber-400" : "text-rose-400")}>
             {score}
           </div>
           <div>
@@ -72,23 +80,56 @@ export default function StepHardening({ project, onNext }) {
           <div className="flex items-center gap-2 mb-3">
             <ShieldCheck className="h-4 w-4 text-lime-400" />
             <h3 className="text-sm font-semibold text-white">Forensic Audit Result</h3>
+            <span className="ml-auto text-lg font-bold text-lime-400">{auditResult.overall_score}/100</span>
           </div>
-          <div className="text-lg font-bold text-lime-400 mb-2">Score: {auditResult.overall_score}/100</div>
-          {(auditResult.critical_findings || []).length > 0 && (
-            <div className="mb-3">
-              <div className="text-xs font-medium text-rose-300 mb-1">Critical Findings</div>
-              <ul className="text-xs text-white/60 space-y-0.5">
-                {auditResult.critical_findings.map((f, i) => <li key={i}>• {f}</li>)}
-              </ul>
-            </div>
+
+          {auditResult.business_owner_summary && (
+            <p className="text-sm text-white/70 mb-4">{auditResult.business_owner_summary}</p>
           )}
-          {auditResult.recommendation && (
-            <div className="text-sm text-white/70 border-t border-white/10 pt-2">{auditResult.recommendation}</div>
+
+          {(auditResult.must_change_pending || []).length > 0 && (
+            <AuditSection title="Must-Change Items Still Pending" icon={AlertCircle} color="rose" items={auditResult.must_change_pending} />
+          )}
+
+          {auditResult.recommendations?.length > 0 && (
+            <div className="mt-3">
+              <div className="text-xs font-medium text-lime-300 mb-1.5">Recommendations</div>
+              <div className="space-y-1.5">
+                {auditResult.recommendations.map((r, i) => (
+                  <div key={i} className="rounded-lg border border-white/10 bg-black/40 p-2.5">
+                    <div className="flex items-center gap-2">
+                      <span className={cn("rounded px-1.5 py-0.5 text-[10px] font-medium uppercase", r.priority === "high" ? "bg-rose-500/20 text-rose-300" : r.priority === "medium" ? "bg-amber-500/20 text-amber-300" : "bg-white/10 text-white/60")}>{r.priority}</span>
+                      <span className="text-sm text-white">{r.action}</span>
+                    </div>
+                    {r.impact && <div className="text-xs text-white/40 mt-1 ml-6">{r.impact}</div>}
+                  </div>
+                ))}
+              </div>
+            </div>
           )}
         </div>
       )}
 
       {error && <div className="rounded-lg border border-rose-500/30 bg-rose-500/10 px-4 py-2 text-sm text-rose-300">{error}</div>}
+    </div>
+  );
+}
+
+function AuditSection({ title, icon: Icon, color, items }) {
+  const [open, setOpen] = useState(false);
+  const colorCls = color === "rose" ? "text-rose-300" : "text-lime-300";
+  return (
+    <div className="mb-3">
+      <button onClick={() => setOpen(!open)} className="flex items-center gap-1.5 text-xs font-medium w-full">
+        {open ? <ChevronDown className="h-3.5 w-3.5 text-white/40" /> : <ChevronRight className="h-3.5 w-3.5 text-white/40" />}
+        <Icon className={cn("h-3.5 w-3.5", colorCls)} />
+        <span className={colorCls}>{title} ({items.length})</span>
+      </button>
+      {open && (
+        <ul className="text-xs text-white/60 space-y-0.5 mt-1 ml-6">
+          {items.map((f, i) => <li key={i}>• {f}</li>)}
+        </ul>
+      )}
     </div>
   );
 }
@@ -101,7 +142,7 @@ function SummaryCard({ label, value, done, link }) {
         {label}
       </div>
       {link ? (
-        <a href={link} target="_blank" rel="noreferrer" className="mt-1 block text-sm text-lime-400 truncate hover:text-lime-300">{value || "—"}</a>
+        <a href={link.startsWith("http") ? link : `https://${link}`} target="_blank" rel="noreferrer" className="mt-1 block text-sm text-lime-400 truncate hover:text-lime-300">{value || "—"}</a>
       ) : (
         <div className="mt-1 text-sm text-white truncate">{value || "—"}</div>
       )}

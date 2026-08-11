@@ -62,6 +62,23 @@ export default function ClonePipeline() {
     setMaxReached(Math.max(maxReached, 2));
   };
 
+  // === Resume an existing project ===
+  const handleResume = (proj) => {
+    setProject(proj);
+    setTargetUrl(proj.target_url || "");
+    setIndustry(proj.industry || "");
+    setError("");
+    // Jump to the step matching the project's current state
+    const stepMap = {
+      queued: 2, scanning: 2, scanned: 3, generating_rebrand: 5,
+      rebrand_ready: 5, approved: 5, provisioning: 6, buying_domain: 6,
+      seo_aeo_optimizing: 6, racing_to_rank: 7, complete: 8, failed: 2,
+    };
+    const targetStep = stepMap[proj.current_step] || 2;
+    setStep(targetStep);
+    setMaxReached(targetStep);
+  };
+
   // === Step 2 → 3: Clone & Audit (legalScanClone) ===
   const handleClone = async () => {
     setBusy(true);
@@ -194,7 +211,7 @@ export default function ClonePipeline() {
 
         {/* Step content */}
         <div className="rounded-xl border border-white/10 bg-black p-6">
-          {step === 1 && <StepSearch onSelect={handleSelectUrl} />}
+          {step === 1 && <StepSearch onSelect={handleSelectUrl} onResume={handleResume} />}
 
           {step === 2 && (
             <StepOriginalPreview

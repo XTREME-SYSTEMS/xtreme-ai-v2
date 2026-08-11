@@ -1,11 +1,12 @@
 import React from "react";
 import { LoadingButton } from "@/components/ui";
-import { CheckCircle2, Globe, Rocket, TrendingUp, ExternalLink, RotateCcw } from "lucide-react";
+import { CheckCircle2, Globe, Rocket, TrendingUp, ExternalLink, RotateCcw, AlertCircle } from "lucide-react";
 
 export default function StepLiveSite({ project, onRestart }) {
   const vercelUrl = project?.provisioning?.vercel?.url;
   const domain = project?.selected_domain;
-  const liveUrl = vercelUrl ? `https://${vercelUrl.replace(/^https?:\/\//, "")}` : `https://${domain}`;
+  const rawUrl = vercelUrl || (domain ? domain : null);
+  const liveUrl = rawUrl ? (rawUrl.startsWith("http") ? rawUrl : `https://${rawUrl}`) : null;
   const score = project?.validation_score || 0;
 
   return (
@@ -37,14 +38,16 @@ export default function StepLiveSite({ project, onRestart }) {
       <div className="grid gap-4 sm:grid-cols-3">
         <div className="rounded-xl border border-white/10 bg-zinc-950 p-4">
           <div className="flex items-center gap-1.5 text-xs uppercase tracking-wider text-white/40 mb-1"><Globe className="h-3 w-3" /> Live URL</div>
-          <a href={liveUrl} target="_blank" rel="noreferrer" className="text-sm text-lime-400 truncate hover:text-lime-300 flex items-center gap-1">
-            {liveUrl.replace(/^https?:\/\//, "")} <ExternalLink className="h-3 w-3 shrink-0" />
-          </a>
+          {liveUrl ? (
+            <a href={liveUrl} target="_blank" rel="noreferrer" className="text-sm text-lime-400 truncate hover:text-lime-300 flex items-center gap-1">
+              {liveUrl.replace(/^https?:\/\//, "")} <ExternalLink className="h-3 w-3 shrink-0" />
+            </a>
+          ) : <div className="text-sm text-white/40">Not available</div>}
         </div>
         <div className="rounded-xl border border-white/10 bg-zinc-950 p-4">
           <div className="flex items-center gap-1.5 text-xs uppercase tracking-wider text-white/40 mb-1"><Rocket className="h-3 w-3" /> Vercel</div>
           {vercelUrl ? (
-            <a href={`https://${vercelUrl.replace(/^https?:\/\//, "")}`} target="_blank" rel="noreferrer" className="text-sm text-lime-400 truncate hover:text-lime-300 flex items-center gap-1">
+            <a href={vercelUrl.startsWith("http") ? vercelUrl : `https://${vercelUrl}`} target="_blank" rel="noreferrer" className="text-sm text-lime-400 truncate hover:text-lime-300 flex items-center gap-1">
               {vercelUrl.replace(/^https?:\/\//, "")} <ExternalLink className="h-3 w-3 shrink-0" />
             </a>
           ) : <div className="text-sm text-white/40">—</div>}
@@ -56,25 +59,35 @@ export default function StepLiveSite({ project, onRestart }) {
       </div>
 
       {/* Live site iframe */}
-      <div className="overflow-hidden rounded-xl border border-white/10 bg-zinc-950">
-        <div className="flex items-center gap-2 border-b border-white/10 px-4 py-2.5">
-          <div className="flex gap-1.5">
-            <span className="h-3 w-3 rounded-full bg-rose-500/60" />
-            <span className="h-3 w-3 rounded-full bg-amber-500/60" />
-            <span className="h-3 w-3 rounded-full bg-emerald-500/60" />
+      {liveUrl ? (
+        <div className="overflow-hidden rounded-xl border border-white/10 bg-zinc-950">
+          <div className="flex items-center gap-2 border-b border-white/10 px-4 py-2.5">
+            <div className="flex gap-1.5">
+              <span className="h-3 w-3 rounded-full bg-rose-500/60" />
+              <span className="h-3 w-3 rounded-full bg-amber-500/60" />
+              <span className="h-3 w-3 rounded-full bg-emerald-500/60" />
+            </div>
+            <span className="ml-2 text-xs text-white/40 truncate">{liveUrl}</span>
+            <a href={liveUrl} target="_blank" rel="noreferrer" className="ml-auto text-white/40 hover:text-white">
+              <ExternalLink className="h-4 w-4" />
+            </a>
           </div>
-          <span className="ml-2 text-xs text-white/40 truncate">{liveUrl}</span>
-          <a href={liveUrl} target="_blank" rel="noreferrer" className="ml-auto text-white/40 hover:text-white">
-            <ExternalLink className="h-4 w-4" />
-          </a>
+          <iframe
+            src={liveUrl}
+            className="h-[600px] w-full"
+            title="Live deployed site"
+            sandbox="allow-scripts allow-same-origin allow-forms allow-popups"
+          />
         </div>
-        <iframe
-          src={liveUrl}
-          className="h-[600px] w-full"
-          title="Live deployed site"
-          sandbox="allow-scripts allow-same-origin allow-forms allow-popups"
-        />
-      </div>
+      ) : (
+        <div className="flex items-center gap-3 rounded-xl border border-amber-500/30 bg-amber-500/10 px-4 py-6">
+          <AlertCircle className="h-6 w-6 text-amber-400 shrink-0" />
+          <div>
+            <div className="text-sm font-medium text-amber-300">No live URL available yet</div>
+            <div className="text-xs text-white/50 mt-0.5">The site hasn't been deployed or the domain wasn't purchased. Check the provisioning step or refresh the project.</div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

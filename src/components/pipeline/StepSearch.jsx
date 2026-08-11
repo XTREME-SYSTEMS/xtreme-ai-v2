@@ -1,9 +1,10 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
 import { LoadingButton } from "@/components/ui";
-import { Search, Globe, Sparkles, ExternalLink } from "lucide-react";
+import { Search, Globe, Sparkles, ExternalLink, FolderOpen, ChevronRight, X } from "lucide-react";
+import { cn } from "@/lib/utils";
 
-export default function StepSearch({ onSelect }) {
+export default function StepSearch({ onSelect, onResume }) {
   const [mode, setMode] = useState("search"); // "search" | "url"
   const [industry, setIndustry] = useState("");
   const [location, setLocation] = useState("");
@@ -11,6 +12,26 @@ export default function StepSearch({ onSelect }) {
   const [results, setResults] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+
+  // Existing projects for resume
+  const [existingProjects, setExistingProjects] = useState([]);
+  const [loadingProjects, setLoadingProjects] = useState(false);
+  const [showResume, setShowResume] = useState(false);
+
+  const loadExistingProjects = async () => {
+    setLoadingProjects(true);
+    try {
+      const projects = await base44.entities.CloneProject.list("-created_date", 10);
+      setExistingProjects(projects || []);
+    } catch {}
+    setLoadingProjects(false);
+  };
+
+  useEffect(() => {
+    if (showResume && existingProjects.length === 0 && !loadingProjects) {
+      loadExistingProjects();
+    }
+  }, [showResume]); // eslint-disable-line
 
   const searchIndustry = async () => {
     if (!industry.trim()) return;
@@ -57,12 +78,57 @@ export default function StepSearch({ onSelect }) {
     pickUrl(directUrl, "");
   };
 
+  const stepLabel = (cs) => (cs || "").replace(/_/g, " ");
+
   return (
     <div className="space-y-6">
-      <div>
-        <h2 className="text-xl font-semibold text-white">Search for a Site to Clone</h2>
-        <p className="mt-1 text-sm text-white/50">Search by industry to find real businesses, or paste a URL directly.</p>
+      <div className="flex items-center justify-between">
+        <div>
+          <h2 className="text-xl font-semibold text-white">Search for a Site to Clone</h2>
+          <p className="mt-1 text-sm text-white/50">Search by industry to find real businesses, or paste a URL directly.</p>
+        </div>
+        <button
+          onClick={() => setShowResume(!showResume)}
+          className={cn("rounded-lg px-3 py-2 text-sm font-medium transition-colors flex items-center gap-1.5", showResume ? "bg-lime-400 text-black" : "border border-white/15 text-white/70 hover:bg-white/5")}
+        >
+          <FolderOpen className="h-4 w-4" /> Resume
+        </button>
       </div>
+
+      {/* Resume existing project panel */}
+      {showResume && (
+        <div className="rounded-xl border border-lime-400/20 bg-lime-400/5 p-4">
+          <div className="flex items-center justify-between mb-3">
+            <div className="text-sm font-semibold text-white">Recent Clone Projects</div>
+            <button onClick={() => setShowResume(false)} className="text-white/40 hover:text-white"><X className="h-4 w-4" /></button>
+          </div>
+          {loadingProjects ? (
+            <div className="text-sm text-white/50 py-4 text-center">Loading projects…</div>
+          ) : existingProjects.length === 0 ? (
+            <div className="text-sm text-white/50 py-4 text-center">No existing projects found.</div>
+          ) : (
+            <div className="space-y-2 max-h-64 overflow-y-auto">
+              {existingProjects.map((p) => (
+                <button
+                  key={p.id}
+                  onClick={() => onResume(p)}
+                  className="group flex w-full items-center gap-3 rounded-lg border border-white/10 bg-black/40 p-3 text-left transition-colors hover:border-lime-400/40 hover:bg-lime-400/5"
+                >
+                  <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-lime-400/10 text-lime-400">
+                    <Globe className="h-4 w-4" />
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <div className="text-sm font-medium text-white truncate">{p.selected_name || p.target_url || "Untitled"}</div>
+                    <div className="text-xs text-white/40 truncate">{p.target_url}</div>
+                  </div>
+                  <span className="rounded-md border border-white/15 bg-white/5 px-2 py-0.5 text-[10px] text-white/60 capitalize shrink-0">{stepLabel(p.current_step)}</span>
+                  <ChevronRight className="h-4 w-4 text-white/30 group-hover:text-lime-400 shrink-0" />
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
 
       {/* Mode toggle */}
       <div className="flex gap-2">
@@ -115,7 +181,7 @@ export default function StepSearch({ onSelect }) {
               <div className="text-sm font-medium text-white/70">{results.length} businesses found — click one to clone</div>
               {results.map((b, i) => (
                 <button
-                  key={i}
+                  key={`${b.url}-${i}`}
                   onClick={() => pickUrl(b.url, b.name)}
                   className="group flex w-full items-center gap-3 rounded-xl border border-white/10 bg-zinc-950 p-4 text-left transition-colors hover:border-lime-400/40 hover:bg-lime-400/5"
                 >

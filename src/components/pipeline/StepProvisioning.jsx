@@ -7,15 +7,16 @@ export default function StepProvisioning({ project, onNext, provisioning }) {
   const logs = project?.logs || [];
 
   const services = [
-    { key: "drive", label: "Google Drive", icon: HardDrive, data: prov.drive },
-    { key: "github", label: "GitHub Repo", icon: Github, data: prov.github },
-    { key: "supabase", label: "Supabase Backend", icon: Database, data: prov.supabase },
-    { key: "vercel", label: "Vercel Deploy", icon: Cloud, data: prov.vercel },
+    { key: "drive", label: "Google Drive", icon: HardDrive, data: prov.drive, urlKey: "url" },
+    { key: "github", label: "GitHub Repo", icon: Github, data: prov.github, urlKey: "html_url" },
+    { key: "supabase", label: "Supabase Backend", icon: Database, data: prov.supabase, urlKey: "url" },
+    { key: "vercel", label: "Vercel Deploy", icon: Cloud, data: prov.vercel, urlKey: "url" },
   ];
 
   const domainStatus = project?.domain_purchase_status;
   const seoFilled = project?.seo_aeo_filled;
   const rankEngineId = project?.rank_engine_id;
+  const vercelReady = !!prov.vercel?.url;
 
   return (
     <div className="space-y-6">
@@ -24,7 +25,7 @@ export default function StepProvisioning({ project, onNext, provisioning }) {
           <h2 className="text-xl font-semibold text-white">Autonomous Provisioning</h2>
           <p className="mt-1 text-sm text-white/50">Drive, GitHub, Supabase, Vercel, domain purchase, SEO/AEO, and Rank Engine — all automatic.</p>
         </div>
-        <LoadingButton onClick={onNext} variant="primary" disabled={!project?.provisioning?.vercel}>
+        <LoadingButton onClick={onNext} variant="primary" disabled={!vercelReady}>
           <ShieldCheck className="h-4 w-4" /> Harden & Validate
           <ArrowRight className="h-4 w-4" />
         </LoadingButton>
@@ -34,6 +35,7 @@ export default function StepProvisioning({ project, onNext, provisioning }) {
       <div className="grid gap-4 sm:grid-cols-2">
         {services.map((svc) => {
           const status = svc.data ? "done" : provisioning ? "loading" : "pending";
+          const svcUrl = svc.data?.[svc.urlKey] || svc.data?.url;
           return (
             <div key={svc.key} className="rounded-xl border border-white/10 bg-zinc-950 p-4">
               <div className="flex items-center gap-3">
@@ -48,14 +50,9 @@ export default function StepProvisioning({ project, onNext, provisioning }) {
                 {status === "loading" && <Loader2 className="h-5 w-5 animate-spin text-amber-400" />}
                 {status === "pending" && <div className="h-5 w-5 rounded-full border-2 border-white/20" />}
               </div>
-              {svc.data?.url && (
-                <a href={svc.data.url} target="_blank" rel="noreferrer" className="mt-2 block text-xs text-lime-400/70 truncate hover:text-lime-400">
-                  {svc.data.url}
-                </a>
-              )}
-              {svc.key === "vercel" && svc.data?.url && (
-                <a href={svc.data.url} target="_blank" rel="noreferrer" className="mt-2 block text-xs text-lime-400/70 truncate hover:text-lime-400">
-                  {svc.data.url}
+              {svcUrl && (
+                <a href={svcUrl.startsWith("http") ? svcUrl : `https://${svcUrl}`} target="_blank" rel="noreferrer" className="mt-2 block text-xs text-lime-400/70 truncate hover:text-lime-400">
+                  {svcUrl.replace(/^https?:\/\//, "")}
                 </a>
               )}
             </div>
@@ -70,7 +67,7 @@ export default function StepProvisioning({ project, onNext, provisioning }) {
             <Globe className="h-4 w-4 text-lime-400" />
             <span className="text-xs font-semibold uppercase tracking-wider text-white/40">Domain</span>
           </div>
-          <div className="text-sm text-white">{project?.selected_domain || "—"}</div>
+          <div className="text-sm text-white truncate">{project?.selected_domain || "—"}</div>
           <div className="text-xs mt-1">
             {project?.domain_purchased ? (
               <span className="text-lime-400 flex items-center gap-1"><CheckCircle2 className="h-3 w-3" /> Purchased</span>
