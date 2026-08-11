@@ -69,6 +69,7 @@ import CloneStudio from '@/pages/CloneStudio';
 import ClonePipeline from '@/pages/ClonePipeline';
 import RebrandStudio from '@/pages/RebrandStudio';
 import RaceToRank from '@/pages/RaceToRank';
+import RankingMonitor from '@/pages/RankingMonitor';
 import Login from '@/pages/Login';
 import Register from '@/pages/Register';
 import ForgotPassword from '@/pages/ForgotPassword';
@@ -166,6 +167,7 @@ const AuthenticatedApp = () => {
           <Route path="/clone-pipeline" element={<ClonePipeline />} />
           <Route path="/rebrand-studio" element={<RebrandStudio />} />
           <Route path="/race-to-rank" element={<RaceToRank />} />
+          <Route path="/ranking-monitor" element={<RankingMonitor />} />
         </Route>
       </Route>
       <Route path="*" element={<PageNotFound />} />
