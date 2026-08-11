@@ -80,26 +80,31 @@ export default function ClonePipeline() {
   };
 
   // === Step 2 → 3: Clone & Audit (legalScanClone) ===
+  // Create the project immediately so realtime subscription kicks in,
+  // then fire the scan WITHOUT awaiting — the UI tracks progress via realtime.
   const handleClone = async () => {
     setBusy(true);
     setError("");
     try {
-      const res = await base44.functions.invoke("legalScanClone", {
+      const proj = await base44.entities.CloneProject.create({
         target_url: targetUrl,
-        industry,
+        industry: industry || "",
         business_name: "",
+        status: "running",
+        current_step: "scanning",
+        approval_status: "pending",
+        logs: [`Legal scan initiated for ${targetUrl}`],
       });
-      if (res?.data?.project_id) {
-        const proj = await base44.entities.CloneProject.get(res.data.project_id);
-        setProject(proj);
-        // Stay on step 2 until scan completes (real-time will advance us)
-      } else if (res?.data?.error) {
-        setError(res.data.error);
-      }
+      setProject(proj);
+      setBusy(false);
+      // Fire-and-forget — realtime subscription updates the UI as the scan progresses
+      base44.functions.invoke("legalScanClone", { project_id: proj.id }).catch((e) => {
+        setError(e.message || "Scan failed to start");
+      });
     } catch (e) {
       setError(e.message);
+      setBusy(false);
     }
-    setBusy(false);
   };
 
   // === Step 3 → 4: View name recommendations ===

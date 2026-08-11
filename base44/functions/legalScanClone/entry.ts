@@ -69,8 +69,8 @@ Industry: ${industry}
 Site title: ${project.scrape?.title || ''}
 Images found: ${imgUrls.length}
 
-HTML (truncated to 50000 chars):
-${html.slice(0, 50000)}
+HTML (truncated to 15000 chars):
+${html.slice(0, 15000)}
 
 Return a JSON object with this exact structure:
 {
@@ -108,8 +108,8 @@ IMPORTANT: Generate exactly 20 name recommendations. For images, only include im
       prompt: analysisPrompt,
       model: 'gemini_3_flash',
       add_context_from_internet: true,
-      timeout: 60000,
-      retries: 2,
+      timeout: 45000,
+      retries: 1,
       label: 'legal analysis',
       response_json_schema: {
         type: 'object',
