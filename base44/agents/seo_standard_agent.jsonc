@@ -136,12 +136,30 @@
     },
     {
       "function_name": "cloneTopSerpCompetitors",
-      "description": "Find top-ranking sites for a keyword and create SERP blueprints to clone"
+      "description": "Find top-ranking sites for a keyword and create SERP blueprints"
     },
     {
       "function_name": "extractRankingBlueprint",
-      "description": "Analyze a competitor site and extract their ranking formula (content, schema, topics, gaps)"
+      "description": "Analyze a competitor site and extract their ranking formula"
     }
   ],
+  "context_files": [],
+  "app_user_connector_configs": [],
+  "selected_skill_names": [],
+  "selected_workspace_skill_ids": [],
+  "model": "automatic",
+  "whatsapp_greeting": null,
+  "telegram_greeting": null,
+  "line_greeting": null,
+  "memory_config": {
+    "enabled": true,
+    "scope": "both",
+    "include_other_conversation_context": false,
+    "instructions": null
+  },
+  "voice_config": {
+    "voice_id": null
+  },
+  "allow_anonymous_access": false,
   "name": "seo_standard_agent"
 }

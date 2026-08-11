@@ -1,0 +1,45 @@
+{
+  "name": "Citation Builder",
+  "trigger": {
+    "condition": null,
+    "config": {
+      "trigger_type": "scheduled",
+      "events": [],
+      "schedule_mode": "recurring",
+      "cron_expression": "0 7 * * 1",
+      "one_time_date": null,
+      "timezone": "America/New_York",
+      "interval_value": null,
+      "interval_unit": null,
+      "interval_anchor": null,
+      "ends_type": "never",
+      "ends_on_date": null,
+      "ends_after_count": null
+    }
+  },
+  "definition": {
+    "document": {
+      "dsl": "1.0.0",
+      "name": "citation_builder",
+      "version": "1.0",
+      "namespace": "base44"
+    },
+    "do": [
+      {
+        "build_citations": {
+          "call": "invoke_backend_function",
+          "with": {
+            "function_name": "autoBuildCitations",
+            "args": {}
+          },
+          "then": "end",
+          "x-base44": {
+            "title": "Build Citations for All Sites",
+            "description": "Create citation records across all major directories for every active portfolio site"
+          }
+        }
+      }
+    ]
+  },
+  "description": "Weekly: auto-build local citation plans for all active portfolio sites across every major directory to ensure consistent NAP and boost local search rankings"
+}
