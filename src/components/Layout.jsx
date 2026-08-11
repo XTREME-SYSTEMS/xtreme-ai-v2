@@ -148,15 +148,15 @@ export default function Layout() {
 
       {/* Main */}
       <div className="flex flex-1 flex-col overflow-hidden">
-        <header className="flex h-14 items-center gap-3 border-b border-white/10 bg-black/80 px-4 backdrop-blur">
-          <button onClick={() => setOpen(true)} className="lg:hidden text-white/50 hover:text-white"><Menu className="h-5 w-5" /></button>
+        <header className="flex h-14 items-center gap-3 border-b border-lime-400/40 bg-white px-4 backdrop-blur">
+          <button onClick={() => setOpen(true)} className="lg:hidden text-black/50 hover:text-black"><Menu className="h-5 w-5" /></button>
           <div className="flex items-center gap-2 text-xs">
-            <span className="rounded-md border border-lime-400/30 bg-lime-400/10 px-2 py-1 font-mono text-lime-300">{user?.role === "admin" ? "THROW THE BOOK AT IT" : "CLIENT PORTAL"}</span>
-            <span className="hidden text-white/40 sm:inline">{user?.role === "admin" ? "Architecture → Preview Build · Production locked" : "Approval-gated workflow"}</span>
+            <span className="rounded-md border border-lime-400 bg-lime-400 px-2 py-1 font-mono text-black font-semibold">{user?.role === "admin" ? "THROW THE BOOK AT IT" : "CLIENT PORTAL"}</span>
+            <span className="hidden text-black/50 sm:inline">{user?.role === "admin" ? "Architecture → Preview Build · Production locked" : "Approval-gated workflow"}</span>
           </div>
           <div className="ml-auto flex items-center gap-3">
-            <span className="hidden text-xs text-white/50 sm:inline">{user?.email || ""}</span>
-            <button onClick={logout} className="flex items-center gap-1.5 rounded-lg border border-white/15 px-2.5 py-1.5 text-xs text-white/80 hover:bg-white/5">
+            <span className="hidden text-xs text-black/60 sm:inline">{user?.email || ""}</span>
+            <button onClick={logout} className="flex items-center gap-1.5 rounded-lg border border-lime-400 px-2.5 py-1.5 text-xs text-black font-medium hover:bg-lime-400/10">
               <LogOut className="h-3.5 w-3.5" /> Sign out
             </button>
           </div>
