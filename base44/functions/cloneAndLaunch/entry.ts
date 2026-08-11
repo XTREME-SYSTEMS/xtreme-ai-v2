@@ -1,5 +1,6 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.40';
 import { slugify, provisionGithub, provisionDrive, provisionSupabase, provisionVercel } from '../../shared/provisioning.ts';
+import { detectIndustry as detectIndustryShared, scrapeTarget } from '../../shared/cloneUtils.ts';
 
 // The unified clone-to-launch pipeline.
 // Runs as a phase machine: each invocation executes the next pending phase,
@@ -88,40 +89,19 @@ export default async function(req) {
 
 // ---- Phase 1: Scrape target site ----
 async function doScrape(base44, project, log, persist) {
-  const res = await fetch(project.target_url, {
-    headers: { 'User-Agent': 'Mozilla/5.0 (compatible; CloneFactory/1.0)' },
-    signal: AbortSignal.timeout(20000), redirect: 'follow'
-  });
-  const html = await res.text();
-  const titleMatch = html.match(/<title[^>]*>([^<]*)<\/title>/i);
-  const descMatch = html.match(/<meta[^>]+name=["']description["'][^>]+content=["']([^"']*)["']/i);
-  const colors = [...new Set((html.match(/#[0-9a-fA-F]{6}/g) || []).slice(0, 10))];
-  const headings = (html.match(/<h[1-3][^>]*>([^<]*)<\/h[1-3]>/gi) || []).slice(0, 10).map(h => h.replace(/<[^>]+>/g, '').trim());
-  log(`Scraped ${html.length} chars, ${colors.length} colors, ${headings.length} headings`);
+  const scraped = await scrapeTarget(project.target_url);
+  log(`Scraped ${scraped.html_size} chars, ${scraped.colors.length} colors, ${scraped.headings.length} headings`);
   await persist({
     scrape: {
-      html_size: html.length,
-      title: titleMatch ? titleMatch[1].trim() : '',
-      meta_description: descMatch ? descMatch[1].trim() : '',
-      colors,
-      structure_summary: headings.join(' | '),
-      html_snapshot: html.slice(0, 80000)
+      html_size: scraped.html_size,
+      title: scraped.title,
+      meta_description: scraped.meta_description,
+      colors: scraped.colors,
+      structure_summary: scraped.headings.join(' | '),
+      html_snapshot: scraped.html.slice(0, 80000)
     },
-    industry: project.industry || detectIndustry(html, titleMatch ? titleMatch[1] : '')
+    industry: project.industry || detectIndustryShared(scraped.html, scraped.title)
   });
-}
-
-function detectIndustry(html, title) {
-  const text = (html + ' ' + title).toLowerCase();
-  if (text.match(/roof|roofing/)) return 'roofing';
-  if (text.match(/garage|epoxy|coating/)) return 'garage floor coating';
-  if (text.match(/hvac|air condition|heating/)) return 'hvac';
-  if (text.match(/plumb/)) return 'plumbing';
-  if (text.match(/dent|dental/)) return 'dental';
-  if (text.match(/law|attorney|legal/)) return 'legal';
-  if (text.match(/real estate|realtor|property/)) return 'real estate';
-  if (text.match(/restaurant|food|dining/)) return 'restaurant';
-  return 'general';
 }
 
 // ---- Phase 2: Identify changeable parts (legal) ----

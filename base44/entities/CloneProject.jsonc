@@ -18,18 +18,17 @@
       "type": "string",
       "enum": [
         "queued",
-        "scraping",
-        "analyzing",
-        "recommending",
-        "rebranding",
+        "scanning",
+        "scanned",
+        "generating_rebrand",
+        "rebrand_ready",
+        "approved",
         "provisioning",
-        "branding",
-        "imaging",
-        "seo",
-        "monetizing",
-        "social",
-        "validating",
-        "complete"
+        "buying_domain",
+        "seo_aeo_optimizing",
+        "racing_to_rank",
+        "complete",
+        "failed"
       ],
       "default": "queued"
     },
@@ -44,10 +43,14 @@
       ],
       "default": "queued"
     },
-    "auto_proceed": {
-      "type": "boolean",
-      "default": true,
-      "description": "If true, auto-selects best name/domain/logo and runs end-to-end without approval gates"
+    "approval_status": {
+      "type": "string",
+      "enum": [
+        "pending",
+        "approved",
+        "rejected"
+      ],
+      "default": "pending"
     },
     "scrape": {
       "type": "object",
@@ -71,50 +74,163 @@
           "type": "string"
         },
         "html_snapshot": {
-          "type": "string",
-          "description": "Truncated HTML for analysis"
+          "type": "string"
         }
       }
     },
-    "changeable_parts": {
+    "legal_scan": {
       "type": "object",
-      "description": "LLM-identified legal/trademark parts that must change",
+      "description": "The single-page legal scan summary with all recommendations",
       "properties": {
-        "logo": {
-          "type": "object"
+        "risk_level": {
+          "type": "string",
+          "enum": [
+            "low",
+            "medium",
+            "high"
+          ]
         },
-        "accent_colors": {
-          "type": "array"
+        "executive_summary": {
+          "type": "string"
         },
-        "key_images": {
-          "type": "array"
-        },
-        "trademark_content": {
-          "type": "array"
-        },
-        "contact_info": {
-          "type": "object"
-        }
-      }
-    },
-    "name_options": {
-      "type": "array",
-      "description": "20 AI-recommended name + domain options",
-      "items": {
-        "type": "object",
-        "properties": {
-          "name": {
-            "type": "string"
-          },
-          "domain": {
-            "type": "string"
-          },
-          "rationale": {
-            "type": "string"
-          },
-          "available": {
-            "type": "boolean"
+        "must_change": {
+          "type": "object",
+          "properties": {
+            "business_name": {
+              "type": "string"
+            },
+            "logo": {
+              "type": "object",
+              "properties": {
+                "description": {
+                  "type": "string"
+                },
+                "location": {
+                  "type": "string"
+                }
+              }
+            },
+            "tagline": {
+              "type": "string"
+            },
+            "contact_info": {
+              "type": "object",
+              "properties": {
+                "phone": {
+                  "type": "string"
+                },
+                "email": {
+                  "type": "string"
+                },
+                "address": {
+                  "type": "string"
+                },
+                "social_links": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              }
+            },
+            "images_to_replace": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "url": {
+                    "type": "string"
+                  },
+                  "description": {
+                    "type": "string"
+                  },
+                  "reason": {
+                    "type": "string"
+                  },
+                  "replacement_prompt": {
+                    "type": "string"
+                  }
+                }
+              }
+            },
+            "content_to_replace": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "section": {
+                    "type": "string"
+                  },
+                  "original_text": {
+                    "type": "string"
+                  },
+                  "reason": {
+                    "type": "string"
+                  }
+                }
+              }
+            },
+            "trademarked_terms": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
           }
+        },
+        "can_keep": {
+          "type": "object",
+          "properties": {
+            "page_structure": {
+              "type": "string"
+            },
+            "service_descriptions": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "faq_format": {
+              "type": "string"
+            },
+            "color_scheme": {
+              "type": "string"
+            },
+            "layout": {
+              "type": "string"
+            },
+            "general_content": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "name_recommendations": {
+          "type": "array",
+          "description": "20 recommended new business names + domains",
+          "items": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string"
+              },
+              "domain": {
+                "type": "string"
+              },
+              "rationale": {
+                "type": "string"
+              },
+              "available": {
+                "type": "boolean"
+              }
+            }
+          }
+        },
+        "single_page_summary": {
+          "type": "string",
+          "description": "Complete markdown summary combining all recommendations"
         }
       }
     },
@@ -124,35 +240,130 @@
     "selected_domain": {
       "type": "string"
     },
-    "rebranded_content": {
+    "rebrand_package": {
       "type": "object",
+      "description": "All generated replacement assets combined",
       "properties": {
-        "hero_headline": {
-          "type": "string"
+        "new_brand": {
+          "type": "object",
+          "properties": {
+            "name": {
+              "type": "string"
+            },
+            "tagline": {
+              "type": "string"
+            },
+            "voice": {
+              "type": "string"
+            },
+            "colors": {
+              "type": "object",
+              "properties": {
+                "primary": {
+                  "type": "string"
+                },
+                "accent": {
+                  "type": "string"
+                }
+              }
+            }
+          }
         },
-        "hero_subhead": {
-          "type": "string"
+        "logos": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "url": {
+                "type": "string"
+              },
+              "prompt": {
+                "type": "string"
+              },
+              "style": {
+                "type": "string"
+              }
+            }
+          }
         },
-        "about": {
-          "type": "string"
+        "replacement_images": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "original_url": {
+                "type": "string"
+              },
+              "new_url": {
+                "type": "string"
+              },
+              "description": {
+                "type": "string"
+              },
+              "prompt": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "replacement_content": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "section": {
+                "type": "string"
+              },
+              "original_text": {
+                "type": "string"
+              },
+              "new_text": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "hero_content": {
+          "type": "object",
+          "properties": {
+            "headline": {
+              "type": "string"
+            },
+            "subhead": {
+              "type": "string"
+            },
+            "about": {
+              "type": "string"
+            }
+          }
         },
         "services": {
-          "type": "array"
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "title": {
+                "type": "string"
+              },
+              "description": {
+                "type": "string"
+              }
+            }
+          }
         },
         "faq": {
-          "type": "array"
-        },
-        "tagline": {
-          "type": "string"
-        },
-        "new_colors": {
-          "type": "object"
-        },
-        "phone": {
-          "type": "string"
-        },
-        "email": {
-          "type": "string"
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "question": {
+                "type": "string"
+              },
+              "answer": {
+                "type": "string"
+              }
+            }
+          }
         }
       }
     },
@@ -173,39 +384,33 @@
         }
       }
     },
-    "logo_options": {
-      "type": "array",
-      "items": {
-        "type": "object",
-        "properties": {
-          "url": {
-            "type": "string"
-          },
-          "prompt": {
-            "type": "string"
-          }
-        }
-      }
+    "domain_purchased": {
+      "type": "boolean",
+      "default": false
     },
-    "selected_logo_url": {
+    "domain_purchase_status": {
       "type": "string"
     },
-    "generated_images": {
+    "seo_aeo_gaps": {
       "type": "array",
       "items": {
         "type": "object",
         "properties": {
-          "type": {
+          "gap": {
             "type": "string"
           },
-          "url": {
+          "fix": {
             "type": "string"
           },
-          "prompt": {
-            "type": "string"
+          "filled": {
+            "type": "boolean"
           }
         }
       }
+    },
+    "seo_aeo_filled": {
+      "type": "boolean",
+      "default": false
     },
     "rank_engine_id": {
       "type": "string"
@@ -241,13 +446,30 @@
       "type": "object",
       "properties": {
         "platforms": {
-          "type": "array"
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
         },
         "post_schedule": {
           "type": "string"
         },
         "content_templates": {
-          "type": "array"
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "platform": {
+                "type": "string"
+              },
+              "template": {
+                "type": "string"
+              },
+              "frequency": {
+                "type": "string"
+              }
+            }
+          }
         },
         "video_prompt": {
           "type": "string"
