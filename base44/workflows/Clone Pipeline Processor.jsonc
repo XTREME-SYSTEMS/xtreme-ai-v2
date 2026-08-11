@@ -1,0 +1,45 @@
+{
+  "description": "Processes CloneProject queue items \u2014 fires instantly when a new clone is queued, and resumes any stuck/running projects every 30 minutes.",
+  "name": "Clone Pipeline Processor",
+  "trigger": {
+    "condition": null,
+    "config": {
+      "trigger_type": "scheduled",
+      "events": [],
+      "schedule_mode": "recurring",
+      "cron_expression": "*/30 * * * *",
+      "one_time_date": null,
+      "timezone": "America/New_York",
+      "interval_value": null,
+      "interval_unit": null,
+      "interval_anchor": null,
+      "ends_type": "never",
+      "ends_on_date": null,
+      "ends_after_count": null
+    }
+  },
+  "definition": {
+    "document": {
+      "dsl": "1.0.0",
+      "name": "clone_pipeline_processor",
+      "version": "1.0",
+      "namespace": "base44"
+    },
+    "do": [
+      {
+        "process_queue": {
+          "call": "invoke_backend_function",
+          "with": {
+            "function_name": "cloneAndLaunch",
+            "args": {}
+          },
+          "then": "end",
+          "x-base44": {
+            "title": "Process Clone Queue",
+            "description": "Resume stuck/running clone projects"
+          }
+        }
+      }
+    ]
+  }
+}

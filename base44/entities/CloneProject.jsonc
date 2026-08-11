@@ -1,0 +1,277 @@
+{
+  "name": "CloneProject",
+  "type": "object",
+  "properties": {
+    "target_url": {
+      "type": "string",
+      "description": "The website URL to clone and rebrand"
+    },
+    "industry": {
+      "type": "string",
+      "description": "Detected or specified industry/niche"
+    },
+    "business_name": {
+      "type": "string",
+      "description": "Optional seed name hint"
+    },
+    "current_step": {
+      "type": "string",
+      "enum": [
+        "queued",
+        "scraping",
+        "analyzing",
+        "recommending",
+        "rebranding",
+        "provisioning",
+        "branding",
+        "imaging",
+        "seo",
+        "monetizing",
+        "social",
+        "validating",
+        "complete"
+      ],
+      "default": "queued"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "queued",
+        "running",
+        "awaiting_approval",
+        "complete",
+        "failed"
+      ],
+      "default": "queued"
+    },
+    "auto_proceed": {
+      "type": "boolean",
+      "default": true,
+      "description": "If true, auto-selects best name/domain/logo and runs end-to-end without approval gates"
+    },
+    "scrape": {
+      "type": "object",
+      "properties": {
+        "html_size": {
+          "type": "number"
+        },
+        "title": {
+          "type": "string"
+        },
+        "meta_description": {
+          "type": "string"
+        },
+        "colors": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "structure_summary": {
+          "type": "string"
+        },
+        "html_snapshot": {
+          "type": "string",
+          "description": "Truncated HTML for analysis"
+        }
+      }
+    },
+    "changeable_parts": {
+      "type": "object",
+      "description": "LLM-identified legal/trademark parts that must change",
+      "properties": {
+        "logo": {
+          "type": "object"
+        },
+        "accent_colors": {
+          "type": "array"
+        },
+        "key_images": {
+          "type": "array"
+        },
+        "trademark_content": {
+          "type": "array"
+        },
+        "contact_info": {
+          "type": "object"
+        }
+      }
+    },
+    "name_options": {
+      "type": "array",
+      "description": "20 AI-recommended name + domain options",
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "domain": {
+            "type": "string"
+          },
+          "rationale": {
+            "type": "string"
+          },
+          "available": {
+            "type": "boolean"
+          }
+        }
+      }
+    },
+    "selected_name": {
+      "type": "string"
+    },
+    "selected_domain": {
+      "type": "string"
+    },
+    "rebranded_content": {
+      "type": "object",
+      "properties": {
+        "hero_headline": {
+          "type": "string"
+        },
+        "hero_subhead": {
+          "type": "string"
+        },
+        "about": {
+          "type": "string"
+        },
+        "services": {
+          "type": "array"
+        },
+        "faq": {
+          "type": "array"
+        },
+        "tagline": {
+          "type": "string"
+        },
+        "new_colors": {
+          "type": "object"
+        },
+        "phone": {
+          "type": "string"
+        },
+        "email": {
+          "type": "string"
+        }
+      }
+    },
+    "provisioning": {
+      "type": "object",
+      "properties": {
+        "drive": {
+          "type": "object"
+        },
+        "github": {
+          "type": "object"
+        },
+        "supabase": {
+          "type": "object"
+        },
+        "vercel": {
+          "type": "object"
+        }
+      }
+    },
+    "logo_options": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "url": {
+            "type": "string"
+          },
+          "prompt": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "selected_logo_url": {
+      "type": "string"
+    },
+    "generated_images": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string"
+          },
+          "url": {
+            "type": "string"
+          },
+          "prompt": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "rank_engine_id": {
+      "type": "string"
+    },
+    "gsc_synced": {
+      "type": "boolean",
+      "default": false
+    },
+    "monetization_options": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "estimated_revenue": {
+            "type": "string"
+          },
+          "implementation": {
+            "type": "string"
+          },
+          "approved": {
+            "type": "boolean"
+          }
+        }
+      }
+    },
+    "social_content": {
+      "type": "object",
+      "properties": {
+        "platforms": {
+          "type": "array"
+        },
+        "post_schedule": {
+          "type": "string"
+        },
+        "content_templates": {
+          "type": "array"
+        },
+        "video_prompt": {
+          "type": "string"
+        }
+      }
+    },
+    "validation_score": {
+      "type": "number",
+      "default": 0
+    },
+    "validation_summary": {
+      "type": "string"
+    },
+    "logs": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "error": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "target_url"
+  ]
+}
