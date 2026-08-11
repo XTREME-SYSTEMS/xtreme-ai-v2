@@ -9,8 +9,8 @@ import { startCheckout } from "@/lib/checkout";
 
 const ADDONS = [
   { name: "AI Tools", desc: "Buy individual AI chatbots, calculators, estimators, and lead tools.", price: "From $99", productId: "ai-tool" },
-  { name: "Web Packs", desc: "Complete website packages — design, build, SEO, and launch.", price: "From $2,500", productId: "web-pack" },
-  { name: "App Packs", desc: "Custom web apps, client portals, and internal tools.", price: "From $5,000", productId: "app-pack" },
+  { name: "Web Packs", desc: "Complete website packages — design, build, SEO, and launch.", price: "From $299", productId: "web-pack" },
+  { name: "App Packs", desc: "Custom web apps, client portals, and internal tools.", price: "From $499", productId: "app-pack" },
 ];
 
 export default function Pricing() {

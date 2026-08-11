@@ -89,8 +89,8 @@ Deno.serve(async (req: Request) => {
       "elite-monthly": { name: "Elite Plan (Monthly)", price: "1499.00",  subscription: { frequency: "MONTH" } },
       "elite-annual":  { name: "Elite Plan (Annual)",  price: "14990.00", subscription: { frequency: "YEAR" } },
       "ai-tool":       { name: "AI Tool",              price: "99.00" },
-      "web-pack":      { name: "Web Pack",             price: "2500.00" },
-      "app-pack":      { name: "App Pack",             price: "5000.00" },
+      "web-pack":      { name: "Web Pack",             price: "299.00" },
+      "app-pack":      { name: "App Pack",             price: "499.00" },
       "deposit":       { name: "Done-For-You Service Deposit", price: "500.00" },
     };
     const product = PRODUCTS[productId];
