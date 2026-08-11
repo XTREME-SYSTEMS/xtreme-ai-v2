@@ -3,7 +3,7 @@ import { base44 } from "@/api/base44Client";
 import { PageHeader, Panel, LoadingButton, EmptyState } from "@/components/ui";
 import {
   TrendingUp, ArrowUp, ArrowDown, Minus, Search, Eye, MousePointerClick,
-  BarChart3, RefreshCw, Globe, Filter, Trophy, Target,
+  BarChart3, RefreshCw, Globe, Filter, Trophy, Target, Crosshair, Clock, CheckCircle,
 } from "lucide-react";
 
 export default function RankingMonitor() {
@@ -11,6 +11,8 @@ export default function RankingMonitor() {
   const [keywords, setKeywords] = useState([]);
   const [loading, setLoading] = useState(true);
   const [syncing, setSyncing] = useState(false);
+  const [trackingLive, setTrackingLive] = useState(false);
+  const [liveResult, setLiveResult] = useState(null);
   const [engineFilter, setEngineFilter] = useState("all");
   const [statusFilter, setStatusFilter] = useState("all");
   const [search, setSearch] = useState("");
@@ -40,6 +42,18 @@ export default function RankingMonitor() {
       await load();
     } catch (e) { alert(e.message); }
     setSyncing(false);
+  };
+
+  const trackLive = async () => {
+    setTrackingLive(true);
+    setLiveResult(null);
+    try {
+      const res = await base44.functions.invoke("trackLiveRankings", {});
+      const data = res?.data || res;
+      setLiveResult(data);
+      await load();
+    } catch (e) { alert(e.message); }
+    setTrackingLive(false);
   };
 
   const engineMap = useMemo(() => {
@@ -85,6 +99,9 @@ export default function RankingMonitor() {
         title="Ranking Monitor"
         subtitle="Track keyword positions and search volume across all cloned sites — powered by Google Search Console."
       >
+        <LoadingButton onClick={trackLive} loading={trackingLive} variant="primary">
+          <Crosshair className="h-4 w-4" /> Track Live Positions
+        </LoadingButton>
         <LoadingButton onClick={syncRankings} loading={syncing} variant="ghost">
           <BarChart3 className="h-4 w-4" /> Sync GSC Data
         </LoadingButton>
@@ -92,6 +109,16 @@ export default function RankingMonitor() {
           <RefreshCw className="h-4 w-4" /> Refresh
         </LoadingButton>
       </PageHeader>
+
+      {liveResult && (
+        <div className="rounded-lg border border-lime-400/30 bg-lime-400/5 px-4 py-3 text-sm text-lime-300 flex items-center gap-3">
+          <CheckCircle className="h-4 w-4 shrink-0" />
+          <span>
+            Live tracking complete — {liveResult.keywords_checked} keywords checked across {liveResult.portfolios_processed} sites · {liveResult.keywords_ranking} currently ranking
+          </span>
+          <button onClick={() => setLiveResult(null)} className="ml-auto text-lime-400/60 hover:text-lime-400">×</button>
+        </div>
+      )}
 
       {/* Summary stats */}
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-4 lg:grid-cols-6">
@@ -165,6 +192,7 @@ export default function RankingMonitor() {
                   <th className="py-2 px-3 font-medium text-right">Impr.</th>
                   <th className="py-2 px-3 font-medium text-right">Clicks</th>
                   <th className="py-2 px-3 font-medium text-right">CTR</th>
+                  <th className="py-2 px-3 font-medium text-right">Last Live Check</th>
                 </tr>
               </thead>
               <tbody>
@@ -255,6 +283,16 @@ function KeywordTableRow({ k, engine }) {
       </td>
       <td className="py-2.5 px-3 text-right text-white/50 text-xs">
         {k.ctr ? `${k.ctr.toFixed(1)}%` : "—"}
+      </td>
+      <td className="py-2.5 px-3 text-right text-xs whitespace-nowrap">
+        {k.last_checked ? (
+          <span className="flex items-center justify-end gap-1 text-cyan-400/70">
+            <Clock className="h-3 w-3" />
+            {new Date(k.last_checked).toLocaleDateString()}
+          </span>
+        ) : (
+          <span className="text-white/20">never</span>
+        )}
       </td>
     </tr>
   );
