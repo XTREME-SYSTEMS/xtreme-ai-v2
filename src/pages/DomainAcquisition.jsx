@@ -176,13 +176,13 @@ export default function DomainAcquisition() {
       <div className="flex flex-wrap items-center gap-3">
         <div className="flex items-center gap-2">
           <Filter className="h-4 w-4 text-white/40" />
-          <select value={filterNiche} onChange={e => setFilterNiche(e.target.value)} className="rounded-lg border border-white/15 bg-black px-3 py-1.5 text-sm text-white outline-none focus:border-lime-400">
+          <select value={filterNiche} onChange={e => setFilterNiche(e.target.value)} className="rounded-lg border border-white/15 bg-zinc-900 px-3 py-1.5 text-sm text-white outline-none focus:border-lime-400">
             <option value="">All Niches</option>
             {[...new Set(candidates.map(c => c.niche).filter(Boolean))].sort().map(n => (
               <option key={n} value={n}>{n}</option>
             ))}
           </select>
-          <select value={filterPriority} onChange={e => setFilterPriority(e.target.value)} className="rounded-lg border border-white/15 bg-black px-3 py-1.5 text-sm text-white outline-none focus:border-lime-400">
+          <select value={filterPriority} onChange={e => setFilterPriority(e.target.value)} className="rounded-lg border border-white/15 bg-zinc-900 px-3 py-1.5 text-sm text-white outline-none focus:border-lime-400">
             <option value="">All Priorities</option>
             <option value="buy_now">Buy Now</option>
             <option value="strong_buy">Strong Buy</option>
@@ -312,7 +312,7 @@ function DomainCard({ candidate: c, onAdd, adding }) {
 
       {/* Analysis */}
       {c.competition_analysis && (
-        <div className="mt-3 rounded-lg border border-white/5 bg-black/50 p-2.5">
+        <div className="mt-3 rounded-lg border border-white/10 bg-black/40 p-2.5">
           <div className="text-[10px] font-semibold uppercase tracking-wider text-white/40 mb-1">AI Analysis</div>
           <p className="text-xs text-white/60 leading-relaxed">{c.competition_analysis}</p>
         </div>
@@ -371,7 +371,7 @@ function DomainCard({ candidate: c, onAdd, adding }) {
 
 function Metric({ label, value, color = "text-white" }) {
   return (
-    <div className="rounded-lg border border-white/5 bg-black/30 px-2.5 py-1.5">
+    <div className="rounded-lg border border-white/10 bg-black/40 px-2.5 py-1.5">
       <div className="text-[10px] uppercase tracking-wider text-white/40">{label}</div>
       <div className={`mt-0.5 font-mono text-sm font-medium ${color}`}>{value}</div>
     </div>

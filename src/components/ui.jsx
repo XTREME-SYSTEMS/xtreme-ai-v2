@@ -15,7 +15,7 @@ export function PageHeader({ title, subtitle, children }) {
 
 export function Panel({ title, children, className, action }) {
   return (
-    <div className={cn("rounded-xl border border-white/10 bg-zinc-950", className)}>
+    <div className={cn("rounded-xl border border-white/15 bg-zinc-900", className)}>
       {title && (
         <div className="flex items-center justify-between border-b border-white/10 px-4 py-3">
           <h2 className="text-sm font-semibold text-white">{title}</h2>
@@ -47,7 +47,7 @@ export function LoadingButton({ loading, children, onClick, disabled, variant = 
 
 export function EmptyState({ icon: Icon, title, subtitle, children }) {
   return (
-    <div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-white/10 bg-zinc-950 px-6 py-12 text-center">
+    <div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-white/15 bg-zinc-900 px-6 py-12 text-center">
       {Icon && <Icon className="mb-3 h-8 w-8 text-lime-400/60" />}
       <p className="text-sm font-medium text-white">{title}</p>
       {subtitle && <p className="mt-1 max-w-md text-xs text-white/40">{subtitle}</p>}
