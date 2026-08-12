@@ -257,7 +257,7 @@ export default function DomainAcquisition() {
 function DomainCard({ candidate: c, onAdd, adding }) {
   const priority = c.acquisition_priority || 'consider';
   return (
-    <div className={`rounded-xl border bg-zinc-950 p-4 transition-colors ${
+    <div className={`rounded-xl border bg-zinc-900 p-4 transition-colors ${
       c.availability_status === 'REGISTERED' ? 'border-white/10 opacity-50' :
       priority === 'buy_now' ? 'border-rose-500/40' :
       priority === 'strong_buy' ? 'border-amber-500/30' :
@@ -380,7 +380,7 @@ function Metric({ label, value, color = "text-white" }) {
 
 function StatCard({ icon: Icon, label, value, color = "text-white" }) {
   return (
-    <div className="rounded-xl border border-white/10 bg-zinc-950 p-4">
+    <div className="rounded-xl border border-white/15 bg-zinc-900 p-4">
       <div className="flex items-center gap-2 text-white/40"><Icon className="h-4 w-4" /><span className="text-xs uppercase tracking-wider">{label}</span></div>
       <div className={`mt-2 text-2xl font-semibold ${color}`}>{value}</div>
     </div>
