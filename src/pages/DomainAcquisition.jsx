@@ -38,7 +38,6 @@ export default function DomainAcquisition() {
   const [filterPriority, setFilterPriority] = useState("");
   const [adding, setAdding] = useState(null);
   const [checking, setChecking] = useState(false);
-  const [autoChecked, setAutoChecked] = useState(false);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -51,24 +50,19 @@ export default function DomainAcquisition() {
 
   useEffect(() => { load(); }, [load]);
 
-  // Auto-check availability when candidates first load with UNKNOWN status
-  useEffect(() => {
-    if (!loading && !autoChecked && !checking && candidates.length > 0) {
-      const hasUnknown = candidates.some(c => !c.availability_status || c.availability_status === 'UNKNOWN');
-      if (hasUnknown) {
-        setAutoChecked(true);
-        checkAvailability();
-      }
-    }
-  }, [loading, autoChecked, checking, candidates]);
-
   const checkAvailability = async () => {
     setChecking(true);
     setError("");
     try {
-      const allDomains = candidates.map(c => c.domain);
-      for (let i = 0; i < allDomains.length; i += 20) {
-        const batch = allDomains.slice(i, i + 20);
+      const unknownDomains = candidates
+        .filter(c => !c.availability_status || c.availability_status === 'UNKNOWN')
+        .map(c => c.domain);
+      if (unknownDomains.length === 0) {
+        setChecking(false);
+        return;
+      }
+      for (let i = 0; i < unknownDomains.length; i += 8) {
+        const batch = unknownDomains.slice(i, i + 8);
         await base44.functions.invoke('checkDomainAvailability', { domains: batch });
       }
       await load();
@@ -80,7 +74,6 @@ export default function DomainAcquisition() {
     setDiscovering(true);
     setError("");
     setDiscoverResult(null);
-    setAutoChecked(false);
     try {
       const payload = selectedNiches.length > 0 ? { niches: selectedNiches } : {};
       const res = await base44.functions.invoke('discoverHighValueDomains', payload);
