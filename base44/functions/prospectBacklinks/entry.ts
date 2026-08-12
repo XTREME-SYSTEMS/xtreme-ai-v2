@@ -114,24 +114,52 @@ Only include REAL sites you found via web search — no fabricated domains. Retu
     }
 
     // ---- 3. Draft personalized outreach emails in a single batch ----
-    log('Drafting personalized outreach emails...');
+    log('Drafting compelling partnership outreach emails...');
     let outreachEmails = [];
     try {
       const draftRes = await base44.integrations.Core.InvokeLLM({
-        prompt: `Write concise, personalized outreach emails for a link-building campaign for ${domain} (a ${niche} business).
+        prompt: `Write compelling, personalized partnership outreach emails for ${domain} — an AI-powered autonomous marketing engine that scales local lead generation by automating site deployment, Google Search Console indexing, citation building, backlink outreach, and persistent SEO/AEO/AI optimization across a portfolio of high-value "near me" service domains.
 
 Prospects to draft emails for:
 ${JSON.stringify(newOpps.map((o, i) => ({ index: i, target_domain: o.target_domain, target_url: o.target_url, angle: o.outreach_angle, contact_name: o.contact_name })), null, 2)}
 
-Rules per email:
-- Subject: compelling, under 60 characters, not spammy, no all-caps
-- Body: 100-150 words, friendly but professional
-- Mention something specific about their site/page based on the target_url and angle
-- Clearly state the value proposition for their readers
-- End with a clear, low-friction ask (guest post pitch, resource inclusion, or quick link)
+Each email must follow this narrative arc:
+
+1. HOOK (personal + specific): Open by mentioning something specific about THEIR site or page (based on target_url and angle) that caught your attention — a recent article, a resource page, their expertise in ${niche}. Show you actually read their work. Keep it genuine, not flattery.
+
+2. THE ANNOUNCEMENT: Tell them what we're building — an AI-powered autonomous marketing engine that deploys and ranks local service websites at scale. In plain language, explain the system's capabilities:
+   - Automated site deployment across dozens of niche "near me" domains
+   - Real-time Google Search Console indexing and sitemap submission
+   - Programmatic citation building across 30+ directories
+   - AI-driven backlink prospecting and personalized outreach (what they're reading right now)
+   - Live SERP rank tracking and autonomous content optimization
+   - AEO/AI search optimization so sites get cited by ChatGPT, Perplexity, and Google AI Overviews
+   Frame it as "we're proving that AI can autonomously take a local service domain from zero to page one — and we're doing it right now."
+
+3. THE BENEFIT TO THEM: Why participating is worth their time:
+   - Early access to a system that's genuinely changing how local SEO works
+   - A high-quality, relevant backlink from a site in the ${niche} space (mutual value)
+   - First look at the results data — they'll see real ranking progress, real traffic, real leads
+   - Their audience gets pointed to a genuinely useful resource
+   - No cost, no obligation — just a genuine partnership opportunity
+
+4. THE PROOF OFFER: Offer to share live ranking data, traffic screenshots, and pipeline metrics so they can verify the system works before committing to anything. Say something like: "I'm happy to share live dashboards, ranking data, and traffic proof so you can see exactly what this system does before you decide."
+
+5. THE PARTNERSHIP ASK: Frame the link/partnership as the beginning of a relationship, not a one-off transaction:
+   - "We're building a network of forward-thinking site owners who want early access to AI-driven marketing tech"
+   - "If this proves out the way we expect, we'd love to explore broader partnership opportunities — co-marketing, content collaborations, or early access to the platform itself"
+   - End with a clear, low-friction ask: a link from their resource page, a guest post opportunity, or a quick chat
+
+6. SIGN-OFF: Close as "The team at ${domain}" with a warm, confident tone.
+
+FORMATTING RULES:
+- Subject: compelling, curiosity-driven, under 60 characters, not spammy, no all-caps, no clickbait
+- Body: 200-280 words (this is a real pitch, not a one-liner), friendly but professional, confident without hype
 - Use the contact name if available ("Hi [name]"), else "Hi there"
-- Sign off as "The team at ${domain}"
+- Use short paragraphs (2-3 sentences max) — no walls of text
 - Do NOT use placeholders like [Your Name] — write the full email ready to send
+- Do NOT mention "AI" more than twice — lead with the human partnership angle
+- Make it feel like a genuine note from a builder, not a marketing blast
 
 Return JSON with an "emails" array — one { subject, body } per prospect, in the same order as the prospects list.`,
         response_json_schema: {
