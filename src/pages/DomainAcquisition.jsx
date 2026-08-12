@@ -36,6 +36,7 @@ export default function DomainAcquisition() {
   const [selectedNiches, setSelectedNiches] = useState(NICHES);
   const [filterNiche, setFilterNiche] = useState("");
   const [filterPriority, setFilterPriority] = useState("");
+  const [showRegistered, setShowRegistered] = useState(false);
   const [adding, setAdding] = useState(null);
   const [checking, setChecking] = useState(false);
 
@@ -104,6 +105,7 @@ export default function DomainAcquisition() {
   };
 
   const filtered = candidates.filter(c => {
+    if (!showRegistered && c.availability_status === 'REGISTERED') return false;
     if (filterNiche && c.niche !== filterNiche) return false;
     if (filterPriority && c.acquisition_priority !== filterPriority) return false;
     return true;
@@ -190,6 +192,10 @@ export default function DomainAcquisition() {
             <option value="pass">Pass</option>
           </select>
         </div>
+        <label className="flex items-center gap-2 text-xs text-white/60 cursor-pointer">
+          <input type="checkbox" checked={showRegistered} onChange={e => setShowRegistered(e.target.checked)} className="accent-lime-400" />
+          Show registered
+        </label>
         <span className="text-xs text-white/40">{filtered.length} domains</span>
       </div>
 
