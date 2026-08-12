@@ -33,7 +33,7 @@ export default function DomainAcquisition() {
   const [discoverResult, setDiscoverResult] = useState(null);
   const [error, setError] = useState("");
   const [showNichePicker, setShowNichePicker] = useState(false);
-  const [selectedNiches, setSelectedNiches] = useState([]);
+  const [selectedNiches, setSelectedNiches] = useState(NICHES);
   const [filterNiche, setFilterNiche] = useState("");
   const [filterPriority, setFilterPriority] = useState("");
   const [adding, setAdding] = useState(null);
