@@ -1,12 +1,12 @@
 import MarketingNav from "@/components/marketing/MarketingNav";
 import Hero from "@/components/marketing/Hero";
-import AITools from "@/components/marketing/AITools";
-import Methodology from "@/components/marketing/Methodology";
-import Services from "@/components/marketing/Services";
+import AwardBadges from "@/components/marketing/AwardBadges";
+import AllInOneTabs from "@/components/marketing/AllInOneTabs";
+import Pillars from "@/components/marketing/Pillars";
+import Testimonial from "@/components/marketing/Testimonial";
+import Community from "@/components/marketing/Community";
 import PricingSection from "@/components/marketing/PricingSection";
 import FAQ from "@/components/marketing/FAQ";
-import Industries from "@/components/marketing/Industries";
-import About from "@/components/marketing/About";
 import PWAInstallBar from "@/components/marketing/PWAInstallBar";
 import MarketingFooter from "@/components/marketing/MarketingFooter";
 
@@ -16,13 +16,13 @@ export default function Marketing() {
       <MarketingNav />
       <main>
         <Hero />
-        <AITools />
-        <Methodology />
-        <Services />
+        <AwardBadges />
+        <AllInOneTabs />
+        <Pillars />
+        <Testimonial />
+        <Community />
         <PricingSection />
         <FAQ />
-        <Industries />
-        <About />
       </main>
       <MarketingFooter />
       <PWAInstallBar />
