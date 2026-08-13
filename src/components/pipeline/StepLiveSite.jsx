@@ -84,7 +84,7 @@ export default function StepLiveSite({ project, onRestart }) {
           <AlertCircle className="h-6 w-6 text-amber-400 shrink-0" />
           <div>
             <div className="text-sm font-medium text-amber-300">No live URL available yet</div>
-            <div className="text-xs text-white/50 mt-0.5">The site hasn't been deployed or the domain wasn't purchased. Check the provisioning step or refresh the project.</div>
+            <div className="text-xs text-white/50 mt-0.5">The site hasn't been deployed yet. The custom domain goes live once you buy it manually and point DNS at Vercel — in the meantime the Vercel URL above is live.</div>
           </div>
         </div>
       )}

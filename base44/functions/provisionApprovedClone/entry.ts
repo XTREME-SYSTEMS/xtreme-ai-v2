@@ -104,19 +104,22 @@ export default async function(req) {
 
     await flushLogs({ provisioning: { drive, github, supabase, vercel } });
 
-    // ---- Step 3: Buy domain from Vercel (with retry) ----
-    log('Attempting domain purchase from Vercel...');
-    const domainResult = await withRetry(
-      () => purchaseVercelDomain(domain, vercel?.project_id),
-      { retries: 2, label: 'Domain purchase' }
-    ).catch(e => {
-      log(`Domain purchase failed: ${e.message}`);
-      return { purchased: false, status: 'failed', error: e.message };
-    });
-    log(`Domain purchase: ${domainResult.purchased ? '✓ purchased' : 'pending'} — ${domainResult.status || ''}`);
+    // ---- Step 3: Add domain to Vercel project (manual purchase) ----
+    // The domain is NOT auto-purchased. We add it to the Vercel project so Vercel
+    // generates the verification + DNS records the operator needs to set on the
+    // domain they buy manually from any registrar. Provisioning is fully automated;
+    // only the actual purchase is a manual step.
+    log('Adding domain to Vercel project (manual purchase required)...');
+    const domainResult = await addDomainToVercelProject(domain, vercel?.project_id)
+      .catch(e => {
+        log(`Domain setup failed: ${e.message}`);
+        return { purchased: false, status: 'setup_failed', error: e.message };
+      });
+    log(`Domain setup: ${domainResult.status} — verification records ${domainResult.verification?.length || 0}`);
     await flushLogs({
-      domain_purchased: domainResult.purchased || false,
+      domain_purchased: false,
       domain_purchase_status: domainResult.status || 'unknown',
+      provisioning: { drive, github, supabase, vercel: vercel ? { ...vercel, domain_verification: domainResult.verification || [], nameservers: domainResult.nameservers || [] } : vercel },
     });
 
     // ---- Step 4: Fill SEO/AEO gaps ----
@@ -422,47 +425,41 @@ ${faq.map(f => `<details><summary>${f.question}</summary><p style="margin-top:8p
   };
 }
 
-// ---- Purchase domain from Vercel ----
-async function purchaseVercelDomain(domain, projectId) {
+// ---- Add domain to Vercel project (manual purchase) ----
+// Does NOT buy the domain. Adds it to the Vercel project so Vercel generates the
+// verification + DNS records the operator must set on the domain they buy manually.
+async function addDomainToVercelProject(domain, projectId) {
   const token = process.env.VERCEL_TOKEN;
   const team = process.env.VERCEL_TEAM_ID;
   if (!token) throw new Error('VERCEL_TOKEN missing');
   const qs = team ? `?teamId=${team}` : '';
 
-  // Step 1: Buy the domain via Vercel's domain purchase API
-  const buyRes = await fetch(`https://api.vercel.com/v4/domains/buy${qs}`, {
+  if (!projectId) throw new Error('Vercel project_id missing — cannot add domain');
+
+  // Step 1: Add the domain to the project (idempotent — 409 means already added)
+  const addRes = await fetch(`https://api.vercel.com/v9/projects/${projectId}/domains${qs}`, {
     method: 'POST',
     headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
     body: JSON.stringify({ name: domain })
   });
-
-  if (buyRes.ok) {
-    const buyData = await buyRes.json();
-    // Step 2: Add the domain to the Vercel project
-    if (projectId) {
-      await fetch(`https://api.vercel.com/v9/projects/${projectId}/domains${qs}`, {
-        method: 'POST',
-        headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name: domain })
-      }).catch(() => {});
-    }
-    return { purchased: true, status: 'purchased', order: buyData };
+  if (!addRes.ok && addRes.status !== 409) {
+    const errText = await addRes.text().catch(() => '');
+    throw new Error(`Vercel add domain failed: ${addRes.status} ${errText}`);
   }
 
-  // If buy fails, try to at least register the domain in the Vercel project
-  if (projectId) {
-    const addRes = await fetch(`https://api.vercel.com/v9/projects/${projectId}/domains${qs}`, {
-      method: 'POST',
-      headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
-      body: JSON.stringify({ name: domain })
-    });
-    if (addRes.ok) {
-      return { purchased: false, status: 'added_to_project_manual_purchase_required', project_domain: true };
-    }
+  // Step 2: Fetch the domain config to get verification + nameserver records
+  const cfgRes = await fetch(`https://api.vercel.com/v9/projects/${projectId}/domains/${encodeURIComponent(domain)}${qs}`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  let verification = [];
+  let nameservers = [];
+  if (cfgRes.ok) {
+    const cfg = await cfgRes.json();
+    verification = (cfg.verification || []).map(v => ({ type: v.type, name: v.name || '', value: v.value || '' }));
+    nameservers = cfg.intendedNameservers || cfg.ns || [];
   }
 
-  const errText = await buyRes.text();
-  return { purchased: false, status: 'purchase_failed', error: errText };
+  return { purchased: false, status: 'manual_purchase_required', verification, nameservers };
 }
 
 // ---- Identify and fill SEO/AEO gaps ----
