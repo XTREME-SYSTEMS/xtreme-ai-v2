@@ -14,6 +14,7 @@
   "dependencies": {
     "@base44/sdk": "^0.8.41",
     "@base44/vite-plugin": "^1.0.30",
+    "@browserbasehq/sdk": "^1.5.0",
     "@hello-pangea/dnd": "^17.0.0",
     "@hookform/resolvers": "^4.1.2",
     "@radix-ui/react-accordion": "^1.2.3",
@@ -61,6 +62,7 @@
     "lucide-react": "^0.475.0",
     "moment": "^2.30.1",
     "next-themes": "^0.4.4",
+    "playwright-core": "^1.62.1",
     "react": "^18.2.0",
     "react-day-picker": "^8.10.1",
     "react-dom": "^18.2.0",
