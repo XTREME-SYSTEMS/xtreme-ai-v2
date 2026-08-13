@@ -6,6 +6,7 @@ import StatCard from "@/components/StatCard";
 import StatusBadge from "@/components/StatusBadge";
 import { Users, Target, ShieldCheck, Hammer, ScrollText, Search, BookOpen, ArrowRight, GitBranch, Eye, MousePointerClick } from "lucide-react";
 import PipelineHealthWidget from "@/components/PipelineHealthWidget";
+import SystemAccessGrid from "@/components/SystemAccessGrid";
 
 export default function CommandCenter() {
   const [stats, setStats] = useState({ prospects: 0, opportunities: 0, builds: 0, receipts: 0, clones: 0, recent: [], gscImpressions: 0, gscClicks: 0, topKeywords: [] });
@@ -136,6 +137,10 @@ export default function CommandCenter() {
           <ShieldCheck className="h-4 w-4 text-lime-400" />
           <span>Governance: <span className="text-emerald-400">Green</span> (research, drafts, preview, QA, receipts) auto-allowed · <span className="text-amber-400">Yellow</span> preview-only · <span className="text-rose-400">Red</span> production locked pending operator approval.</span>
         </div>
+      </div>
+
+      <div className="mt-6">
+        <SystemAccessGrid />
       </div>
     </div>
   );
