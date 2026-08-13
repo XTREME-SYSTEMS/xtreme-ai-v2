@@ -24,7 +24,8 @@ export default function Login() {
     setLoading(true);
     try {
       await base44.auth.loginViaEmailPassword(email, password);
-      window.location.href = returnTo;
+      // Default logged-in users to the dashboard, not the public marketing page.
+      window.location.href = returnTo === "/" ? "/dashboard" : returnTo;
     } catch (err) {
       setError(err.message || "Invalid email or password");
     } finally {

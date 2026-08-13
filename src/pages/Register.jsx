@@ -46,7 +46,9 @@ export default function Register() {
       if (result?.access_token) {
         base44.auth.setToken(result.access_token);
       }
-      window.location.href = safeReturnTo();
+      const dest = safeReturnTo();
+      // Default logged-in users to the dashboard, not the public marketing page.
+      window.location.href = dest === "/" ? "/dashboard" : dest;
     } catch (err) {
       setError(err.message || "Invalid verification code");
     } finally {
