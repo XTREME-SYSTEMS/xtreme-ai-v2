@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { motion } from "framer-motion";
-import { Zap, ArrowRight } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import { Link } from "react-router-dom";
 
 const STATS = [
@@ -65,12 +65,6 @@ export default function Hero() {
     <section className="relative overflow-hidden bg-white pt-16">
       <div className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6">
         <div className="flex flex-col items-center pt-16 pb-12 text-center sm:pt-24">
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}
-            className="mb-6 inline-flex items-center gap-2 rounded-full border border-lime-400/40 bg-lime-400/10 px-4 py-1.5">
-            <Zap className="h-3.5 w-3.5 text-lime-600" />
-            <span className="text-xs font-semibold uppercase tracking-wider text-lime-700">Power up your business with AI</span>
-          </motion.div>
-
           <motion.h1 initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1, duration: 0.6 }}
             className="max-w-3xl text-4xl font-bold leading-[1.1] tracking-tight text-black sm:text-5xl lg:text-6xl">
             The AI-powered business <span className="text-lime-600">operating system</span>
