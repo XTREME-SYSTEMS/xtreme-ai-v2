@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { base44 } from "@/api/base44Client";
 import { Button } from "@/components/ui/button";
@@ -16,6 +16,16 @@ export default function Login() {
   const [loading, setLoading] = useState(false);
   // Post-login destination (e.g. the MCP OAuth consent page sends users here
   // with returnTo so the grant flow can resume). Same-origin paths only.
+  // Default to /dashboard so the SDK's built-in post-login redirect (which
+  // reads returnTo, falling back to "/") lands logged-in users on the app,
+  // not the public marketing home page.
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (!params.get("returnTo")) {
+      params.set("returnTo", "/dashboard");
+      window.history.replaceState({}, "", `${window.location.pathname}?${params.toString()}`);
+    }
+  }, []);
   const returnTo = safeReturnTo();
 
   const handleSubmit = async (e) => {
