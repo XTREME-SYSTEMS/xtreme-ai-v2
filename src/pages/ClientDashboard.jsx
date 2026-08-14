@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { base44 } from "@/api/base44Client";
 import {
-  Package, CheckCircle, FileText, ScrollText, Settings, Sparkles,
+  Package, CheckCircle, ScrollText, Settings, Sparkles,
   ArrowRight, LayoutDashboard,
 } from "lucide-react";
 
@@ -10,7 +10,6 @@ const TABS = [
   { to: "/my-package", icon: Package, label: "My Package", desc: "Everything you paid for, listed item by item. Review this first to confirm nothing is missing." },
   { to: "/client-portal", icon: LayoutDashboard, label: "Client Portal", desc: "This page — your welcome guide and overview of how the portal works." },
   { to: "/approvals", icon: CheckCircle, label: "Approvals", desc: "Each step of your build laid out in order. The step you're on glows green and flashes — approve or deny it (with a comment) to keep things moving." },
-  { to: "/proposals", icon: FileText, label: "My Proposals", desc: "Plans and quotes your team prepares for your review." },
   { to: "/receipts", icon: ScrollText, label: "Activity", desc: "A log of the actions you've taken in the portal." },
   { to: "/settings", icon: Settings, label: "Settings", desc: "Your account details and preferences." },
 ];

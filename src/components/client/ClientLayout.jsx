@@ -2,7 +2,7 @@ import { NavLink, Outlet, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { base44 } from "@/api/base44Client";
 import {
-  LayoutDashboard, CheckCircle, FileText, ScrollText, Settings,
+  LayoutDashboard, CheckCircle, ScrollText, Settings,
   LogOut, Menu, X, ArrowLeft, Package,
 } from "lucide-react";
 import { Image } from "@/components/ui/image";
@@ -17,7 +17,6 @@ const NAV = [
   { to: "/my-package", label: "My Package", icon: Package, end: true },
   { to: "/client-portal", label: "Client Portal", icon: LayoutDashboard, end: true },
   { to: "/approvals", label: "Approvals", icon: CheckCircle },
-  { to: "/proposals", label: "My Proposals", icon: FileText },
   { to: "/receipts", label: "Activity", icon: ScrollText },
   { to: "/settings", label: "Settings", icon: Settings },
 ];
