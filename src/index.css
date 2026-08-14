@@ -5,19 +5,19 @@
 @layer base {
   :root {
     --background: 0 0% 100%;
-    --foreground: 240 10% 4%;
+    --foreground: 0 0% 0%;
     --card: 240 5% 98%;
-    --card-foreground: 240 10% 4%;
+    --card-foreground: 0 0% 0%;
     --popover: 0 0% 100%;
-    --popover-foreground: 240 10% 4%;
+    --popover-foreground: 0 0% 0%;
     --primary: 84 100% 59%;
-    --primary-foreground: 240 10% 4%;
+    --primary-foreground: 0 0% 0%;
     --secondary: 240 5% 96%;
-    --secondary-foreground: 240 10% 4%;
+    --secondary-foreground: 0 0% 0%;
     --muted: 240 5% 96%;
-    --muted-foreground: 240 4% 42%;
+    --muted-foreground: 0 0% 35%;
     --accent: 84 100% 59%;
-    --accent-foreground: 240 10% 4%;
+    --accent-foreground: 0 0% 0%;
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 98%;
     --border: 240 6% 90%;
@@ -130,13 +130,13 @@
 :root:not(.dark) .bg-zinc-950 { background-color: hsl(var(--card)); }
 
 :root:not(.dark) .text-white { color: hsl(var(--foreground)); }
-:root:not(.dark) .text-white\/30,
-:root:not(.dark) .text-white\/40,
-:root:not(.dark) .text-white\/50,
-:root:not(.dark) .text-white\/60,
-:root:not(.dark) .text-white\/70,
-:root:not(.dark) .text-white\/80,
-:root:not(.dark) .text-white\/90 { color: hsl(var(--muted-foreground)); }
+:root:not(.dark) .text-white\/30 { color: hsl(var(--foreground) / 0.4); }
+:root:not(.dark) .text-white\/40 { color: hsl(var(--foreground) / 0.5); }
+:root:not(.dark) .text-white\/50 { color: hsl(var(--foreground) / 0.6); }
+:root:not(.dark) .text-white\/60 { color: hsl(var(--foreground) / 0.7); }
+:root:not(.dark) .text-white\/70 { color: hsl(var(--foreground) / 0.8); }
+:root:not(.dark) .text-white\/80 { color: hsl(var(--foreground) / 0.9); }
+:root:not(.dark) .text-white\/90 { color: hsl(var(--foreground)); }
 
 :root:not(.dark) .border-white\/5,
 :root:not(.dark) .border-white\/10,
