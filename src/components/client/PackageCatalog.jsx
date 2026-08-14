@@ -8,7 +8,7 @@ const PLANS = [
   {
     name: "Free Starter", price: "$0", period: "forever", tagline: "Test the waters",
     features: ["1 AI Tool Access", "Basic Presence Audit", "Community Support", "Starter Dashboard"],
-    cta: "Start Free", free: true, to: "/dashboard",
+    cta: "Start Free", free: true, to: "/client-portal",
   },
   {
     name: "Pro", price: "$499", period: "/mo", tagline: "For growing businesses",

@@ -16,7 +16,7 @@ import ClientLayout from "@/components/client/ClientLayout";
 import ThemeToggle from "@/components/ThemeToggle";
 
 const NAV = [
-  { to: "/dashboard", label: "Command Center", icon: LayoutDashboard, end: true },
+  { to: "/client-portal", label: "Command Center", icon: LayoutDashboard, end: true },
   { section: "Discovery" },
   { to: "/discovery", label: "Business Discovery", icon: Search },
   { to: "/prospects", label: "Prospects", icon: Users },
@@ -89,7 +89,7 @@ const NAV = [
 ];
 
 const CLIENT_NAV = [
-  { to: "/dashboard", label: "My Dashboard", icon: LayoutDashboard, end: true },
+  { to: "/client-portal", label: "My Dashboard", icon: LayoutDashboard, end: true },
   { section: "Workflow" },
   { to: "/approvals", label: "Approvals", icon: CheckCircle },
   { to: "/proposals", label: "My Proposals", icon: FileText },

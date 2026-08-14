@@ -25,7 +25,7 @@ export const TRACKS = {
     subtitle: "Your full-service growth engine is unlocked.",
     greeting: "Welcome to your Elite plan! You've got the full growth factory at your fingertips.",
     start: [
-      { to: "/dashboard", icon: LayoutDashboard, label: "Command Center", desc: "Your mission control for every tool and metric." },
+      { to: "/client-portal", icon: LayoutDashboard, label: "Command Center", desc: "Your mission control for every tool and metric." },
       { to: "/brand-factory", icon: Wand2, label: "Brand Factory", desc: "Build a complete brand kit with AI." },
       { to: "/clone-pipeline", icon: Rocket, label: "Clone Pipeline", desc: "Clone, rebrand & deploy sites end-to-end." },
     ],
@@ -43,7 +43,7 @@ export const TRACKS = {
     subtitle: "Your growth toolkit is ready.",
     greeting: "Welcome to your Pro plan! Let's get your brand and sites ranking.",
     start: [
-      { to: "/dashboard", icon: LayoutDashboard, label: "Command Center", desc: "See your portfolio and quick actions." },
+      { to: "/client-portal", icon: LayoutDashboard, label: "Command Center", desc: "See your portfolio and quick actions." },
       { to: "/brand-factory", icon: Wand2, label: "Brand Factory", desc: "Build your brand kit with AI." },
       { to: "/race-to-rank", icon: Crosshair, label: "Race to Rank", desc: "Push your pages toward page one." },
     ],
@@ -61,7 +61,7 @@ export const TRACKS = {
     subtitle: "Your team is on it — just guide and approve.",
     greeting: "Welcome! You've reserved a Done-For-You service. Let's capture your details so your team can get to work.",
     start: [
-      { to: "/dashboard", icon: Sparkles, label: "Finish Onboarding", desc: "Answer a few questions about your business." },
+      { to: "/client-portal", icon: Sparkles, label: "Finish Onboarding", desc: "Answer a few questions about your business." },
       { to: "/proposals", icon: FileText, label: "My Proposals", desc: "Review the plan your team prepares for you." },
       { to: "/approvals", icon: CheckCircle, label: "Approvals", desc: "Sign off on work before it goes live." },
     ],
@@ -71,7 +71,7 @@ export const TRACKS = {
       "You approve each deliverable before it ships.",
       "Track progress in your Activity feed.",
     ],
-    cta: { to: "/dashboard", label: "Go to Dashboard" },
+    cta: { to: "/client-portal", label: "Go to Dashboard" },
   },
   "web-pack": {
     key: "web-pack",
@@ -127,7 +127,7 @@ export const TRACKS = {
     subtitle: "Let's get you started.",
     greeting: "Welcome aboard! Let's get to know your business, then build your brand.",
     start: [
-      { to: "/dashboard", icon: Sparkles, label: "AI Onboarding", desc: "Answer a few questions about your business." },
+      { to: "/client-portal", icon: Sparkles, label: "AI Onboarding", desc: "Answer a few questions about your business." },
       { to: "/brand-factory", icon: Wand2, label: "Brand Factory", desc: "Build your full brand kit with AI." },
     ],
     steps: [

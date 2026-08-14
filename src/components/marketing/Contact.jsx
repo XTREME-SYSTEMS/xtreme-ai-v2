@@ -40,7 +40,7 @@ export default function Contact() {
                   <Link to="/pricing" className="group inline-flex items-center justify-center gap-2 rounded-xl bg-lime-400 px-5 py-3 text-sm font-bold text-black transition-all hover:bg-lime-300">
                     View Pricing <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
                   </Link>
-                  <Link to="/dashboard" className="inline-flex items-center justify-center gap-2 rounded-xl border border-white/20 px-5 py-3 text-sm font-bold text-white transition-all hover:bg-white hover:text-black">
+                  <Link to="/client-portal" className="inline-flex items-center justify-center gap-2 rounded-xl border border-white/20 px-5 py-3 text-sm font-bold text-white transition-all hover:bg-white hover:text-black">
                     Client Portal
                   </Link>
                 </div>
@@ -48,7 +48,7 @@ export default function Contact() {
               <div className="rounded-2xl border border-lime-400/30 bg-lime-400/10 p-6">
                 <div className="text-sm font-semibold text-lime-400">Already a client?</div>
                 <p className="mt-1 text-sm text-white/70">Log in to your dashboard to track approvals, view brand packs, and get real-time updates.</p>
-                <Link to="/dashboard" className="mt-3 inline-flex items-center gap-1.5 text-sm font-bold text-lime-400 hover:text-lime-300">Go to Dashboard <ArrowRight className="h-4 w-4" /></Link>
+                <Link to="/client-portal" className="mt-3 inline-flex items-center gap-1.5 text-sm font-bold text-lime-400 hover:text-lime-300">Go to Dashboard <ArrowRight className="h-4 w-4" /></Link>
               </div>
             </div>
           </div>

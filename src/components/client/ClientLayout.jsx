@@ -15,7 +15,7 @@ import ClientSidebarTimeline from "@/components/client/ClientSidebarTimeline";
 
 const NAV = [
   { to: "/my-package", label: "My Package", icon: Package, end: true },
-  { to: "/dashboard", label: "Client Portal", icon: LayoutDashboard, end: true },
+  { to: "/client-portal", label: "Client Portal", icon: LayoutDashboard, end: true },
   { to: "/approvals", label: "Approvals", icon: CheckCircle },
   { to: "/proposals", label: "My Proposals", icon: FileText },
   { to: "/receipts", label: "Activity", icon: ScrollText },
@@ -79,7 +79,7 @@ export default function ClientLayout({ user }) {
           <span className="rounded-md border border-lime-400 bg-lime-400/10 px-2 py-1 text-xs font-semibold text-lime-400">CLIENT PORTAL</span>
           <span className="hidden text-xs text-white/40 sm:inline">Approval-gated workflow</span>
           {user?.role === "admin" && (
-            <button onClick={() => { setPreview(false); navigate("/dashboard"); }} className="flex items-center gap-1.5 rounded-md border border-lime-400 px-2.5 py-1.5 text-xs font-semibold text-lime-400 hover:bg-lime-400/10">
+            <button onClick={() => { setPreview(false); navigate("/client-portal"); }} className="flex items-center gap-1.5 rounded-md border border-lime-400 px-2.5 py-1.5 text-xs font-semibold text-lime-400 hover:bg-lime-400/10">
               <ArrowLeft className="h-3.5 w-3.5" /> Exit Preview
             </button>
           )}

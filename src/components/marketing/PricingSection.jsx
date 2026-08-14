@@ -73,7 +73,7 @@ export default function PricingSection({ showHeader = true }) {
               {annual && t.yearly ? <div className="mt-1 text-xs text-lime-700">Billed ${t.yearly.toLocaleString()}/yr</div> : <div className="mt-1 text-xs text-black/20">&nbsp;</div>}
 
               {t.free ? (
-                <Link to="/dashboard" className="mt-5 inline-flex items-center justify-center gap-1.5 rounded-xl border border-black/20 px-4 py-3 text-sm font-bold text-black transition-all hover:bg-black hover:text-white">
+                <Link to="/client-portal" className="mt-5 inline-flex items-center justify-center gap-1.5 rounded-xl border border-black/20 px-4 py-3 text-sm font-bold text-black transition-all hover:bg-black hover:text-white">
                   {t.cta} <ArrowRight className="h-4 w-4" />
                 </Link>
               ) : t.contact ? (

@@ -16,13 +16,13 @@ export default function Login() {
   const [loading, setLoading] = useState(false);
   // Post-login destination (e.g. the MCP OAuth consent page sends users here
   // with returnTo so the grant flow can resume). Same-origin paths only.
-  // Default to /dashboard so the SDK's built-in post-login redirect (which
+  // Default to /client-portal so the SDK's built-in post-login redirect (which
   // reads returnTo, falling back to "/") lands logged-in users on the app,
   // not the public marketing home page.
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     if (!params.get("returnTo")) {
-      params.set("returnTo", "/dashboard");
+      params.set("returnTo", "/client-portal");
       window.history.replaceState({}, "", `${window.location.pathname}?${params.toString()}`);
     }
   }, []);
@@ -35,7 +35,7 @@ export default function Login() {
     try {
       await base44.auth.loginViaEmailPassword(email, password);
       // Default logged-in users to the dashboard, not the public marketing page.
-      window.location.href = returnTo === "/" ? "/dashboard" : returnTo;
+      window.location.href = returnTo === "/" ? "/client-portal" : returnTo;
     } catch (err) {
       setError(err.message || "Invalid email or password");
     } finally {

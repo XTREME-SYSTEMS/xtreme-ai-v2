@@ -113,7 +113,7 @@ const AuthenticatedApp = () => {
   // Render the main app
   return (
     <Routes>
-      <Route path="/" element={isAuthenticated ? <Navigate to="/dashboard" replace /> : <Marketing />} />
+      <Route path="/" element={isAuthenticated ? <Navigate to="/client-portal" replace /> : <Marketing />} />
       <Route path="/pricing" element={<Pricing />} />
       <Route path="/ThankYou" element={<ThankYou />} />
       <Route path="/seo/:slug" element={<SeoLanding />} />
@@ -126,7 +126,7 @@ const AuthenticatedApp = () => {
       <Route path="/reset-password" element={<ResetPassword />} />
       <Route element={<ProtectedRoute unauthenticatedElement={<Navigate to="/login" replace />} />}>
         <Route element={<Layout />}>
-          <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/client-portal" element={<Dashboard />} />
           <Route path="/my-package" element={<MyPackage />} />
           <Route path="/discovery" element={<BusinessDiscovery />} />
           <Route path="/prospects" element={<Prospects />} />

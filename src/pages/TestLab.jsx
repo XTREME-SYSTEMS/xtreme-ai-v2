@@ -160,7 +160,7 @@ export default function TestLab() {
           <div className="flex items-center gap-2 border-b border-white/10 px-4 py-2.5">
             <span className="h-2 w-2 rounded-full bg-lime-400" />
             <h2 className="text-sm font-semibold text-white">Admin Dashboard</h2>
-            <span className="ml-auto text-xs text-white/40">/dashboard · admin view</span>
+            <span className="ml-auto text-xs text-white/40">/client-portal · admin view</span>
           </div>
           <div className="overflow-y-auto p-4" style={{ maxHeight: "70vh" }}>
             <div key={`admin-${refreshKey}`}><CommandCenter /></div>
@@ -170,7 +170,7 @@ export default function TestLab() {
           <div className="flex items-center gap-2 border-b border-white/10 px-4 py-2.5">
             <span className="h-2 w-2 rounded-full bg-lime-400" />
             <h2 className="text-sm font-semibold text-white">Client Dashboard</h2>
-            <span className="ml-auto text-xs text-white/40">/dashboard · client view</span>
+            <span className="ml-auto text-xs text-white/40">/client-portal · client view</span>
           </div>
           <div className="overflow-y-auto p-4" style={{ maxHeight: "70vh" }}>
             <div key={`client-${refreshKey}`}><ClientDashboard /></div>

@@ -48,7 +48,7 @@ export default function Register() {
       }
       const dest = safeReturnTo();
       // Default logged-in users to the dashboard, not the public marketing page.
-      window.location.href = dest === "/" ? "/dashboard" : dest;
+      window.location.href = dest === "/" ? "/client-portal" : dest;
     } catch (err) {
       setError(err.message || "Invalid verification code");
     } finally {
