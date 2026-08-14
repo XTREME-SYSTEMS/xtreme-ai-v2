@@ -6,20 +6,13 @@ import StatusBadge from "@/components/StatusBadge";
 import { Loader2 } from "lucide-react";
 
 // Generic aggregate table page for an entity, with optional business_name join.
-export default function EntityTable({ entity, title, subtitle, columns, filter = {}, ready = true, emptyIcon: Icon, emptyTitle, emptySub, linkTo }) {
+export default function EntityTable({ entity, title, subtitle, columns, filter = {}, emptyIcon: Icon, emptyTitle, emptySub, linkTo }) {
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
-  const filterKey = JSON.stringify(filter);
 
   useEffect(() => {
-    if (!ready) return;
-    setLoading(true);
-    const hasFilter = filterKey !== "{}";
-    const req = hasFilter
-      ? base44.entities[entity].filter(filter, "-created_date", 200)
-      : base44.entities[entity].list("-created_date", 200);
-    req.then((r) => setItems(r)).finally(() => setLoading(false));
-  }, [entity, filterKey, ready]);
+    base44.entities[entity].list("-created_date", 200).then((r) => setItems(r)).finally(() => setLoading(false));
+  }, [entity]);
 
   return (
     <div>

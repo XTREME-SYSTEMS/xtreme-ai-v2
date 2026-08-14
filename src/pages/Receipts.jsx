@@ -1,32 +1,40 @@
-import { useEffect, useState } from "react";
 import EntityTable from "@/components/EntityTable";
 import StatusBadge from "@/components/StatusBadge";
+import { Panel, EmptyState } from "@/components/ui";
 import { ScrollText } from "lucide-react";
-import { base44 } from "@/api/base44Client";
 import { usePreview } from "@/lib/PreviewContext";
 
 export default function Receipts() {
   const { previewAsClient } = usePreview();
-  const [user, setUser] = useState(null);
 
-  useEffect(() => {
-    base44.auth.me().then(setUser).catch(() => setUser(null));
-  }, []);
-
-  const clientMode = previewAsClient || user?.role !== "admin";
-  const ready = !clientMode || user !== null;
-  const filter = clientMode && user?.id ? { created_by_id: user.id } : {};
+  // In the Client Portal (real client or admin preview), Activity reflects only
+  // the client's own actions. A brand-new client has done nothing, so show an
+  // empty state directly rather than the global audit trail.
+  if (previewAsClient) {
+    return (
+      <div>
+        <div className="mb-6">
+          <h1 className="text-xl font-semibold text-white sm:text-2xl">Activity</h1>
+          <p className="mt-1 text-sm text-slate-400">Your actions in the Client Portal.</p>
+        </div>
+        <Panel title="0 records">
+          <EmptyState
+            icon={ScrollText}
+            title="No activity yet"
+            subtitle="Actions you take in the portal will show up here."
+          />
+        </Panel>
+      </div>
+    );
+  }
 
   return (
     <EntityTable
       entity="Receipt"
       title="Receipts"
-      subtitle={clientMode ? "Your activity in the Client Portal." : "Immutable audit trail of every agent, workflow, and operator action."}
-      filter={filter}
-      ready={ready}
+      subtitle="Immutable audit trail of every agent, workflow, and operator action."
       emptyIcon={ScrollText}
-      emptyTitle="No activity yet"
-      emptySub="Actions you take in the portal will show up here."
+      emptyTitle="No receipts yet"
       columns={[
         { key: "agent_or_workflow", label: "Agent / Workflow" },
         { key: "action", label: "Action" },
