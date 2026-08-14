@@ -1,20 +1,12 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { Rocket, Compass, ArrowRight, CheckCircle2, X, Wand2, GitBranch, Palette } from "lucide-react";
+import { Rocket, Compass, ArrowRight, CheckCircle2, X, Wand2, Palette } from "lucide-react";
 import { useClientTrack } from "@/hooks/useClientTrack";
 import { LOGO_ICON } from "@/lib/brandAssets";
 import Typewriter from "@/components/Typewriter";
 
 const ADMIN_START = [
-  { to: "/dashboard", icon: Compass, label: "Command Center", desc: "Your mission control — portfolio, traffic, and quick actions." },
   { to: "/brand-factory", icon: Wand2, label: "Brand Factory", desc: "AI concept-to-reality brand pipeline." },
-  { to: "/clone-pipeline", icon: GitBranch, label: "Clone Pipeline", desc: "Clone → rebrand → deploy a site end-to-end." },
-];
-const ADMIN_STEPS = [
-  "Start in the Command Center — it's your hub for every tool.",
-  "Use Brand Factory to generate a brand, or Clone Pipeline to clone & deploy a site.",
-  "Watch the GSC Traffic panel as your sites get indexed and ranked.",
-  "Approve anything production-bound in the Approvals queue (Red = needs your sign-off).",
 ];
 
 const BRAND_STEPS = [
@@ -48,7 +40,7 @@ export default function WelcomeModal({ user, role }) {
 
   const isAdmin = role === "admin";
   const start = isAdmin ? ADMIN_START : track.start;
-  const steps = isAdmin ? ADMIN_STEPS : BRAND_STEPS;
+  const steps = BRAND_STEPS;
   const greeting = isAdmin
     ? "Hey! I'm your launch assistant. I'll point you to the right buttons so you can start building right away."
     : track.greeting;
