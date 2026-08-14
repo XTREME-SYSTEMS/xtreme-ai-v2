@@ -1,41 +1,25 @@
 import { useEffect, useState } from "react";
 import { base44 } from "@/api/base44Client";
-import { Package, Info, CheckCircle, ChevronRight } from "lucide-react";
-import { useClientTrack } from "@/hooks/useClientTrack";
-import { getPackage } from "@/lib/packageContents";
+import { Package, ChevronRight } from "lucide-react";
 import { getProductDetails } from "@/lib/productDetails";
-import PackageTimeline from "@/components/client/PackageTimeline";
 import PackageCatalog from "@/components/client/PackageCatalog";
 import PurchaseDetailModal from "@/components/client/PurchaseDetailModal";
 
 // Dedicated page for the client's purchased package — the top-level
-// destination of the client portal. Shows the package, its approval-gated
-// build timeline, and inline approve/reject for any pending gate.
+// destination of the client portal. Shows only the package and its items.
 export default function MyPackage() {
-  const [user, setUser] = useState(null);
   const [purchases, setPurchases] = useState([]);
-  const [approvals, setApprovals] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [busy, setBusy] = useState(null);
   const [activePurchase, setActivePurchase] = useState(null);
-  const { track } = useClientTrack(user);
-  const pkg = getPackage(track.key);
 
   const load = async () => {
-    const [paid, pending, approved] = await Promise.all([
-      base44.entities.Base44Purchase.filter({ status: "paid" }, "-paidAt", 20),
-      base44.entities.Approval.filter({ status: "pending" }, "-created_date", 50),
-      base44.entities.Approval.filter({ status: "approved" }, "-created_date", 50),
-    ]);
+    const paid = await base44.entities.Base44Purchase.filter({ status: "paid" }, "-paidAt", 20);
     setPurchases(paid);
-    setApprovals([...pending, ...approved]);
   };
 
   useEffect(() => {
     (async () => {
       try {
-        const u = await base44.auth.me();
-        setUser(u);
         await load();
       } catch (e) {}
       setLoading(false);
@@ -45,21 +29,6 @@ export default function MyPackage() {
   useEffect(() => {
     document.title = "My Package · Lead Gen Near You";
   }, []);
-
-  const decide = async (id, status) => {
-    setBusy(id);
-    try {
-      await base44.entities.Approval.update(id, {
-        status,
-        decided_at: new Date().toISOString(),
-        decision_by: user?.email || "client",
-      });
-      await load();
-    } catch (e) {}
-    setBusy(null);
-  };
-
-  const pendingCount = approvals.filter((a) => a.status === "pending").length;
 
   const fmtMoney = (p) => {
     if (!p?.amount) return "";
@@ -109,7 +78,7 @@ export default function MyPackage() {
                   </div>
                   <div className="min-w-0 flex-1">
                     <div className="flex items-center gap-2">
-                      <h3 className="truncate text-base font-semibold text-white">{p.productName || p.productId || pkg.title}</h3>
+                      <h3 className="truncate text-base font-semibold text-white">{p.productName || p.productId}</h3>
                       <span className="rounded bg-lime-400/15 px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-lime-400">Active</span>
                     </div>
                     <p className="mt-0.5 truncate text-xs text-white/50">{detail.tagline}</p>
@@ -128,32 +97,6 @@ export default function MyPackage() {
               );
             })}
           </div>
-        )}
-      </div>
-
-      <div className="mt-4">
-        <h2 className="text-base font-semibold text-white">{pkg.title} — Build Timeline</h2>
-        <p className="text-sm text-white/50">{pkg.subtitle}</p>
-      </div>
-
-      {pendingCount > 0 && (
-        <div className="mt-4 flex items-center gap-2 rounded-lg border border-amber-400/40 bg-amber-400/10 px-4 py-2.5 text-sm text-amber-300">
-          <Info className="h-4 w-4 shrink-0" />
-          You have <span className="font-semibold">{pendingCount}</span> step{pendingCount === 1 ? "" : "s"} awaiting your approval below.
-        </div>
-      )}
-
-      <div className="mt-4 rounded-xl border border-white/10 bg-zinc-900 p-4">
-        <h2 className="text-sm font-semibold text-white">Your Build Timeline</h2>
-        <p className="mb-4 text-xs text-white/50">
-          Each gated step needs your approval before we continue.
-        </p>
-        {loading ? (
-          <div className="flex items-center justify-center py-10">
-            <div className="h-7 w-7 animate-spin rounded-full border-2 border-white/20 border-t-lime-400" />
-          </div>
-        ) : (
-          <PackageTimeline pkg={pkg} user={user} approvals={approvals} busy={busy} onDecide={decide} />
         )}
       </div>
 
