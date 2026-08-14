@@ -1,4 +1,4 @@
-import { PageHeader, Panel } from "@/components/ui";
+import { Panel } from "@/components/ui";
 import { ShieldCheck, Lock, Cpu, Database, GitBranch } from "lucide-react";
 
 const TIERS = [
@@ -17,40 +17,43 @@ const SYSTEM = [
 export default function Settings() {
   return (
     <div>
-      <PageHeader title="Settings" subtitle="System configuration, governance tiers, and deployment gate." />
+      <div className="mb-6">
+        <h1 className="text-xl font-semibold text-foreground sm:text-2xl">Settings</h1>
+        <p className="mt-1 text-sm text-foreground">System configuration, governance tiers, and deployment gate.</p>
+      </div>
       <div className="grid gap-4 lg:grid-cols-2">
-        <Panel title="Governance Tiers">
+        <Panel title="Governance Tiers" className="bg-background border-border">
           <div className="space-y-3">
             {TIERS.map((t) => {
               const Icon = t.icon;
               return (
-                <div key={t.label} className="flex items-start gap-3 rounded-lg border border-slate-800 bg-slate-900/40 p-3">
-                  <Icon className={`mt-0.5 h-5 w-5 ${t.color === "emerald" ? "text-emerald-400" : t.color === "amber" ? "text-amber-400" : "text-rose-400"}`} />
+                <div key={t.label} className="flex items-start gap-3 rounded-lg border border-border p-3">
+                  <Icon className={`mt-0.5 h-5 w-5 ${t.color === "emerald" ? "text-emerald-500" : t.color === "amber" ? "text-amber-500" : "text-rose-500"}`} />
                   <div>
-                    <div className="text-sm font-medium text-slate-200">{t.label}</div>
-                    <p className="mt-0.5 text-xs text-slate-400">{t.desc}</p>
+                    <div className="text-sm font-medium text-foreground">{t.label}</div>
+                    <p className="mt-0.5 text-xs text-foreground">{t.desc}</p>
                   </div>
                 </div>
               );
             })}
           </div>
         </Panel>
-        <Panel title="System">
+        <Panel title="System" className="bg-background border-border">
           <div className="space-y-3">
             {SYSTEM.map((s) => {
               const Icon = s.icon;
               return (
                 <div key={s.label} className="flex items-center gap-3">
-                  <Icon className="h-4 w-4 text-cyan-400" />
-                  <span className="text-sm text-slate-400">{s.label}:</span>
-                  <span className="text-sm font-medium text-slate-200">{s.value}</span>
+                  <Icon className="h-4 w-4 text-lime-500" />
+                  <span className="text-sm text-foreground">{s.label}:</span>
+                  <span className="text-sm font-medium text-foreground">{s.value}</span>
                 </div>
               );
             })}
           </div>
-          <div className="mt-4 rounded-lg border border-slate-800 bg-slate-950/50 p-3">
-            <div className="text-xs font-semibold uppercase tracking-wider text-slate-500">Signature Command</div>
-            <div className="mt-1 font-mono text-sm text-cyan-300">THROW THE BOOK AT IT</div>
+          <div className="mt-4 rounded-lg border border-border p-3">
+            <div className="text-xs font-semibold uppercase tracking-wider text-foreground">Signature Command</div>
+            <div className="mt-1 font-mono text-sm text-lime-600">THROW THE BOOK AT IT</div>
           </div>
         </Panel>
       </div>
