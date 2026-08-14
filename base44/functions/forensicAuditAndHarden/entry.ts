@@ -78,10 +78,13 @@ export default async function(req) {
       completed_phases: phases.filter((p) => p.status === 'passed').length
     });
 
-    // Auto-create repair tasks for hardening actions
+    // Auto-create repair tasks for hardening actions (attach to first phase —
+    // RepairTask requires phase_id; system-level repairs use the lead phase).
+    const fallbackPhaseId = phases[0]?.id || '';
     for (const action of (a.hardening_actions || []).slice(0, 10)) {
       await base44.asServiceRole.entities.RepairTask.create({
         plan_id: plan.id,
+        phase_id: action.phase_id || fallbackPhaseId,
         area: action.area || 'system',
         description: action.action || '',
         fix_strategy: action.action || '',
