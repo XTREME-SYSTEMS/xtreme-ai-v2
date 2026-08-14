@@ -3,7 +3,7 @@ import { useState } from "react";
 import { base44 } from "@/api/base44Client";
 import {
   LayoutDashboard, CheckCircle, ScrollText, Settings,
-  LogOut, Menu, X, ArrowLeft, Package,
+  LogOut, Menu, X, ArrowLeft, Package, Bot,
 } from "lucide-react";
 import { Image } from "@/components/ui/image";
 import { cn } from "@/lib/utils";
@@ -16,6 +16,7 @@ import ClientSidebarTimeline from "@/components/client/ClientSidebarTimeline";
 const NAV = [
   { to: "/my-package", label: "My Package", icon: Package, end: true },
   { to: "/client-portal", label: "Client Portal", icon: LayoutDashboard, end: true },
+  { to: "/assistant", label: "AI Assistant", icon: Bot, end: true },
   { to: "/approvals", label: "Approvals", icon: CheckCircle },
   { to: "/receipts", label: "Activity", icon: ScrollText },
   { to: "/settings", label: "Settings", icon: Settings },

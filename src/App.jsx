@@ -86,6 +86,7 @@ import Register from '@/pages/Register';
 import ForgotPassword from '@/pages/ForgotPassword';
 import ResetPassword from '@/pages/ResetPassword';
 import MyPackage from '@/pages/MyPackage';
+import Assistant from '@/pages/Assistant';
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin, isAuthenticated } = useAuth();
@@ -128,6 +129,7 @@ const AuthenticatedApp = () => {
         <Route element={<Layout />}>
           <Route path="/client-portal" element={<Dashboard />} />
           <Route path="/my-package" element={<MyPackage />} />
+          <Route path="/assistant" element={<Assistant />} />
           <Route path="/discovery" element={<BusinessDiscovery />} />
           <Route path="/prospects" element={<Prospects />} />
           <Route path="/prospects/:id" element={<ProspectDetail />} />
