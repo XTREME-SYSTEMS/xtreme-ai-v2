@@ -3,7 +3,7 @@ import { useState } from "react";
 import { base44 } from "@/api/base44Client";
 import {
   LayoutDashboard, CheckCircle, FileText, ScrollText, Settings,
-  LogOut, Menu, X, MessageSquare, Sparkles,
+  LogOut, Menu, X, MessageSquare, Sparkles, ArrowLeft,
 } from "lucide-react";
 import { Image } from "@/components/ui/image";
 import { cn } from "@/lib/utils";
@@ -12,6 +12,7 @@ import ThemeToggle from "@/components/ThemeToggle";
 import { useClientTrack } from "@/hooks/useClientTrack";
 import { getPackage } from "@/lib/packageContents";
 import ClientAssistantChat from "@/components/client/ClientAssistantChat";
+import { usePreview } from "@/lib/PreviewContext";
 
 const NAV = [
   { to: "/dashboard", label: "Client Portal", icon: LayoutDashboard, end: true },
@@ -27,6 +28,7 @@ export default function ClientLayout({ user }) {
   const { track } = useClientTrack(user);
   const pkg = getPackage(track.key);
   const navigate = useNavigate();
+  const { setPreview } = usePreview();
 
   const logout = async () => {
     await base44.auth.logout();
@@ -78,6 +80,11 @@ export default function ClientLayout({ user }) {
           <button onClick={() => setOpen(true)} className="text-white/60 hover:text-white md:hidden"><Menu className="h-5 w-5" /></button>
           <span className="rounded-md border border-lime-400 bg-lime-400/10 px-2 py-1 text-xs font-semibold text-lime-400">CLIENT PORTAL</span>
           <span className="hidden text-xs text-white/40 sm:inline">Approval-gated workflow</span>
+          {user?.role === "admin" && (
+            <button onClick={() => { setPreview(false); navigate("/dashboard"); }} className="flex items-center gap-1.5 rounded-md border border-lime-400 px-2.5 py-1.5 text-xs font-semibold text-lime-400 hover:bg-lime-400/10">
+              <ArrowLeft className="h-3.5 w-3.5" /> Exit Preview
+            </button>
+          )}
           <button
             onClick={() => setChatOpen((v) => !v)}
             className="ml-auto flex items-center gap-1.5 rounded-md border border-white/15 px-2.5 py-1.5 text-xs text-white/70 hover:bg-white/5"

@@ -46,7 +46,6 @@ export default function CommandCenter() {
     { to: "/discovery", label: "Discover Businesses", icon: Search, desc: "Find prospects by industry + geography" },
     { to: "/throw-the-book", label: "Throw The Book", icon: BookOpen, desc: "Score the full tactic library" },
     { to: "/build-queue", label: "Build Queue", icon: Hammer, desc: "Compose generator chains & build" },
-    { to: "/portal", label: "Preview Client Portal", icon: Eye, desc: "View the client dashboard experience" },
   ];
 
   return (

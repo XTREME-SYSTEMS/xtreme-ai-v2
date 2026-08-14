@@ -3,9 +3,11 @@ import { base44 } from "@/api/base44Client";
 import CommandCenter from "@/pages/CommandCenter";
 import ClientDashboard from "@/pages/ClientDashboard";
 import WelcomeModal from "@/components/WelcomeModal";
+import { usePreview } from "@/lib/PreviewContext";
 
 export default function Dashboard() {
   const [user, setUser] = useState(null);
+  const { previewAsClient } = usePreview();
 
   useEffect(() => {
     base44.auth.me()
@@ -26,7 +28,7 @@ export default function Dashboard() {
   return (
     <>
       <WelcomeModal user={user} role={role} />
-      {role === "admin" ? <CommandCenter /> : <ClientDashboard />}
+      {role === "admin" && !previewAsClient ? <CommandCenter /> : <ClientDashboard />}
     </>
   );
 }

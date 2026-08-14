@@ -11,6 +11,7 @@ import {
 import { Image } from "@/components/ui/image";
 import { cn } from "@/lib/utils";
 import { LOGO_ICON } from "@/lib/brandAssets";
+import { usePreview } from "@/lib/PreviewContext";
 import ClientLayout from "@/components/client/ClientLayout";
 import ThemeToggle from "@/components/ThemeToggle";
 
@@ -111,6 +112,8 @@ export default function Layout() {
     navigate("/login");
   };
 
+  const { previewAsClient, setPreview } = usePreview();
+
   if (user === null) {
     return (
       <div className="flex h-screen items-center justify-center bg-black">
@@ -119,7 +122,7 @@ export default function Layout() {
     );
   }
   const isAdmin = user?.role === "admin";
-  if (!isAdmin) return <ClientLayout user={user} />;
+  if (!isAdmin || previewAsClient) return <ClientLayout user={user} />;
 
   return (
     <div className="flex h-screen bg-black text-white">
@@ -178,6 +181,9 @@ export default function Layout() {
           </div>
           <div className="ml-auto flex items-center gap-3">
             <span className="hidden text-xs text-black/60 sm:inline">{user?.email || ""}</span>
+            <button onClick={() => { setPreview(true); navigate("/dashboard"); }} className="flex items-center gap-1.5 rounded-lg border border-lime-400 px-2.5 py-1.5 text-xs text-black font-medium hover:bg-lime-400/10">
+              <Eye className="h-3.5 w-3.5" /> Preview as Client
+            </button>
             <ThemeToggle className="flex items-center gap-1.5 rounded-lg border border-lime-400 px-2.5 py-1.5 text-xs text-black font-medium hover:bg-lime-400/10" />
             <button onClick={logout} className="flex items-center gap-1.5 rounded-lg border border-lime-400 px-2.5 py-1.5 text-xs text-black font-medium hover:bg-lime-400/10">
               <LogOut className="h-3.5 w-3.5" /> Sign out

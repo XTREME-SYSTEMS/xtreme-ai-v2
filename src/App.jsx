@@ -8,6 +8,7 @@ import UserNotRegisteredError from '@/components/UserNotRegisteredError';
 import ScrollToTop from './components/ScrollToTop';
 import ProtectedRoute from '@/components/ProtectedRoute';
 import { ThemeProvider } from '@/lib/ThemeContext';
+import { PreviewProvider } from '@/lib/PreviewContext';
 import Layout from '@/components/Layout';
 import CommandCenter from '@/pages/CommandCenter';
 import Dashboard from '@/pages/Dashboard';
@@ -84,8 +85,6 @@ import Login from '@/pages/Login';
 import Register from '@/pages/Register';
 import ForgotPassword from '@/pages/ForgotPassword';
 import ResetPassword from '@/pages/ResetPassword';
-import ClientPortalRoute from '@/pages/ClientPortalRoute';
-import ClientDashboard from '@/pages/ClientDashboard';
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin, isAuthenticated } = useAuth();
@@ -190,9 +189,6 @@ const AuthenticatedApp = () => {
           <Route path="/pipeline-dashboard" element={<PipelineDashboard />} />
           <Route path="/domain-acquisition" element={<DomainAcquisition />} />
         </Route>
-        <Route path="/portal" element={<ClientPortalRoute />}>
-          <Route index element={<ClientDashboard />} />
-        </Route>
       </Route>
       <Route path="*" element={<PageNotFound />} />
     </Routes>
@@ -205,13 +201,15 @@ function App() {
   return (
     <AuthProvider>
       <ThemeProvider>
-        <QueryClientProvider client={queryClientInstance}>
-          <Router>
+        <PreviewProvider>
+          <QueryClientProvider client={queryClientInstance}>
+            <Router>
             <ScrollToTop />
             <AuthenticatedApp />
           </Router>
-          <Toaster />
-        </QueryClientProvider>
+            <Toaster />
+          </QueryClientProvider>
+        </PreviewProvider>
       </ThemeProvider>
     </AuthProvider>
   )
