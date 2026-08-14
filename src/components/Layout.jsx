@@ -11,6 +11,7 @@ import {
 import { Image } from "@/components/ui/image";
 import { cn } from "@/lib/utils";
 import { LOGO_ICON } from "@/lib/brandAssets";
+import ClientLayout from "@/components/client/ClientLayout";
 
 const NAV = [
   { to: "/dashboard", label: "Command Center", icon: LayoutDashboard, end: true },
@@ -108,6 +109,16 @@ export default function Layout() {
     await base44.auth.logout();
     navigate("/login");
   };
+
+  if (user === null) {
+    return (
+      <div className="flex h-screen items-center justify-center bg-black">
+        <div className="h-8 w-8 animate-spin rounded-full border-2 border-white/20 border-t-lime-400" />
+      </div>
+    );
+  }
+  const isAdmin = user?.role === "admin";
+  if (!isAdmin) return <ClientLayout user={user} />;
 
   return (
     <div className="flex h-screen bg-black text-white">
