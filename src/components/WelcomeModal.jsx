@@ -17,6 +17,13 @@ const ADMIN_STEPS = [
   "Approve anything production-bound in the Approvals queue (Red = needs your sign-off).",
 ];
 
+const BRAND_STEPS = [
+  "Start in the Branding Studio — it'll interview you about your business.",
+  "Step through Logo → Business Card → Brochure → Social → Video.",
+  "Pick your favorite at each step; everything saves automatically.",
+  "Review your full brand kit at the end and download what you need.",
+];
+
 export default function WelcomeModal({ user, role }) {
   const [open, setOpen] = useState(false);
   const [revealed, setRevealed] = useState(false);
@@ -41,7 +48,7 @@ export default function WelcomeModal({ user, role }) {
 
   const isAdmin = role === "admin";
   const start = isAdmin ? ADMIN_START : track.start;
-  const steps = isAdmin ? ADMIN_STEPS : track.steps;
+  const steps = isAdmin ? ADMIN_STEPS : BRAND_STEPS;
   const greeting = isAdmin
     ? "Hey! I'm your launch assistant. I'll point you to the right buttons so you can start building right away."
     : track.greeting;
@@ -81,23 +88,25 @@ export default function WelcomeModal({ user, role }) {
             </Link>
           )}
 
-          <Section icon={Rocket} title="Where to start">
-            <div className="space-y-2">
-              {start.map((s) => {
-                const Icon = s.icon;
-                return (
-                  <Link key={s.to} to={s.to} onClick={close} className="flex items-start gap-3 rounded-lg border border-zinc-200 bg-white p-3 transition-colors hover:border-lime-400 hover:bg-lime-50">
-                    <Icon className="mt-0.5 h-5 w-5 shrink-0 text-lime-500" />
-                    <div className="min-w-0">
-                      <div className="text-sm font-semibold text-zinc-900">{s.label}</div>
-                      <div className="text-xs text-zinc-500">{s.desc}</div>
-                    </div>
-                    <ArrowRight className="ml-auto h-4 w-4 shrink-0 text-zinc-300" />
-                  </Link>
-                );
-              })}
-            </div>
-          </Section>
+          {isAdmin && (
+            <Section icon={Rocket} title="Where to start">
+              <div className="space-y-2">
+                {start.map((s) => {
+                  const Icon = s.icon;
+                  return (
+                    <Link key={s.to} to={s.to} onClick={close} className="flex items-start gap-3 rounded-lg border border-zinc-200 bg-white p-3 transition-colors hover:border-lime-400 hover:bg-lime-50">
+                      <Icon className="mt-0.5 h-5 w-5 shrink-0 text-lime-500" />
+                      <div className="min-w-0">
+                        <div className="text-sm font-semibold text-zinc-900">{s.label}</div>
+                        <div className="text-xs text-zinc-500">{s.desc}</div>
+                      </div>
+                      <ArrowRight className="ml-auto h-4 w-4 shrink-0 text-zinc-300" />
+                    </Link>
+                  );
+                })}
+              </div>
+            </Section>
+          )}
 
           <Section icon={Compass} title="How the process works">
             <ol className="space-y-2">
