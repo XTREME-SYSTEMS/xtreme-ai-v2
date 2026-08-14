@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import { CheckCircle2, Lock, Loader2, X, MessageSquare, ArrowRight } from "lucide-react";
 import { UNIVERSAL_PIPELINE } from "@/lib/universalPipeline";
-import { stepMatches } from "@/lib/pipelineUtils";
+import { computePipelineState } from "@/lib/pipelineState";
 import ClientOnboarding from "@/components/ClientOnboarding";
 
 // Step-by-step approval timeline for the client, driven by the universal
@@ -23,8 +23,7 @@ export default function ApprovalSteps({ user, approvals = [], onDecide }) {
     }
   };
 
-  let prevIncomplete = false;
-  let currentFound = false;
+  const states = computePipelineState(user, approvals);
 
   return (
     <div className="relative">
@@ -32,23 +31,7 @@ export default function ApprovalSteps({ user, approvals = [], onDecide }) {
       <div className="space-y-3">
         {UNIVERSAL_PIPELINE.map((step, i) => {
           const Icon = step.icon;
-          let completed = false;
-          let pendingApproval = null;
-
-          if (step.key === "onboarding") {
-            completed = !!user?.onboarded;
-          } else if (step.gate) {
-            const ap = approvals.find((a) => a.status === "approved" && stepMatches(step, a));
-            const pp = approvals.find((a) => a.status === "pending" && stepMatches(step, a));
-            if (ap) completed = true;
-            else if (pp) pendingApproval = pp;
-          }
-
-          const locked = prevIncomplete && !completed && !pendingApproval;
-          const isCurrent = !completed && !locked && !currentFound;
-          if (isCurrent) currentFound = true;
-
-          if ((step.key === "onboarding" || step.gate) && !completed) prevIncomplete = true;
+          const { completed, pendingApproval, locked, isCurrent } = states[i];
 
           let dotClass, statusLabel, statusClass, rowClass;
           if (completed) {

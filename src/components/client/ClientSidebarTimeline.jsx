@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { CheckCircle2, Lock, ShieldCheck } from "lucide-react";
 import { base44 } from "@/api/base44Client";
 import { UNIVERSAL_PIPELINE } from "@/lib/universalPipeline";
-import { stepMatches } from "@/lib/pipelineUtils";
+import { computePipelineState } from "@/lib/pipelineState";
 import { cn } from "@/lib/utils";
 
 // Compact, read-only progress timeline shown in the client portal sidebar.
@@ -31,25 +31,7 @@ export default function ClientSidebarTimeline({ user }) {
   }, [user]);
 
   const steps = UNIVERSAL_PIPELINE;
-
-  // First pass: compute per-step state.
-  let prevIncomplete = false;
-  const states = steps.map((step) => {
-    let completed = false;
-    let pendingApproval = null;
-    if (step.key === "onboarding") {
-      completed = !!user?.onboarded;
-    } else if (step.gate) {
-      const ap = approvals.find((a) => a.status === "approved" && stepMatches(step, a));
-      const pp = approvals.find((a) => a.status === "pending" && stepMatches(step, a));
-      if (ap) completed = true;
-      else if (pp) pendingApproval = pp;
-    }
-    const locked = prevIncomplete && !completed && !pendingApproval;
-    if ((step.key === "onboarding" || step.gate) && !completed) prevIncomplete = true;
-    return { completed, pendingApproval, locked };
-  });
-
+  const states = computePipelineState(user, approvals);
   let currentIndex = states.findIndex((s) => !s.completed && !s.locked);
   if (currentIndex === -1) currentIndex = steps.length - 1;
 
