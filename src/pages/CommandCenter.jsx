@@ -38,6 +38,10 @@ export default function CommandCenter() {
     })();
   }, []);
 
+  useEffect(() => {
+    document.title = "Command Center · Lead Gen Near You";
+  }, []);
+
   const quick = [
     { to: "/discovery", label: "Discover Businesses", icon: Search, desc: "Find prospects by industry + geography" },
     { to: "/throw-the-book", label: "Throw The Book", icon: BookOpen, desc: "Score the full tactic library" },
