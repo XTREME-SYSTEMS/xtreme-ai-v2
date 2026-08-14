@@ -124,7 +124,7 @@ export default function Layout() {
     <div className="flex h-screen bg-black text-white">
       {/* Sidebar */}
       <aside className={cn(
-        "fixed inset-y-0 left-0 z-40 w-64 transform border-r border-white/10 bg-black transition-transform lg:static lg:translate-x-0",
+        "fixed inset-y-0 left-0 z-40 w-64 transform border-r border-white/10 bg-black transition-transform md:static md:translate-x-0",
         open ? "translate-x-0" : "-translate-x-full"
       )}>
         <div className="flex h-14 items-center gap-2 border-b border-white/10 px-4">
@@ -138,7 +138,7 @@ export default function Layout() {
             <div className="text-sm font-semibold text-white">Lead Gen Near You</div>
             <div className="text-[10px] uppercase tracking-wider text-lime-400">{user?.role === "admin" ? "Growth Factory" : "Client Portal"}</div>
           </div>
-          <button onClick={() => setOpen(false)} className="ml-auto lg:hidden text-white/50 hover:text-white"><X className="h-5 w-5" /></button>
+          <button onClick={() => setOpen(false)} className="ml-auto md:hidden text-white/50 hover:text-white"><X className="h-5 w-5" /></button>
         </div>
         <nav className="h-[calc(100vh-3.5rem)] overflow-y-auto px-2 py-3">
           {(user?.role === "admin" ? NAV : CLIENT_NAV).map((item, i) => {
@@ -165,12 +165,12 @@ export default function Layout() {
         </nav>
       </aside>
 
-      {open && <div className="fixed inset-0 z-30 bg-black/70 lg:hidden" onClick={() => setOpen(false)} />}
+      {open && <div className="fixed inset-0 z-30 bg-black/70 md:hidden" onClick={() => setOpen(false)} />}
 
       {/* Main */}
       <div className="flex flex-1 flex-col overflow-hidden">
         <header className="flex h-14 items-center gap-3 border-b border-lime-400/40 bg-white px-4 backdrop-blur">
-          <button onClick={() => setOpen(true)} className="lg:hidden text-black/50 hover:text-black"><Menu className="h-5 w-5" /></button>
+          <button onClick={() => setOpen(true)} className="md:hidden text-black/50 hover:text-black"><Menu className="h-5 w-5" /></button>
           <div className="flex items-center gap-2 text-xs">
             <span className="rounded-md border border-lime-400 bg-lime-400 px-2 py-1 font-mono text-black font-semibold">{user?.role === "admin" ? "THROW THE BOOK AT IT" : "CLIENT PORTAL"}</span>
             <span className="hidden text-black/50 sm:inline">{user?.role === "admin" ? "Architecture → Preview Build · Production locked" : "Approval-gated workflow"}</span>
