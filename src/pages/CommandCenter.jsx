@@ -4,7 +4,7 @@ import { base44 } from "@/api/base44Client";
 import { PageHeader, Panel, EmptyState } from "@/components/ui";
 import StatCard from "@/components/StatCard";
 import StatusBadge from "@/components/StatusBadge";
-import { Users, Target, ShieldCheck, Hammer, ScrollText, Search, BookOpen, ArrowRight, GitBranch, Eye, MousePointerClick } from "lucide-react";
+import { Users, Target, ShieldCheck, Hammer, ScrollText, Search, BookOpen, ArrowRight, GitBranch, Eye, MousePointerClick, Palette } from "lucide-react";
 import PipelineHealthWidget from "@/components/PipelineHealthWidget";
 import SystemAccessGrid from "@/components/SystemAccessGrid";
 
@@ -56,6 +56,19 @@ export default function CommandCenter() {
         <StatCard label="Search Opportunities" value={loading ? "—" : stats.opportunities} icon={Target} accent="text-lime-400" />
         <StatCard label="Build Projects" value={loading ? "—" : stats.builds} icon={Hammer} accent="text-lime-400" />
         <StatCard label="Receipts" value={loading ? "—" : stats.receipts} icon={ScrollText} accent="text-lime-400" />
+      </div>
+
+      <div className="mt-6">
+        <Link to="/brand-factory" className="group flex items-center gap-4 rounded-xl bg-gradient-to-r from-lime-400 to-emerald-400 p-5 text-black transition-all hover:from-lime-300 hover:to-emerald-300 hover:shadow-lg">
+          <div className="flex h-11 w-11 items-center justify-center rounded-lg bg-black/10">
+            <Palette className="h-6 w-6" />
+          </div>
+          <div className="flex-1">
+            <div className="text-base font-bold">Branding Studio</div>
+            <div className="text-sm text-black/70">Generate a complete brand kit — logo, business card, brochure, social posts & video — with AI.</div>
+          </div>
+          <ArrowRight className="h-6 w-6 group-hover:translate-x-1 transition-transform" />
+        </Link>
       </div>
 
       <div className="mt-6 grid gap-4 lg:grid-cols-2">

@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { Rocket, Compass, ArrowRight, CheckCircle2, X, Wand2, GitBranch } from "lucide-react";
+import { Rocket, Compass, ArrowRight, CheckCircle2, X, Wand2, GitBranch, Palette } from "lucide-react";
 import { useClientTrack } from "@/hooks/useClientTrack";
 import { LOGO_ICON } from "@/lib/brandAssets";
 
@@ -44,34 +44,47 @@ export default function WelcomeModal({ user, role }) {
   const showBadge = !isAdmin && track.title !== "Welcome";
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4 backdrop-blur-sm" onClick={close}>
-      <div className="relative w-full max-w-lg overflow-hidden rounded-2xl border border-lime-400/30 bg-zinc-900 shadow-2xl" onClick={(e) => e.stopPropagation()}>
-        <button onClick={close} className="absolute right-3 top-3 z-10 text-white/40 hover:text-white"><X className="h-5 w-5" /></button>
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm" onClick={close}>
+      <div className="relative w-full max-w-lg overflow-hidden rounded-2xl bg-white shadow-2xl ring-1 ring-lime-400/40" onClick={(e) => e.stopPropagation()}>
+        <button onClick={close} className="absolute right-3 top-3 z-10 text-zinc-400 hover:text-zinc-900"><X className="h-5 w-5" /></button>
 
-        <div className="bg-gradient-to-br from-lime-400/15 to-transparent p-6 pb-4">
+        <div className="border-b border-zinc-100 bg-gradient-to-br from-lime-50 via-white to-emerald-50 p-6 pb-5">
           <img src={LOGO_ICON} alt="Lead Generation Near You" className="mb-3 h-12 w-12" />
-          <h2 className="text-2xl font-bold text-white">Hello{user?.full_name ? `, ${user.full_name}` : ""}! 👋</h2>
-          <p className="mt-1 text-sm text-white/60">{subtitle}</p>
+          <h2 className="text-2xl font-bold text-zinc-900">Hello{user?.full_name ? `, ${user.full_name}` : ""}! 👋</h2>
+          <p className="mt-1 text-sm text-zinc-500">{subtitle}</p>
           {showBadge && (
-            <div className="mt-2 inline-flex items-center gap-1.5 rounded-full bg-lime-400/15 px-2.5 py-1 text-xs font-medium text-lime-300">
+            <div className="mt-2 inline-flex items-center gap-1.5 rounded-full bg-lime-100 px-2.5 py-1 text-xs font-semibold text-lime-700">
               <CheckCircle2 className="h-3.5 w-3.5" /> {track.title} unlocked
             </div>
           )}
         </div>
 
-        <div className="max-h-[60vh] overflow-y-auto px-6 pb-6">
+        <div className="max-h-[58vh] overflow-y-auto px-6 py-5">
+          {!isAdmin && (
+            <Link to="/brand-factory" onClick={close} className="group mb-5 flex items-center gap-3 rounded-xl bg-gradient-to-r from-lime-400 to-emerald-400 p-4 text-black transition-all hover:from-lime-300 hover:to-emerald-300 hover:shadow-lg">
+              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-black/10">
+                <Palette className="h-5 w-5" />
+              </div>
+              <div className="flex-1">
+                <div className="text-sm font-bold">Branding Studio</div>
+                <div className="text-xs text-black/70">Build your logo, business card, brochure & social posts with AI.</div>
+              </div>
+              <ArrowRight className="h-5 w-5 group-hover:translate-x-1 transition-transform" />
+            </Link>
+          )}
+
           <Section icon={Rocket} title="Where to start">
             <div className="space-y-2">
               {start.map((s) => {
                 const Icon = s.icon;
                 return (
-                  <Link key={s.to} to={s.to} onClick={close} className="flex items-start gap-3 rounded-lg border border-white/10 bg-zinc-950 p-3 hover:border-lime-400/40 hover:bg-white/5">
-                    <Icon className="mt-0.5 h-5 w-5 shrink-0 text-lime-400" />
+                  <Link key={s.to} to={s.to} onClick={close} className="flex items-start gap-3 rounded-lg border border-zinc-200 bg-white p-3 transition-colors hover:border-lime-400 hover:bg-lime-50">
+                    <Icon className="mt-0.5 h-5 w-5 shrink-0 text-lime-500" />
                     <div className="min-w-0">
-                      <div className="text-sm font-medium text-white">{s.label}</div>
-                      <div className="text-xs text-white/50">{s.desc}</div>
+                      <div className="text-sm font-semibold text-zinc-900">{s.label}</div>
+                      <div className="text-xs text-zinc-500">{s.desc}</div>
                     </div>
-                    <ArrowRight className="ml-auto h-4 w-4 shrink-0 text-white/30" />
+                    <ArrowRight className="ml-auto h-4 w-4 shrink-0 text-zinc-300" />
                   </Link>
                 );
               })}
@@ -81,8 +94,8 @@ export default function WelcomeModal({ user, role }) {
           <Section icon={Compass} title="How the process works">
             <ol className="space-y-2">
               {steps.map((s, i) => (
-                <li key={i} className="flex items-start gap-2.5 text-sm text-white/70">
-                  <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-lime-400/15 text-xs font-semibold text-lime-400">{i + 1}</span>
+                <li key={i} className="flex items-start gap-2.5 text-sm text-zinc-600">
+                  <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-lime-100 text-xs font-bold text-lime-700">{i + 1}</span>
                   {s}
                 </li>
               ))}
@@ -90,16 +103,16 @@ export default function WelcomeModal({ user, role }) {
           </Section>
 
           <Section icon={CheckCircle2} title="What to expect & key buttons">
-            <ul className="space-y-1.5 text-sm text-white/70">
-              <li className="flex gap-2"><span className="text-lime-400">•</span> Lime-green buttons are your primary actions — click to generate, launch, or approve.</li>
-              <li className="flex gap-2"><span className="text-lime-400">•</span> Anything that goes live requires your approval first (Green = auto, Yellow = preview, Red = your sign-off).</li>
-              <li className="flex gap-2"><span className="text-lime-400">•</span> AI steps save automatically — close and come back anytime, your progress is kept.</li>
-              <li className="flex gap-2"><span className="text-lime-400">•</span> Use the paperclip in any AI chat to attach an inspiration image.</li>
+            <ul className="space-y-1.5 text-sm text-zinc-600">
+              <li className="flex gap-2"><span className="text-lime-500">•</span> Lime-green buttons are your primary actions — click to generate, launch, or approve.</li>
+              <li className="flex gap-2"><span className="text-lime-500">•</span> Anything that goes live requires your approval first (Green = auto, Yellow = preview, Red = your sign-off).</li>
+              <li className="flex gap-2"><span className="text-lime-500">•</span> AI steps save automatically — close and come back anytime, your progress is kept.</li>
+              <li className="flex gap-2"><span className="text-lime-500">•</span> Use the paperclip in any AI chat to attach an inspiration image.</li>
             </ul>
           </Section>
         </div>
 
-        <div className="border-t border-white/10 p-4">
+        <div className="border-t border-zinc-100 bg-zinc-50 p-4">
           <button onClick={close} className="w-full rounded-lg bg-lime-400 py-2.5 text-sm font-semibold text-black transition-colors hover:bg-lime-300">
             Got it — let's go
           </button>
@@ -112,7 +125,7 @@ export default function WelcomeModal({ user, role }) {
 function Section({ icon: Icon, title, children }) {
   return (
     <div className="mb-5 last:mb-0">
-      <div className="mb-2 flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-lime-400/80">
+      <div className="mb-2 flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-lime-600">
         <Icon className="h-3.5 w-3.5" /> {title}
       </div>
       {children}
