@@ -97,10 +97,13 @@ export default function ClientDashboard() {
         <div className="mt-6 space-y-3">
           {UNIVERSAL_PIPELINE.map((step, i) => {
             const Icon = step.icon;
+            const StepTag = step.to ? Link : "div";
+            const stepProps = step.to ? { to: step.to } : {};
             return (
-              <div
+              <StepTag
                 key={step.key}
-                className="flex gap-4 rounded-xl border border-white/10 bg-zinc-950 p-4"
+                {...stepProps}
+                className={`flex gap-4 rounded-xl border border-white/10 bg-zinc-950 p-4 ${step.to ? "transition-colors hover:border-lime-400/40" : ""}`}
               >
                 <div className="flex flex-col items-center">
                   <div className="flex h-10 w-10 items-center justify-center rounded-full border border-white/15 bg-zinc-900 text-sm font-bold text-white/80">
@@ -123,10 +126,11 @@ export default function ClientDashboard() {
                         Automatic
                       </span>
                     )}
+                    {step.to && <ArrowRight className="ml-auto h-3.5 w-3.5 shrink-0 text-white/30" />}
                   </div>
                   <p className="mt-1.5 text-sm text-white/60">{step.desc}</p>
                 </div>
-              </div>
+              </StepTag>
             );
           })}
         </div>

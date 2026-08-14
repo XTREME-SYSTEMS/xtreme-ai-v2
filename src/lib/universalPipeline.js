@@ -6,13 +6,15 @@ import {
 // A single canonical, approval-gated pipeline that every system
 // implementation follows — regardless of which product was purchased.
 // `gate: true` marks a step that requires explicit client approval
-// before the team moves on.
+// before the team moves on. `to` deep-links the step to its work surface
+// (null = handled inline within the Approvals page).
 export const UNIVERSAL_PIPELINE = [
   {
     key: "onboarding",
     label: "Onboarding",
     desc: "Tell us about your business so your team can get to work.",
     gate: false,
+    to: null,
     icon: Sparkles,
   },
   {
@@ -20,6 +22,7 @@ export const UNIVERSAL_PIPELINE = [
     label: "Strategy & Proposal",
     desc: "We prepare your tailored plan, positioning and roadmap.",
     gate: true,
+    to: null,
     icon: FileText,
   },
   {
@@ -27,6 +30,7 @@ export const UNIVERSAL_PIPELINE = [
     label: "Brand Kit",
     desc: "Logo, colors, business card, brochure and social posts.",
     gate: true,
+    to: "/brand-factory",
     icon: Palette,
   },
   {
@@ -34,6 +38,7 @@ export const UNIVERSAL_PIPELINE = [
     label: "Website Build",
     desc: "Design, copy and build of your site, end to end.",
     gate: true,
+    to: "/website-factory",
     icon: Monitor,
   },
   {
@@ -41,6 +46,7 @@ export const UNIVERSAL_PIPELINE = [
     label: "SEO & AEO",
     desc: "On-page, schema and AI-search optimization.",
     gate: true,
+    to: "/seo-accelerator",
     icon: Crosshair,
   },
   {
@@ -48,6 +54,7 @@ export const UNIVERSAL_PIPELINE = [
     label: "Launch",
     desc: "Deploy to your live domain once approved.",
     gate: true,
+    to: null,
     icon: Rocket,
   },
   {
@@ -55,6 +62,7 @@ export const UNIVERSAL_PIPELINE = [
     label: "Index & Rank",
     desc: "GSC submission, citations and backlink outreach.",
     gate: false,
+    to: "/gsc-traffic",
     icon: BarChart3,
   },
   {
@@ -62,6 +70,7 @@ export const UNIVERSAL_PIPELINE = [
     label: "Report & Optimize",
     desc: "Ongoing tracking, content refresh and authority building.",
     gate: false,
+    to: "/ranking-monitor",
     icon: Megaphone,
   },
 ];

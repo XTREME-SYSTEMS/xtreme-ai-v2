@@ -1,17 +1,18 @@
 import { useState } from "react";
-import { CheckCircle2, Lock, Loader2, X, MessageSquare } from "lucide-react";
+import { Link } from "react-router-dom";
+import { CheckCircle2, Lock, Loader2, X, MessageSquare, ArrowRight } from "lucide-react";
+import { UNIVERSAL_PIPELINE } from "@/lib/universalPipeline";
+import { stepMatches } from "@/lib/pipelineUtils";
+import ClientOnboarding from "@/components/ClientOnboarding";
 
-// Step-by-step approval timeline for the client. The step they're currently on
-// glows green and flashes; gated steps awaiting approval show an Approve / Deny
-// control with a comment box (comment required to deny).
-export default function ApprovalSteps({ pkg, user, approvals = [], onDecide }) {
+// Step-by-step approval timeline for the client, driven by the universal
+// pipeline. The step they're currently on glows green and flashes; gated steps
+// awaiting approval show an Approve / Deny control with a comment box
+// (comment required to deny). The onboarding step renders the onboarding
+// chat inline; non-gated steps deep-link to their work surface.
+export default function ApprovalSteps({ user, approvals = [], onDecide }) {
   const [comments, setComments] = useState({});
   const [busy, setBusy] = useState(null);
-
-  const matches = (step, a) => {
-    const hay = `${a.requested_action || ""} ${a.notes || ""} ${a.entity_type || ""}`.toLowerCase();
-    return hay.includes(step.label.toLowerCase());
-  };
 
   const decide = async (id, status, comment) => {
     setBusy(id);
@@ -29,7 +30,7 @@ export default function ApprovalSteps({ pkg, user, approvals = [], onDecide }) {
     <div className="relative">
       <div className="absolute bottom-3 left-[15px] top-3 w-px bg-white/10" />
       <div className="space-y-3">
-        {pkg.steps.map((step, i) => {
+        {UNIVERSAL_PIPELINE.map((step, i) => {
           const Icon = step.icon;
           let completed = false;
           let pendingApproval = null;
@@ -37,8 +38,8 @@ export default function ApprovalSteps({ pkg, user, approvals = [], onDecide }) {
           if (step.key === "onboarding") {
             completed = !!user?.onboarded;
           } else if (step.gate) {
-            const ap = approvals.find((a) => a.status === "approved" && matches(step, a));
-            const pp = approvals.find((a) => a.status === "pending" && matches(step, a));
+            const ap = approvals.find((a) => a.status === "approved" && stepMatches(step, a));
+            const pp = approvals.find((a) => a.status === "pending" && stepMatches(step, a));
             if (ap) completed = true;
             else if (pp) pendingApproval = pp;
           }
@@ -56,7 +57,6 @@ export default function ApprovalSteps({ pkg, user, approvals = [], onDecide }) {
             statusClass = "text-lime-400";
             rowClass = "border-white/10";
           } else if (pendingApproval || isCurrent) {
-            // The step they're on — green and flashing.
             dotClass = "bg-lime-400 text-black animate-pulse";
             statusLabel = pendingApproval ? "Action needed" : "In progress";
             statusClass = "text-lime-400";
@@ -90,6 +90,20 @@ export default function ApprovalSteps({ pkg, user, approvals = [], onDecide }) {
                   <span className={`ml-auto text-xs font-medium ${statusClass}`}>{statusLabel}</span>
                 </div>
                 <div className="mt-0.5 text-xs text-white/50">{step.desc}</div>
+
+                {/* Inline onboarding for step 1 */}
+                {step.key === "onboarding" && !completed && !locked && (
+                  <div className="mt-3 border-t border-white/10 pt-3">
+                    <ClientOnboarding user={user} />
+                  </div>
+                )}
+
+                {/* Deep-link for completed non-gate steps with a route */}
+                {step.to && !pendingApproval && (
+                  <Link to={step.to} className="mt-3 inline-flex items-center gap-1 text-xs font-medium text-lime-400 hover:underline">
+                    Open {step.label} <ArrowRight className="h-3.5 w-3.5" />
+                  </Link>
+                )}
 
                 {pendingApproval && (
                   <div className="mt-3 space-y-2 border-t border-white/10 pt-3">

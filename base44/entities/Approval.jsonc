@@ -11,6 +11,14 @@
     "requested_action": {
       "type": "string"
     },
+    "pipeline_step": {
+      "type": "string",
+      "description": "Universal pipeline step key this approval gates (e.g. 'brand-kit', 'website'). Enables exact step matching."
+    },
+    "client_email": {
+      "type": "string",
+      "description": "Email of the client this approval is assigned to. Used for row-level isolation."
+    },
     "risk_level": {
       "type": "string",
       "enum": [
@@ -44,5 +52,47 @@
   "required": [
     "entity_type",
     "requested_action"
-  ]
+  ],
+  "rls": {
+    "read": {
+      "$or": [
+        {
+          "data.client_email": "{{user.email}}"
+        },
+        {
+          "created_by_id": "{{user.id}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "create": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "update": {
+      "$or": [
+        {
+          "data.client_email": "{{user.email}}"
+        },
+        {
+          "created_by_id": "{{user.id}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
 }

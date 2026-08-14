@@ -3,34 +3,34 @@ import { Link } from "react-router-dom";
 import { CheckCircle2, Lock, ShieldCheck } from "lucide-react";
 import { base44 } from "@/api/base44Client";
 import { UNIVERSAL_PIPELINE } from "@/lib/universalPipeline";
+import { stepMatches } from "@/lib/pipelineUtils";
 import { cn } from "@/lib/utils";
 
 // Compact, read-only progress timeline shown in the client portal sidebar.
-// Uses a single universal pipeline that applies to every system implementation,
-// with approval-gated steps marked explicitly.
+// Uses the single universal pipeline that applies to every system
+// implementation, with approval-gated steps marked explicitly. Subscribes
+// to live Approval changes so the timeline refreshes without a page reload.
 export default function ClientSidebarTimeline({ user }) {
   const [approvals, setApprovals] = useState([]);
 
   useEffect(() => {
     if (!user) return;
     let cancelled = false;
-    (async () => {
+    const load = async () => {
       try {
         const list = await base44.entities.Approval.list("-created_date", 50);
         if (!cancelled) setApprovals(list || []);
       } catch (e) {
         if (!cancelled) setApprovals([]);
       }
-    })();
-    return () => { cancelled = true; };
+    };
+    load();
+    // Live-refresh when any Approval record changes.
+    const unsubscribe = base44.entities.Approval.subscribe(() => { load(); });
+    return () => { cancelled = true; unsubscribe(); };
   }, [user]);
 
   const steps = UNIVERSAL_PIPELINE;
-
-  const matches = (step, a) => {
-    const hay = `${a.requested_action || ""} ${a.notes || ""} ${a.entity_type || ""}`.toLowerCase();
-    return hay.includes(step.label.toLowerCase());
-  };
 
   // First pass: compute per-step state.
   let prevIncomplete = false;
@@ -40,8 +40,8 @@ export default function ClientSidebarTimeline({ user }) {
     if (step.key === "onboarding") {
       completed = !!user?.onboarded;
     } else if (step.gate) {
-      const ap = approvals.find((a) => a.status === "approved" && matches(step, a));
-      const pp = approvals.find((a) => a.status === "pending" && matches(step, a));
+      const ap = approvals.find((a) => a.status === "approved" && stepMatches(step, a));
+      const pp = approvals.find((a) => a.status === "pending" && stepMatches(step, a));
       if (ap) completed = true;
       else if (pp) pendingApproval = pp;
     }

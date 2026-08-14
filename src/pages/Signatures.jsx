@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { base44 } from "@/api/base44Client";
 import { FileSignature, Loader2, ShieldCheck, CheckCircle2, X, PenLine } from "lucide-react";
 import SignaturePad from "@/components/client/SignaturePad";
+import { logReceipt } from "@/lib/pipelineUtils";
 
 // Client-facing Signatures page: lists contracts assigned to the logged-in
 // user and lets them sign inline on mobile (touch) or desktop (mouse).
@@ -48,6 +49,13 @@ export default function Signatures() {
       const r = await base44.functions.invoke("esignPortal", { action: "sign", token: active.share_token, signature: sig });
       if (r.data?.ok) {
         setDone(active.id);
+        await logReceipt({
+          action: "Document signed",
+          entityType: "EsignDocument",
+          entityId: active.id,
+          status: "success",
+          notes: `Signed: ${active.title}`,
+        });
         await load(user.email);
       } else setError(r.data?.error || "Signing failed");
     } catch (e) { setError("Signing failed"); }

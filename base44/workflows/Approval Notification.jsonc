@@ -1,0 +1,40 @@
+{
+  "name": "Approval Notification",
+  "description": "Emails the client when a new pending approval is assigned to them.",
+  "trigger": {
+    "config": {
+      "trigger_type": "entity",
+      "entity_name": "Approval",
+      "events": [
+        "create"
+      ]
+    },
+    "condition": "${ .trigger.data.status == \"pending\" and (.trigger.data.client_email // \"\") != \"\" }"
+  },
+  "definition": {
+    "document": {
+      "dsl": "1.0.0",
+      "name": "approval_notification",
+      "version": "1.0",
+      "namespace": "base44"
+    },
+    "do": [
+      {
+        "notify": {
+          "call": "invoke_backend_function",
+          "with": {
+            "function_name": "notifyApprovalPending",
+            "args": {
+              "approval_id": "${ .trigger.entity_id }"
+            }
+          },
+          "then": "end",
+          "x-base44": {
+            "title": "Notify client",
+            "description": "Email the assigned client"
+          }
+        }
+      }
+    ]
+  }
+}
