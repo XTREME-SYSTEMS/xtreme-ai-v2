@@ -1,11 +1,13 @@
 import { useEffect, useState } from "react";
 import { base44 } from "@/api/base44Client";
-import { Package, Info, CheckCircle } from "lucide-react";
+import { Package, Info, CheckCircle, ChevronRight } from "lucide-react";
 import { useClientTrack } from "@/hooks/useClientTrack";
 import { getPackage } from "@/lib/packageContents";
+import { getProductDetails } from "@/lib/productDetails";
 import PackageModal from "@/components/client/PackageModal";
 import PackageTimeline from "@/components/client/PackageTimeline";
 import PackageCatalog from "@/components/client/PackageCatalog";
+import PurchaseDetailModal from "@/components/client/PurchaseDetailModal";
 
 // Dedicated page for the client's purchased package — the top-level
 // destination of the client portal. Shows the package, its approval-gated
@@ -17,6 +19,7 @@ export default function MyPackage() {
   const [loading, setLoading] = useState(true);
   const [busy, setBusy] = useState(null);
   const [pkgOpen, setPkgOpen] = useState(false);
+  const [activePurchase, setActivePurchase] = useState(null);
   const { track } = useClientTrack(user);
   const pkg = getPackage(track.key);
 
@@ -90,25 +93,36 @@ export default function MyPackage() {
             </p>
           </div>
         ) : (
-          <div className="mt-3 space-y-3">
-            {purchases.map((p) => (
-              <div key={p.id} className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-white/10 bg-zinc-950 p-4">
-                <div className="min-w-0">
-                  <div className="flex items-center gap-2">
-                    <CheckCircle className="h-4 w-4 text-lime-400" />
-                    <h1 className="text-lg font-semibold text-white sm:text-xl">{p.productName || p.productId || pkg.title}</h1>
+          <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
+            {purchases.map((p) => {
+              const detail = getProductDetails(p.productId);
+              const Icon = detail.icon;
+              return (
+                <button
+                  key={p.id}
+                  onClick={() => setActivePurchase(p)}
+                  className="group flex flex-col rounded-xl border border-white/10 bg-zinc-950 p-4 text-left transition-all hover:border-lime-400/50 hover:bg-white/5"
+                >
+                  <div className="flex items-start justify-between">
+                    <div className={`flex h-10 w-10 items-center justify-center rounded-lg bg-gradient-to-br ${detail.accent}`}>
+                      <Icon className="h-5 w-5 text-lime-400" />
+                    </div>
+                    <span className="rounded bg-lime-400/15 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-lime-400">Active</span>
                   </div>
-                  <p className="mt-0.5 text-xs text-white/50">
-                    Paid{p.paidAt ? ` on ${fmtDate(p.paidAt)}` : ""}{p.orderId ? ` · Order ${p.orderId.slice(0, 8)}` : ""}
-                  </p>
-                </div>
-                <div className="text-right">
-                  {p.amount && <div className="text-lg font-bold text-lime-400">{fmtMoney(p)}</div>}
-                  {p.quantity > 1 && <div className="text-xs text-white/40">Qty {p.quantity}</div>}
-                  <span className="mt-1 inline-block rounded bg-lime-400/15 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-lime-400">Active</span>
-                </div>
-              </div>
-            ))}
+                  <h3 className="mt-3 text-sm font-semibold text-white">{p.productName || p.productId || pkg.title}</h3>
+                  <p className="mt-0.5 line-clamp-2 text-xs text-white/50">{detail.tagline}</p>
+                  <div className="mt-3 flex items-center justify-between border-t border-white/10 pt-3">
+                    <div>
+                      {p.amount && <div className="text-base font-bold text-lime-400">{fmtMoney(p)}</div>}
+                      <div className="text-[11px] text-white/40">{p.paidAt ? `Paid ${fmtDate(p.paidAt)}` : "Active"}</div>
+                    </div>
+                    <span className="flex items-center gap-0.5 text-xs font-medium text-lime-400 opacity-0 transition-opacity group-hover:opacity-100">
+                      Details <ChevronRight className="h-3.5 w-3.5" />
+                    </span>
+                  </div>
+                </button>
+              );
+            })}
           </div>
         )}
       </div>
@@ -149,6 +163,7 @@ export default function MyPackage() {
       </div>
 
       <PackageModal open={pkgOpen} onClose={() => setPkgOpen(false)} pkg={pkg} />
+      <PurchaseDetailModal purchase={activePurchase} onClose={() => setActivePurchase(null)} />
 
       {/* Everything we sell — plans, tools & services */}
       <div className="mt-10 border-t border-white/10 pt-8">
