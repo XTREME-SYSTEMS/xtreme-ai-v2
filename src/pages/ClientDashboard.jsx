@@ -5,6 +5,7 @@ import { PageHeader, Panel, EmptyState } from "@/components/ui";
 import StatCard from "@/components/StatCard";
 import StatusBadge from "@/components/StatusBadge";
 import { CheckCircle, FileText, ScrollText, ShieldCheck, ArrowRight, Loader2, Check, X } from "lucide-react";
+import ClientOnboarding from "@/components/ClientOnboarding";
 
 export default function ClientDashboard() {
   const [user, setUser] = useState(null);
@@ -58,6 +59,10 @@ export default function ClientDashboard() {
             <span className="font-semibold text-white">Approval-gated workflow.</span> Nothing goes live without your sign-off. Review pending items below — approve to release, or reject to send back for revision.
           </div>
         </div>
+      </div>
+
+      <div className="mb-6">
+        <ClientOnboarding user={user} />
       </div>
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
