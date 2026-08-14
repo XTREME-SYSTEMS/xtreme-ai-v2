@@ -84,6 +84,8 @@ import Login from '@/pages/Login';
 import Register from '@/pages/Register';
 import ForgotPassword from '@/pages/ForgotPassword';
 import ResetPassword from '@/pages/ResetPassword';
+import ClientPortalRoute from '@/pages/ClientPortalRoute';
+import ClientDashboard from '@/pages/ClientDashboard';
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin, isAuthenticated } = useAuth();
@@ -187,6 +189,9 @@ const AuthenticatedApp = () => {
           <Route path="/serp-blueprint" element={<SerpBlueprint />} />
           <Route path="/pipeline-dashboard" element={<PipelineDashboard />} />
           <Route path="/domain-acquisition" element={<DomainAcquisition />} />
+        </Route>
+        <Route path="/portal" element={<ClientPortalRoute />}>
+          <Route index element={<ClientDashboard />} />
         </Route>
       </Route>
       <Route path="*" element={<PageNotFound />} />
