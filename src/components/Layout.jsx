@@ -181,7 +181,7 @@ export default function Layout() {
           </div>
           <div className="ml-auto flex items-center gap-3">
             <span className="hidden text-xs text-black/60 sm:inline">{user?.email || ""}</span>
-            <button onClick={() => { setPreview(true); navigate("/dashboard"); }} className="flex items-center gap-1.5 rounded-lg border border-lime-400 px-2.5 py-1.5 text-xs text-black font-medium hover:bg-lime-400/10">
+            <button onClick={() => { setPreview(true); navigate("/my-package"); }} className="flex items-center gap-1.5 rounded-lg border border-lime-400 px-2.5 py-1.5 text-xs text-black font-medium hover:bg-lime-400/10">
               <Eye className="h-3.5 w-3.5" /> Preview as Client
             </button>
             <ThemeToggle className="flex items-center gap-1.5 rounded-lg border border-lime-400 px-2.5 py-1.5 text-xs text-black font-medium hover:bg-lime-400/10" />
