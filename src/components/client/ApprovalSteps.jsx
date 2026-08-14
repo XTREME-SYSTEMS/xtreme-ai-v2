@@ -92,7 +92,18 @@ export default function ApprovalSteps({ user, approvals = [], onDecide }) {
 
                 {pendingApproval && (
                   <div className="mt-3 space-y-2 border-t border-white/10 pt-3">
-                    <div className="text-xs text-white/60">{pendingApproval.requested_action}</div>
+                    <div className="flex items-center gap-2">
+                      <div className="text-xs text-white/60">{pendingApproval.requested_action}</div>
+                      {pendingApproval.risk_level && (
+                        <span className={`rounded px-1.5 py-0.5 text-[10px] font-semibold uppercase ${
+                          pendingApproval.risk_level === "red" ? "bg-rose-400/15 text-rose-300"
+                            : pendingApproval.risk_level === "yellow" ? "bg-amber-400/15 text-amber-300"
+                              : "bg-emerald-400/15 text-emerald-300"
+                        }`}>
+                          {pendingApproval.risk_level}
+                        </span>
+                      )}
+                    </div>
                     <div className="flex items-start gap-2">
                       <MessageSquare className="mt-2 h-4 w-4 shrink-0 text-white/40" />
                       <textarea

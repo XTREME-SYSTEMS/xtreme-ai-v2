@@ -22,7 +22,7 @@ export const UNIVERSAL_PIPELINE = [
     label: "Strategy & Proposal",
     desc: "We prepare your tailored plan, positioning and roadmap.",
     gate: true,
-    to: null,
+    to: "/proposals",
     icon: FileText,
   },
   {
@@ -54,7 +54,7 @@ export const UNIVERSAL_PIPELINE = [
     label: "Launch",
     desc: "Deploy to your live domain once approved.",
     gate: true,
-    to: null,
+    to: "/preview-factory",
     icon: Rocket,
   },
   {

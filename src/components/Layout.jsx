@@ -15,6 +15,9 @@ import { usePreview } from "@/lib/PreviewContext";
 import ClientLayout from "@/components/client/ClientLayout";
 import ThemeToggle from "@/components/ThemeToggle";
 
+// Client portal navigation lives in ClientLayout; this admin NAV is the only
+// nav array used by the admin sidebar.
+
 const NAV = [
   { to: "/client-portal", label: "Command Center", icon: LayoutDashboard, end: true },
   { section: "Discovery" },
@@ -88,16 +91,6 @@ const NAV = [
   { to: "/settings", label: "Settings", icon: Settings },
 ];
 
-const CLIENT_NAV = [
-  { to: "/client-portal", label: "My Dashboard", icon: LayoutDashboard, end: true },
-  { section: "Workflow" },
-  { to: "/approvals", label: "Approvals", icon: CheckCircle },
-  { to: "/proposals", label: "My Proposals", icon: FileText },
-  { to: "/receipts", label: "Activity", icon: ScrollText },
-  { section: "Account" },
-  { to: "/settings", label: "Settings", icon: Settings },
-];
-
 export default function Layout() {
   const [open, setOpen] = useState(false);
   const [user, setUser] = useState(null);
@@ -108,11 +101,12 @@ export default function Layout() {
   }, []);
 
   const logout = async () => {
+    clearPreview();
     await base44.auth.logout();
     navigate("/login");
   };
 
-  const { previewAsClient, setPreview } = usePreview();
+  const { previewAsClient, setPreview, clearPreview } = usePreview();
 
   if (user === null) {
     return (
@@ -145,7 +139,7 @@ export default function Layout() {
           <button onClick={() => setOpen(false)} className="ml-auto md:hidden text-white/50 hover:text-white"><X className="h-5 w-5" /></button>
         </div>
         <nav className="h-[calc(100vh-3.5rem)] overflow-y-auto px-2 py-3">
-          {(user?.role === "admin" ? NAV : CLIENT_NAV).map((item, i) => {
+          {NAV.map((item, i) => {
             if (item.section) {
               return <div key={i} className="mt-4 mb-1 px-2 text-[10px] font-semibold uppercase tracking-wider text-white">{item.section}</div>;
             }

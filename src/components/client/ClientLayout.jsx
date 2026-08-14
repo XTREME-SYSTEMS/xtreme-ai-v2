@@ -26,9 +26,10 @@ const NAV = [
 export default function ClientLayout({ user }) {
   const [open, setOpen] = useState(false);
   const navigate = useNavigate();
-  const { setPreview } = usePreview();
+  const { setPreview, clearPreview } = usePreview();
 
   const logout = async () => {
+    clearPreview();
     await base44.auth.logout();
     navigate("/login");
   };

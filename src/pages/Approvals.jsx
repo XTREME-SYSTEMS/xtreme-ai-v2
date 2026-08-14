@@ -67,6 +67,10 @@ export default function Approvals() {
       status: status === "approved" ? "success" : "escalated",
       notes: comment ? `${status === "approved" ? "Approved" : "Denied"}: ${comment}` : status === "approved" ? "Approved" : "Denied",
     });
+    // Notify admins that the client decided.
+    try {
+      await base44.functions.invoke("notifyApprovalDecided", { approval_id: id, status });
+    } catch (e) { /* best effort */ }
     await load();
   };
 
@@ -80,7 +84,8 @@ export default function Approvals() {
         emptyIcon={CheckCircle}
         emptyTitle="No approvals yet"
         columns={[
-          { key: "entity_type", label: "Entity" },
+          { key: "client_email", label: "Client" },
+          { key: "pipeline_step", label: "Step" },
           { key: "requested_action", label: "Action" },
           { key: "risk_level", label: "Risk", render: (it) => <span className={`text-xs font-medium ${it.risk_level === "red" ? "text-rose-400" : it.risk_level === "yellow" ? "text-amber-400" : "text-emerald-400"}`}>{it.risk_level}</span> },
           { key: "decision_by", label: "By" },

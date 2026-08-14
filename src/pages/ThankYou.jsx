@@ -32,8 +32,8 @@ export default function ThankYou() {
           </div>
 
           <div className="mt-10 flex flex-col items-center justify-center gap-3 sm:flex-row">
-            <Link to="/client-portal" className="group inline-flex w-full items-center justify-center gap-2 rounded-xl bg-lime-400 px-7 py-4 text-base font-bold text-black transition-all hover:bg-lime-300 hover:shadow-xl hover:shadow-lime-400/40 sm:w-auto">
-              Go to Dashboard <ArrowRight className="h-5 w-5 transition-transform group-hover:translate-x-1" />
+            <Link to="/my-package" className="group inline-flex w-full items-center justify-center gap-2 rounded-xl bg-lime-400 px-7 py-4 text-base font-bold text-black transition-all hover:bg-lime-300 hover:shadow-xl hover:shadow-lime-400/40 sm:w-auto">
+              Go to My Package <ArrowRight className="h-5 w-5 transition-transform group-hover:translate-x-1" />
             </Link>
             <Link to="/" className="inline-flex w-full items-center justify-center gap-2 rounded-xl border-2 border-black/15 px-7 py-4 text-base font-bold text-black transition-all hover:border-black hover:bg-black hover:text-white sm:w-auto">
               Back to Home

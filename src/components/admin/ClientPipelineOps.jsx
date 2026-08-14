@@ -1,16 +1,20 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { base44 } from "@/api/base44Client";
 import { computePipelineState, currentPipelineStep, pipelineProgress } from "@/lib/pipelineState";
 import { UNIVERSAL_PIPELINE } from "@/lib/universalPipeline";
 import { logReceipt } from "@/lib/pipelineUtils";
+import { usePreview } from "@/lib/PreviewContext";
 import { Panel, EmptyState } from "@/components/ui";
-import { Loader2, Users, ShieldCheck, X, Send, Clock } from "lucide-react";
+import { Loader2, Users, ShieldCheck, X, Send, Clock, UserPlus, Gift, Eye } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 // Admin-side view of every client's position in the universal pipeline.
 // Mirrors exactly what each client sees in their portal, and lets the admin
 // push a pipeline-step approval to a specific client — which instantly
-// appears in that client's portal as an "Action needed" step.
+// appears in that client's portal as an "Action needed" step. Also supports
+// inviting new clients, granting a paid package manually, and previewing the
+// portal exactly as a specific client sees it.
 export default function ClientPipelineOps() {
   const [users, setUsers] = useState([]);
   const [approvals, setApprovals] = useState([]);
@@ -21,6 +25,16 @@ export default function ClientPipelineOps() {
   const [risk, setRisk] = useState("yellow");
   const [note, setNote] = useState("");
   const [busy, setBusy] = useState(false);
+  const [inviteOpen, setInviteOpen] = useState(false);
+  const [inviteEmail, setInviteEmail] = useState("");
+  const [inviteRole, setInviteRole] = useState("user");
+  const [inviteBusy, setInviteBusy] = useState(false);
+  const [inviteMsg, setInviteMsg] = useState(null);
+  const [grantFor, setGrantFor] = useState(null);
+  const [grantProduct, setGrantProduct] = useState("Elite Growth Package");
+  const [grantBusy, setGrantBusy] = useState(false);
+  const navigate = useNavigate();
+  const { setPreviewClient } = usePreview();
 
   const load = async () => {
     const [u, a] = await Promise.all([
@@ -101,13 +115,67 @@ export default function ClientPipelineOps() {
 
   const gateSteps = UNIVERSAL_PIPELINE.filter((s) => s.gate);
 
+  const inviteClient = async () => {
+    if (!inviteEmail.trim()) return;
+    setInviteBusy(true); setInviteMsg(null);
+    try {
+      await base44.users.inviteUser(inviteEmail.trim(), inviteRole);
+      setInviteMsg({ ok: true, text: `Invitation sent to ${inviteEmail.trim()}` });
+      setInviteEmail("");
+      await load();
+    } catch (e) {
+      setInviteMsg({ ok: false, text: e?.message || "Invite failed" });
+    }
+    setInviteBusy(false);
+  };
+
+  const grantPackage = async () => {
+    if (!grantFor) return;
+    setGrantBusy(true);
+    try {
+      await base44.entities.Base44Purchase.create({
+        checkoutSessionId: `manual-${grantFor.id}-${Date.now()}`,
+        status: "paid",
+        buyerEmail: grantFor.email,
+        appUserId: grantFor.id,
+        productId: "manual_override",
+        productName: grantProduct,
+        amount: "0",
+        currency: "USD",
+        paidAt: new Date().toISOString(),
+      });
+      await logReceipt({
+        action: `Package granted: ${grantProduct}`,
+        entityType: "Base44Purchase",
+        status: "success",
+        notes: `Manually granted to ${grantFor.email}`,
+      });
+      setGrantFor(null);
+      await load();
+    } catch (e) { /* ignore */ }
+    setGrantBusy(false);
+  };
+
+  const previewClient = (u) => {
+    setPreviewClient(u.email);
+    navigate("/approvals");
+  };
+
   return (
     <Panel
       title="Client Pipeline Operations"
       action={
-        <span className="rounded-md border border-amber-400/40 bg-amber-400/10 px-2 py-1 text-[10px] font-semibold uppercase tracking-wider text-amber-300">
-          {pendingApprovals.length} pending
-        </span>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => { setInviteOpen(true); setInviteMsg(null); }}
+            className="inline-flex items-center gap-1 rounded-md border border-lime-400/40 bg-lime-400/10 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wider text-lime-300 transition-colors hover:bg-lime-400/20"
+          >
+            <UserPlus className="h-3.5 w-3.5" /> Invite
+          </button>
+          <span className="rounded-md border border-amber-400/40 bg-amber-400/10 px-2 py-1 text-[10px] font-semibold uppercase tracking-wider text-amber-300">
+            {pendingApprovals.length} pending
+          </span>
+        </div>
       }
     >
       {loading ? (
@@ -155,12 +223,28 @@ export default function ClientPipelineOps() {
                     <div className="truncate text-sm font-semibold text-white">{u.full_name || u.email}</div>
                     <div className="truncate text-xs text-white/40">{u.email}</div>
                   </div>
-                  <button
-                    onClick={() => openRequest(u)}
-                    className="inline-flex items-center gap-1 rounded-md border border-lime-400/40 bg-lime-400/10 px-2.5 py-1.5 text-xs font-semibold text-lime-300 transition-colors hover:bg-lime-400/20"
-                  >
-                    <Send className="h-3.5 w-3.5" /> Request approval
-                  </button>
+                  <div className="flex items-center gap-1.5">
+                    <button
+                      onClick={() => previewClient(u)}
+                      title="Preview as this client"
+                      className="inline-flex items-center gap-1 rounded-md border border-white/15 px-2 py-1.5 text-xs font-medium text-white/70 transition-colors hover:bg-white/5"
+                    >
+                      <Eye className="h-3.5 w-3.5" />
+                    </button>
+                    <button
+                      onClick={() => setGrantFor(u)}
+                      title="Grant package (mark as paid)"
+                      className="inline-flex items-center gap-1 rounded-md border border-white/15 px-2 py-1.5 text-xs font-medium text-white/70 transition-colors hover:bg-white/5"
+                    >
+                      <Gift className="h-3.5 w-3.5" />
+                    </button>
+                    <button
+                      onClick={() => openRequest(u)}
+                      className="inline-flex items-center gap-1 rounded-md border border-lime-400/40 bg-lime-400/10 px-2.5 py-1.5 text-xs font-semibold text-lime-300 transition-colors hover:bg-lime-400/20"
+                    >
+                      <Send className="h-3.5 w-3.5" /> Request approval
+                    </button>
+                  </div>
                 </div>
 
                 {/* Progress */}
@@ -192,6 +276,118 @@ export default function ClientPipelineOps() {
               </div>
             );
           })}
+        </div>
+      )}
+
+      {/* Invite-client modal */}
+      {inviteOpen && (
+        <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/80 sm:items-center sm:p-4">
+          <div className="w-full max-w-md overflow-hidden rounded-t-2xl border border-white/10 bg-zinc-900 shadow-2xl sm:rounded-2xl">
+            <div className="flex items-center gap-2.5 border-b border-white/10 px-4 py-3">
+              <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-lime-400/10">
+                <UserPlus className="h-4 w-4 text-lime-400" />
+              </div>
+              <div className="min-0 flex-1">
+                <h3 className="text-sm font-semibold text-white">Invite client</h3>
+                <p className="text-[11px] text-white/40">They'll get an email to join the portal.</p>
+              </div>
+              <button onClick={() => setInviteOpen(false)} className="flex h-8 w-8 items-center justify-center rounded-lg text-white/50 hover:bg-white/5 hover:text-white">
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+            <div className="space-y-3 px-4 py-4">
+              <div>
+                <label className="mb-1 block text-[11px] font-semibold uppercase tracking-wider text-white/40">Email</label>
+                <input
+                  type="email"
+                  value={inviteEmail}
+                  onChange={(e) => setInviteEmail(e.target.value)}
+                  placeholder="client@example.com"
+                  className="w-full rounded-md border border-white/15 bg-black/30 px-2.5 py-1.5 text-sm text-white placeholder:text-white/30 focus:border-lime-400 focus:outline-none"
+                />
+              </div>
+              <div>
+                <label className="mb-1 block text-[11px] font-semibold uppercase tracking-wider text-white/40">Role</label>
+                <div className="grid grid-cols-2 gap-1.5">
+                  {["user", "admin"].map((r) => (
+                    <button
+                      key={r}
+                      onClick={() => setInviteRole(r)}
+                      className={cn(
+                        "rounded-md border px-2 py-1.5 text-xs font-medium capitalize transition-colors",
+                        inviteRole === r ? "border-lime-400 bg-lime-400/10 text-lime-300" : "border-white/10 text-white/60 hover:bg-white/5"
+                      )}
+                    >
+                      {r}
+                    </button>
+                  ))}
+                </div>
+              </div>
+              {inviteMsg && (
+                <div className={cn("rounded-md border px-3 py-2 text-xs", inviteMsg.ok ? "border-lime-400/30 bg-lime-400/10 text-lime-300" : "border-rose-400/30 bg-rose-400/10 text-rose-300")}>
+                  {inviteMsg.text}
+                </div>
+              )}
+            </div>
+            <div className="flex items-center justify-end gap-2 border-t border-white/10 px-4 py-3 pb-[calc(0.75rem+env(safe-area-inset-bottom))]">
+              <button onClick={() => setInviteOpen(false)} className="rounded-md border border-white/15 px-4 py-2 text-xs font-semibold text-white/70 hover:bg-white/5">Cancel</button>
+              <button
+                onClick={inviteClient}
+                disabled={inviteBusy || !inviteEmail.trim()}
+                className="inline-flex items-center gap-1.5 rounded-md bg-lime-400 px-4 py-2 text-xs font-semibold text-black transition-colors hover:bg-lime-300 disabled:opacity-50"
+              >
+                {inviteBusy ? <Loader2 className="h-4 w-4 animate-spin" /> : <UserPlus className="h-4 w-4" />}
+                {inviteBusy ? "Sending…" : "Send invite"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Grant-package modal */}
+      {grantFor && (
+        <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/80 sm:items-center sm:p-4">
+          <div className="w-full max-w-md overflow-hidden rounded-t-2xl border border-white/10 bg-zinc-900 shadow-2xl sm:rounded-2xl">
+            <div className="flex items-center gap-2.5 border-b border-white/10 px-4 py-3">
+              <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-lime-400/10">
+                <Gift className="h-4 w-4 text-lime-400" />
+              </div>
+              <div className="min-0 flex-1">
+                <h3 className="text-sm font-semibold text-white">Grant package</h3>
+                <p className="truncate text-[11px] text-white/40">{grantFor.email}</p>
+              </div>
+              <button onClick={() => setGrantFor(null)} className="flex h-8 w-8 items-center justify-center rounded-lg text-white/50 hover:bg-white/5 hover:text-white">
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+            <div className="space-y-3 px-4 py-4">
+              <div>
+                <label className="mb-1 block text-[11px] font-semibold uppercase tracking-wider text-white/40">Package</label>
+                <select
+                  value={grantProduct}
+                  onChange={(e) => setGrantProduct(e.target.value)}
+                  className="w-full rounded-md border border-white/15 bg-black/30 px-2.5 py-1.5 text-sm text-white focus:border-lime-400 focus:outline-none"
+                >
+                  <option>Elite Growth Package</option>
+                  <option>Pro Growth Package</option>
+                  <option>Deposit / Build Only</option>
+                  <option>Web / App Pack</option>
+                </select>
+              </div>
+              <p className="text-xs text-white/40">This manually marks the client as paid — the package will appear in their "My Package" page immediately.</p>
+            </div>
+            <div className="flex items-center justify-end gap-2 border-t border-white/10 px-4 py-3 pb-[calc(0.75rem+env(safe-area-inset-bottom))]">
+              <button onClick={() => setGrantFor(null)} className="rounded-md border border-white/15 px-4 py-2 text-xs font-semibold text-white/70 hover:bg-white/5">Cancel</button>
+              <button
+                onClick={grantPackage}
+                disabled={grantBusy}
+                className="inline-flex items-center gap-1.5 rounded-md bg-lime-400 px-4 py-2 text-xs font-semibold text-black transition-colors hover:bg-lime-300 disabled:opacity-50"
+              >
+                {grantBusy ? <Loader2 className="h-4 w-4 animate-spin" /> : <Gift className="h-4 w-4" />}
+                {grantBusy ? "Granting…" : "Grant package"}
+              </button>
+            </div>
+          </div>
         </div>
       )}
 

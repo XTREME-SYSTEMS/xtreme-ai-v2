@@ -115,7 +115,7 @@ const AuthenticatedApp = () => {
   // Render the main app
   return (
     <Routes>
-      <Route path="/" element={isAuthenticated ? <Navigate to="/client-portal" replace /> : <Marketing />} />
+      <Route path="/" element={isAuthenticated ? <Navigate to="/my-package" replace /> : <Marketing />} />
       <Route path="/pricing" element={<Pricing />} />
       <Route path="/ThankYou" element={<ThankYou />} />
       <Route path="/seo/:slug" element={<SeoLanding />} />
