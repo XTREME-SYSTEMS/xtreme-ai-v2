@@ -5,6 +5,7 @@ import { useClientTrack } from "@/hooks/useClientTrack";
 import { getPackage } from "@/lib/packageContents";
 import PackageModal from "@/components/client/PackageModal";
 import PackageTimeline from "@/components/client/PackageTimeline";
+import ClientAssistantChat from "@/components/client/ClientAssistantChat";
 import ClientOnboarding from "@/components/ClientOnboarding";
 
 export default function ClientDashboard() {
@@ -93,6 +94,14 @@ export default function ClientDashboard() {
       </div>
 
       <PackageModal open={pkgOpen} onClose={() => setPkgOpen(false)} pkg={pkg} />
+
+      {/* AI assistant chat */}
+      <div className="mt-6 rounded-xl border border-white/10 bg-zinc-900 p-4">
+        <h2 className="mb-3 text-sm font-semibold text-white">Ask your assistant</h2>
+        <div className="h-96">
+          <ClientAssistantChat user={user} pkg={pkg} />
+        </div>
+      </div>
     </div>
   );
 }
