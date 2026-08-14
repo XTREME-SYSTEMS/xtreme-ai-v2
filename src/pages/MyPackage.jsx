@@ -4,7 +4,6 @@ import { Package, Info, CheckCircle, ChevronRight } from "lucide-react";
 import { useClientTrack } from "@/hooks/useClientTrack";
 import { getPackage } from "@/lib/packageContents";
 import { getProductDetails } from "@/lib/productDetails";
-import PackageModal from "@/components/client/PackageModal";
 import PackageTimeline from "@/components/client/PackageTimeline";
 import PackageCatalog from "@/components/client/PackageCatalog";
 import PurchaseDetailModal from "@/components/client/PurchaseDetailModal";
@@ -18,7 +17,6 @@ export default function MyPackage() {
   const [approvals, setApprovals] = useState([]);
   const [loading, setLoading] = useState(true);
   const [busy, setBusy] = useState(null);
-  const [pkgOpen, setPkgOpen] = useState(false);
   const [activePurchase, setActivePurchase] = useState(null);
   const { track } = useClientTrack(user);
   const pkg = getPackage(track.key);
@@ -133,18 +131,9 @@ export default function MyPackage() {
         )}
       </div>
 
-      <div className="mt-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <h2 className="text-base font-semibold text-white">{pkg.title} — Build Timeline</h2>
-          <p className="text-sm text-white/50">{pkg.subtitle}</p>
-        </div>
-        <button
-          onClick={() => setPkgOpen(true)}
-          className="inline-flex items-center gap-2 rounded-lg border border-lime-400 px-4 py-2.5 text-sm font-semibold text-lime-400 transition-colors hover:bg-lime-400/10"
-        >
-          <Info className="h-4 w-4" />
-          What's included
-        </button>
+      <div className="mt-4">
+        <h2 className="text-base font-semibold text-white">{pkg.title} — Build Timeline</h2>
+        <p className="text-sm text-white/50">{pkg.subtitle}</p>
       </div>
 
       {pendingCount > 0 && (
@@ -168,7 +157,6 @@ export default function MyPackage() {
         )}
       </div>
 
-      <PackageModal open={pkgOpen} onClose={() => setPkgOpen(false)} pkg={pkg} />
       <PurchaseDetailModal purchase={activePurchase} onClose={() => setActivePurchase(null)} />
 
       {/* Everything we sell — plans, tools & services */}
