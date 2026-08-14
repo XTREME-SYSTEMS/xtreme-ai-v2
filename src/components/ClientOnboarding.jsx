@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import { base44 } from "@/api/base44Client";
 import AiOnboardingChat from "@/components/brand/AiOnboardingChat";
+import { useClientTrack } from "@/hooks/useClientTrack";
 import { CheckCircle2, ArrowRight, Sparkles } from "lucide-react";
 
 const QUESTIONS = [
@@ -34,8 +35,10 @@ const SCHEMA = {
 
 export default function ClientOnboarding({ user }) {
   const [done, setDone] = useState(false);
+  const { track } = useClientTrack(user);
 
   if (user?.onboarded || done) {
+    const cta = track.cta || { to: "/brand-factory", label: "Start Brand Factory" };
     return (
       <div className="rounded-xl border border-lime-400/30 bg-lime-400/5 p-4">
         <div className="flex items-center gap-2">
@@ -43,21 +46,23 @@ export default function ClientOnboarding({ user }) {
           <h2 className="text-sm font-semibold text-white">Onboarding complete</h2>
         </div>
         <p className="mt-1 text-sm text-white/70">
-          Thanks{user?.onboarding?.business_name ? `, ${user.onboarding.business_name}` : ""}! Your team has your info. Ready to build your brand?
+          Thanks{user?.onboarding?.business_name ? `, ${user.onboarding.business_name}` : ""}! Your team has your info. {track.subtitle}
         </p>
-        <Link to="/brand-factory" className="mt-3 inline-flex items-center gap-1.5 rounded-md bg-lime-400 px-3 py-1.5 text-xs font-semibold text-black hover:bg-lime-300">
-          <Sparkles className="h-3.5 w-3.5" /> Start Brand Factory <ArrowRight className="h-3.5 w-3.5" />
+        <Link to={cta.to} className="mt-3 inline-flex items-center gap-1.5 rounded-md bg-lime-400 px-3 py-1.5 text-xs font-semibold text-black hover:bg-lime-300">
+          <Sparkles className="h-3.5 w-3.5" /> {cta.label} <ArrowRight className="h-3.5 w-3.5" />
         </Link>
       </div>
     );
   }
 
+  const subtitle = track.title && track.title !== "Welcome" ? `${track.title} · let's get to know your business` : "let's get to know your business";
+
   return (
     <AiOnboardingChat
       title="AI Onboarding"
-      subtitle="let's get to know your business"
+      subtitle={subtitle}
       questions={QUESTIONS}
-      greetingPrefix="Hi! I'm your onboarding assistant. Welcome aboard."
+      greetingPrefix={track.greeting || "Hi! I'm your onboarding assistant. Welcome aboard."}
       completeLabel="Finish Onboarding"
       aiRoleName="Assistant"
       extractionPrompt={(t) => `From this onboarding conversation, extract a structured client profile. Fill every field; use empty string if missing.\n\n${t}`}

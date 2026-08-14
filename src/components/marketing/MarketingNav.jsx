@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { MapPin, Menu, X } from "lucide-react";
+import { Menu, X } from "lucide-react";
+import { LOGO_HORIZONTAL } from "@/lib/brandAssets";
 import { cn } from "@/lib/utils";
 import AnnouncementBar from "@/components/marketing/AnnouncementBar";
 
@@ -27,13 +28,7 @@ export default function MarketingNav() {
       <nav className={cn("w-full bg-white transition-all duration-300", scrolled ? "border-b border-black/10 shadow-sm" : "border-b border-black/5")}>
         <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6">
           <Link to="/" className="flex items-center gap-2">
-            <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-lime-400">
-              <MapPin className="h-5 w-5 text-black" />
-            </div>
-            <div className="leading-tight">
-              <div className="text-sm font-bold text-black">Lead Generation Near Me</div>
-              <div className="text-[10px] font-medium uppercase tracking-wider text-black/40">LEADGENERATIONNEARME.COM</div>
-            </div>
+            <img src={LOGO_HORIZONTAL} alt="Lead Generation Near You" className="h-9 w-auto" />
           </Link>
 
           <div className="hidden items-center gap-7 md:flex">
@@ -54,7 +49,7 @@ export default function MarketingNav() {
       {open && (
         <div className="fixed inset-0 z-50 bg-white md:hidden">
           <div className="flex h-16 items-center justify-between px-4">
-            <Link to="/" className="flex items-center gap-2"><div className="flex h-9 w-9 items-center justify-center rounded-lg bg-lime-400"><MapPin className="h-5 w-5 text-black" /></div><span className="text-sm font-bold text-black">Lead Generation Near Me</span></Link>
+            <Link to="/" className="flex items-center gap-2"><img src={LOGO_HORIZONTAL} alt="Lead Generation Near You" className="h-9 w-auto" /></Link>
             <button onClick={() => setOpen(false)} className="text-black"><X className="h-6 w-6" /></button>
           </div>
           <div className="flex flex-col gap-1 px-4 py-6">

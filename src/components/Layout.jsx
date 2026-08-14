@@ -10,6 +10,7 @@ import {
 } from "lucide-react";
 import { Image } from "@/components/ui/image";
 import { cn } from "@/lib/utils";
+import { LOGO_ICON } from "@/lib/brandAssets";
 
 const NAV = [
   { to: "/dashboard", label: "Command Center", icon: LayoutDashboard, end: true },
@@ -117,7 +118,7 @@ export default function Layout() {
       )}>
         <div className="flex h-14 items-center gap-2 border-b border-white/10 px-4">
           <Image
-            src="https://media.base44.com/images/public/6a79444e821211169a147eee/708cd67ef_ChatGPTImageAug9202611_49_11PM.png"
+            src={LOGO_ICON}
             alt="Lead Gen Near You"
             className="h-8 w-8"
             fittingType="fit"
