@@ -1,9 +1,12 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { base44 } from "@/api/base44Client";
+import { useClientTrack } from "@/hooks/useClientTrack";
+import { getPackage } from "@/lib/packageContents";
+import ClientAssistantChat from "@/components/client/ClientAssistantChat";
 import {
   Package, CheckCircle, ScrollText, Settings, Sparkles,
-  ArrowRight, LayoutDashboard,
+  ArrowRight, LayoutDashboard, Bot,
 } from "lucide-react";
 
 const TABS = [
@@ -18,6 +21,8 @@ const TABS = [
 // portal works, what each tab does, and points them to My Package and Approvals.
 export default function ClientDashboard() {
   const [user, setUser] = useState(null);
+  const { track } = useClientTrack(user);
+  const pkg = getPackage(track.key);
 
   useEffect(() => {
     base44.auth.me().then(setUser).catch(() => {});
@@ -105,6 +110,18 @@ export default function ClientDashboard() {
             <span>Approve that step to move forward, or deny it with a comment telling us what to change.</span>
           </li>
         </ol>
+      </section>
+
+      {/* AI assistant */}
+      <section className="mt-6 overflow-hidden rounded-xl border border-white/10 bg-zinc-950">
+        <div className="flex items-center gap-2 border-b border-white/10 bg-zinc-900 px-4 py-3">
+          <Bot className="h-4 w-4 text-lime-400" />
+          <span className="text-sm font-semibold text-white">Ask your assistant</span>
+          <span className="ml-auto text-[10px] uppercase tracking-wider text-white/40">AI</span>
+        </div>
+        <div className="h-80">
+          <ClientAssistantChat user={user} pkg={pkg} />
+        </div>
       </section>
     </div>
   );
