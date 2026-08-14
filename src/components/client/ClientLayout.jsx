@@ -8,6 +8,7 @@ import {
 import { Image } from "@/components/ui/image";
 import { cn } from "@/lib/utils";
 import { LOGO_ICON } from "@/lib/brandAssets";
+import ThemeToggle from "@/components/ThemeToggle";
 import { useClientTrack } from "@/hooks/useClientTrack";
 import { getPackage } from "@/lib/packageContents";
 import ClientAssistantChat from "@/components/client/ClientAssistantChat";
@@ -83,6 +84,7 @@ export default function ClientLayout({ user }) {
           >
             <MessageSquare className="h-3.5 w-3.5" /> Assistant
           </button>
+          <ThemeToggle className="flex items-center gap-1.5 rounded-md border border-white/15 px-2.5 py-1.5 text-xs text-white/70 hover:bg-white/5" />
           <span className="hidden text-xs text-white/50 sm:inline">{user?.email || ""}</span>
           <button onClick={logout} className="flex items-center gap-1.5 rounded-md border border-white/15 px-2.5 py-1.5 text-xs text-white/70 hover:bg-white/5">
             <LogOut className="h-3.5 w-3.5" /> Sign out

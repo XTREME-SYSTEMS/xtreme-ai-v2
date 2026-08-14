@@ -1,6 +1,15 @@
 <!doctype html>
 <html lang="en">
   <head>
+    <script>
+      (function () {
+        try {
+          var t = localStorage.getItem("theme") || "system";
+          var dark = t === "dark" || (t === "system" && window.matchMedia("(prefers-color-scheme: dark)").matches);
+          if (dark) document.documentElement.classList.add("dark");
+        } catch (e) {}
+      })();
+    </script>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/png" href="https://media.base44.com/images/public/6a79444e821211169a147eee/0a0bc87bf_lgny-icon.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />

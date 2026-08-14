@@ -4,43 +4,43 @@
 
 @layer base {
   :root {
-    --background: 0 0% 0%;
-    --foreground: 0 0% 100%;
-    --card: 0 0% 4%;
-    --card-foreground: 0 0% 100%;
-    --popover: 0 0% 4%;
-    --popover-foreground: 0 0% 100%;
+    --background: 0 0% 100%;
+    --foreground: 240 10% 4%;
+    --card: 240 5% 98%;
+    --card-foreground: 240 10% 4%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 240 10% 4%;
     --primary: 84 100% 59%;
-    --primary-foreground: 0 0% 0%;
-    --secondary: 0 0% 8%;
-    --secondary-foreground: 0 0% 100%;
-    --muted: 0 0% 8%;
-    --muted-foreground: 0 0% 60%;
+    --primary-foreground: 240 10% 4%;
+    --secondary: 240 5% 96%;
+    --secondary-foreground: 240 10% 4%;
+    --muted: 240 5% 96%;
+    --muted-foreground: 240 4% 42%;
     --accent: 84 100% 59%;
-    --accent-foreground: 0 0% 0%;
-    --destructive: 0 84.2% 60.2%;
+    --accent-foreground: 240 10% 4%;
+    --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 98%;
-    --border: 0 0% 15%;
-    --input: 0 0% 15%;
+    --border: 240 6% 90%;
+    --input: 240 6% 90%;
     --ring: 84 100% 59%;
-    --chart-1: 12 76% 61%;
+    --chart-1: 12 76% 55%;
     --chart-2: 173 58% 39%;
-    --chart-3: 197 37% 24%;
-    --chart-4: 43 74% 66%;
-    --chart-5: 27 87% 67%;
+    --chart-3: 197 37% 40%;
+    --chart-4: 43 74% 55%;
+    --chart-5: 27 87% 60%;
     --radius: 0.5rem;
     --font-heading: ui-sans-serif, system-ui, sans-serif;
     --font-body: ui-sans-serif, system-ui, sans-serif;
     --font-display: ui-sans-serif, system-ui, sans-serif;
     --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
-    --sidebar-background: 0 0% 98%;
+    --sidebar-background: 0 0% 100%;
     --sidebar-foreground: 240 5.3% 26.1%;
     --sidebar-primary: 240 5.9% 10%;
     --sidebar-primary-foreground: 0 0% 98%;
     --sidebar-accent: 240 4.8% 95.9%;
     --sidebar-accent-foreground: 240 5.9% 10%;
-    --sidebar-border: 220 13% 91%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    --sidebar-border: 240 6% 90%;
+    --sidebar-ring: 84 100% 59.8%;
   }
 
   .dark {
@@ -92,7 +92,7 @@
 
   * {
     scrollbar-width: thin;
-    scrollbar-color: #000000 #000000;
+    scrollbar-color: hsl(var(--border)) hsl(var(--background));
   }
 
   ::-webkit-scrollbar {
@@ -101,15 +101,52 @@
   }
 
   ::-webkit-scrollbar-track {
-    background: #000000;
+    background: hsl(var(--background));
   }
 
   ::-webkit-scrollbar-thumb {
-    background: #000000;
+    background: hsl(var(--border));
     border-radius: 4px;
   }
 
   ::-webkit-scrollbar-thumb:hover {
-    background: #1a1a1a;
+    background: hsl(var(--muted-foreground));
   }
 }
+
+/* ============================================================
+   Whole-app light/dark overrides
+   Components use hardcoded dark utilities (bg-black, text-white,
+   bg-zinc-900, border-white/10, ...). Instead of editing every
+   component, we remap those utilities to theme tokens in LIGHT
+   mode here. DARK mode is the components' native look, so no
+   overrides are needed. The .dark class is toggled on <html>
+   by ThemeContext. These rules are unlayered so they win over
+   Tailwind's @layer utilities.
+   ============================================================ */
+:root:not(.dark) .bg-black { background-color: hsl(var(--background)); }
+:root:not(.dark) .bg-zinc-800,
+:root:not(.dark) .bg-zinc-900,
+:root:not(.dark) .bg-zinc-950 { background-color: hsl(var(--card)); }
+
+:root:not(.dark) .text-white { color: hsl(var(--foreground)); }
+:root:not(.dark) .text-white\/30,
+:root:not(.dark) .text-white\/40,
+:root:not(.dark) .text-white\/50,
+:root:not(.dark) .text-white\/60,
+:root:not(.dark) .text-white\/70,
+:root:not(.dark) .text-white\/80,
+:root:not(.dark) .text-white\/90 { color: hsl(var(--muted-foreground)); }
+
+:root:not(.dark) .border-white\/5,
+:root:not(.dark) .border-white\/10,
+:root:not(.dark) .border-white\/15,
+:root:not(.dark) .border-white\/20,
+:root:not(.dark) .border-white\/25 { border-color: hsl(var(--border)); }
+:root:not(.dark) .border-zinc-800,
+:root:not(.dark) .border-zinc-700 { border-color: hsl(var(--border)); }
+
+:root:not(.dark) .bg-white\/5,
+:root:not(.dark) .bg-white\/10 { background-color: hsl(var(--muted)); }
+:root:not(.dark) .hover\:bg-white\/5:hover,
+:root:not(.dark) .hover\:bg-white\/10:hover { background-color: hsl(var(--muted)); }

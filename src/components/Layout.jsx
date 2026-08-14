@@ -12,6 +12,7 @@ import { Image } from "@/components/ui/image";
 import { cn } from "@/lib/utils";
 import { LOGO_ICON } from "@/lib/brandAssets";
 import ClientLayout from "@/components/client/ClientLayout";
+import ThemeToggle from "@/components/ThemeToggle";
 
 const NAV = [
   { to: "/dashboard", label: "Command Center", icon: LayoutDashboard, end: true },
@@ -177,6 +178,7 @@ export default function Layout() {
           </div>
           <div className="ml-auto flex items-center gap-3">
             <span className="hidden text-xs text-black/60 sm:inline">{user?.email || ""}</span>
+            <ThemeToggle className="flex items-center gap-1.5 rounded-lg border border-lime-400 px-2.5 py-1.5 text-xs text-black font-medium hover:bg-lime-400/10" />
             <button onClick={logout} className="flex items-center gap-1.5 rounded-lg border border-lime-400 px-2.5 py-1.5 text-xs text-black font-medium hover:bg-lime-400/10">
               <LogOut className="h-3.5 w-3.5" /> Sign out
             </button>
