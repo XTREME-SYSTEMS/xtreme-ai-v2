@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { Rocket, Compass, ArrowRight, CheckCircle2, X, Wand2, GitBranch, Palette } from "lucide-react";
 import { useClientTrack } from "@/hooks/useClientTrack";
 import { LOGO_ICON } from "@/lib/brandAssets";
+import Typewriter from "@/components/Typewriter";
 
 const ADMIN_START = [
   { to: "/dashboard", icon: Compass, label: "Command Center", desc: "Your mission control — portfolio, traffic, and quick actions." },
@@ -18,6 +19,7 @@ const ADMIN_STEPS = [
 
 export default function WelcomeModal({ user, role }) {
   const [open, setOpen] = useState(false);
+  const [revealed, setRevealed] = useState(false);
   const { track } = useClientTrack(role === "admin" ? null : user);
   const storageKey = `lgny_welcome_${user?.id || "guest"}`;
 
@@ -40,7 +42,9 @@ export default function WelcomeModal({ user, role }) {
   const isAdmin = role === "admin";
   const start = isAdmin ? ADMIN_START : track.start;
   const steps = isAdmin ? ADMIN_STEPS : track.steps;
-  const subtitle = isAdmin ? "Welcome aboard. Here's a quick tour to get you moving." : track.subtitle;
+  const greeting = isAdmin
+    ? "Hey! I'm your launch assistant. I'll point you to the right buttons so you can start building right away."
+    : track.greeting;
   const showBadge = !isAdmin && track.title !== "Welcome";
 
   return (
@@ -49,17 +53,21 @@ export default function WelcomeModal({ user, role }) {
         <button onClick={close} className="absolute right-3 top-3 z-10 text-zinc-400 hover:text-zinc-900"><X className="h-5 w-5" /></button>
 
         <div className="border-b border-zinc-100 bg-gradient-to-br from-lime-50 via-white to-emerald-50 p-6 pb-5">
-          <img src={LOGO_ICON} alt="Lead Generation Near You" className="mb-3 h-12 w-12" />
           <h2 className="text-2xl font-bold text-zinc-900">Hello{user?.full_name ? `, ${user.full_name}` : ""}! 👋</h2>
-          <p className="mt-1 text-sm text-zinc-500">{subtitle}</p>
+          <div className="mt-3 flex items-start gap-2">
+            <img src={LOGO_ICON} alt="" className="mt-0.5 h-7 w-7 shrink-0 rounded-lg" />
+            <div className="flex-1 rounded-2xl rounded-tl-sm border border-lime-200 bg-lime-50 px-3.5 py-2.5">
+              <Typewriter text={greeting} className="text-sm leading-relaxed text-zinc-700" onDone={() => setRevealed(true)} />
+            </div>
+          </div>
           {showBadge && (
-            <div className="mt-2 inline-flex items-center gap-1.5 rounded-full bg-lime-100 px-2.5 py-1 text-xs font-semibold text-lime-700">
+            <div className={`mt-3 inline-flex items-center gap-1.5 rounded-full bg-lime-100 px-2.5 py-1 text-xs font-semibold text-lime-700 transition-opacity duration-500 ${revealed ? "opacity-100" : "opacity-0"}`}>
               <CheckCircle2 className="h-3.5 w-3.5" /> {track.title} unlocked
             </div>
           )}
         </div>
 
-        <div className="max-h-[58vh] overflow-y-auto px-6 py-5">
+        <div className={`max-h-[52vh] overflow-y-auto px-6 py-5 transition-opacity duration-500 ${revealed ? "opacity-100" : "pointer-events-none opacity-0"}`}>
           {!isAdmin && (
             <Link to="/brand-factory" onClick={close} className="group mb-5 flex items-center gap-3 rounded-xl bg-gradient-to-r from-lime-400 to-emerald-400 p-4 text-black transition-all hover:from-lime-300 hover:to-emerald-300 hover:shadow-lg">
               <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-black/10">
