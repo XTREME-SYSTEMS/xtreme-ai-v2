@@ -4,7 +4,7 @@ import { base44 } from "@/api/base44Client";
 import { PageHeader, Panel, EmptyState } from "@/components/ui";
 import StatCard from "@/components/StatCard";
 import StatusBadge from "@/components/StatusBadge";
-import { Users, Target, ShieldCheck, Hammer, ScrollText, Search, BookOpen, ArrowRight, GitBranch, Eye, MousePointerClick, Palette } from "lucide-react";
+import { Users, Target, ShieldCheck, Hammer, ScrollText, Search, BookOpen, ArrowRight, Eye, MousePointerClick, Palette } from "lucide-react";
 import PipelineHealthWidget from "@/components/PipelineHealthWidget";
 import SystemAccessGrid from "@/components/SystemAccessGrid";
 
@@ -15,12 +15,11 @@ export default function CommandCenter() {
   useEffect(() => {
     (async () => {
       try {
-        const [prospects, opportunities, builds, receipts, clones, keywords] = await Promise.all([
+        const [prospects, opportunities, builds, receipts, keywords] = await Promise.all([
           base44.entities.BusinessProspect.list("-created_date", 1),
           base44.entities.SearchOpportunity.list("-created_date", 1),
           base44.entities.BuildProject.list("-created_date", 1),
           base44.entities.Receipt.list("-created_date", 8),
-          base44.entities.CloneProject.list("-created_date", 1),
           base44.entities.RankKeyword.list("-clicks", 200),
         ]);
         const gscImpressions = keywords.reduce((a, k) => a + (k.impressions || 0), 0);
@@ -31,7 +30,7 @@ export default function CommandCenter() {
           .slice(0, 5);
         setStats({
           prospects: prospects.length, opportunities: opportunities.length,
-          builds: builds.length, receipts: receipts.length, clones: clones.length, recent: receipts,
+          builds: builds.length, receipts: receipts.length, recent: receipts,
           gscImpressions, gscClicks, topKeywords,
         });
       } catch (e) {}
@@ -40,7 +39,6 @@ export default function CommandCenter() {
   }, []);
 
   const quick = [
-    { to: "/clone-pipeline", label: "Clone Pipeline", icon: GitBranch, desc: "End-to-end clone → rebrand → deploy" },
     { to: "/discovery", label: "Discover Businesses", icon: Search, desc: "Find prospects by industry + geography" },
     { to: "/throw-the-book", label: "Throw The Book", icon: BookOpen, desc: "Score the full tactic library" },
     { to: "/build-queue", label: "Build Queue", icon: Hammer, desc: "Compose generator chains & build" },
@@ -50,8 +48,7 @@ export default function CommandCenter() {
     <div>
       <PageHeader title="Command Center" subtitle="LEAD GEN NEAR YOU — Universal Growth Factory · THROW THE BOOK AT IT" />
 
-      <div className="grid grid-cols-2 gap-4 lg:grid-cols-5">
-        <StatCard label="Clone Projects" value={loading ? "—" : stats.clones} icon={GitBranch} accent="text-lime-400" />
+      <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
         <StatCard label="Prospects" value={loading ? "—" : stats.prospects} icon={Users} />
         <StatCard label="Search Opportunities" value={loading ? "—" : stats.opportunities} icon={Target} accent="text-lime-400" />
         <StatCard label="Build Projects" value={loading ? "—" : stats.builds} icon={Hammer} accent="text-lime-400" />
