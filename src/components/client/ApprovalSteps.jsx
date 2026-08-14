@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { CheckCircle2, Lock, Loader2, X, MessageSquare, ArrowRight } from "lucide-react";
 import { UNIVERSAL_PIPELINE } from "@/lib/universalPipeline";
 import { computePipelineState } from "@/lib/pipelineState";
+import { usePipelineSignals } from "@/hooks/usePipelineSignals";
 import ClientOnboarding from "@/components/ClientOnboarding";
 
 // Step-by-step approval timeline for the client, driven by the universal
@@ -13,6 +14,7 @@ import ClientOnboarding from "@/components/ClientOnboarding";
 export default function ApprovalSteps({ user, approvals = [], onDecide }) {
   const [comments, setComments] = useState({});
   const [busy, setBusy] = useState(null);
+  const { signals } = usePipelineSignals(user?.email);
 
   const decide = async (id, status, comment) => {
     setBusy(id);
@@ -23,7 +25,7 @@ export default function ApprovalSteps({ user, approvals = [], onDecide }) {
     }
   };
 
-  const states = computePipelineState(user, approvals);
+  const states = computePipelineState(user, approvals, signals);
 
   return (
     <div className="relative">

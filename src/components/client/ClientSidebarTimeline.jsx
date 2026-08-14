@@ -4,6 +4,7 @@ import { CheckCircle2, Lock, ShieldCheck } from "lucide-react";
 import { base44 } from "@/api/base44Client";
 import { UNIVERSAL_PIPELINE } from "@/lib/universalPipeline";
 import { computePipelineState } from "@/lib/pipelineState";
+import { usePipelineSignals } from "@/hooks/usePipelineSignals";
 import { cn } from "@/lib/utils";
 
 // Compact, read-only progress timeline shown in the client portal sidebar.
@@ -12,6 +13,7 @@ import { cn } from "@/lib/utils";
 // to live Approval changes so the timeline refreshes without a page reload.
 export default function ClientSidebarTimeline({ user }) {
   const [approvals, setApprovals] = useState([]);
+  const { signals } = usePipelineSignals(user?.email);
 
   useEffect(() => {
     if (!user) return;
@@ -31,7 +33,7 @@ export default function ClientSidebarTimeline({ user }) {
   }, [user]);
 
   const steps = UNIVERSAL_PIPELINE;
-  const states = computePipelineState(user, approvals);
+  const states = computePipelineState(user, approvals, signals);
   let currentIndex = states.findIndex((s) => !s.completed && !s.locked);
   if (currentIndex === -1) currentIndex = steps.length - 1;
 

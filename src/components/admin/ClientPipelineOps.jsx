@@ -14,6 +14,7 @@ import { cn } from "@/lib/utils";
 export default function ClientPipelineOps() {
   const [users, setUsers] = useState([]);
   const [approvals, setApprovals] = useState([]);
+  const [signalsByUser, setSignalsByUser] = useState({});
   const [loading, setLoading] = useState(true);
   const [requestFor, setRequestFor] = useState(null); // user being targeted
   const [stepKey, setStepKey] = useState("");
@@ -26,8 +27,19 @@ export default function ClientPipelineOps() {
       base44.entities.User.list("-created_date", 200),
       base44.entities.Approval.list("-created_date", 200),
     ]);
-    setUsers(u || []);
+    const userList = u || [];
+    setUsers(userList);
     setApprovals(a || []);
+    // Fetch pipeline signals for each client (index-rank / optimize completion).
+    const clients = userList.filter((x) => x.role !== "admin" && x.email);
+    const sigResults = await Promise.all(
+      clients.map((c) =>
+        base44.functions.invoke("getPipelineSignals", { email: c.email })
+          .then((res) => [c.email, res.data || {}])
+          .catch(() => [c.email, {}])
+      )
+    );
+    setSignalsByUser(Object.fromEntries(sigResults));
   };
 
   useEffect(() => {
@@ -50,7 +62,7 @@ export default function ClientPipelineOps() {
   const openRequest = (u) => {
     setRequestFor(u);
     // Default to the client's current gate step.
-    const cur = currentPipelineStep(u, approvalsFor(u.email));
+    const cur = currentPipelineStep(u, approvalsFor(u.email), signalsByUser[u.email] || {});
     const gateSteps = UNIVERSAL_PIPELINE.filter((s) => s.gate);
     const def = cur?.step?.gate ? cur.step.key : (gateSteps.find((s) => !approvalsFor(u.email).some((a) => a.pipeline_step === s.key && a.status === "approved"))?.key || gateSteps[0].key);
     setStepKey(def || "");
@@ -127,9 +139,10 @@ export default function ClientPipelineOps() {
           {/* Client rows */}
           {clients.map((u) => {
             const aFor = approvalsFor(u.email);
-            const states = computePipelineState(u, aFor);
-            const cur = currentPipelineStep(u, aFor);
-            const prog = pipelineProgress(u, aFor);
+            const sig = signalsByUser[u.email] || {};
+            const states = computePipelineState(u, aFor, sig);
+            const cur = currentPipelineStep(u, aFor, sig);
+            const prog = pipelineProgress(u, aFor, sig);
             const pending = aFor.filter((a) => a.status === "pending");
             const Icon = cur.step.icon;
             return (

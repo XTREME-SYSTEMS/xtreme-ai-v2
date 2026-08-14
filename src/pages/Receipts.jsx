@@ -3,18 +3,20 @@ import { base44 } from "@/api/base44Client";
 import { usePreview } from "@/lib/PreviewContext";
 import EntityTable from "@/components/EntityTable";
 import StatusBadge from "@/components/StatusBadge";
+import PreviewBanner from "@/components/client/PreviewBanner";
 import { Panel, EmptyState } from "@/components/ui";
 import { ScrollText } from "lucide-react";
 
 export default function Receipts() {
-  const { previewAsClient } = usePreview();
+  const { previewAsClient, previewClientEmail } = usePreview();
   const [rows, setRows] = useState([]);
   const [loading, setLoading] = useState(true);
 
   // In the Client Portal (real client or admin preview), Activity reflects
   // only the client's own actions — RLS scopes the Receipt reads to the
   // current user, and client-portal actions (approvals, signatures) are now
-  // logged here.
+  // logged here. When an admin previews a specific client, we resolve that
+  // client's user id and filter receipts to it.
   const isClientView = previewAsClient;
 
   useEffect(() => {
@@ -22,7 +24,12 @@ export default function Receipts() {
     let cancelled = false;
     (async () => {
       try {
-        const list = await base44.entities.Receipt.list("-created_date", 50);
+        let list = await base44.entities.Receipt.list("-created_date", 50);
+        if (previewAsClient && previewClientEmail) {
+          const users = await base44.entities.User.filter({ email: previewClientEmail }, undefined, 5);
+          const uid = users[0]?.id;
+          if (uid) list = (list || []).filter((r) => r.created_by_id === uid);
+        }
         if (!cancelled) setRows(list || []);
       } catch (e) {
         if (!cancelled) setRows([]);
@@ -31,11 +38,12 @@ export default function Receipts() {
       }
     })();
     return () => { cancelled = true; };
-  }, [isClientView]);
+  }, [isClientView, previewAsClient, previewClientEmail]);
 
   if (isClientView) {
     return (
       <div>
+        <PreviewBanner />
         <div className="mb-6">
           <h1 className="text-xl font-semibold text-white sm:text-2xl">Activity</h1>
           <p className="mt-1 text-sm text-white/50">Your actions in the Client Portal — approvals, signatures and more.</p>

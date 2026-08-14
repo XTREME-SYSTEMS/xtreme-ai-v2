@@ -2,6 +2,8 @@ import { useEffect, useState } from "react";
 import { base44 } from "@/api/base44Client";
 import { FileSignature, Loader2, ShieldCheck, CheckCircle2, X, PenLine, Clock } from "lucide-react";
 import SignaturePad from "@/components/client/SignaturePad";
+import PreviewBanner from "@/components/client/PreviewBanner";
+import { usePreviewEmail } from "@/hooks/usePreviewEmail";
 import { logReceipt } from "@/lib/pipelineUtils";
 import { cn } from "@/lib/utils";
 
@@ -16,6 +18,7 @@ export default function Signatures() {
   const [busy, setBusy] = useState(false);
   const [done, setDone] = useState(null);
   const [error, setError] = useState(null);
+  const { effectiveEmail, isPreviewing } = usePreviewEmail(user);
 
   useEffect(() => {
     base44.auth.me().then(setUser).catch(() => {});
@@ -32,9 +35,9 @@ export default function Signatures() {
   };
 
   useEffect(() => {
-    if (!user?.email) return;
-    load(user.email).finally(() => setLoading(false));
-  }, [user?.email]);
+    if (!effectiveEmail) return;
+    load(effectiveEmail).finally(() => setLoading(false));
+  }, [effectiveEmail]);
 
   useEffect(() => {
     if (!user && !loading) setLoading(false);
@@ -78,16 +81,16 @@ export default function Signatures() {
   };
 
   const pending = docs.filter((d) => {
-    const signer = (d.signers || []).find((s) => s.email?.toLowerCase() === user?.email?.toLowerCase()) || {};
+    const signer = (d.signers || []).find((s) => s.email?.toLowerCase() === effectiveEmail?.toLowerCase()) || {};
     return !signer.signed && d.status !== "signed";
   });
   const completed = docs.filter((d) => {
-    const signer = (d.signers || []).find((s) => s.email?.toLowerCase() === user?.email?.toLowerCase()) || {};
+    const signer = (d.signers || []).find((s) => s.email?.toLowerCase() === effectiveEmail?.toLowerCase()) || {};
     return signer.signed || d.status === "signed";
   });
 
   const DocCard = ({ d }) => {
-    const signer = (d.signers || []).find((s) => s.email?.toLowerCase() === user?.email?.toLowerCase()) || {};
+    const signer = (d.signers || []).find((s) => s.email?.toLowerCase() === effectiveEmail?.toLowerCase()) || {};
     const signed = !!signer.signed || d.status === "signed";
     return (
       <div className={cn(
@@ -123,6 +126,7 @@ export default function Signatures() {
   return (
     <div className="mx-auto max-w-3xl px-1 pb-10">
       {/* Header */}
+      {isPreviewing && <PreviewBanner />}
       <div className="flex items-start gap-3 pb-6 pt-1">
         <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-lime-400/30 bg-lime-400/10">
           <FileSignature className="h-5 w-5 text-lime-400" />

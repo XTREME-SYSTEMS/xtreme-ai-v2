@@ -22,6 +22,46 @@
     "has_paid": {
       "type": "boolean",
       "default": false
+    },
+    "onboarded": {
+      "type": "boolean",
+      "default": false,
+      "description": "Whether the client has completed AI onboarding"
+    },
+    "onboarding": {
+      "type": "object",
+      "description": "Structured onboarding profile captured from the AI onboarding chat",
+      "properties": {
+        "business_name": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "goals": {
+          "type": "string"
+        },
+        "challenges": {
+          "type": "string"
+        },
+        "location": {
+          "type": "string"
+        },
+        "contact": {
+          "type": "object",
+          "properties": {
+            "phone": {
+              "type": "string"
+            },
+            "email": {
+              "type": "string"
+            }
+          }
+        },
+        "summary": {
+          "type": "string"
+        }
+      }
     }
   },
   "required": [

@@ -3,6 +3,8 @@ import { base44 } from "@/api/base44Client";
 import { Package, ChevronRight } from "lucide-react";
 import { getProductDetails } from "@/lib/productDetails";
 import PurchaseDetailModal from "@/components/client/PurchaseDetailModal";
+import PreviewBanner from "@/components/client/PreviewBanner";
+import { usePreviewEmail } from "@/hooks/usePreviewEmail";
 
 // Dedicated page for the client's purchased package — the top-level
 // destination of the client portal. Shows only the package and its items.
@@ -10,20 +12,28 @@ export default function MyPackage() {
   const [purchases, setPurchases] = useState([]);
   const [loading, setLoading] = useState(true);
   const [activePurchase, setActivePurchase] = useState(null);
+  const [user, setUser] = useState(null);
+  const { effectiveEmail, isScoped, isPreviewing } = usePreviewEmail(user);
+
+  useEffect(() => { base44.auth.me().then(setUser).catch(() => {}); }, []);
 
   const load = async () => {
-    const paid = await base44.entities.Base44Purchase.filter({ status: "paid" }, "-paidAt", 20);
+    const query = { status: "paid" };
+    if (isScoped) query.buyerEmail = effectiveEmail;
+    const paid = await base44.entities.Base44Purchase.filter(query, "-paidAt", 20);
     setPurchases(paid);
   };
 
   useEffect(() => {
+    if (isPreviewing && !isScoped) { setLoading(false); return; }
+    if (!effectiveEmail && !isPreviewing) { setLoading(false); return; }
     (async () => {
       try {
         await load();
       } catch (e) {}
       setLoading(false);
     })();
-  }, []);
+  }, [effectiveEmail, isScoped, isPreviewing]);
 
   useEffect(() => {
     document.title = "My Package · Lead Gen Near You";
@@ -42,6 +52,7 @@ export default function MyPackage() {
 
   return (
     <div>
+      {isPreviewing && <PreviewBanner />}
       {/* What you paid for — the source of truth the whole system keys off */}
       <div className="rounded-xl border border-lime-400/40 bg-lime-400/5 p-5">
         <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-lime-400">

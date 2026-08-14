@@ -1,14 +1,16 @@
 import { useEffect, useState } from "react";
 import { base44 } from "@/api/base44Client";
 import { usePreview } from "@/lib/PreviewContext";
+import { usePreviewEmail } from "@/hooks/usePreviewEmail";
 import ApprovalSteps from "@/components/client/ApprovalSteps";
+import PreviewBanner from "@/components/client/PreviewBanner";
 import { logReceipt } from "@/lib/pipelineUtils";
 import EntityTable from "@/components/EntityTable";
 import StatusBadge from "@/components/StatusBadge";
 import { CheckCircle } from "lucide-react";
 
 export default function Approvals() {
-  const { previewAsClient } = usePreview();
+  const { previewAsClient, previewClientEmail } = usePreview();
   const [user, setUser] = useState(null);
   const [approvals, setApprovals] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -17,12 +19,21 @@ export default function Approvals() {
   const isClientView = previewAsClient || user?.role !== "admin";
 
   const load = async () => {
-    // RLS scopes reads to the current user; fetch pending + approved.
-    const [pending, approved] = await Promise.all([
-      base44.entities.Approval.filter({ status: "pending" }, "-created_date", 50),
-      base44.entities.Approval.filter({ status: "approved" }, "-created_date", 50),
-    ]);
-    setApprovals([...pending, ...approved]);
+    // When previewing a specific client, scope to their email; otherwise RLS
+    // scopes to the current user (real client) or returns all (admin preview).
+    if (previewAsClient && previewClientEmail) {
+      const [pending, approved] = await Promise.all([
+        base44.entities.Approval.filter({ status: "pending", client_email: previewClientEmail }, "-created_date", 50),
+        base44.entities.Approval.filter({ status: "approved", client_email: previewClientEmail }, "-created_date", 50),
+      ]);
+      setApprovals([...pending, ...approved]);
+    } else {
+      const [pending, approved] = await Promise.all([
+        base44.entities.Approval.filter({ status: "pending" }, "-created_date", 50),
+        base44.entities.Approval.filter({ status: "approved" }, "-created_date", 50),
+      ]);
+      setApprovals([...pending, ...approved]);
+    }
   };
 
   useEffect(() => {
@@ -34,7 +45,7 @@ export default function Approvals() {
       } catch (e) {}
       setLoading(false);
     })();
-  }, []);
+  }, [previewAsClient, previewClientEmail]);
 
   useEffect(() => {
     document.title = "Approvals · Lead Gen Near You";
@@ -81,6 +92,7 @@ export default function Approvals() {
 
   return (
     <div>
+      <PreviewBanner />
       <h1 className="mb-1 text-xl font-semibold text-white sm:text-2xl">Approvals</h1>
       <p className="mb-5 text-sm text-white/50">
         Each step of your build is laid out below in order. The green, flashing step is the one you're on —
