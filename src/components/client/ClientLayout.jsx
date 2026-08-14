@@ -11,6 +11,7 @@ import { LOGO_ICON } from "@/lib/brandAssets";
 import ThemeToggle from "@/components/ThemeToggle";
 import { useClientTrack } from "@/hooks/useClientTrack";
 import { usePreview } from "@/lib/PreviewContext";
+import ClientSidebarTimeline from "@/components/client/ClientSidebarTimeline";
 
 const NAV = [
   { to: "/dashboard", label: "Client Portal", icon: LayoutDashboard, end: true },
@@ -64,6 +65,7 @@ export default function ClientLayout({ user }) {
               </NavLink>
             );
           })}
+          <ClientSidebarTimeline user={user} />
         </nav>
       </aside>
 
