@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import { base44 } from "@/api/base44Client";
 import { Package, ChevronRight } from "lucide-react";
 import { getProductDetails } from "@/lib/productDetails";
-import PackageCatalog from "@/components/client/PackageCatalog";
 import PurchaseDetailModal from "@/components/client/PurchaseDetailModal";
 
 // Dedicated page for the client's purchased package — the top-level
@@ -101,13 +100,6 @@ export default function MyPackage() {
       </div>
 
       <PurchaseDetailModal purchase={activePurchase} onClose={() => setActivePurchase(null)} />
-
-      {/* Everything we sell — plans, tools & services */}
-      <div className="mt-10 border-t border-white/10 pt-8">
-        <h2 className="text-base font-semibold text-white">Everything we offer</h2>
-        <p className="mb-6 text-sm text-white/50">Plans, à-la-carte tools, and done-for-you services available to you.</p>
-        <PackageCatalog />
-      </div>
     </div>
   );
 }
