@@ -93,30 +93,36 @@ export default function MyPackage() {
             </p>
           </div>
         ) : (
-          <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
-            {purchases.map((p) => {
+          <div className="mt-3 space-y-3">
+            {purchases.map((p, idx) => {
               const detail = getProductDetails(p.productId);
               const Icon = detail.icon;
               return (
                 <button
                   key={p.id}
                   onClick={() => setActivePurchase(p)}
-                  className="group flex flex-col rounded-xl border border-white/10 bg-zinc-950 p-4 text-left transition-all hover:border-lime-400/50 hover:bg-white/5"
+                  className="group flex w-full items-center gap-4 rounded-lg border border-white/10 bg-zinc-950 p-4 text-left transition-all hover:border-lime-400/50 hover:bg-white/5"
                 >
-                  <div className="flex items-start justify-between">
-                    <div className={`flex h-10 w-10 items-center justify-center rounded-lg bg-gradient-to-br ${detail.accent}`}>
-                      <Icon className="h-5 w-5 text-lime-400" />
-                    </div>
-                    <span className="rounded bg-lime-400/15 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-lime-400">Active</span>
+                  <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-lime-400/40 text-sm font-semibold text-lime-400">
+                    {idx + 1}
                   </div>
-                  <h3 className="mt-3 text-sm font-semibold text-white">{p.productName || p.productId || pkg.title}</h3>
-                  <p className="mt-0.5 line-clamp-2 text-xs text-white/50">{detail.tagline}</p>
-                  <div className="mt-3 flex items-center justify-between border-t border-white/10 pt-3">
-                    <div>
-                      {p.amount && <div className="text-base font-bold text-lime-400">{fmtMoney(p)}</div>}
-                      <div className="text-[11px] text-white/40">{p.paidAt ? `Paid ${fmtDate(p.paidAt)}` : "Active"}</div>
+                  <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br ${detail.accent}`}>
+                    <Icon className="h-5 w-5 text-lime-400" />
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-center gap-2">
+                      <h3 className="truncate text-base font-semibold text-white">{p.productName || p.productId || pkg.title}</h3>
+                      <span className="rounded bg-lime-400/15 px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-lime-400">Active</span>
                     </div>
-                    <span className="flex items-center gap-0.5 text-xs font-medium text-lime-400 opacity-0 transition-opacity group-hover:opacity-100">
+                    <p className="mt-0.5 truncate text-xs text-white/50">{detail.tagline}</p>
+                    <p className="mt-0.5 text-[11px] text-white/40">
+                      Paid{p.paidAt ? ` on ${fmtDate(p.paidAt)}` : ""}{p.orderId ? ` · Order ${p.orderId.slice(0, 8)}` : ""}
+                    </p>
+                  </div>
+                  <div className="shrink-0 text-right">
+                    {p.amount && <div className="text-lg font-bold text-lime-400">{fmtMoney(p)}</div>}
+                    {p.quantity > 1 && <div className="text-xs text-white/40">Qty {p.quantity}</div>}
+                    <span className="mt-1 inline-flex items-center gap-0.5 text-xs font-medium text-lime-400 opacity-0 transition-opacity group-hover:opacity-100">
                       Details <ChevronRight className="h-3.5 w-3.5" />
                     </span>
                   </div>
