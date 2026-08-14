@@ -6,7 +6,7 @@ export default async function(req) {
   try {
     const base44 = createClientFromRequest(req);
     const body = await req.json();
-    const { action, token, signature } = body;
+    const { action, token, signature, email } = body;
 
     const docs = await base44.asServiceRole.entities.EsignDocument.filter({ share_token: token });
     const doc = docs[0];
@@ -21,9 +21,24 @@ export default async function(req) {
       });
     }
     if (action === "sign") {
-      const signers = (doc.signers || []).map((s) => ({ ...s, signed: true, signed_at: new Date().toISOString(), signature }));
-      await base44.asServiceRole.entities.EsignDocument.update(doc.id, { status: "signed", signers, signed_pdf_url: signature });
-      return Response.json({ ok: true });
+      const target = (email || "").toLowerCase();
+      let signers = (doc.signers || []).map((s) => {
+        if (target && s.email && s.email.toLowerCase() === target) {
+          return { ...s, signed: true, signed_at: new Date().toISOString(), signature };
+        }
+        return s;
+      });
+      // If no email was supplied (legacy/public link), mark all signers.
+      if (!target) {
+        signers = signers.map((s) => ({ ...s, signed: true, signed_at: new Date().toISOString(), signature }));
+      }
+      const allSigned = signers.length > 0 && signers.every((s) => s.signed);
+      await base44.asServiceRole.entities.EsignDocument.update(doc.id, {
+        status: allSigned ? "signed" : "viewed",
+        signers,
+        signed_pdf_url: allSigned ? signature : (doc.signed_pdf_url || undefined),
+      });
+      return Response.json({ ok: true, status: allSigned ? "signed" : "viewed" });
     }
     return Response.json({ error: "Invalid action" }, { status: 400 });
   } catch (error) {

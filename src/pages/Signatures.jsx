@@ -46,7 +46,7 @@ export default function Signatures() {
     if (!sig) { setError("Please draw your signature first."); return; }
     setBusy(true); setError(null);
     try {
-      const r = await base44.functions.invoke("esignPortal", { action: "sign", token: active.share_token, signature: sig });
+      const r = await base44.functions.invoke("esignPortal", { action: "sign", token: active.share_token, signature: sig, email: user?.email });
       if (r.data?.ok) {
         setDone(active.id);
         await logReceipt({
