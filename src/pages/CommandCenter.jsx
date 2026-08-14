@@ -93,9 +93,9 @@ export default function CommandCenter() {
         </Panel>
       </div>
 
-      <div className="mt-4 grid gap-4 lg:grid-cols-2">
+      <div className="mt-4">
         <Panel title="Quick Actions">
-          <div className="grid gap-2 sm:grid-cols-2">
+          <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
             {quick.map((q) => {
               const Icon = q.icon;
               return (
@@ -110,25 +110,6 @@ export default function CommandCenter() {
               );
             })}
           </div>
-        </Panel>
-
-        <Panel title="Recent Receipts">
-          {stats.recent.length === 0 ? (
-            <EmptyState icon={ScrollText} title="No receipts yet" subtitle="Run a generation step to start the audit trail." />
-          ) : (
-            <div className="space-y-2">
-              {stats.recent.map((r) => (
-                <div key={r.id} className="flex items-center gap-3 rounded-lg border border-white/10 bg-zinc-950 px-3 py-2">
-                  <StatusBadge status={r.status} />
-                  <div className="min-w-0 flex-1">
-                    <div className="truncate text-sm text-white">{r.action}</div>
-                    <div className="truncate text-xs text-white/40">{r.agent_or_workflow} · {r.entity_type || ""}</div>
-                  </div>
-                  <span className="shrink-0 text-xs text-white/30">{new Date(r.created_date).toLocaleTimeString()}</span>
-                </div>
-              ))}
-            </div>
-          )}
         </Panel>
       </div>
 
