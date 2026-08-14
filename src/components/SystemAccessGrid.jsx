@@ -75,6 +75,7 @@ const GROUPS = [
     name: "Site Factory",
     items: [
       { to: "/website-factory", label: "Website Factory", icon: Factory, desc: "Generate websites end-to-end" },
+      { to: "/brand-factory", label: "Brand Factory", icon: Wand2, desc: "AI concept-to-reality brand pipeline" },
       { to: "/template-library", label: "Template Library", icon: LayoutTemplate, desc: "Site templates" },
       { to: "/prompt-library", label: "Prompt Library", icon: BookOpen, desc: "Reusable AI prompts" },
       { to: "/clone-studio", label: "Clone Studio", icon: Copy, desc: "Clone a target site" },

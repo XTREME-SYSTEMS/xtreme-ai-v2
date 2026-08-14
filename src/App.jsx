@@ -62,6 +62,7 @@ import Expenses from '@/pages/billing/Expenses';
 import BillingDashboard from '@/pages/billing/BillingDashboard';
 import AutonomousSystem from '@/pages/AutonomousSystem';
 import WebsiteFactory from '@/pages/WebsiteFactory';
+import BrandFactory from '@/pages/BrandFactory';
 import TemplateLibrary from '@/pages/TemplateLibrary';
 import PromptLibrary from '@/pages/PromptLibrary';
 import RankEngine from '@/pages/RankEngine';
@@ -168,6 +169,7 @@ const AuthenticatedApp = () => {
           <Route path="/billing/expenses" element={<Expenses />} />
           <Route path="/autonomous-system" element={<AutonomousSystem />} />
           <Route path="/website-factory" element={<WebsiteFactory />} />
+          <Route path="/brand-factory" element={<BrandFactory />} />
           <Route path="/template-library" element={<TemplateLibrary />} />
           <Route path="/prompt-library" element={<PromptLibrary />} />
           <Route path="/rank-engine" element={<RankEngine />} />

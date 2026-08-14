@@ -1,0 +1,207 @@
+{
+  "name": "BrandProject",
+  "type": "object",
+  "properties": {
+    "business_name": {
+      "type": "string",
+      "description": "The business being branded"
+    },
+    "industry": {
+      "type": "string"
+    },
+    "description": {
+      "type": "string",
+      "description": "What the business does"
+    },
+    "audience": {
+      "type": "string",
+      "description": "Ideal customer / target market"
+    },
+    "vibe": {
+      "type": "string",
+      "description": "Tone / style keywords"
+    },
+    "contact": {
+      "type": "object",
+      "properties": {
+        "phone": {
+          "type": "string"
+        },
+        "email": {
+          "type": "string"
+        },
+        "website": {
+          "type": "string"
+        },
+        "address": {
+          "type": "string"
+        }
+      }
+    },
+    "current_step": {
+      "type": "string",
+      "enum": [
+        "concept",
+        "strategy",
+        "logo",
+        "business_card",
+        "brochure",
+        "social",
+        "video",
+        "review",
+        "complete"
+      ],
+      "default": "concept"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "draft",
+        "running",
+        "complete",
+        "failed"
+      ],
+      "default": "draft"
+    },
+    "strategy": {
+      "type": "object",
+      "properties": {
+        "positioning": {
+          "type": "string"
+        },
+        "promise": {
+          "type": "string"
+        },
+        "tagline": {
+          "type": "string"
+        },
+        "voice": {
+          "type": "string"
+        },
+        "colors": {
+          "type": "object",
+          "properties": {
+            "primary": {
+              "type": "string"
+            },
+            "accent": {
+              "type": "string"
+            },
+            "neutral": {
+              "type": "string"
+            }
+          }
+        },
+        "typography": {
+          "type": "object",
+          "properties": {
+            "heading": {
+              "type": "string"
+            },
+            "body": {
+              "type": "string"
+            }
+          }
+        },
+        "logo_direction": {
+          "type": "string"
+        }
+      }
+    },
+    "logos": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "url": {
+            "type": "string"
+          },
+          "prompt": {
+            "type": "string"
+          },
+          "style": {
+            "type": "string"
+          },
+          "selected": {
+            "type": "boolean",
+            "default": false
+          }
+        }
+      }
+    },
+    "selected_logo_url": {
+      "type": "string"
+    },
+    "business_card": {
+      "type": "object",
+      "properties": {
+        "front_url": {
+          "type": "string"
+        },
+        "back_url": {
+          "type": "string"
+        },
+        "prompt": {
+          "type": "string"
+        }
+      }
+    },
+    "brochure": {
+      "type": "object",
+      "properties": {
+        "cover_url": {
+          "type": "string"
+        },
+        "copy": {
+          "type": "string"
+        },
+        "pages": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "social_posts": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "platform": {
+            "type": "string"
+          },
+          "image_url": {
+            "type": "string"
+          },
+          "caption": {
+            "type": "string"
+          },
+          "prompt": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "video": {
+      "type": "object",
+      "properties": {
+        "url": {
+          "type": "string"
+        },
+        "prompt": {
+          "type": "string"
+        }
+      }
+    },
+    "logs": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    }
+  },
+  "required": [
+    "business_name"
+  ]
+}
