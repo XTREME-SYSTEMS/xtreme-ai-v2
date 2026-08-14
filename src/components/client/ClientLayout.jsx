@@ -13,7 +13,7 @@ import { getPackage } from "@/lib/packageContents";
 import ClientAssistantChat from "@/components/client/ClientAssistantChat";
 
 const NAV = [
-  { to: "/dashboard", label: "Client Dashboard", icon: LayoutDashboard, end: true },
+  { to: "/dashboard", label: "Client Portal", icon: LayoutDashboard, end: true },
   { to: "/approvals", label: "Approvals", icon: CheckCircle },
   { to: "/proposals", label: "My Proposals", icon: FileText },
   { to: "/receipts", label: "Activity", icon: ScrollText },

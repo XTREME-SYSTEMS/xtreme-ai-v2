@@ -36,7 +36,7 @@ export default function ClientDashboard() {
   }, []);
 
   useEffect(() => {
-    document.title = "Client Dashboard · Lead Gen Near You";
+    document.title = "Client Portal · Lead Gen Near You";
   }, []);
 
   const decide = async (id, status) => {
@@ -54,7 +54,7 @@ export default function ClientDashboard() {
 
   return (
     <div>
-      <h1 className="mb-1 text-xl font-semibold text-white sm:text-2xl">Client Dashboard</h1>
+      <h1 className="mb-1 text-xl font-semibold text-white sm:text-2xl">Client Portal</h1>
       <p className="mb-5 text-sm text-white/50">
         Welcome{user?.full_name ? `, ${user.full_name}` : ""} — your {pkg.title} build, step by step.
       </p>
