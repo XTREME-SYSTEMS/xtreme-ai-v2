@@ -1,16 +1,14 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { CheckCircle2, Lock } from "lucide-react";
+import { CheckCircle2, Lock, ShieldCheck } from "lucide-react";
 import { base44 } from "@/api/base44Client";
-import { useClientTrack } from "@/hooks/useClientTrack";
-import { getPackage } from "@/lib/packageContents";
+import { UNIVERSAL_PIPELINE } from "@/lib/universalPipeline";
 import { cn } from "@/lib/utils";
 
 // Compact, read-only progress timeline shown in the client portal sidebar.
-// Mirrors PackageTimeline's gate logic so the user always sees which step
-// of their approval-gated build they are currently on.
+// Uses a single universal pipeline that applies to every system implementation,
+// with approval-gated steps marked explicitly.
 export default function ClientSidebarTimeline({ user }) {
-  const { track } = useClientTrack(user);
   const [approvals, setApprovals] = useState([]);
 
   useEffect(() => {
@@ -27,8 +25,7 @@ export default function ClientSidebarTimeline({ user }) {
     return () => { cancelled = true; };
   }, [user]);
 
-  const pkg = getPackage(track?.key);
-  const steps = pkg?.steps || [];
+  const steps = UNIVERSAL_PIPELINE;
 
   const matches = (step, a) => {
     const hay = `${a.requested_action || ""} ${a.notes || ""} ${a.entity_type || ""}`.toLowerCase();
@@ -53,16 +50,14 @@ export default function ClientSidebarTimeline({ user }) {
     return { completed, pendingApproval, locked };
   });
 
-  // The "current" step is the first one that isn't done and isn't locked.
   let currentIndex = states.findIndex((s) => !s.completed && !s.locked);
-  if (currentIndex === -1) currentIndex = states.length - 1;
-
-  if (!steps.length) return null;
+  if (currentIndex === -1) currentIndex = steps.length - 1;
 
   return (
     <div className="mt-5 px-2">
-      <div className="mb-2 px-1 text-[10px] font-semibold uppercase tracking-wider text-white/40">
+      <div className="mb-2 flex items-center gap-1.5 px-1 text-[10px] font-semibold uppercase tracking-wider text-white/40">
         Your Progress
+        <ShieldCheck className="h-3 w-3 text-lime-400/70" />
       </div>
       <div className="relative">
         <div className="absolute left-[11px] top-2 bottom-2 w-px bg-white/10" />
@@ -113,7 +108,14 @@ export default function ClientSidebarTimeline({ user }) {
                   )}>
                     {step.label}
                   </div>
-                  <div className={cn("text-[10px] leading-tight", statusClass)}>{statusLabel}</div>
+                  <div className="flex items-center gap-1.5">
+                    <span className={cn("text-[10px] leading-tight", statusClass)}>{statusLabel}</span>
+                    {step.gate && (
+                      <span className="rounded bg-white/10 px-1 text-[9px] font-medium uppercase tracking-wide text-white/50">
+                        Approval
+                      </span>
+                    )}
+                  </div>
                 </div>
               </div>
             );
