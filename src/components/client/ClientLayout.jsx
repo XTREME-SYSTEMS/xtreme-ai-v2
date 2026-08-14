@@ -3,15 +3,13 @@ import { useState } from "react";
 import { base44 } from "@/api/base44Client";
 import {
   LayoutDashboard, CheckCircle, FileText, ScrollText, Settings,
-  LogOut, Menu, X, MessageSquare, Sparkles, ArrowLeft,
+  LogOut, Menu, X, ArrowLeft,
 } from "lucide-react";
 import { Image } from "@/components/ui/image";
 import { cn } from "@/lib/utils";
 import { LOGO_ICON } from "@/lib/brandAssets";
 import ThemeToggle from "@/components/ThemeToggle";
 import { useClientTrack } from "@/hooks/useClientTrack";
-import { getPackage } from "@/lib/packageContents";
-import ClientAssistantChat from "@/components/client/ClientAssistantChat";
 import { usePreview } from "@/lib/PreviewContext";
 
 const NAV = [
@@ -24,9 +22,6 @@ const NAV = [
 
 export default function ClientLayout({ user }) {
   const [open, setOpen] = useState(false);
-  const [chatOpen, setChatOpen] = useState(true);
-  const { track } = useClientTrack(user);
-  const pkg = getPackage(track.key);
   const navigate = useNavigate();
   const { setPreview } = usePreview();
 
@@ -85,37 +80,16 @@ export default function ClientLayout({ user }) {
               <ArrowLeft className="h-3.5 w-3.5" /> Exit Preview
             </button>
           )}
-          <button
-            onClick={() => setChatOpen((v) => !v)}
-            className="ml-auto flex items-center gap-1.5 rounded-md border border-white/15 px-2.5 py-1.5 text-xs text-white/70 hover:bg-white/5"
-          >
-            <MessageSquare className="h-3.5 w-3.5" /> Assistant
-          </button>
-          <ThemeToggle className="flex items-center gap-1.5 rounded-md border border-white/15 px-2.5 py-1.5 text-xs text-white/70 hover:bg-white/5" />
+          <ThemeToggle className="ml-auto flex items-center gap-1.5 rounded-md border border-white/15 px-2.5 py-1.5 text-xs text-white/70 hover:bg-white/5" />
           <span className="hidden text-xs text-white/50 sm:inline">{user?.email || ""}</span>
           <button onClick={logout} className="flex items-center gap-1.5 rounded-md border border-white/15 px-2.5 py-1.5 text-xs text-white/70 hover:bg-white/5">
             <LogOut className="h-3.5 w-3.5" /> Sign out
           </button>
         </header>
 
-        <div className="flex flex-1 overflow-hidden">
-          <main className="flex-1 overflow-y-auto p-4 sm:p-6">
-            <Outlet />
-          </main>
-
-          {chatOpen && (
-            <aside className="hidden w-80 shrink-0 border-l border-white/10 bg-zinc-950 md:flex md:flex-col">
-              <div className="flex h-14 items-center gap-2 border-b border-white/10 px-4">
-                <Sparkles className="h-4 w-4 text-lime-400" />
-                <span className="text-sm font-semibold text-white">Assistant</span>
-                <button onClick={() => setChatOpen(false)} className="ml-auto text-white/40 hover:text-white"><X className="h-4 w-4" /></button>
-              </div>
-              <div className="flex-1 overflow-hidden">
-                <ClientAssistantChat user={user} pkg={pkg} />
-              </div>
-            </aside>
-          )}
-        </div>
+        <main className="flex-1 overflow-y-auto p-4 sm:p-6">
+          <Outlet />
+        </main>
       </div>
     </div>
   );
