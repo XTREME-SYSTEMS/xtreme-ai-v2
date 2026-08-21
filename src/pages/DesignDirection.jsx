@@ -1,13 +1,13 @@
 import { useEffect } from "react";
-import DesignPackPicker from "@/components/client/DesignPackPicker";
+import WebsiteDesignStudio from "@/components/website/WebsiteDesignStudio";
 
-// Step 3 of the epoxy website build: the client picks up to 3 design
-// directions from 10 curated logo/web packs. The selection is saved as a
-// design DNA profile that informs the actual website build.
+// Website Design step: the client sees their logo & brand on 10 real website
+// layouts (desktop + mobile), filled with location-aware content generated
+// from their onboarding profile. They pick one and approve — that exact layout
+// is what gets built.
 export default function DesignDirection() {
   useEffect(() => {
-    document.title = "Design Direction · Lead Gen Near You";
+    document.title = "Website Design · Lead Gen Near You";
   }, []);
-
-  return <DesignPackPicker />;
+  return <WebsiteDesignStudio />;
 }
