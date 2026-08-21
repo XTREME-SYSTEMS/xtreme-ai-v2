@@ -16,7 +16,10 @@ export function computePipelineState(user, approvals = [], signals = {}) {
     let pendingApproval = null;
 
     if (step.key === "onboarding") {
-      completed = !!user?.onboarded;
+      // Onboarding = the client submitting their Business Profile (the new
+      // constrained intake). Legacy `onboarded` flag kept as a fallback for
+      // any accounts that completed the old AI chat.
+      completed = !!(user?.epoxyProfileSubmitted || user?.onboarded);
     } else if (step.key === "index-rank") {
       completed = !!signals.indexRankComplete;
     } else if (step.key === "optimize") {
