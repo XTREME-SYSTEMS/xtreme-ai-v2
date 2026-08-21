@@ -90,6 +90,8 @@ import Assistant from '@/pages/Assistant';
 import Signatures from '@/pages/Signatures';
 import BusinessProfile from '@/pages/BusinessProfile';
 import BusinessNameStudio from '@/pages/BusinessNameStudio';
+import WalkthroughStudio from '@/pages/WalkthroughStudio';
+import WalkthroughView from '@/pages/WalkthroughView';
 import ContentGenerator from '@/pages/ContentGenerator';
 import LogoGenerator from '@/pages/LogoGenerator';
 import BrandGenerator from '@/pages/BrandGenerator';
@@ -136,6 +138,7 @@ const AuthenticatedApp = () => {
       <Route path="/coupon" element={<CouponPage />} />
       <Route path="/free-audit" element={<FreeAuditPage />} />
       <Route path="/sign/:token" element={<SignPortal />} />
+      <Route path="/walkthrough/:token" element={<WalkthroughView />} />
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
       <Route path="/forgot-password" element={<ForgotPassword />} />
@@ -147,6 +150,7 @@ const AuthenticatedApp = () => {
           <Route path="/assistant" element={<Assistant />} />
           <Route path="/business-profile" element={<BusinessProfile />} />
           <Route path="/business-name-studio" element={<BusinessNameStudio />} />
+          <Route path="/walkthrough-studio" element={<WalkthroughStudio />} />
           <Route path="/content-generator" element={<ContentGenerator />} />
           <Route path="/logo-generator" element={<LogoGenerator />} />
           <Route path="/brand-generator" element={<BrandGenerator />} />

@@ -1,0 +1,118 @@
+{
+  "name": "WalkthroughProject",
+  "type": "object",
+  "description": "AI-powered 3D walkthrough projects. Users upload images of their space, AI analyzes them, and a 3D walkthrough is generated for clients to view.",
+  "properties": {
+    "title": {
+      "type": "string",
+      "description": "Title of the walkthrough"
+    },
+    "client_email": {
+      "type": "string",
+      "description": "Email of the client who owns this project. Used for row-level isolation."
+    },
+    "description": {
+      "type": "string",
+      "description": "Description of the space"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "draft",
+        "processing",
+        "ready",
+        "published"
+      ],
+      "default": "draft"
+    },
+    "images": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Uploaded image URLs"
+    },
+    "viewpoints": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "imageIndex": {
+            "type": "number"
+          },
+          "imageUrl": {
+            "type": "string"
+          },
+          "label": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "focusPoints": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "ai_analysis": {
+      "type": "string",
+      "description": "AI-generated walkthrough analysis"
+    },
+    "share_token": {
+      "type": "string",
+      "description": "Public share token for the walkthrough viewer"
+    },
+    "published": {
+      "type": "boolean",
+      "default": false
+    }
+  },
+  "required": [
+    "title",
+    "client_email"
+  ],
+  "rls": {
+    "read": {
+      "$or": [
+        {
+          "data.client_email": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "create": {
+      "$or": [
+        {
+          "data.client_email": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "update": {
+      "$or": [
+        {
+          "data.client_email": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}
