@@ -5,6 +5,7 @@ import { MessageSquareText, Loader2, Check, RefreshCw, ArrowRight, AlertCircle, 
 import { cn } from "@/lib/utils";
 import { logReceipt } from "@/lib/pipelineUtils";
 import BackButton from "@/components/client/BackButton";
+import { notifyStepComplete } from "@/lib/pipelineNotify";
 
 // Step: Content Generator. Scrapes the client's market (location, industry,
 // competitors, pricing, social) and generates 10 distinct content/tone
@@ -74,6 +75,7 @@ export default function ContentGenerator() {
         contentTemplatesChosen: true,
       });
       try { await logReceipt({ action: "Content tone chosen", entityType: "User", entityId: "self", status: "success", notes: chosen?.name || selectedId }); } catch {}
+      await notifyStepComplete("content", { businessName: profile?.businessName || "" });
       setSaved(true);
       try { localStorage.setItem("coach:done:/content-generator", "1"); } catch {}
       setTimeout(() => navigate("/logo-generator"), 800);

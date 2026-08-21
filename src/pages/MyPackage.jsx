@@ -6,6 +6,7 @@ import { getProductDetails } from "@/lib/productDetails";
 import PurchaseDetailModal from "@/components/client/PurchaseDetailModal";
 import PreviewBanner from "@/components/client/PreviewBanner";
 import { usePreviewEmail } from "@/hooks/usePreviewEmail";
+import { notifyStepComplete } from "@/lib/pipelineNotify";
 
 // Dedicated page for the client's purchased package — the top-level
 // destination of the client portal. Shows only the package and its items.
@@ -27,6 +28,7 @@ export default function MyPackage() {
   const continueToOnboarding = () => {
     setActivePurchase(null);
     try { localStorage.setItem("coach:done:/my-package", "1"); } catch {}
+    notifyStepComplete("welcome", { clientEmail: user?.email || "" });
     navigate("/business-profile");
   };
 

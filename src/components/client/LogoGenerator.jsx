@@ -7,6 +7,7 @@ import { cn } from "@/lib/utils";
 import { logReceipt } from "@/lib/pipelineUtils";
 import { LOGO_STYLES } from "@/lib/designPrompts";
 import BackButton from "@/components/client/BackButton";
+import { notifyStepComplete } from "@/lib/pipelineNotify";
 
 // Step: Logo Generator. Generates 10 distinct logos for the client's epoxy
 // business (from their Business Profile name), lets them pick one, and saves
@@ -80,6 +81,7 @@ export default function LogoGenerator() {
       try {
         await logReceipt({ action: "Logo chosen", entityType: "User", entityId: "self", status: "success", notes: `Logo selected` });
       } catch {}
+      await notifyStepComplete("logo", { businessName: profile?.businessName || "" });
       setSaved(true);
       try { localStorage.setItem("coach:done:/logo-generator", "1"); } catch {}
       setTimeout(() => navigate("/brand-generator"), 800);

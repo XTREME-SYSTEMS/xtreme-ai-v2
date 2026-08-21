@@ -1,11 +1,20 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.40';
 import { secrets } from "base44:runtime";
+import {
+  notifyRevisionRequested,
+  applyRevisionCascade,
+  STEP_LABELS,
+} from '../../shared/pipelineNotifications.ts';
 
-// Called by a client from the Welcome (My Package) page when they press
-// "Request Revision". Creates an admin-visible Approval record capturing the
-// revision note and emails every admin so the team is alerted immediately.
-// Runs as service role because the Approval entity is admin-create-only and
-// clients must not be able to impersonate admin writes.
+// Called by a client from any pipeline step when they press "Request Revision".
+// 1. Creates an admin-visible Approval record capturing the revision note.
+// 2. Applies the revision cascade: clears the revised step's saved data AND all
+//    downstream dependent steps' data on the user profile (e.g. revising the
+//    logo invalidates brand mockups + website design).
+// 3. Emails the client + all admins about the revision (and which steps cascade).
+// 4. Stubs SMS.
+// Runs as service role because Approval is admin-create-only and the cascade
+// must update the user profile server-side.
 export default async function(req) {
   try {
     const base44 = createClientFromRequest(req);
@@ -17,6 +26,12 @@ export default async function(req) {
 
     const note = String(comment).trim();
     const email = clientEmail ? String(clientEmail) : "";
+    const stepKey = pipelineStep || "welcome";
+    const stepLabel = STEP_LABELS[stepKey] || stepKey;
+    const appUrl =
+      secrets.get("WIX_CHECKOUT_APP_URL") ||
+      req.headers.get("x-base44-app-url") ||
+      `https://${req.headers.get("host") || ""}`;
 
     // 1) Persist the revision request as a pending Approval so it shows up in
     //    the admin's Approvals dashboard immediately.
@@ -25,8 +40,8 @@ export default async function(req) {
       const created = await base44.asServiceRole.entities.Approval.create({
         entity_type: "Base44Purchase",
         entity_id: purchaseId || "",
-        requested_action: "Revise package — client requested changes",
-        pipeline_step: pipelineStep || "welcome",
+        requested_action: `Revise ${stepLabel} — client requested changes`,
+        pipeline_step: stepKey,
         client_email: email,
         risk_level: "yellow",
         status: "pending",
@@ -37,35 +52,44 @@ export default async function(req) {
       console.error("submitRevisionRequest: Approval create failed", e?.message || e);
     }
 
-    // 2) Email every admin so the request alerts the team right away.
-    let emailed = 0;
+    // 2) Apply the revision cascade: clear the revised step + downstream steps'
+    //    saved data so the client must redo them.
+    let cascadedSteps: string[] = [];
     try {
-      const users = await base44.asServiceRole.entities.User.list();
-      const appUrl = secrets.get("WIX_CHECKOUT_APP_URL") || `https://${req.headers.get("host") || ""}`;
-      for (const u of users || []) {
-        if (u.role !== "admin" || !u.email) continue;
-        try {
-          await base44.integrations.Core.SendEmail({
-            to: u.email,
-            subject: "Revision request from a client",
-            body:
-              `A client just requested a revision to their package.\n\n` +
-              `Client: ${email || "(unknown)"}\n` +
-              `Step: ${pipelineStep || "welcome"}\n` +
-              `Purchase ID: ${purchaseId || "(none)"}\n\n` +
-              `Their note:\n${note}\n\n` +
-              `Review pending approvals: ${appUrl}/approvals`,
-          });
-          emailed++;
-        } catch (e) {
-          console.error("submitRevisionRequest: email to admin failed", u.email, e?.message || e);
-        }
-      }
+      cascadedSteps = await applyRevisionCascade(base44, stepKey, email);
     } catch (e) {
-      console.error("submitRevisionRequest: admin list failed", e?.message || e);
+      console.error("submitRevisionRequest: cascade failed", e?.message || e);
     }
 
-    return Response.json({ ok: true, approvalId, emailed });
+    // 3) Email the client + all admins about the revision (including cascade).
+    try {
+      await notifyRevisionRequested(base44, {
+        clientEmail: email,
+        stepKey,
+        stepLabel,
+        comment: note,
+        appUrl,
+        cascadedSteps,
+      });
+    } catch (e) {
+      console.error("submitRevisionRequest: notification failed", e?.message || e);
+    }
+
+    // 4) Audit trail
+    try {
+      await base44.asServiceRole.entities.Receipt.create({
+        agent_or_workflow: "submitRevisionRequest",
+        action: `Revision requested: ${stepLabel}`,
+        entity_type: "User",
+        entity_id: email,
+        status: "escalated",
+        evidence: `Note: ${note.slice(0, 200)}${cascadedSteps.length ? ` | Cascaded: ${cascadedSteps.join(", ")}` : ""}`,
+      });
+    } catch (e) {
+      console.error("submitRevisionRequest: receipt failed", e?.message || e);
+    }
+
+    return Response.json({ ok: true, approvalId, cascadedSteps });
   } catch (error) {
     console.error("submitRevisionRequest error", error?.message || error);
     return Response.json({ error: error?.message || "server error" }, { status: 500 });

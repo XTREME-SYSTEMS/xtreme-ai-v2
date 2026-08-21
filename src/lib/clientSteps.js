@@ -1,5 +1,5 @@
 import {
-  Package, Building2, MessageSquareText, PenTool, Shirt, Palette, Share2, Video, LayoutTemplate, FileSignature, ShieldCheck, Rocket, Settings, LayoutDashboard,
+  Package, Building2, MessageSquareText, PenTool, Shirt, Palette, Share2, Video, LayoutTemplate, FileSignature, ShieldCheck, Rocket, Settings, LayoutDashboard, Sparkles,
 } from "lucide-react";
 
 // The ordered journey a client follows to get their epoxy contractor website
@@ -66,27 +66,34 @@ export const CLIENT_STEPS = [
     to: "/your-designs", label: "Your Designs", icon: LayoutTemplate, step: 9, gate: "auto",
     activityLabel: "Review your finished brand package",
     title: "Step 9 · Your Finished Brand Package",
-    body: "Everything you picked — your content tone, logo, brand mockups, website design, social media kit, and videos — is compiled here. Review it all, then continue to sign your service agreement.",
+    body: "Everything you picked — your content tone, logo, brand mockups, website design, social media kit, and videos — is compiled here. Review it all, then continue to choose any enhancements.",
+    nextLabel: "Go to Enhancements", nextTo: "/enhancements",
+  },
+  {
+    to: "/enhancements", label: "Enhancements", icon: Sparkles, step: 10, gate: "auto",
+    activityLabel: "Choose optional add-ons",
+    title: "Step 10 · Enhance Your Package",
+    body: "Add optional enhancements to supercharge your launch — rush delivery, extra pages, blog content, Google Business Profile setup, and more. Skip if you're happy with your current package.",
     nextLabel: "Go to Sign Agreement", nextTo: "/signatures",
   },
   {
-    to: "/signatures", label: "Sign Agreement", icon: FileSignature, step: 10, gate: "signatures",
+    to: "/signatures", label: "Sign Agreement", icon: FileSignature, step: 11, gate: "signatures",
     activityLabel: "Sign your service agreement",
-    title: "Step 10 · Sign Your Service Agreement",
-    body: "Review and sign your service agreement below. You must sign all pending documents before we can begin building.",
+    title: "Step 11 · Sign Your Service Agreement",
+    body: "Review and sign your service agreement below. You must sign all pending documents before we can begin building. Need to change something? Go back to any step.",
     nextLabel: "Go to Design Approval", nextTo: "/approvals",
   },
   {
-    to: "/approvals", label: "Design Approval", icon: ShieldCheck, step: 11, gate: "approvals",
+    to: "/approvals", label: "Design Approval", icon: ShieldCheck, step: 12, gate: "approvals",
     activityLabel: "Approve your website design",
-    title: "Step 11 · Approve Your Website Design",
+    title: "Step 12 · Approve Your Website Design",
     body: "Review and approve your website design below. Nothing goes live until you approve it.",
     nextLabel: "Go to Launch", nextTo: "/receipts",
   },
   {
-    to: "/receipts", label: "Launch", icon: Rocket, step: 12, gate: "auto",
+    to: "/receipts", label: "Launch", icon: Rocket, step: 13, gate: "auto",
     activityLabel: "Track your launch",
-    title: "Step 12 · Your Website Is Launching",
+    title: "Step 13 · Your Website Is Launching",
     body: "Every action your team takes to build and launch your epoxy contractor website is logged here for full transparency.",
     nextLabel: null, nextTo: null,
   },

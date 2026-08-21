@@ -7,6 +7,7 @@ import { logReceipt } from "@/lib/pipelineUtils";
 import { BRAND_TYPES } from "@/lib/designPrompts";
 import BrandPackPreview from "@/components/client/BrandPackPreview";
 import BackButton from "@/components/client/BackButton";
+import { notifyStepComplete } from "@/lib/pipelineNotify";
 
 // Step: Brand Generator. Uses the client's chosen logo to generate 10 brand
 // mockups (business card, brochure, t-shirt, hat, app, vehicle wrap, …).
@@ -114,6 +115,7 @@ export default function BrandGenerator() {
       try {
         await logReceipt({ action: "Brand mockups approved", entityType: "User", entityId: "self", status: "success", notes: `${packs.length} mockups approved` });
       } catch {}
+      await notifyStepComplete("brand", { businessName: businessName || "" });
       setSaved(true);
       try { localStorage.setItem("coach:done:/brand-generator", "1"); } catch {}
       setTimeout(() => navigate("/design-direction"), 800);

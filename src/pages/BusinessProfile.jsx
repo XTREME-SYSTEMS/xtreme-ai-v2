@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { base44 } from "@/api/base44Client";
 import { Building2, Upload, Loader2, CheckCircle2, X, MapPin, Star, Shield } from "lucide-react";
 import BackButton from "@/components/client/BackButton";
+import { notifyStepComplete } from "@/lib/pipelineNotify";
 
 // Step 2 of the epoxy website build: a constrained, multiple-choice intake.
 // No open-ended prose, no AI chat — every field is an exact answer or a
@@ -151,6 +152,7 @@ export default function BusinessProfile() {
       setGallery([]);
       setSaved(true);
       try { localStorage.setItem("coach:done:/business-profile", "1"); } catch {}
+      await notifyStepComplete("profile", { businessName: form.businessName || "" });
       setTimeout(() => navigate("/content-generator"), 1000);
     } catch (err) {
       setError("Something went wrong saving your profile. Please try again.");

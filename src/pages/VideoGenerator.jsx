@@ -6,6 +6,7 @@ import { Video, Loader2, Check, RefreshCw, ArrowRight, AlertCircle, X, Send, Mes
 import { cn } from "@/lib/utils";
 import { logReceipt } from "@/lib/pipelineUtils";
 import BackButton from "@/components/client/BackButton";
+import { notifyStepComplete } from "@/lib/pipelineNotify";
 
 // Step: Video Generator. Generates 10 video concept cards (thumbnail +
 // description + production script) using the client's onboarding, content
@@ -86,6 +87,7 @@ export default function VideoGenerator() {
     try {
       await base44.auth.updateMe({ videoChosen: true });
       try { await logReceipt({ action: "Video pack approved", entityType: "User", entityId: "self", status: "success", notes: `${data?.concepts?.length || 0} concepts` }); } catch {}
+      await notifyStepComplete("video", { businessName: profile?.businessName || "" });
       setSaved(true);
       try { localStorage.setItem("coach:done:/video-generator", "1"); } catch {}
       setTimeout(() => navigate("/your-designs"), 800);

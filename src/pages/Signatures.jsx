@@ -1,15 +1,30 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { base44 } from "@/api/base44Client";
-import { FileSignature, Loader2, ShieldCheck, CheckCircle2, X, PenLine, Clock } from "lucide-react";
+import { FileSignature, Loader2, ShieldCheck, CheckCircle2, X, PenLine, Clock, ArrowRight, RotateCcw, Calendar } from "lucide-react";
 import SignaturePad from "@/components/client/SignaturePad";
 import PreviewBanner from "@/components/client/PreviewBanner";
+import BackButton from "@/components/client/BackButton";
 import { usePreviewEmail } from "@/hooks/usePreviewEmail";
 import { logReceipt } from "@/lib/pipelineUtils";
+import { notifyStepComplete } from "@/lib/pipelineNotify";
 import { cn } from "@/lib/utils";
+
+const REVISION_LINKS = [
+  { to: "/business-profile", label: "Business Profile" },
+  { to: "/content-generator", label: "Content" },
+  { to: "/logo-generator", label: "Logo" },
+  { to: "/brand-generator", label: "Brand" },
+  { to: "/design-direction", label: "Website" },
+  { to: "/social-media", label: "Social" },
+  { to: "/video-generator", label: "Video" },
+  { to: "/your-designs", label: "Your Designs" },
+];
 
 // Client-facing Signatures page: lists contracts assigned to the logged-in
 // user and lets them sign inline on mobile (touch) or desktop (mouse).
 export default function Signatures() {
+  const navigate = useNavigate();
   const [user, setUser] = useState(null);
   const [docs, setDocs] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -18,6 +33,9 @@ export default function Signatures() {
   const [busy, setBusy] = useState(false);
   const [done, setDone] = useState(null);
   const [error, setError] = useState(null);
+  const [kickoffDate, setKickoffDate] = useState("");
+  const [savingKickoff, setSavingKickoff] = useState(false);
+  const [kickoffSaved, setKickoffSaved] = useState(false);
   const { effectiveEmail, isPreviewing } = usePreviewEmail(user);
 
   useEffect(() => {
@@ -69,9 +87,26 @@ export default function Signatures() {
           notes: `Signed: ${active.title}`,
         });
         await load(user.email);
+        await notifyStepComplete("signatures", { clientEmail: user?.email || "" });
       } else setError(r.data?.error || "Signing failed");
     } catch (e) { setError("Signing failed"); }
     setBusy(false);
+  };
+
+  const saveKickoff = async () => {
+    if (!kickoffDate) return;
+    setSavingKickoff(true);
+    try {
+      await base44.auth.updateMe({ kickoffCallDate: kickoffDate });
+      try {
+        await logReceipt({ action: "Kickoff call scheduled", entityType: "User", entityId: "self", status: "success", notes: `Preferred date: ${kickoffDate}` });
+      } catch {}
+      setKickoffSaved(true);
+    } catch (e) {
+      setError("Couldn't save. Please try again.");
+    } finally {
+      setSavingKickoff(false);
+    }
   };
 
   const fmtDate = (iso) => {
@@ -127,6 +162,7 @@ export default function Signatures() {
     <div className="mx-auto max-w-3xl px-1 pb-10">
       {/* Header */}
       {isPreviewing && <PreviewBanner />}
+      <BackButton to="/enhancements" />
       <div className="flex items-start gap-3 pb-6 pt-1">
         <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-lime-400/30 bg-lime-400/10">
           <FileSignature className="h-5 w-5 text-lime-400" />
@@ -136,6 +172,21 @@ export default function Signatures() {
           <p className="mt-0.5 text-sm text-white/50">Review and sign your contracts on any device.</p>
         </div>
         <span className="ml-auto hidden rounded-md border border-white/15 px-2 py-1 text-[10px] font-semibold uppercase tracking-wider text-white/40 sm:inline">E-Sign</span>
+      </div>
+
+      {/* Revision navigation — go back to any step to fix something */}
+      <div className="mb-6 rounded-xl border border-white/10 bg-zinc-950 p-4">
+        <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-white/50">
+          <RotateCcw className="h-3.5 w-3.5" /> Need to change something?
+        </div>
+        <p className="mt-1 text-xs text-white/40">Go back to any step to revise your choices. Revising a step will also reset any steps that depend on it.</p>
+        <div className="mt-3 flex flex-wrap gap-2">
+          {REVISION_LINKS.map((l) => (
+            <button key={l.to} onClick={() => navigate(l.to)} className="inline-flex items-center gap-1 rounded-md border border-white/15 px-2.5 py-1.5 text-xs font-medium text-white/60 hover:border-lime-400/50 hover:text-lime-300">
+              {l.label}
+            </button>
+          ))}
+        </div>
       </div>
 
       {loading ? (
@@ -173,6 +224,50 @@ export default function Signatures() {
               <div className="space-y-3">{completed.map((d) => <DocCard key={d.id} d={d} />)}</div>
             </section>
           )}
+        </div>
+      )}
+
+      {/* Scheduling + continue — shown when all docs are signed */}
+      {pending.length === 0 && docs.length > 0 && (
+        <div className="mt-7 space-y-4">
+          <div className="rounded-xl border border-lime-400/40 bg-lime-400/5 p-5">
+            <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-lime-400">
+              <Calendar className="h-4 w-4" /> Schedule Your Kickoff Call
+            </div>
+            <p className="mt-1 text-sm text-white/60">
+              Pick a preferred date for your kickoff call with our team. We'll confirm the time via email.
+            </p>
+            {kickoffSaved ? (
+              <div className="mt-3 flex items-center gap-2 rounded-lg border border-lime-400/50 bg-lime-400/10 px-3 py-2.5 text-sm text-lime-300">
+                <CheckCircle2 className="h-4 w-4" /> Saved — our team will reach out to confirm.
+              </div>
+            ) : (
+              <div className="mt-3 flex flex-wrap items-center gap-2">
+                <input
+                  type="date"
+                  value={kickoffDate}
+                  onChange={(e) => setKickoffDate(e.target.value)}
+                  className="rounded-lg border border-white/15 bg-zinc-950 px-3 py-2 text-sm text-white focus:border-lime-400 focus:outline-none"
+                />
+                <button
+                  type="button"
+                  onClick={saveKickoff}
+                  disabled={!kickoffDate || savingKickoff}
+                  className="inline-flex items-center gap-1.5 rounded-lg bg-lime-400 px-3 py-2 text-xs font-semibold text-black hover:bg-lime-300 disabled:opacity-50"
+                >
+                  {savingKickoff ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Calendar className="h-3.5 w-3.5" />}
+                  {savingKickoff ? "Saving…" : "Save preference"}
+                </button>
+              </div>
+            )}
+          </div>
+          <button
+            type="button"
+            onClick={() => navigate("/approvals")}
+            className="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-lime-400 px-4 py-3 text-sm font-semibold text-black transition-colors hover:bg-lime-300"
+          >
+            Continue to Design Approval <ArrowRight className="h-4 w-4" />
+          </button>
         </div>
       )}
 

@@ -5,6 +5,7 @@ import { Image } from "@/components/ui/image";
 import { LayoutTemplate, PenTool, Shirt, Globe, ArrowRight, Eye, Sparkles, MessageSquareText, Share2, Video, RefreshCw, AlertCircle, Check, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import BackButton from "@/components/client/BackButton";
+import { notifyStepComplete } from "@/lib/pipelineNotify";
 import { WEBSITE_LAYOUTS, PALETTES, buildTheme } from "@/components/website/websiteLayouts";
 import WebsitePreview, { ScaledPreview } from "@/components/website/WebsitePreview";
 
@@ -68,6 +69,7 @@ export default function YourDesigns() {
       setShowFlag(true);
       return;
     }
+    notifyStepComplete("designs", { clientEmail: user?.email || "", businessName: profile?.businessName || "" });
     navigate("/signatures");
   };
 

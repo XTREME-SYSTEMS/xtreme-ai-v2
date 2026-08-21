@@ -6,6 +6,7 @@ import { Share2, Loader2, Check, RefreshCw, ArrowRight, AlertCircle, Eye, X, Sen
 import { cn } from "@/lib/utils";
 import { logReceipt } from "@/lib/pipelineUtils";
 import BackButton from "@/components/client/BackButton";
+import { notifyStepComplete } from "@/lib/pipelineNotify";
 
 // Step: Social Media Generator. Generates 10 on-brand social media template
 // images (profile, cover, story, posts, favicon, icons, highlights) using the
@@ -65,6 +66,7 @@ export default function SocialMediaGenerator() {
     try {
       await base44.auth.updateMe({ socialMediaChosen: true });
       try { await logReceipt({ action: "Social media pack approved", entityType: "User", entityId: "self", status: "success", notes: `${data?.templates?.length || 0} templates + ${data?.posts?.length || 0} posts` }); } catch {}
+      await notifyStepComplete("social", { businessName: profile?.businessName || "" });
       setSaved(true);
       try { localStorage.setItem("coach:done:/social-media", "1"); } catch {}
       setTimeout(() => navigate("/video-generator"), 800);

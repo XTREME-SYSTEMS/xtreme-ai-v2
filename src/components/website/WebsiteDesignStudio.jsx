@@ -7,6 +7,7 @@ import { logReceipt } from "@/lib/pipelineUtils";
 import { PALETTES, WEBSITE_LAYOUTS, buildTheme, SECTION_META } from "@/components/website/websiteLayouts";
 import WebsitePreview, { ScaledPreview } from "@/components/website/WebsitePreview";
 import BackButton from "@/components/client/BackButton";
+import { notifyStepComplete } from "@/lib/pipelineNotify";
 
 const REVISE_CHIPS = ["Different layout", "Different colors", "Different content", "Different images", "Too plain", "Not local enough", "Doesn't match my brand", "Other"];
 
@@ -166,6 +167,7 @@ export default function WebsiteDesignStudio() {
         websiteContent: content, websiteImages: images, designPacksChosen: true,
       });
       try { await logReceipt({ action: "Website layout approved", entityType: "User", entityId: "self", status: "success", notes: `Layout ${selectedId} · palette ${paletteId}` }); } catch {}
+      await notifyStepComplete("website", { businessName: profile?.businessName || "" });
       setSaved(true);
       try { localStorage.setItem("coach:done:/design-direction", "1"); } catch {}
       setTimeout(() => navigate("/social-media"), 800);

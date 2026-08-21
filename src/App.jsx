@@ -96,6 +96,7 @@ import DesignDirection from '@/pages/DesignDirection';
 import SocialMediaGenerator from '@/pages/SocialMediaGenerator';
 import VideoGenerator from '@/pages/VideoGenerator';
 import YourDesigns from '@/pages/YourDesigns';
+import Enhancements from '@/pages/Enhancements';
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin, isAuthenticated } = useAuth();
@@ -147,6 +148,7 @@ const AuthenticatedApp = () => {
           <Route path="/social-media" element={<SocialMediaGenerator />} />
           <Route path="/video-generator" element={<VideoGenerator />} />
           <Route path="/your-designs" element={<YourDesigns />} />
+          <Route path="/enhancements" element={<Enhancements />} />
           <Route path="/signatures" element={<Signatures />} />
           <Route path="/discovery" element={<BusinessDiscovery />} />
           <Route path="/prospects" element={<Prospects />} />
