@@ -7,6 +7,7 @@ import ThemeToggle from "@/components/ThemeToggle";
 import { usePreview } from "@/lib/PreviewContext";
 import StepCoach from "@/components/client/StepCoach";
 import ClientTimeline from "@/components/client/ClientTimeline";
+import PWAInstallBar from "@/components/marketing/PWAInstallBar";
 
 // Distraction-free client shell: no sidebar, no timeline, no manual nav.
 // The only thing on screen is the current step's content plus the guided
@@ -52,6 +53,11 @@ export default function ClientLayout({ user }) {
       </main>
 
       <StepCoach />
+
+      {/* Branded mobile download button — PWA install bar (mobile / tablet only) */}
+      <div className="md:hidden">
+        <PWAInstallBar />
+      </div>
     </div>
   );
 }

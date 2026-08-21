@@ -7,6 +7,7 @@ import PurchaseDetailModal from "@/components/client/PurchaseDetailModal";
 import PreviewBanner from "@/components/client/PreviewBanner";
 import { usePreviewEmail } from "@/hooks/usePreviewEmail";
 import { notifyStepComplete } from "@/lib/pipelineNotify";
+import BrandedButton from "@/components/client/BrandedButton";
 
 // Dedicated page for the client's purchased package — the top-level
 // destination of the client portal. Shows only the package and its items.
@@ -227,13 +228,9 @@ export default function MyPackage() {
                     <MessageSquare className="h-3.5 w-3.5" /> Request Revision
                   </button>
                 </div>
-                <button
-                  type="button"
-                  onClick={continueToOnboarding}
-                  className="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-lime-400 px-4 py-3 text-sm font-semibold text-black transition-colors hover:bg-lime-300"
-                >
-                  <CheckCircle className="h-4 w-4" /> Approve Package
-                </button>
+                <BrandedButton onClick={continueToOnboarding} icon={CheckCircle} trailingIcon={null} showLogo>
+                  Approve Package
+                </BrandedButton>
               </>
             )}
           </div>
