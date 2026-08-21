@@ -1,19 +1,15 @@
-import { useEffect, useState } from "react";
-import { base44 } from "@/api/base44Client";
+import { useEffect } from "react";
 import { useClientTrack } from "@/hooks/useClientTrack";
+import { useClientUser } from "@/hooks/useClientUser";
 import { getPackage } from "@/lib/packageContents";
 import ClientAssistantChat from "@/components/client/ClientAssistantChat";
 import { Bot } from "lucide-react";
 
 // Dedicated AI assistant tab for the client portal.
 export default function Assistant() {
-  const [user, setUser] = useState(null);
+  const { user } = useClientUser();
   const { track } = useClientTrack(user);
   const pkg = getPackage(track.key);
-
-  useEffect(() => {
-    base44.auth.me().then(setUser).catch(() => {});
-  }, []);
 
   useEffect(() => {
     document.title = "Assistant · Lead Gen Near You";

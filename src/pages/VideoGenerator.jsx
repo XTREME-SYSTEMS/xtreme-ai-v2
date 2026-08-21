@@ -6,6 +6,7 @@ import { Video, Loader2, Check, RefreshCw, ArrowRight, AlertCircle, X, Send, Mes
 import { cn } from "@/lib/utils";
 import { logReceipt } from "@/lib/pipelineUtils";
 import BackButton from "@/components/client/BackButton";
+import { useClientUser } from "@/hooks/useClientUser";
 import { notifyStepComplete } from "@/lib/pipelineNotify";
 
 // Step: Video Generator. Generates 10 video concept cards (thumbnail +
@@ -31,17 +32,18 @@ export default function VideoGenerator() {
   const [generatingVideoId, setGeneratingVideoId] = useState("");
   const [preview, setPreview] = useState(null);
 
+  const { user } = useClientUser();
+
   useEffect(() => { document.title = "Video Generator · Lead Gen Near You"; }, []);
 
   useEffect(() => {
-    base44.auth.me().then((u) => {
-      setProfile(u?.epoxyProfile || null);
-      setLogoUrl(u?.chosenLogoUrl || "");
-      setContentTone(u?.chosenContentTone || "");
-      if (u?.videoPack) setData(u.videoPack);
-      if (u?.videoChosen) setSaved(true);
-    }).catch(() => {});
-  }, []);
+    if (!user) return;
+    setProfile(user?.epoxyProfile || null);
+    setLogoUrl(user?.chosenLogoUrl || "");
+    setContentTone(user?.chosenContentTone || "");
+    if (user?.videoPack) setData(user.videoPack);
+    if (user?.videoChosen) setSaved(true);
+  }, [user]);
 
   const generate = async () => {
     if (!profile?.businessName) { setGenError("Complete your Business Profile first."); return; }

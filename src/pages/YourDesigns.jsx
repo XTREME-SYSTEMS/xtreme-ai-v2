@@ -6,6 +6,7 @@ import { LayoutTemplate, PenTool, Shirt, Globe, ArrowRight, Eye, Sparkles, Messa
 import { cn } from "@/lib/utils";
 import BackButton from "@/components/client/BackButton";
 import { notifyStepComplete } from "@/lib/pipelineNotify";
+import { useClientUser } from "@/hooks/useClientUser";
 import { WEBSITE_LAYOUTS, PALETTES, buildTheme } from "@/components/website/websiteLayouts";
 import WebsitePreview, { ScaledPreview } from "@/components/website/WebsitePreview";
 import { BRAND_TYPES } from "@/lib/designPrompts";
@@ -18,8 +19,8 @@ import { BRAND_TYPES } from "@/lib/designPrompts";
 // regenerate button for granular control.
 export default function YourDesigns() {
   const navigate = useNavigate();
+  const { user: hookUser, loading } = useClientUser();
   const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true);
   const [checks, setChecks] = useState({ content: true, logo: true, brand: true, website: true, social: true, video: true });
   const [showFlag, setShowFlag] = useState(false);
   const [itemChecks, setItemChecks] = useState({ brand: {}, social: {}, video: {} });
@@ -28,11 +29,15 @@ export default function YourDesigns() {
 
   useEffect(() => {
     document.title = "Your Designs · Lead Gen Near You";
-    base44.auth.me().then((u) => {
-      setUser(u);
-      setLogoUrl(u?.chosenLogoUrl || "");
-    }).catch(() => {}).finally(() => setLoading(false));
   }, []);
+
+  useEffect(() => {
+    if (hookUser) setUser(hookUser);
+  }, [hookUser]);
+
+  useEffect(() => {
+    if (user) setLogoUrl(user?.chosenLogoUrl || "");
+  }, [user]);
 
   if (loading) {
     return <div className="flex items-center justify-center py-20 text-sm text-white/50">Loading your designs…</div>;

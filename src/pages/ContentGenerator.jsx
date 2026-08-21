@@ -5,6 +5,7 @@ import { MessageSquareText, Loader2, Check, RefreshCw, ArrowRight, AlertCircle, 
 import { cn } from "@/lib/utils";
 import { logReceipt } from "@/lib/pipelineUtils";
 import BackButton from "@/components/client/BackButton";
+import { useClientUser } from "@/hooks/useClientUser";
 import { notifyStepComplete } from "@/lib/pipelineNotify";
 
 // Step: Content Generator. Scrapes the client's market (location, industry,
@@ -28,17 +29,17 @@ export default function ContentGenerator() {
   const [sendingRevise, setSendingRevise] = useState(false);
   const [reviseSent, setReviseSent] = useState(false);
   const [reviseError, setReviseError] = useState("");
+  const { user } = useClientUser();
 
   useEffect(() => { document.title = "Content Generator · Lead Gen Near You"; }, []);
 
   useEffect(() => {
-    base44.auth.me().then((u) => {
-      setProfile(u?.epoxyProfile || null);
-      if (u?.contentTemplates) setData(u.contentTemplates);
-      if (u?.chosenContentTemplate) setSelectedId(u.chosenContentTemplate);
-      if (u?.contentTemplatesChosen) setSaved(true);
-    }).catch(() => {});
-  }, []);
+    if (!user) return;
+    setProfile(user?.epoxyProfile || null);
+    if (user?.contentTemplates) setData(user.contentTemplates);
+    if (user?.chosenContentTemplate) setSelectedId(user.chosenContentTemplate);
+    if (user?.contentTemplatesChosen) setSaved(true);
+  }, [user]);
 
   const generate = async () => {
     if (!profile?.businessName) { setGenError("Complete your Business Profile first."); return; }

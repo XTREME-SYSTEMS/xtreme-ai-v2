@@ -57,69 +57,34 @@ export function useStepGate(step, user) {
             });
           }
         } else if (step.gate === "profile") {
-          try {
-            const me = await base44.auth.me();
-            const done = !!(me && me.epoxyProfileSubmitted);
-            if (!cancelled)
-              setState({ isComplete: done, loading: false, pendingLabel: done ? "" : "Business profile needed" });
-          } catch {
-            if (!cancelled) setState({ isComplete: false, loading: false, pendingLabel: "Couldn't verify status" });
-          }
+          const done = !!(user && user.epoxyProfileSubmitted);
+          if (!cancelled)
+            setState({ isComplete: done, loading: false, pendingLabel: done ? "" : "Business profile needed" });
         } else if (step.gate === "logo") {
-          try {
-            const me = await base44.auth.me();
-            const done = !!(me && me.chosenLogoUrl);
-            if (!cancelled)
-              setState({ isComplete: done, loading: false, pendingLabel: done ? "" : "Pick your logo" });
-          } catch {
-            if (!cancelled) setState({ isComplete: false, loading: false, pendingLabel: "Couldn't verify status" });
-          }
+          const done = !!(user && user.chosenLogoUrl);
+          if (!cancelled)
+            setState({ isComplete: done, loading: false, pendingLabel: done ? "" : "Pick your logo" });
         } else if (step.gate === "brand") {
-          try {
-            const me = await base44.auth.me();
-            const imgs = (me && me.chosenBrandImages) || [];
-            const done = imgs.length > 0;
-            if (!cancelled)
-              setState({ isComplete: done, loading: false, pendingLabel: done ? "" : "Pick your brand mockups" });
-          } catch {
-            if (!cancelled) setState({ isComplete: false, loading: false, pendingLabel: "Couldn't verify status" });
-          }
+          const imgs = (user && user.chosenBrandImages) || [];
+          const done = imgs.length > 0;
+          if (!cancelled)
+            setState({ isComplete: done, loading: false, pendingLabel: done ? "" : "Pick your brand mockups" });
         } else if (step.gate === "design") {
-          try {
-            const me = await base44.auth.me();
-            const done = !!(me && me.designPacksChosen);
-            if (!cancelled)
-              setState({ isComplete: done, loading: false, pendingLabel: done ? "" : "Pick your design direction" });
-          } catch {
-            if (!cancelled) setState({ isComplete: false, loading: false, pendingLabel: "Couldn't verify status" });
-          }
+          const done = !!(user && user.designPacksChosen);
+          if (!cancelled)
+            setState({ isComplete: done, loading: false, pendingLabel: done ? "" : "Pick your design direction" });
         } else if (step.gate === "content") {
-          try {
-            const me = await base44.auth.me();
-            const done = !!(me && me.contentTemplatesChosen);
-            if (!cancelled)
-              setState({ isComplete: done, loading: false, pendingLabel: done ? "" : "Pick your content tone" });
-          } catch {
-            if (!cancelled) setState({ isComplete: false, loading: false, pendingLabel: "Couldn't verify status" });
-          }
+          const done = !!(user && user.contentTemplatesChosen);
+          if (!cancelled)
+            setState({ isComplete: done, loading: false, pendingLabel: done ? "" : "Pick your content tone" });
         } else if (step.gate === "social") {
-          try {
-            const me = await base44.auth.me();
-            const done = !!(me && me.socialMediaChosen);
-            if (!cancelled)
-              setState({ isComplete: done, loading: false, pendingLabel: done ? "" : "Approve your social media pack" });
-          } catch {
-            if (!cancelled) setState({ isComplete: false, loading: false, pendingLabel: "Couldn't verify status" });
-          }
+          const done = !!(user && user.socialMediaChosen);
+          if (!cancelled)
+            setState({ isComplete: done, loading: false, pendingLabel: done ? "" : "Approve your social media pack" });
         } else if (step.gate === "video") {
-          try {
-            const me = await base44.auth.me();
-            const done = !!(me && me.videoChosen);
-            if (!cancelled)
-              setState({ isComplete: done, loading: false, pendingLabel: done ? "" : "Approve your video concepts" });
-          } catch {
-            if (!cancelled) setState({ isComplete: false, loading: false, pendingLabel: "Couldn't verify status" });
-          }
+          const done = !!(user && user.videoChosen);
+          if (!cancelled)
+            setState({ isComplete: done, loading: false, pendingLabel: done ? "" : "Approve your video concepts" });
         }
       } catch (e) {
         if (!cancelled) setState({ isComplete: false, loading: false, pendingLabel: "Couldn't verify status" });
@@ -148,7 +113,7 @@ export function useStepGate(step, user) {
       clearInterval(interval);
       window.removeEventListener("focus", onFocus);
     };
-  }, [step?.to, step?.gate, effectiveEmail]);
+  }, [step?.to, step?.gate, effectiveEmail, user]);
 
   return state;
 }

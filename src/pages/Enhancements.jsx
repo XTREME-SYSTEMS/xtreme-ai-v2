@@ -6,6 +6,7 @@ import {
 } from "lucide-react";
 import BackButton from "@/components/client/BackButton";
 import { notifyStepComplete } from "@/lib/pipelineNotify";
+import { useClientUser } from "@/hooks/useClientUser";
 import { logReceipt } from "@/lib/pipelineUtils";
 
 // Step: Enhancements — upsell page shown after Your Designs and before Sign
@@ -25,7 +26,7 @@ const ENHANCEMENTS = [
 
 export default function Enhancements() {
   const navigate = useNavigate();
-  const [user, setUser] = useState(null);
+  const { user } = useClientUser();
   const [selected, setSelected] = useState([]);
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
@@ -33,15 +34,13 @@ export default function Enhancements() {
 
   useEffect(() => {
     document.title = "Enhancements · Lead Gen Near You";
-    base44
-      .auth.me()
-      .then((u) => {
-        setUser(u);
-        if (u?.enhancements) setSelected(u.enhancements);
-        if (u?.enhancementsChosen) setSaved(true);
-      })
-      .catch(() => {});
   }, []);
+
+  useEffect(() => {
+    if (!user) return;
+    if (user?.enhancements) setSelected(user.enhancements);
+    if (user?.enhancementsChosen) setSaved(true);
+  }, [user]);
 
   const toggle = (id) => {
     setSelected((prev) => (prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]));

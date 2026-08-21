@@ -7,6 +7,7 @@ import { logReceipt } from "@/lib/pipelineUtils";
 import { PALETTES, WEBSITE_LAYOUTS, buildTheme, SECTION_META } from "@/components/website/websiteLayouts";
 import WebsitePreview, { ScaledPreview } from "@/components/website/WebsitePreview";
 import BackButton from "@/components/client/BackButton";
+import { useClientUser } from "@/hooks/useClientUser";
 import { notifyStepComplete } from "@/lib/pipelineNotify";
 
 const REVISE_CHIPS = ["Different layout", "Different colors", "Different content", "Different images", "Too plain", "Not local enough", "Doesn't match my brand", "Other"];
@@ -25,6 +26,7 @@ function shuffle(pool, excludeIds, n) {
 
 export default function WebsiteDesignStudio() {
   const navigate = useNavigate();
+  const { user: hookUser } = useClientUser();
   const [user, setUser] = useState(null);
   const [profile, setProfile] = useState(null);
   const [logoUrl, setLogoUrl] = useState("");
@@ -56,17 +58,16 @@ export default function WebsiteDesignStudio() {
   useEffect(() => { document.title = "Website Design · Lead Gen Near You"; }, []);
 
   useEffect(() => {
-    base44.auth.me().then((u) => {
-      setUser(u);
-      setProfile(u?.epoxyProfile || null);
-      setLogoUrl(u?.chosenLogoUrl || u?.epoxyProfile?.logoUrl || "");
-      if (u?.websiteContent) setContent(u.websiteContent);
-      if (u?.websiteImages) setImages(u.websiteImages);
-      if (u?.chosenPalette) setPaletteId(u.chosenPalette);
-      if (u?.chosenWebsiteLayout) setSelectedId(u.chosenWebsiteLayout);
-      if (u?.designPacksChosen) setSaved(true);
-    }).catch(() => {});
-  }, []);
+    if (!hookUser) return;
+    setUser(hookUser);
+    setProfile(hookUser?.epoxyProfile || null);
+    setLogoUrl(hookUser?.chosenLogoUrl || hookUser?.epoxyProfile?.logoUrl || "");
+    if (hookUser?.websiteContent) setContent(hookUser.websiteContent);
+    if (hookUser?.websiteImages) setImages(hookUser.websiteImages);
+    if (hookUser?.chosenPalette) setPaletteId(hookUser.chosenPalette);
+    if (hookUser?.chosenWebsiteLayout) setSelectedId(hookUser.chosenWebsiteLayout);
+    if (hookUser?.designPacksChosen) setSaved(true);
+  }, [hookUser]);
 
   const callGenerate = async (p) => {
     const res = await base44.functions.invoke("generateWebsiteContent", {

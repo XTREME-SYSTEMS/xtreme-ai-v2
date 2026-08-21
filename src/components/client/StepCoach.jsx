@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { ArrowRight, Lightbulb, CheckCircle2, Lock, Loader2 } from "lucide-react";
 import { getStepByPath } from "@/lib/clientSteps";
-import { base44 } from "@/api/base44Client";
+import { useClientUser } from "@/hooks/useClientUser";
 import { useStepGate } from "@/hooks/useStepGate";
 
 // Forced, two-phase gated walkthrough:
@@ -19,10 +19,8 @@ export default function StepCoach() {
   const location = useLocation();
   const navigate = useNavigate();
   const step = getStepByPath(location.pathname);
-  const [user, setUser] = useState(null);
+  const { user } = useClientUser();
   const [phase, setPhase] = useState("intro"); // "intro" | "gate" | "done"
-
-  useEffect(() => { base44.auth.me().then(setUser).catch(() => {}); }, []);
 
   const introKey = step ? `coach:intro:${step.to}` : null;
   const doneKey = step ? `coach:done:${step.to}` : null;

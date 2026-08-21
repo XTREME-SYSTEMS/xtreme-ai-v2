@@ -6,6 +6,7 @@ import SignaturePad from "@/components/client/SignaturePad";
 import PreviewBanner from "@/components/client/PreviewBanner";
 import BackButton from "@/components/client/BackButton";
 import { usePreviewEmail } from "@/hooks/usePreviewEmail";
+import { useClientUser } from "@/hooks/useClientUser";
 import { logReceipt } from "@/lib/pipelineUtils";
 import { notifyStepComplete } from "@/lib/pipelineNotify";
 import { cn } from "@/lib/utils";
@@ -25,7 +26,7 @@ const REVISION_LINKS = [
 // user and lets them sign inline on mobile (touch) or desktop (mouse).
 export default function Signatures() {
   const navigate = useNavigate();
-  const [user, setUser] = useState(null);
+  const { user } = useClientUser();
   const [docs, setDocs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [active, setActive] = useState(null);
@@ -37,10 +38,6 @@ export default function Signatures() {
   const [savingKickoff, setSavingKickoff] = useState(false);
   const [kickoffSaved, setKickoffSaved] = useState(false);
   const { effectiveEmail, isPreviewing } = usePreviewEmail(user);
-
-  useEffect(() => {
-    base44.auth.me().then(setUser).catch(() => {});
-  }, []);
 
   useEffect(() => { document.title = "Signatures · Lead Gen Near You"; }, []);
 

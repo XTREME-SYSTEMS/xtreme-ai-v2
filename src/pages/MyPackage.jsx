@@ -6,6 +6,7 @@ import { getProductDetails } from "@/lib/productDetails";
 import PurchaseDetailModal from "@/components/client/PurchaseDetailModal";
 import PreviewBanner from "@/components/client/PreviewBanner";
 import { usePreviewEmail } from "@/hooks/usePreviewEmail";
+import { useClientUser } from "@/hooks/useClientUser";
 import { notifyStepComplete } from "@/lib/pipelineNotify";
 import BrandedButton from "@/components/client/BrandedButton";
 
@@ -15,7 +16,7 @@ export default function MyPackage() {
   const [purchases, setPurchases] = useState([]);
   const [loading, setLoading] = useState(true);
   const [activePurchase, setActivePurchase] = useState(null);
-  const [user, setUser] = useState(null);
+  const { user } = useClientUser();
   const [revising, setRevising] = useState(false);
   const [reviseComment, setReviseComment] = useState("");
   const [sendingRevise, setSendingRevise] = useState(false);
@@ -54,8 +55,6 @@ export default function MyPackage() {
       setSendingRevise(false);
     }
   };
-
-  useEffect(() => { base44.auth.me().then(setUser).catch(() => {}); }, []);
 
   const load = async () => {
     const query = { status: "paid" };

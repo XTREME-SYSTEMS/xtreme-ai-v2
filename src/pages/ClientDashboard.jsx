@@ -1,19 +1,18 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { Link } from "react-router-dom";
-import { base44 } from "@/api/base44Client";
 import {
   Sparkles, ArrowRight, ShieldCheck, CheckCircle2, Package,
 } from "lucide-react";
 import { UNIVERSAL_PIPELINE } from "@/lib/universalPipeline";
 import { cn } from "@/lib/utils";
+import { useClientUser } from "@/hooks/useClientUser";
 
 // The landing page of the client portal. A clear, top-down, step-by-step
 // walkthrough of how the portal works and the universal build pipeline every
 // implementation follows — with approval-gated steps called out explicitly.
 export default function ClientDashboard() {
-  const [user, setUser] = useState(null);
+  const { user } = useClientUser();
 
-  useEffect(() => { base44.auth.me().then(setUser).catch(() => {}); }, []);
   useEffect(() => { document.title = "Client Portal · Lead Gen Near You"; }, []);
 
   const approvalSteps = UNIVERSAL_PIPELINE.filter((s) => s.gate);

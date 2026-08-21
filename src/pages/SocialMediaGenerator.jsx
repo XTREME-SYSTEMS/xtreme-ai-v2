@@ -6,6 +6,7 @@ import { Share2, Loader2, Check, RefreshCw, ArrowRight, AlertCircle, Eye, X, Sen
 import { cn } from "@/lib/utils";
 import { logReceipt } from "@/lib/pipelineUtils";
 import BackButton from "@/components/client/BackButton";
+import { useClientUser } from "@/hooks/useClientUser";
 import { notifyStepComplete } from "@/lib/pipelineNotify";
 
 // Step: Social Media Generator. Generates 10 on-brand social media template
@@ -29,16 +30,17 @@ export default function SocialMediaGenerator() {
   const [reviseSent, setReviseSent] = useState(false);
   const [reviseError, setReviseError] = useState("");
 
+  const { user } = useClientUser();
+
   useEffect(() => { document.title = "Social Media · Lead Gen Near You"; }, []);
 
   useEffect(() => {
-    base44.auth.me().then((u) => {
-      setProfile(u?.epoxyProfile || null);
-      setLogoUrl(u?.chosenLogoUrl || "");
-      if (u?.socialMediaPack) setData(u.socialMediaPack);
-      if (u?.socialMediaChosen) setSaved(true);
-    }).catch(() => {});
-  }, []);
+    if (!user) return;
+    setProfile(user?.epoxyProfile || null);
+    setLogoUrl(user?.chosenLogoUrl || "");
+    if (user?.socialMediaPack) setData(user.socialMediaPack);
+    if (user?.socialMediaChosen) setSaved(true);
+  }, [user]);
 
   const generate = async () => {
     if (!profile?.businessName) { setGenError("Complete your Business Profile first."); return; }

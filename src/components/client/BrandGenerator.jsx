@@ -7,6 +7,7 @@ import { logReceipt } from "@/lib/pipelineUtils";
 import { BRAND_TYPES } from "@/lib/designPrompts";
 import BrandPackPreview from "@/components/client/BrandPackPreview";
 import BackButton from "@/components/client/BackButton";
+import { useClientUser } from "@/hooks/useClientUser";
 import { notifyStepComplete } from "@/lib/pipelineNotify";
 
 // Step: Brand Generator. Uses the client's chosen logo to generate 10 brand
@@ -31,20 +32,20 @@ export default function BrandGenerator() {
   const [sendingRevise, setSendingRevise] = useState(false);
   const [reviseSent, setReviseSent] = useState(false);
   const [reviseError, setReviseError] = useState("");
+  const { user } = useClientUser();
 
   useEffect(() => {
     document.title = "Brand Generator · Lead Gen Near You";
-    base44
-      .auth.me()
-      .then((u) => {
-        setLogoUrl(u?.chosenLogoUrl || "");
-        setBusinessName(u?.epoxyProfile?.businessName || "");
-        setUserEmail(u?.email || "");
-        if (u?.brandPacks?.length) setPacks(u.brandPacks);
-        if (u?.brandPacksChosen) setSaved(true);
-      })
-      .catch(() => {});
   }, []);
+
+  useEffect(() => {
+    if (!user) return;
+    setLogoUrl(user?.chosenLogoUrl || "");
+    setBusinessName(user?.epoxyProfile?.businessName || "");
+    setUserEmail(user?.email || "");
+    if (user?.brandPacks?.length) setPacks(user.brandPacks);
+    if (user?.brandPacksChosen) setSaved(true);
+  }, [user]);
 
   const generate = async () => {
     if (!logoUrl) {

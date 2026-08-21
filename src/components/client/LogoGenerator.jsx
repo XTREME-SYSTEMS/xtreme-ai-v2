@@ -7,6 +7,7 @@ import { cn } from "@/lib/utils";
 import { logReceipt } from "@/lib/pipelineUtils";
 import { LOGO_STYLES, ACCENT_COLORS } from "@/lib/designPrompts";
 import BackButton from "@/components/client/BackButton";
+import { useClientUser } from "@/hooks/useClientUser";
 import { notifyStepComplete } from "@/lib/pipelineNotify";
 
 // Step: Logo Generator. Generates 10 distinct logos for the client's epoxy
@@ -23,19 +24,19 @@ export default function LogoGenerator() {
   const [saved, setSaved] = useState(false);
   const [error, setError] = useState("");
   const [regeneratingId, setRegeneratingId] = useState(null);
+  const { user } = useClientUser();
 
   useEffect(() => {
     document.title = "Logo Generator · Lead Gen Near You";
-    base44
-      .auth.me()
-      .then((u) => {
-        setProfile(u?.epoxyProfile || null);
-        if (u?.logoPacks?.length) setPacks(u.logoPacks);
-        if (u?.chosenLogoUrl) setChosen(u.chosenLogoUrl);
-        if (u?.logoPacksChosen) setSaved(true);
-      })
-      .catch(() => {});
   }, []);
+
+  useEffect(() => {
+    if (!user) return;
+    setProfile(user?.epoxyProfile || null);
+    if (user?.logoPacks?.length) setPacks(user.logoPacks);
+    if (user?.chosenLogoUrl) setChosen(user.chosenLogoUrl);
+    if (user?.logoPacksChosen) setSaved(true);
+  }, [user]);
 
   const businessName = profile?.businessName?.trim() || "";
 

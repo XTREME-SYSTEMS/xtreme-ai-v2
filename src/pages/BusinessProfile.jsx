@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { base44 } from "@/api/base44Client";
 import { Building2, Upload, Loader2, CheckCircle2, X, MapPin, Star, Shield } from "lucide-react";
 import BackButton from "@/components/client/BackButton";
+import { useClientUser } from "@/hooks/useClientUser";
 import { notifyStepComplete } from "@/lib/pipelineNotify";
 
 // Step 2 of the epoxy website build: a constrained, multiple-choice intake.
@@ -74,32 +75,32 @@ export default function BusinessProfile() {
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
   const [error, setError] = useState("");
+  const { user } = useClientUser();
 
   useEffect(() => {
     document.title = "Business Profile · Lead Gen Near You";
-    base44
-      .auth.me()
-      .then((u) => {
-        if (u?.epoxyProfile) {
-          const p = u.epoxyProfile;
-          setForm({
-            businessName: p.businessName || "",
-            phone: p.phone || "",
-            email: p.email || "",
-            website: p.website || "",
-            primaryLocation: p.primaryLocation || p.serviceArea || "",
-          });
-          setServices(p.services || []);
-          setServiceRange(p.serviceRange || []);
-          setYearsInBusiness(p.yearsInBusiness || "");
-          setDifferentiators(p.differentiators || []);
-          setLogoUrl(p.logoUrl || "");
-          setGalleryUrls(p.galleryUrls || []);
-          if (u.epoxyProfileSubmitted) setSaved(true);
-        }
-      })
-      .catch(() => {});
   }, []);
+
+  useEffect(() => {
+    if (!user) return;
+    if (user?.epoxyProfile) {
+      const p = user.epoxyProfile;
+      setForm({
+        businessName: p.businessName || "",
+        phone: p.phone || "",
+        email: p.email || "",
+        website: p.website || "",
+        primaryLocation: p.primaryLocation || p.serviceArea || "",
+      });
+      setServices(p.services || []);
+      setServiceRange(p.serviceRange || []);
+      setYearsInBusiness(p.yearsInBusiness || "");
+      setDifferentiators(p.differentiators || []);
+      setLogoUrl(p.logoUrl || "");
+      setGalleryUrls(p.galleryUrls || []);
+      if (user.epoxyProfileSubmitted) setSaved(true);
+    }
+  }, [user]);
 
   const set = (k) => (e) => setForm((f) => ({ ...f, [k]: e.target.value }));
   const toggle = (list, setList, val) =>

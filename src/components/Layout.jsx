@@ -13,6 +13,7 @@ import { cn } from "@/lib/utils";
 import { LOGO_ICON } from "@/lib/brandAssets";
 import { usePreview } from "@/lib/PreviewContext";
 import ClientLayout from "@/components/client/ClientLayout";
+import PreviewAsClientModal from "@/components/admin/PreviewAsClientModal";
 import ThemeToggle from "@/components/ThemeToggle";
 
 // Client portal navigation lives in ClientLayout; this admin NAV is the only
@@ -95,6 +96,7 @@ const NAV = [
 export default function Layout() {
   const [open, setOpen] = useState(false);
   const [user, setUser] = useState(null);
+  const [showPreviewModal, setShowPreviewModal] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -176,7 +178,7 @@ export default function Layout() {
           </div>
           <div className="ml-auto flex items-center gap-3">
             <span className="hidden text-xs text-black/60 sm:inline">{user?.email || ""}</span>
-            <button onClick={() => { setPreview(true); navigate("/my-package"); }} className="flex items-center gap-1.5 rounded-lg border border-lime-400 px-2.5 py-1.5 text-xs text-black font-medium hover:bg-lime-400/10">
+            <button onClick={() => setShowPreviewModal(true)} className="flex items-center gap-1.5 rounded-lg border border-lime-400 px-2.5 py-1.5 text-xs text-black font-medium hover:bg-lime-400/10">
               <Eye className="h-3.5 w-3.5" /> Preview as Client
             </button>
             <ThemeToggle className="flex items-center gap-1.5 rounded-lg border border-lime-400 px-2.5 py-1.5 text-xs text-black font-medium hover:bg-lime-400/10" />
@@ -189,6 +191,7 @@ export default function Layout() {
           <Outlet />
         </main>
       </div>
+      {showPreviewModal && <PreviewAsClientModal onClose={() => setShowPreviewModal(false)} />}
     </div>
   );
 }
