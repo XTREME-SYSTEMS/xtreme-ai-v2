@@ -42,7 +42,7 @@ export default function BusinessProfile() {
     industry: "",
     subIndustry: "",
     customSubIndustry: "",
-    businessType: "",
+    businessType: [],
     businessName: "",
     phone: "",
     email: "",
@@ -123,7 +123,7 @@ export default function BusinessProfile() {
         industry: p.industry || "",
         subIndustry: p.subIndustry || "",
         customSubIndustry: p.customSubIndustry || "",
-        businessType: p.businessType || "",
+        businessType: Array.isArray(p.businessType) ? p.businessType : (p.businessType ? [p.businessType] : []),
         businessName: p.businessName || "",
         phone: p.phone || "",
         email: p.email || "",
@@ -161,7 +161,7 @@ export default function BusinessProfile() {
       const res = await base44.functions.invoke("getIndustryOnboarding", {
         industry: form.industry,
         subIndustry: form.subIndustry || form.customSubIndustry || "",
-        businessType: form.businessType,
+        businessType: Array.isArray(form.businessType) ? form.businessType.join(", ") : form.businessType,
         businessStage: form.businessStage,
       });
       setIndustryQuestions(res.data?.questions || []);
@@ -182,7 +182,7 @@ export default function BusinessProfile() {
         radius: form.radius,
         industry: form.industry,
         subIndustry: form.subIndustry || form.customSubIndustry || "",
-        businessType: form.businessType,
+        businessType: Array.isArray(form.businessType) ? form.businessType.join(", ") : form.businessType,
       });
       setFinancialIntel(res.data);
     } catch (e) {
@@ -195,7 +195,7 @@ export default function BusinessProfile() {
   // Step validation
   const canNext = () => {
     switch (step) {
-      case 0: return !!(form.businessStage && form.industry && form.businessType);
+      case 0: return !!(form.businessStage && form.industry && form.businessType.length > 0);
       case 1: return !!(form.businessName.trim() && form.primaryLocation.trim());
       case 2: return !loadingQuestions;
       case 3: return true; // financial intel is optional
@@ -271,7 +271,7 @@ export default function BusinessProfile() {
           business_name: form.businessName,
           industry: form.industry,
           sub_industry: effectiveSubIndustry,
-          business_type: form.businessType,
+          business_type: Array.isArray(form.businessType) ? form.businessType.join(", ") : form.businessType,
           business_stage: form.businessStage,
           profile,
           status: "onboarding",
@@ -421,15 +421,20 @@ export default function BusinessProfile() {
               </Section>
             )}
 
-            <Section title="Who do you serve?" icon={Shield} hint="Commercial, residential, or both?">
+            <Section title="Who do you serve?" icon={Shield} hint="Select all that apply">
               <div className="grid gap-2.5">
                 {BUSINESS_TYPES.map((t) => (
                   <OptionCard
                     key={t.id}
                     label={t.label}
                     desc={t.desc}
-                    selected={form.businessType === t.id}
-                    onClick={() => setForm((f) => ({ ...f, businessType: t.id }))}
+                    selected={Array.isArray(form.businessType) && form.businessType.includes(t.id)}
+                    onClick={() => setForm((f) => ({
+                      ...f,
+                      businessType: Array.isArray(f.businessType)
+                        ? (f.businessType.includes(t.id) ? f.businessType.filter((x) => x !== t.id) : [...f.businessType, t.id])
+                        : [t.id],
+                    }))}
                   />
                 ))}
               </div>
