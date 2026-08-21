@@ -9,7 +9,7 @@ import {
 } from "@/lib/pipelineState";
 import { usePreviewEmail } from "@/hooks/usePreviewEmail";
 import {
-  Sparkles, CheckCircle2, Clock, Lock, ArrowRight, ShieldCheck, PenLine,
+  Sparkles, CheckCircle2, Clock, Lock, ArrowRight, ShieldCheck, PenLine, ChevronDown,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -21,6 +21,7 @@ export default function ClientStartHere({ user }) {
   const [approvals, setApprovals] = useState([]);
   const [signals, setSignals] = useState({});
   const [loading, setLoading] = useState(true);
+  const [showAll, setShowAll] = useState(false);
   const { effectiveEmail } = usePreviewEmail(user);
 
   useEffect(() => {
@@ -82,52 +83,60 @@ export default function ClientStartHere({ user }) {
           step={current.step}
           pendingApproval={current.pendingApproval}
           pendingApprovalCount={pendingApprovalCount}
+          doneCount={prog.done}
+          totalCount={prog.total}
         />
       )}
 
-      {/* The numbered timeline */}
-      <ol className="mt-5 space-y-2.5">
-        {loading ? (
-          <li className="flex items-center gap-2 py-4 text-sm text-white/50">
-            <div className="h-4 w-4 animate-spin rounded-full border-2 border-white/20 border-t-lime-400" />
-            Loading your steps…
-          </li>
-        ) : (
-          states.map((s, i) => {
-            const Icon = s.step.icon;
-            const status = s.completed
-              ? "done"
-              : s.pendingApproval
-                ? "action"
-                : s.isCurrent
-                  ? "current"
-                  : s.locked
-                    ? "locked"
-                    : "upcoming";
-            return (
-              <TimelineRow
-                key={s.step.key}
-                index={i + 1}
-                icon={Icon}
-                label={s.step.label}
-                desc={s.step.desc}
-                gate={s.step.gate}
-                to={s.step.to}
-                status={status}
-                isLast={i === states.length - 1}
-              />
-            );
-          })
-        )}
-      </ol>
-
-      {/* Legend */}
+      {/* Collapsible full timeline — hidden by default to avoid overwhelm */}
       {!loading && (
-        <div className="mt-4 flex flex-wrap items-center gap-x-4 gap-y-1.5 border-t border-white/10 pt-3 text-[11px] text-white/50">
-          <span className="inline-flex items-center gap-1.5"><span className="h-2.5 w-2.5 rounded-full bg-lime-400" /> Current step</span>
-          <span className="inline-flex items-center gap-1.5"><span className="h-2.5 w-2.5 rounded-full bg-amber-400" /> Action needed</span>
-          <span className="inline-flex items-center gap-1.5"><span className="h-2.5 w-2.5 rounded-full bg-white/20" /> Completed</span>
-          <span className="inline-flex items-center gap-1.5"><span className="h-2.5 w-2.5 rounded-full border border-white/30" /> Upcoming</span>
+        <div className="mt-4">
+          <button
+            onClick={() => setShowAll((v) => !v)}
+            className="flex w-full items-center justify-center gap-1.5 rounded-lg border border-white/10 bg-zinc-950 px-3 py-2 text-xs font-medium text-white/60 transition-colors hover:border-lime-400/40 hover:text-white"
+          >
+            {showAll ? "Hide steps" : `View all ${UNIVERSAL_PIPELINE.length} steps`}
+            <ChevronDown className={cn("h-3.5 w-3.5 transition-transform", showAll && "rotate-180")} />
+          </button>
+
+          {showAll && (
+            <>
+              <ol className="mt-3 space-y-2.5">
+                {states.map((s, i) => {
+                  const Icon = s.step.icon;
+                  const status = s.completed
+                    ? "done"
+                    : s.pendingApproval
+                      ? "action"
+                      : s.isCurrent
+                        ? "current"
+                        : s.locked
+                          ? "locked"
+                          : "upcoming";
+                  return (
+                    <TimelineRow
+                      key={s.step.key}
+                      index={i + 1}
+                      icon={Icon}
+                      label={s.step.label}
+                      desc={s.step.desc}
+                      gate={s.step.gate}
+                      to={s.step.to}
+                      status={status}
+                      isLast={i === states.length - 1}
+                    />
+                  );
+                })}
+              </ol>
+
+              <div className="mt-4 flex flex-wrap items-center gap-x-4 gap-y-1.5 border-t border-white/10 pt-3 text-[11px] text-white/50">
+                <span className="inline-flex items-center gap-1.5"><span className="h-2.5 w-2.5 rounded-full bg-lime-400" /> Current step</span>
+                <span className="inline-flex items-center gap-1.5"><span className="h-2.5 w-2.5 rounded-full bg-amber-400" /> Action needed</span>
+                <span className="inline-flex items-center gap-1.5"><span className="h-2.5 w-2.5 rounded-full bg-white/20" /> Completed</span>
+                <span className="inline-flex items-center gap-1.5"><span className="h-2.5 w-2.5 rounded-full border border-white/30" /> Upcoming</span>
+              </div>
+            </>
+          )}
         </div>
       )}
     </section>
@@ -135,7 +144,7 @@ export default function ClientStartHere({ user }) {
 }
 
 // ── Current action callout ────────────────────────────────────────────────
-function CurrentActionCallout({ step, pendingApproval, pendingApprovalCount }) {
+function CurrentActionCallout({ step, pendingApproval, pendingApprovalCount, doneCount, totalCount }) {
   let title, body, ctaLabel, ctaTo, CtaIcon;
   if (pendingApproval) {
     title = `Action needed: approve your ${step.label}`;
@@ -181,11 +190,14 @@ function CurrentActionCallout({ step, pendingApproval, pendingApprovalCount }) {
             </Link>
           )}
         </div>
-        {pendingApprovalCount > 0 && (
-          <span className="shrink-0 rounded-full border border-amber-400/50 bg-amber-400/15 px-2.5 py-1 text-[11px] font-bold text-amber-300">
-            {pendingApprovalCount} waiting
-          </span>
-        )}
+        <div className="flex shrink-0 flex-col items-end gap-1">
+          {pendingApprovalCount > 0 && (
+            <span className="rounded-full border border-amber-400/50 bg-amber-400/15 px-2.5 py-1 text-[11px] font-bold text-amber-300">
+              {pendingApprovalCount} waiting
+            </span>
+          )}
+          <span className="text-[11px] font-medium text-white/40">{doneCount} of {totalCount} done</span>
+        </div>
       </div>
     </div>
   );
