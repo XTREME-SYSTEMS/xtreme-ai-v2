@@ -145,36 +145,64 @@ export default function MyPackage() {
                     <Fact label="Buyer" value={p.buyerEmail || "—"} />
                   </div>
 
-                  {/* Full line-item invoice */}
+                  {/* Full line-item invoice — line items + deliverables side by side */}
                   <div className="p-4">
                     <p className="text-sm text-white/70">{detail.description}</p>
 
-                    {detail.features.length > 0 && (
-                      <div className="mt-4">
-                        <h4 className="text-xs font-semibold uppercase tracking-wider text-lime-400">Line items included</h4>
-                        <ul className="mt-2 space-y-1.5">
-                          {detail.features.map((f, i) => (
-                            <li key={i} className="flex items-start gap-2 text-sm text-white/80">
-                              <CheckCircle className="mt-0.5 h-4 w-4 shrink-0 text-lime-400" />
-                              <span className={f.startsWith("  ·") ? "pl-4 text-white/60" : ""}>{f}</span>
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
-                    )}
-
-                    {detail.deliverables.length > 0 && (
-                      <div className="mt-4">
-                        <h4 className="text-xs font-semibold uppercase tracking-wider text-lime-400">Deliverables</h4>
-                        <div className="mt-2 flex flex-wrap gap-2">
-                          {detail.deliverables.map((d, i) => (
-                            <span key={i} className="rounded-md border border-white/10 bg-white/5 px-2.5 py-1 text-xs text-white/70">
-                              {d}
-                            </span>
-                          ))}
+                    <div className="mt-4 grid gap-4 lg:grid-cols-2">
+                      {/* Line items included — numbered */}
+                      {detail.features.length > 0 && (
+                        <div className="rounded-lg border border-white/10 bg-black/20 p-4">
+                          <h4 className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-lime-400">
+                            <span className="h-1 w-4 rounded-full bg-lime-400" /> Line items included
+                          </h4>
+                          <ol className="mt-3 space-y-2">
+                            {(() => {
+                              let n = 0;
+                              return detail.features.map((f, i) => {
+                                const isSub = f.startsWith("  ·");
+                                if (isSub) {
+                                  return (
+                                    <li key={i} className="flex items-start gap-2 pl-7 text-xs text-white/50">
+                                      <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-white/30" />
+                                      <span>{f.replace(/^  ·\s*/, "")}</span>
+                                    </li>
+                                  );
+                                }
+                                n++;
+                                return (
+                                  <li key={i} className="flex items-start gap-2.5 text-sm text-white/80">
+                                    <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full border border-lime-400/30 bg-lime-400/10 text-[10px] font-bold text-lime-400">
+                                      {n}
+                                    </span>
+                                    <span className="pt-0.5">{f}</span>
+                                  </li>
+                                );
+                              });
+                            })()}
+                          </ol>
                         </div>
-                      </div>
-                    )}
+                      )}
+
+                      {/* Deliverables — numbered */}
+                      {detail.deliverables.length > 0 && (
+                        <div className="rounded-lg border border-white/10 bg-black/20 p-4">
+                          <h4 className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-lime-400">
+                            <span className="h-1 w-4 rounded-full bg-lime-400" /> Deliverables
+                          </h4>
+                          <ol className="mt-3 space-y-2">
+                            {detail.deliverables.map((d, i) => (
+                              <li key={i} className="flex items-start gap-2.5 text-sm text-white/80">
+                                <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full border border-lime-400/30 bg-lime-400/10 text-[10px] font-bold text-lime-400">
+                                  {i + 1}
+                                </span>
+                                <span className="pt-0.5">{d}</span>
+                              </li>
+                            ))}
+                          </ol>
+                        </div>
+                      )}
+                    </div>
                   </div>
                 </div>
               );
