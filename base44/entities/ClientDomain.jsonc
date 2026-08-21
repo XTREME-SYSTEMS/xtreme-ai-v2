@@ -1,0 +1,128 @@
+{
+  "name": "ClientDomain",
+  "type": "object",
+  "description": "Tracks AI-recommended business names and domain purchases for client portal users. Admins can purchase and assign domains to clients.",
+  "properties": {
+    "domain": {
+      "type": "string",
+      "description": "The domain name (e.g. apexroofingnearme.com)"
+    },
+    "client_email": {
+      "type": "string",
+      "description": "Email of the client this domain is for. Used for row-level isolation."
+    },
+    "business_name": {
+      "type": "string",
+      "description": "Recommended business name"
+    },
+    "tagline": {
+      "type": "string"
+    },
+    "industry": {
+      "type": "string"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "recommended",
+        "requested",
+        "searching",
+        "available",
+        "purchasing",
+        "purchased",
+        "deployed",
+        "unavailable"
+      ],
+      "default": "recommended"
+    },
+    "viral_score": {
+      "type": "number",
+      "default": 0,
+      "description": "AI-scored viral potential (0-100)"
+    },
+    "domain_available": {
+      "type": "boolean",
+      "default": false
+    },
+    "domain_status": {
+      "type": "string",
+      "description": "RDAP availability check result"
+    },
+    "state_registry_status": {
+      "type": "string",
+      "description": "AI-checked state registry status"
+    },
+    "google_search_status": {
+      "type": "string",
+      "description": "AI-checked Google uniqueness status"
+    },
+    "rationale": {
+      "type": "string",
+      "description": "Why this name could become successful"
+    },
+    "buy_url": {
+      "type": "string",
+      "description": "Registrar purchase link"
+    },
+    "registrar": {
+      "type": "string"
+    },
+    "price": {
+      "type": "string"
+    },
+    "assigned_by": {
+      "type": "string",
+      "description": "Admin who purchased/assigned the domain"
+    },
+    "notes": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "domain",
+    "client_email"
+  ],
+  "rls": {
+    "read": {
+      "$or": [
+        {
+          "data.client_email": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "create": {
+      "$or": [
+        {
+          "data.client_email": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "update": {
+      "$or": [
+        {
+          "data.client_email": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

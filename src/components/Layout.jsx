@@ -89,6 +89,7 @@ const NAV = [
   { to: "/client-setup", label: "Client Setup", icon: UserPlus },
   { to: "/admin-packages", label: "Package Gallery", icon: Package },
   { to: "/admin-promo-codes", label: "Promo Codes", icon: Tag },
+  { to: "/admin-domain-purchase", label: "Domain Purchaser", icon: Globe },
   { to: "/approvals", label: "Approvals", icon: CheckCircle },
   { to: "/receipts", label: "Receipts", icon: ScrollText },
   { to: "/connectors", label: "Connectors", icon: Plug },

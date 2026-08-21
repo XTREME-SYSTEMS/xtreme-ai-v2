@@ -1,7 +1,7 @@
 import {
   Package, Building2, MessageSquareText, PenTool, Shirt, Palette, Share2,
   Video, LayoutTemplate, FileSignature, ShieldCheck, Rocket, Sparkles,
-  LayoutDashboard, Settings,
+  LayoutDashboard, Settings, Compass,
 } from "lucide-react";
 
 // ─────────────────────────────────────────────────────────────────────────
@@ -24,6 +24,14 @@ export const PORTAL_STEPS = {
     activityLabel: "Review your package",
     title: "Welcome to Your Build",
     body: "Here's everything included in your package. Review what's included, then continue to tell us about your business.",
+    nextLabel: "Go to Business Name Studio", nextTo: "/business-name-studio",
+  },
+  "business-name": {
+    key: "business-name",
+    to: "/business-name-studio", label: "Business Name", icon: Compass, gate: "auto",
+    activityLabel: "Find your business name & domain",
+    title: "Find Your Business Name & Domain",
+    body: "Our AI scans Google and state registries to recommend highly successful, potentially viral business names with available .com domains. Pick your favorite and we'll secure the URL for you.",
     nextLabel: "Go to Business Profile", nextTo: "/business-profile",
   },
   "business-profile": {
@@ -135,13 +143,13 @@ export const PORTAL_STEPS = {
 
 // Standard build — no social media or video pack
 const FULL_BUILD = [
-  "welcome", "business-profile", "content", "logo", "brand", "website",
+  "welcome", "business-name", "business-profile", "content", "logo", "brand", "website",
   "your-designs", "enhancements", "signatures", "approvals", "launch",
 ];
 
 // Build with social media + video pack included
 const FULL_BUILD_PLUS_MEDIA = [
-  "welcome", "business-profile", "content", "logo", "brand", "website",
+  "welcome", "business-name", "business-profile", "content", "logo", "brand", "website",
   "social", "video", "your-designs", "enhancements", "signatures",
   "approvals", "launch",
 ];

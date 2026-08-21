@@ -89,6 +89,7 @@ import MyPackage from '@/pages/MyPackage';
 import Assistant from '@/pages/Assistant';
 import Signatures from '@/pages/Signatures';
 import BusinessProfile from '@/pages/BusinessProfile';
+import BusinessNameStudio from '@/pages/BusinessNameStudio';
 import ContentGenerator from '@/pages/ContentGenerator';
 import LogoGenerator from '@/pages/LogoGenerator';
 import BrandGenerator from '@/pages/BrandGenerator';
@@ -99,6 +100,7 @@ import YourDesigns from '@/pages/YourDesigns';
 import Enhancements from '@/pages/Enhancements';
 import AdminPackages from '@/pages/AdminPackages';
 import AdminPromoCodes from '@/pages/AdminPromoCodes';
+import AdminDomainPurchase from '@/pages/AdminDomainPurchase';
 import ClientSetup from '@/pages/ClientSetup';
 
 const AuthenticatedApp = () => {
@@ -144,6 +146,7 @@ const AuthenticatedApp = () => {
           <Route path="/my-package" element={<MyPackage />} />
           <Route path="/assistant" element={<Assistant />} />
           <Route path="/business-profile" element={<BusinessProfile />} />
+          <Route path="/business-name-studio" element={<BusinessNameStudio />} />
           <Route path="/content-generator" element={<ContentGenerator />} />
           <Route path="/logo-generator" element={<LogoGenerator />} />
           <Route path="/brand-generator" element={<BrandGenerator />} />
@@ -217,6 +220,7 @@ const AuthenticatedApp = () => {
           <Route path="/domain-acquisition" element={<DomainAcquisition />} />
           <Route path="/admin-packages" element={<AdminPackages />} />
           <Route path="/admin-promo-codes" element={<AdminPromoCodes />} />
+          <Route path="/admin-domain-purchase" element={<AdminDomainPurchase />} />
           <Route path="/client-setup" element={<ClientSetup />} />
         </Route>
       </Route>
