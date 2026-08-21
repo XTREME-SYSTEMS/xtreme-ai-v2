@@ -46,7 +46,8 @@ export default function Register() {
       if (result?.access_token) {
         base44.auth.setToken(result.access_token);
       }
-      // Grant full Elite access for presentation purposes (free starter).
+      // Grant Demo access — user can experience the full workflow but must
+      // pay to finalize. plan="demo", has_paid=false.
       try {
         await base44.functions.invoke("grantStarterAccess", {});
       } catch (e) {

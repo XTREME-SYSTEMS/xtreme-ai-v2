@@ -69,7 +69,7 @@ export default function About() {
         <div className="mt-16 rounded-3xl bg-black px-8 py-14 text-center sm:px-16">
           <h3 className="text-2xl font-bold text-white sm:text-3xl">Come grow with us</h3>
           <Link to="/register" className="group mt-6 inline-flex items-center gap-2 rounded-xl bg-lime-400 px-7 py-4 text-base font-bold text-black transition-all hover:bg-lime-300">
-            Start Free Trial <ArrowRight className="h-5 w-5 transition-transform group-hover:translate-x-1" />
+            Try Demo <ArrowRight className="h-5 w-5 transition-transform group-hover:translate-x-1" />
           </Link>
         </div>
       </div>

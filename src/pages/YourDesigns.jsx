@@ -5,6 +5,7 @@ import { Image } from "@/components/ui/image";
 import { LayoutTemplate, PenTool, Shirt, Globe, ArrowRight, Eye, Sparkles, MessageSquareText, Share2, Video, RefreshCw, AlertCircle, Check, X, Loader2, Download } from "lucide-react";
 import { cn } from "@/lib/utils";
 import BackButton from "@/components/client/BackButton";
+import DemoPaywallBanner from "@/components/client/DemoPaywallBanner";
 import { notifyStepComplete } from "@/lib/pipelineNotify";
 import { useClientUser } from "@/hooks/useClientUser";
 import { useClientUpdate } from "@/hooks/useClientUpdate";
@@ -112,6 +113,13 @@ export default function YourDesigns() {
       setShowFlag(true);
       return;
     }
+    // Demo paywall — demo users can experience the full workflow but must
+    // purchase a plan to finalize (sign agreement, approve, launch).
+    if (user?.plan === "demo") {
+      notifyStepComplete("designs", { clientEmail: user?.email || "", businessName: profile?.businessName || "" });
+      navigate("/pricing");
+      return;
+    }
     notifyStepComplete("designs", { clientEmail: user?.email || "", businessName: profile?.businessName || "" });
     navigate("/signatures");
   };
@@ -155,9 +163,12 @@ export default function YourDesigns() {
     });
   };
 
+  const isDemo = user?.plan === "demo";
+
   return (
     <div className="mx-auto max-w-4xl">
       <BackButton to="/video-generator" />
+      {isDemo && <DemoPaywallBanner businessName={businessName} />}
       <div className="rounded-xl border border-lime-400/40 bg-lime-400/5 p-5 sm:p-6">
         <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-lime-400">
           <LayoutTemplate className="h-4 w-4" /> Your Designs
@@ -360,7 +371,7 @@ export default function YourDesigns() {
           onClick={continueToSign}
           className="mt-5 inline-flex w-full items-center justify-center gap-2 rounded-lg bg-lime-400 px-4 py-3 text-sm font-semibold text-black transition-colors hover:bg-lime-300"
         >
-          Continue to Sign Agreement <ArrowRight className="h-4 w-4" />
+          {isDemo ? <>Choose a Plan to Finalize <ArrowRight className="h-4 w-4" /></> : <>Continue to Sign Agreement <ArrowRight className="h-4 w-4" /></>}
         </button>
       </div>
     </div>

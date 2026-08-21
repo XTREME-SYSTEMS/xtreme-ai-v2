@@ -27,7 +27,7 @@ const COLS = [
     title: "Portal",
     links: [
       { label: "Login", to: "/login" },
-      { label: "Start Free Trial", to: "/register" },
+      { label: "Try Demo", to: "/register" },
       { label: "Client Dashboard", to: "/client-portal" },
       { label: "Free Audit", to: "/free-audit" },
     ],

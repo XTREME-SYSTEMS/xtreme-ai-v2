@@ -282,7 +282,7 @@ export function adminNotificationEmail(opts: {
     ? `<tr><td style="padding: 8px 0; color: #666; font-size: 14px;">Product:</td><td style="padding: 8px 0; font-weight: bold; font-size: 14px; text-align: right;">${productName || ""}</td></tr>
        <tr><td style="padding: 8px 0; color: #666; font-size: 14px;">Amount:</td><td style="padding: 8px 0; font-weight: bold; font-size: 14px; text-align: right;">${amount || ""}</td></tr>
        <tr><td style="padding: 8px 0; color: #666; font-size: 14px;">Purchase ID:</td><td style="padding: 8px 0; font-weight: bold; font-size: 14px; text-align: right;">${purchaseId || ""}</td></tr>`
-    : `<tr><td style="padding: 8px 0; color: #666; font-size: 14px;">Plan:</td><td style="padding: 8px 0; font-weight: bold; font-size: 14px; text-align: right;">Free Starter (Elite demo)</td></tr>`;
+    : `<tr><td style="padding: 8px 0; color: #666; font-size: 14px;">Plan:</td><td style="padding: 8px 0; font-weight: bold; font-size: 14px; text-align: right;">Demo Mode</td></tr>`;
 
   return `
     <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">

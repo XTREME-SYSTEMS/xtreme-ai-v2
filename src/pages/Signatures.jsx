@@ -28,6 +28,12 @@ const REVISION_LINKS = [
 export default function Signatures() {
   const navigate = useNavigate();
   const { user } = useClientUser();
+
+  // Demo paywall — demo users can't sign agreements without purchasing.
+  // Redirect them to pricing so they can choose a plan to finalize.
+  useEffect(() => {
+    if (user?.plan === "demo") navigate("/pricing", { replace: true });
+  }, [user?.plan, navigate]);
   const { update } = useClientUpdate();
   const [docs, setDocs] = useState([]);
   const [loading, setLoading] = useState(true);

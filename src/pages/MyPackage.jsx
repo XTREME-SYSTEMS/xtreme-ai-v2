@@ -67,12 +67,13 @@ export default function MyPackage() {
     let paid = await base44.entities.Base44Purchase.filter(query, "-paidAt", 20);
     // C1 — Free starter users have plan="elite" but no purchase record.
     // Synthesize a purchase from their plan so they can proceed past step 1.
-    if ((!paid || paid.length === 0) && (user?.plan === "elite" || user?.plan === "pro")) {
-      const planProduct = user.plan === "elite" ? "elite-monthly" : "pro-monthly";
+    if ((!paid || paid.length === 0) && (user?.plan === "elite" || user?.plan === "pro" || user?.plan === "demo")) {
+      const planProduct = user.plan === "elite" ? "elite-monthly" : user.plan === "pro" ? "pro-monthly" : "demo";
+      const planName = user.plan === "elite" ? "Elite Plan (Free Starter)" : user.plan === "pro" ? "Pro Plan (Free Starter)" : "Demo Mode";
       paid = [{
         id: `plan-${user.plan}`,
         productId: planProduct,
-        productName: user.plan === "elite" ? "Elite Plan (Free Starter)" : "Pro Plan (Free Starter)",
+        productName: planName,
         buyerEmail: user?.email || "",
         amount: "0",
         currency: "USD",

@@ -20,7 +20,7 @@ export default function Services() {
           <h2 className="text-3xl font-bold tracking-tight text-black sm:text-4xl lg:text-5xl">One platform. Every tool you need.</h2>
           <p className="mt-4 text-lg text-black/60">Lead Generation Near Me brings CRM, funnels, marketing, bookings, and automations together — so you can run your whole business from a single login.</p>
           <Link to="/register" className="group mt-6 inline-flex items-center gap-2 rounded-xl bg-lime-400 px-6 py-3 text-sm font-bold text-black transition-all hover:bg-lime-300">
-            Start 14 Day Free Trial <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+            Try Demo <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
           </Link>
         </div>
 

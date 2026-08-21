@@ -6,9 +6,9 @@ import { startCheckout } from "@/lib/checkout";
 // Subscription / membership plans we sell.
 const PLANS = [
   {
-    name: "Free Starter", price: "$0", period: "forever", tagline: "Test the waters",
-    features: ["1 AI Tool Access", "Basic Presence Audit", "Community Support", "Starter Dashboard"],
-    cta: "Start Free", free: true, to: "/client-portal",
+    name: "Demo", price: "$0", period: "forever", tagline: "Try the full workflow — pay to finalize",
+    features: ["Full AI Tools Access", "Full Brand & Website Build", "SEO + AEO Optimization", "Social Media Pack", "Video Pack", "Client Dashboard", "Pay to Finalize & Export"],
+    cta: "Try Demo", free: true, to: "/register",
   },
   {
     name: "Pro", price: "$499", period: "/mo", tagline: "For growing businesses",

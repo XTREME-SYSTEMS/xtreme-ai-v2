@@ -54,7 +54,7 @@ export default function Industries() {
 
         <div className="mt-12 text-center">
           <Link to="/register" className="group inline-flex items-center gap-2 rounded-xl bg-lime-400 px-7 py-4 text-base font-bold text-black transition-all hover:bg-lime-300">
-            Start Free Trial <ArrowRight className="h-5 w-5 transition-transform group-hover:translate-x-1" />
+            Try Demo <ArrowRight className="h-5 w-5 transition-transform group-hover:translate-x-1" />
           </Link>
         </div>
       </div>

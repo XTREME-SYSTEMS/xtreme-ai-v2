@@ -155,11 +155,15 @@ export const PRODUCT_STEPS = {
   "app-pack": FULL_BUILD_PLUS_MEDIA,
   "deposit": FULL_BUILD_PLUS_MEDIA,
   "ai-tool": FULL_BUILD,
+  // Demo mode — full build with social + video so users experience everything,
+  // but paywalled at finalization (YourDesigns → pricing redirect).
+  "demo": FULL_BUILD_PLUS_MEDIA,
 };
 
-// Fallback for users with no purchase and no plan — matches the Elite build
-// since grantStarterAccess gives all new users Elite access.
-export const DEFAULT_STEPS = FULL_BUILD;
+// Fallback for users with no purchase and no plan. grantStarterAccess now
+// grants "demo" plan (full workflow, paywalled at finalization); this fallback
+// covers edge cases where a user has no plan at all.
+export const DEFAULT_STEPS = FULL_BUILD_PLUS_MEDIA;
 
 // Utility nav items (not part of the build journey)
 export const CLIENT_UTILITIES = [

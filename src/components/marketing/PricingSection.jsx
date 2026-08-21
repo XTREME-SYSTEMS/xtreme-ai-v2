@@ -6,9 +6,9 @@ import { startCheckout } from "@/lib/checkout";
 
 const TIERS = [
   {
-    name: "Free Starter", monthly: 0, tagline: "Full Elite access — try the entire workflow",
-    features: ["Unlimited AI Tools", "Full Brand & Website Build", "SEO + AEO Optimization", "Social Media Pack", "Video Pack", "Approval-Gated Workflow", "Client Dashboard", "Up to 2 Free Iterations"],
-    cta: "Start Free", highlight: false, free: true,
+    name: "Demo", monthly: 0, tagline: "Try the full workflow — pay to finalize",
+    features: ["Full AI Tools Access", "Full Brand & Website Build", "SEO + AEO Optimization", "Social Media Pack", "Video Pack", "Approval-Gated Workflow", "Client Dashboard", "Pay to Finalize & Export"],
+    cta: "Try Demo", highlight: false, free: true,
   },
   {
     name: "Pro", monthly: 499, yearly: 4990, tagline: "For growing businesses",
@@ -49,7 +49,7 @@ export default function PricingSection({ showHeader = true }) {
           className="mx-auto max-w-2xl text-center">
             <div className="mb-3 inline-flex items-center gap-2 rounded-full bg-lime-400/15 px-3 py-1 text-xs font-bold uppercase tracking-wider text-lime-700">Pricing</div>
             <h2 className="text-3xl font-bold tracking-tight text-black sm:text-5xl">Choose Your Plan</h2>
-            <p className="mt-4 text-lg text-black/60">Start free with full Elite access, or pick a paid plan. No credit card required to get started.</p>
+            <p className="mt-4 text-lg text-black/60">Try the full workflow free with Demo mode, or pick a paid plan. Pay only when you're ready to finalize.</p>
 
             <div className="mt-7 inline-flex items-center gap-3 rounded-full border border-black/15 bg-white p-1">
               <button onClick={() => setAnnual(false)} className={`rounded-full px-4 py-1.5 text-sm font-semibold transition-all ${!annual ? "bg-lime-400 text-black" : "text-black/60"}`}>Monthly</button>

@@ -31,6 +31,8 @@ export function useClientTrack(user) {
         productId = "elite-monthly";
       } else if (user.plan === "pro") {
         productId = "pro-monthly";
+      } else if (user.plan === "demo") {
+        productId = "demo";
       }
 
       return { track, productId };

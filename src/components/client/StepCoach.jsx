@@ -62,6 +62,12 @@ export default function StepCoach() {
   const finish = () => {
     try { localStorage.setItem(doneKey, "1"); } catch {}
     setPhase("done");
+    // Demo paywall — when a demo user completes the Your Designs step (the
+    // finalization point), redirect to pricing instead of the next step.
+    if (user?.plan === "demo" && step?.key === "your-designs") {
+      navigate("/pricing");
+      return;
+    }
     // Navigate to the next VISIBLE step — computed dynamically from the
     // product's step list, so it always goes to the right next step.
     const idx = visibleSteps.findIndex((s) => s.to === step?.to);

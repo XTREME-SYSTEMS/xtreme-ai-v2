@@ -23,6 +23,12 @@ export default function Enhancements() {
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
   const [error, setError] = useState("");
+
+  // Demo paywall — demo users can't access enhancements or any post-finalization
+  // step. Redirect them to pricing so they can choose a plan to finalize.
+  useEffect(() => {
+    if (user?.plan === "demo") navigate("/pricing", { replace: true });
+  }, [user?.plan, navigate]);
   const [paying, setPaying] = useState(false);
 
   // D8 — Dynamic industry-aware enhancements

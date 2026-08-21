@@ -97,7 +97,7 @@ export default function AllInOneTabs() {
                 ))}
               </ul>
               <Link to="/register" className="group mt-8 inline-flex items-center gap-2 rounded-xl bg-lime-400 px-6 py-3 text-sm font-bold text-black transition-all hover:bg-lime-300">
-                Start 14 Day Free Trial <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+                Try Demo <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
               </Link>
             </div>
             <div className="overflow-hidden rounded-2xl border border-black/10 bg-white shadow-xl shadow-black/5">

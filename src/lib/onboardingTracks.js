@@ -13,10 +13,12 @@ export const PRODUCT_TO_TRACK = {
   "web-pack": "web-pack",
   "app-pack": "app-pack",
   "ai-tool": "ai-tool",
+  demo: "demo",
 };
 
 // Highest-priority track wins when a user owns multiple products.
-export const PRIORITY = ["elite", "pro", "deposit", "web-pack", "app-pack", "ai-tool"];
+// Demo is lowest priority — any paid plan overrides it.
+export const PRIORITY = ["elite", "pro", "deposit", "web-pack", "app-pack", "ai-tool", "demo"];
 
 export const TRACKS = {
   elite: {
@@ -120,6 +122,23 @@ export const TRACKS = {
       "Approve any production work in the Approvals queue.",
     ],
     cta: { to: "/brand-factory", label: "Start Brand Factory" },
+  },
+  demo: {
+    key: "demo",
+    title: "Demo Mode",
+    subtitle: "Try the full workflow — pay to finalize.",
+    greeting: "Welcome to your demo! You can explore the entire workflow — build your brand, website, social media, and videos. When you're ready to finalize and export, choose a plan.",
+    start: [
+      { to: "/my-package", icon: Sparkles, label: "Start Demo", desc: "Review your demo package and begin the workflow." },
+      { to: "/business-profile", icon: LayoutDashboard, label: "Business Profile", desc: "Tell us about your business." },
+    ],
+    steps: [
+      "Review your demo package and continue to Business Profile.",
+      "Go through each creative step — content, logo, brand, website, social, video.",
+      "Review everything in Your Designs.",
+      "Choose a plan to finalize and export your project.",
+    ],
+    cta: { to: "/my-package", label: "Start Demo" },
   },
   default: {
     key: "default",

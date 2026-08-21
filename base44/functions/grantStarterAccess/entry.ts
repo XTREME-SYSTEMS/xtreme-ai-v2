@@ -24,11 +24,12 @@ export default async function (req: Request) {
     return Response.json({ ok: false, error: "User not found" }, { status: 404 });
   }
 
-  // Grant full Elite access (presentation mode)
+  // Grant Demo access — user can experience the full workflow but must
+  // pay to finalize/export their project. plan="demo", has_paid=false.
   try {
     await base44.asServiceRole.entities.User.update(appUser.id, {
-      plan: "elite",
-      has_paid: true,
+      plan: "demo",
+      has_paid: false,
     });
   } catch (e) {
     console.error("grantStarterAccess: failed to update user plan", e?.message || e);
@@ -41,13 +42,13 @@ export default async function (req: Request) {
     try {
       const emailBody = welcomeEmail({
         email: appUser.email,
-        planName: "Elite (Free Starter Demo)",
+        planName: "Demo Mode",
         appUrl,
         hasAccount: true,
       });
       await base44.asServiceRole.integrations.Core.SendEmail({
         to: appUser.email,
-        subject: "🎉 Welcome to Lead Generation Near You — Your Elite Access is Active!",
+        subject: "🎉 Welcome to Lead Generation Near You — Your Demo is Active!",
         body: emailBody,
       });
     } catch (emailErr) {
@@ -78,5 +79,5 @@ export default async function (req: Request) {
     }
   }
 
-  return Response.json({ ok: true, plan: "elite", has_paid: true });
+  return Response.json({ ok: true, plan: "demo", has_paid: false });
 }
