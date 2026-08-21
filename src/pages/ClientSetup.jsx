@@ -90,7 +90,19 @@ export default function ClientSetup() {
         currency: "USD",
         paidAt: new Date().toISOString(),
       });
-      setAssignMsg({ type: "ok", text: `${product.name} assigned to ${assignEmail.trim()}. They'll see it in their portal.` });
+      // Notify the client via email that a package was added to their account.
+      // The email includes a direct link to their client portal.
+      try {
+        await base44.functions.invoke("notifyAccountChange", {
+          userEmail: assignEmail.trim().toLowerCase(),
+          changeType: "Package Added",
+          changeSummary: `An administrator has assigned you the "${product.name}" package. It's now visible in your client portal — click below to view it and start your onboarding.`,
+        });
+      } catch (notifyErr) {
+        // Don't block the assignment if the email fails — the purchase is already recorded.
+        console.warn("ClientSetup: account notification email failed", notifyErr);
+      }
+      setAssignMsg({ type: "ok", text: `${product.name} assigned to ${assignEmail.trim()}. They'll see it in their portal and get an email notification.` });
       setAssignEmail("");
       await loadPurchases();
     } catch (e) {
