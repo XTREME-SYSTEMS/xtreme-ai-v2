@@ -2,26 +2,16 @@ import { NavLink, Outlet, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { base44 } from "@/api/base44Client";
 import {
-  LayoutDashboard, CheckCircle, ScrollText, Settings,
-  LogOut, Menu, X, ArrowLeft, Package, Bot, FileSignature,
+  LogOut, Menu, X, ArrowLeft,
 } from "lucide-react";
 import { Image } from "@/components/ui/image";
 import { cn } from "@/lib/utils";
 import { LOGO_ICON } from "@/lib/brandAssets";
 import ThemeToggle from "@/components/ThemeToggle";
-import { useClientTrack } from "@/hooks/useClientTrack";
 import { usePreview } from "@/lib/PreviewContext";
 import ClientSidebarTimeline from "@/components/client/ClientSidebarTimeline";
-
-const NAV = [
-  { to: "/my-package", label: "My Package", icon: Package, end: true },
-  { to: "/client-portal", label: "Client Portal", icon: LayoutDashboard, end: true },
-  { to: "/assistant", label: "AI Assistant", icon: Bot, end: true },
-  { to: "/signatures", label: "Signatures", icon: FileSignature, end: true },
-  { to: "/approvals", label: "Approvals", icon: CheckCircle },
-  { to: "/receipts", label: "Activity", icon: ScrollText },
-  { to: "/settings", label: "Settings", icon: Settings },
-];
+import StepCoach from "@/components/client/StepCoach";
+import { CLIENT_NAV } from "@/lib/clientSteps";
 
 export default function ClientLayout({ user }) {
   const [open, setOpen] = useState(false);
@@ -50,22 +40,34 @@ export default function ClientLayout({ user }) {
           <button onClick={() => setOpen(false)} className="ml-auto text-white/50 hover:text-white md:hidden"><X className="h-5 w-5" /></button>
         </div>
         <nav className="h-[calc(100vh-3.5rem)] overflow-y-auto px-2 py-3">
-          {NAV.map((item) => {
+          {CLIENT_NAV.map((item, idx) => {
             const Icon = item.icon;
+            const showDivider = idx === 4; // divider before utilities
             return (
-              <NavLink
-                key={item.to}
-                to={item.to}
-                end={item.end}
-                onClick={() => setOpen(false)}
-                className={({ isActive }) => cn(
-                  "flex items-center gap-2.5 rounded-lg px-2.5 py-2 text-sm transition-colors",
-                  isActive ? "bg-lime-400/10 font-medium text-white" : "text-white/80 hover:bg-white/5"
-                )}
-              >
-                <Icon className="h-4 w-4 shrink-0" />
-                {item.label}
-              </NavLink>
+              <div key={item.to}>
+                {showDivider && <div className="my-2 border-t border-white/10" />}
+                <NavLink
+                  to={item.to}
+                  end={item.end}
+                  onClick={() => setOpen(false)}
+                  className={({ isActive }) => cn(
+                    "flex items-center gap-2.5 rounded-lg px-2.5 py-2 text-sm transition-colors",
+                    isActive ? "bg-lime-400/10 font-medium text-white" : "text-white/80 hover:bg-white/5"
+                  )}
+                >
+                  {item.step ? (
+                    <span className={cn(
+                      "flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-[11px] font-bold",
+                      "border border-lime-400/40 text-lime-400"
+                    )}>
+                      {item.step}
+                    </span>
+                  ) : (
+                    <Icon className="h-4 w-4 shrink-0" />
+                  )}
+                  {item.label}
+                </NavLink>
+              </div>
             );
           })}
           <ClientSidebarTimeline user={user} />
@@ -96,6 +98,8 @@ export default function ClientLayout({ user }) {
           <Outlet />
         </main>
       </div>
+
+      <StepCoach />
     </div>
   );
 }
