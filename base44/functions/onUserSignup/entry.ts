@@ -57,7 +57,7 @@ export default async function (req: Request) {
   // 4. Sync to Supabase (non-blocking)
   const supabaseResult: any = { ok: false, error: null };
   try {
-    await syncToSupabase(contact, user_id);
+    await syncToSupabase(base44, contact, user_id);
     supabaseResult.ok = true;
   } catch (e) {
     supabaseResult.error = (e as Error).message;
@@ -123,13 +123,13 @@ async function syncToGoogleDrive(base44: any, contact: any, userId: string) {
   if (!appendRes.ok) throw new Error(`Sheets append failed: ${appendRes.status}`);
 }
 
-// ---- Supabase sync (Management API + PostgREST) ----
-async function syncToSupabase(contact: any, userId: string) {
-  const token = process.env.SUPABASE_ACCESS_TOKEN;
-  if (!token) throw new Error("SUPABASE_ACCESS_TOKEN not set");
+// ---- Supabase sync (Management API + PostgREST via authorized connector) ----
+async function syncToSupabase(base44: any, contact: any, userId: string) {
+  const { accessToken } = await base44.asServiceRole.connectors.getConnection("supabase");
+  if (!accessToken) throw new Error("Supabase not connected");
 
   // List projects and pick the first
-  const projectsRes = await fetch("https://api.supabase.com/v1/projects", { headers: { Authorization: `Bearer ${token}` } });
+  const projectsRes = await fetch("https://api.supabase.com/v1/projects", { headers: { Authorization: `Bearer ${accessToken}` } });
   if (!projectsRes.ok) throw new Error(`Supabase list projects failed: ${projectsRes.status}`);
   const projects = await projectsRes.json();
   if (!projects || projects.length === 0) throw new Error("No Supabase projects found");
@@ -140,7 +140,7 @@ async function syncToSupabase(contact: any, userId: string) {
   try {
     await fetch(`https://api.supabase.com/v1/projects/${ref}/database/query`, {
       method: "POST",
-      headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
+      headers: { Authorization: `Bearer ${accessToken}`, "Content-Type": "application/json" },
       body: JSON.stringify({
         query: `CREATE TABLE IF NOT EXISTS crm_contacts (
           id TEXT PRIMARY KEY,
@@ -160,7 +160,7 @@ async function syncToSupabase(contact: any, userId: string) {
   } catch { /* table may already exist */ }
 
   // Get service role key
-  const keysRes = await fetch(`https://api.supabase.com/v1/projects/${ref}/api-keys`, { headers: { Authorization: `Bearer ${token}` } });
+  const keysRes = await fetch(`https://api.supabase.com/v1/projects/${ref}/api-keys`, { headers: { Authorization: `Bearer ${accessToken}` } });
   if (!keysRes.ok) throw new Error(`Supabase api-keys failed: ${keysRes.status}`);
   const keys = await keysRes.json();
   const serviceKey = (keys || []).find((k: any) => k.name === "service_role")?.api_key;
