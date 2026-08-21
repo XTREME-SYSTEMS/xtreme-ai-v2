@@ -1,6 +1,6 @@
 import { useEffect, useRef } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { Check, Lock } from "lucide-react";
+import { Check } from "lucide-react";
 import { getStepByPath } from "@/lib/clientSteps";
 import { useClientUser } from "@/hooks/useClientUser";
 import { usePortalPipeline } from "@/hooks/usePortalPipeline";
@@ -50,29 +50,22 @@ export default function ClientTimeline() {
           const Icon = step.icon;
           const isCurrent = i === currentIdx;
           const isDone = states[i]?.completed || false;
-          const isLocked = states[i]?.locked || false;
-          const clickable = isDone || isCurrent;
           return (
             <div key={step.to} className="flex items-center" data-step-idx={i}>
               <button
                 type="button"
-                disabled={!clickable}
-                onClick={() => clickable && navigate(step.to)}
-                className={cn(
-                  "group flex flex-col items-center gap-1 shrink-0",
-                  clickable ? "cursor-pointer" : "cursor-default"
-                )}
+                onClick={() => navigate(step.to)}
+                className="group flex cursor-pointer flex-col items-center gap-1 shrink-0"
               >
                 <span
                   className={cn(
                     "flex h-8 w-8 items-center justify-center rounded-full border-2 text-xs font-bold transition-all sm:h-9 sm:w-9",
                     isDone && "border-lime-400 bg-lime-400 text-black",
                     isCurrent && !isDone && "border-lime-400 bg-lime-400/15 text-lime-400 ring-2 ring-lime-400/30",
-                    isLocked && "border-white/15 bg-zinc-900 text-white/30",
-                    !isDone && !isCurrent && !isLocked && "border-white/15 bg-zinc-900 text-white/40"
+                    !isDone && !isCurrent && "border-white/15 bg-zinc-900 text-white/40 hover:border-lime-400/40 hover:text-lime-300"
                   )}
                 >
-                  {isDone ? <Check className="h-4 w-4" /> : isLocked ? <Lock className="h-3 w-3" /> : <Icon className="h-4 w-4" />}
+                  {isDone ? <Check className="h-4 w-4" /> : <Icon className="h-4 w-4" />}
                 </span>
                 <span
                   className={cn(
