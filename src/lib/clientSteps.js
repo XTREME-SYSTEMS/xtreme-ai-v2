@@ -2,22 +2,23 @@ import {
   Package, Building2, MessageSquareText, PenTool, Shirt, Palette, Share2, Video, LayoutTemplate, FileSignature, ShieldCheck, Rocket, Settings, LayoutDashboard, Sparkles,
 } from "lucide-react";
 
-// The ordered journey a client follows to get their epoxy contractor website
-// built. Each step gates the next so the client only ever sees the one thing
-// they need to do. `step` is the 1-based number shown in the timeline.
+// The ordered journey a client follows to get their website built. Each step
+// gates the next so the client only ever sees the one thing they need to do.
+// `step` is the 1-based number shown in the timeline. Industry-agnostic —
+// works for any local service business, not just epoxy contractors.
 export const CLIENT_STEPS = [
   {
     to: "/my-package", label: "Welcome", icon: Package, step: 1, gate: "auto",
     activityLabel: "Review your package",
     title: "Step 1 · Welcome to Your Website Build",
-    body: "Here's everything included in your epoxy contractor website package. Review what's included, then continue to tell us about your business.",
+    body: "Here's everything included in your website package. Review what's included, then continue to tell us about your business.",
     nextLabel: "Go to Business Profile", nextTo: "/business-profile",
   },
   {
     to: "/business-profile", label: "Business Profile", icon: Building2, step: 2, gate: "profile",
     activityLabel: "Complete your business profile",
-    title: "Step 2 · Tell Us About Your Epoxy Business",
-    body: "Fill out your business details — name, services, service area, logo and photos. Our team uses this to build everything else.",
+    title: "Step 2 · Tell Us About Your Business",
+    body: "Fill out your business details — industry, name, services, service area, logo and photos. Our team uses this to build everything else.",
     nextLabel: "Go to Content Generator", nextTo: "/content-generator",
   },
   {
@@ -31,14 +32,14 @@ export const CLIENT_STEPS = [
     to: "/logo-generator", label: "Logo Generator", icon: PenTool, step: 4, gate: "logo",
     activityLabel: "Pick your logo",
     title: "Step 4 · Pick Your Logo",
-    body: "We generated 10 logo concepts for your epoxy business. All are created with transparent backgrounds so they look perfect on any website theme. Tap the one that feels right.",
+    body: "We generated 10 logo concepts for your business. All are created with transparent backgrounds so they look perfect on any website theme. Tap the one that feels right.",
     nextLabel: "Go to Brand Generator", nextTo: "/brand-generator",
   },
   {
     to: "/brand-generator", label: "Brand Generator", icon: Shirt, step: 5, gate: "brand",
     activityLabel: "Approve your brand mockups",
     title: "Step 5 · See Your Brand Come to Life",
-    body: "We applied your logo to 10 real-world mockups — business cards, brochures, apparel, a van wrap and more. All are included. Don't like one? Regenerate just that item.",
+    body: "We applied your logo to 10 real-world mockups — business cards, brochures, apparel, a vehicle wrap and more. All are included. Don't like one? Regenerate just that item.",
     nextLabel: "Go to Website Design", nextTo: "/design-direction",
   },
   {
@@ -94,7 +95,7 @@ export const CLIENT_STEPS = [
     to: "/receipts", label: "Launch", icon: Rocket, step: 13, gate: "auto",
     activityLabel: "Track your launch",
     title: "Step 13 · Your Website Is Launching",
-    body: "Every action your team takes to build and launch your epoxy contractor website is logged here for full transparency.",
+    body: "Every action your team takes to build and launch your website is logged here for full transparency.",
     nextLabel: null, nextTo: null,
   },
 ];

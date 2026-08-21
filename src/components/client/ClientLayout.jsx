@@ -8,6 +8,7 @@ import { usePreview } from "@/lib/PreviewContext";
 import StepCoach from "@/components/client/StepCoach";
 import ClientTimeline from "@/components/client/ClientTimeline";
 import MobileBottomNav from "@/components/client/MobileBottomNav";
+import ClientErrorBoundary from "@/components/client/ClientErrorBoundary";
 
 // Distraction-free client shell: no sidebar, no timeline, no manual nav.
 // The only thing on screen is the current step's content plus the guided
@@ -49,7 +50,9 @@ export default function ClientLayout({ user }) {
       <ClientTimeline />
 
       <main className="flex-1 overflow-y-auto p-4 pb-24 sm:p-6 sm:pb-28">
-        <Outlet />
+        <ClientErrorBoundary>
+          <Outlet />
+        </ClientErrorBoundary>
       </main>
 
       <StepCoach />
