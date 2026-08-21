@@ -36,7 +36,10 @@ export default function AiOnboardingChat({
   const fileRef = useRef(null);
   const scrollRef = useRef(null);
 
-  useEffect(() => { scrollRef.current?.scrollIntoView({ behavior: "smooth" }); }, [messages, thinking]);
+  useEffect(() => {
+    const el = scrollRef.current;
+    if (el) el.scrollTop = el.scrollHeight;
+  }, [messages, thinking]);
 
   const onPickFile = async (e) => {
     const file = e.target.files?.[0];
@@ -111,7 +114,7 @@ export default function AiOnboardingChat({
         <span className="text-xs text-white/40">· {subtitle}</span>
       </div>
 
-      <div className="h-80 space-y-3 overflow-y-auto pr-1">
+      <div ref={scrollRef} className="h-80 space-y-3 overflow-y-auto pr-1">
         {messages.map((m, i) => (
           <div key={i} className={`flex ${m.role === "user" ? "justify-end" : "justify-start"}`}>
             <div className={`max-w-[80%] rounded-2xl px-4 py-2 text-sm ${m.role === "user" ? "bg-lime-400 text-black" : "bg-zinc-800 text-white"}`}>
@@ -125,7 +128,7 @@ export default function AiOnboardingChat({
             <div className="rounded-2xl bg-zinc-800 px-4 py-2.5"><Loader2 className="h-4 w-4 animate-spin text-white/60" /></div>
           </div>
         )}
-        <div ref={scrollRef} />
+        <div />
       </div>
 
       {error && <div className="mt-3 rounded-lg bg-rose-500/10 p-2 text-xs text-rose-300">{error}</div>}

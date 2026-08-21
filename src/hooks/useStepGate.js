@@ -65,6 +65,15 @@ export function useStepGate(step, user) {
           } catch {
             if (!cancelled) setState({ isComplete: false, loading: false, pendingLabel: "Couldn't verify status" });
           }
+        } else if (step.gate === "design") {
+          try {
+            const me = await base44.auth.me();
+            const done = !!(me && me.designPacksChosen);
+            if (!cancelled)
+              setState({ isComplete: done, loading: false, pendingLabel: done ? "" : "Pick your design direction" });
+          } catch {
+            if (!cancelled) setState({ isComplete: false, loading: false, pendingLabel: "Couldn't verify status" });
+          }
         }
       } catch (e) {
         if (!cancelled) setState({ isComplete: false, loading: false, pendingLabel: "Couldn't verify status" });
