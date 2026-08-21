@@ -150,7 +150,7 @@ export default function BusinessProfile() {
       setGallery([]);
       setSaved(true);
       try { localStorage.setItem("coach:done:/business-profile", "1"); } catch {}
-      setTimeout(() => navigate("/design-direction"), 1000);
+      setTimeout(() => navigate("/logo-generator"), 1000);
     } catch (err) {
       setError("Something went wrong saving your profile. Please try again.");
     } finally {

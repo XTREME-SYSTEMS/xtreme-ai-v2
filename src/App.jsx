@@ -89,7 +89,10 @@ import MyPackage from '@/pages/MyPackage';
 import Assistant from '@/pages/Assistant';
 import Signatures from '@/pages/Signatures';
 import BusinessProfile from '@/pages/BusinessProfile';
+import LogoGenerator from '@/pages/LogoGenerator';
+import BrandGenerator from '@/pages/BrandGenerator';
 import DesignDirection from '@/pages/DesignDirection';
+import YourDesigns from '@/pages/YourDesigns';
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin, isAuthenticated } = useAuth();
@@ -134,7 +137,10 @@ const AuthenticatedApp = () => {
           <Route path="/my-package" element={<MyPackage />} />
           <Route path="/assistant" element={<Assistant />} />
           <Route path="/business-profile" element={<BusinessProfile />} />
+          <Route path="/logo-generator" element={<LogoGenerator />} />
+          <Route path="/brand-generator" element={<BrandGenerator />} />
           <Route path="/design-direction" element={<DesignDirection />} />
+          <Route path="/your-designs" element={<YourDesigns />} />
           <Route path="/signatures" element={<Signatures />} />
           <Route path="/discovery" element={<BusinessDiscovery />} />
           <Route path="/prospects" element={<Prospects />} />

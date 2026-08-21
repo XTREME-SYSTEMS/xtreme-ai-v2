@@ -88,7 +88,7 @@ export default function DesignPackPicker() {
       }
       setSaved(true);
       try { localStorage.setItem("coach:done:/design-direction", "1"); } catch {}
-      setTimeout(() => navigate("/signatures"), 1000);
+      setTimeout(() => navigate("/your-designs"), 1000);
     } catch (e) {
       setError("Couldn't save your selection. Please try again.");
     } finally {

@@ -1,0 +1,189 @@
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { base44 } from "@/api/base44Client";
+import { Image } from "@/components/ui/image";
+import { PenTool, Loader2, Check, RefreshCw, ArrowRight, AlertCircle } from "lucide-react";
+import { cn } from "@/lib/utils";
+import { logReceipt } from "@/lib/pipelineUtils";
+import { LOGO_STYLES } from "@/lib/designPrompts";
+
+// Step: Logo Generator. Generates 10 distinct logos for the client's epoxy
+// business (from their Business Profile name), lets them pick one, and saves
+// the choice to their user record. Generated logos are cached on the user so
+// they don't regenerate (and burn credits) on every visit.
+export default function LogoGenerator() {
+  const navigate = useNavigate();
+  const [profile, setProfile] = useState(null);
+  const [packs, setPacks] = useState([]); // [{url, label, id}]
+  const [chosen, setChosen] = useState(""); // url
+  const [generating, setGenerating] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [saved, setSaved] = useState(false);
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    document.title = "Logo Generator · Lead Gen Near You";
+    base44
+      .auth.me()
+      .then((u) => {
+        setProfile(u?.epoxyProfile || null);
+        if (u?.logoPacks?.length) setPacks(u.logoPacks);
+        if (u?.chosenLogoUrl) setChosen(u.chosenLogoUrl);
+        if (u?.logoPacksChosen) setSaved(true);
+      })
+      .catch(() => {});
+  }, []);
+
+  const businessName = profile?.businessName?.trim() || "";
+
+  const generate = async () => {
+    if (!businessName) {
+      setError("Add your business name in the Business Profile step first.");
+      return;
+    }
+    setGenerating(true);
+    setError("");
+    try {
+      const results = await Promise.allSettled(
+        LOGO_STYLES.map(async (s) => {
+          const res = await base44.integrations.Core.GenerateImage({ prompt: s.prompt(businessName) });
+          return { id: s.id, label: s.label, url: res.url };
+        })
+      );
+      const ok = results.map((r) => r.value).filter(Boolean);
+      if (ok.length === 0) throw new Error("generation failed");
+      setPacks(ok);
+      await base44.auth.updateMe({ logoPacks: ok });
+    } catch (e) {
+      setError("Logo generation hit a snag. Please try again.");
+    } finally {
+      setGenerating(false);
+    }
+  };
+
+  // Auto-generate on first visit if the client has no packs yet.
+  useEffect(() => {
+    if (businessName && packs.length === 0 && !generating && !error) generate();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [businessName]);
+
+  const save = async () => {
+    if (!chosen) {
+      setError("Pick one logo to continue.");
+      return;
+    }
+    setSaving(true);
+    setError("");
+    try {
+      await base44.auth.updateMe({ chosenLogoUrl: chosen, logoPacksChosen: true });
+      try {
+        await logReceipt({ action: "Logo chosen", entityType: "User", entityId: "self", status: "success", notes: `Logo selected` });
+      } catch {}
+      setSaved(true);
+      try { localStorage.setItem("coach:done:/logo-generator", "1"); } catch {}
+      setTimeout(() => navigate("/brand-generator"), 800);
+    } catch (e) {
+      setError("Couldn't save your choice. Please try again.");
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  return (
+    <div className="mx-auto max-w-5xl">
+      <div className="rounded-xl border border-lime-400/40 bg-lime-400/5 p-5 sm:p-6">
+        <div className="flex flex-wrap items-center gap-2">
+          <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-lime-400">
+            <PenTool className="h-4 w-4" /> Logo Generator
+          </div>
+          <span className="ml-auto rounded-full border border-white/15 px-2.5 py-1 text-[11px] font-medium text-white/60">
+            {businessName || "Add a business name"}
+          </span>
+        </div>
+        <h1 className="mt-2 text-xl font-semibold text-white sm:text-2xl">Pick your logo</h1>
+        <p className="mt-1 text-sm text-white/60">
+          We generated 10 logo concepts for <span className="font-semibold text-white">{businessName || "your business"}</span>. Tap the one that feels right —
+          your team will use it across your entire brand.
+        </p>
+
+        {saved && (
+          <div className="mt-4 flex items-center gap-2 rounded-lg border border-lime-400/50 bg-lime-400/10 px-3 py-2.5 text-sm text-lime-300">
+            <Check className="h-4 w-4" /> Logo saved — building your brand mockups…
+          </div>
+        )}
+
+        {generating && (
+          <div className="mt-6 flex flex-col items-center justify-center rounded-xl border border-white/10 bg-zinc-950 py-16">
+            <Loader2 className="h-8 w-8 animate-spin text-lime-400" />
+            <p className="mt-3 text-sm text-white/60">Generating 10 logo concepts…</p>
+            <p className="text-xs text-white/40">This takes about 30 seconds.</p>
+          </div>
+        )}
+
+        {!generating && packs.length > 0 && (
+          <>
+            <div className="mt-5 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
+              {packs.map((p) => {
+                const on = chosen === p.url;
+                return (
+                  <button
+                    key={p.url}
+                    type="button"
+                    onClick={() => setChosen(p.url)}
+                    className={cn(
+                      "group relative overflow-hidden rounded-xl border-2 bg-zinc-950 text-left transition-all",
+                      on ? "border-lime-400 ring-2 ring-lime-400/40" : "border-white/10 hover:border-white/25"
+                    )}
+                  >
+                    <div className="relative aspect-square w-full overflow-hidden bg-white">
+                      <Image src={p.url} alt={p.label} fittingType="fit" className="h-full w-full" />
+                      {on && (
+                        <div className="absolute right-1.5 top-1.5 flex h-6 w-6 items-center justify-center rounded-full bg-lime-400 text-black">
+                          <Check className="h-4 w-4" />
+                        </div>
+                      )}
+                    </div>
+                    <div className="p-2.5 text-xs font-semibold text-white">{p.label}</div>
+                  </button>
+                );
+              })}
+            </div>
+
+            <button
+              type="button"
+              onClick={generate}
+              disabled={generating}
+              className="mt-4 inline-flex items-center gap-1.5 rounded-lg border border-white/15 px-3 py-2 text-xs font-medium text-white/70 hover:border-lime-400/50 hover:text-lime-300"
+            >
+              <RefreshCw className="h-3.5 w-3.5" /> Regenerate concepts
+            </button>
+          </>
+        )}
+
+        {!generating && packs.length === 0 && !error && (
+          <div className="mt-6 rounded-xl border border-white/10 bg-zinc-950 p-10 text-center">
+            <PenTool className="mx-auto mb-3 h-10 w-10 text-white/30" />
+            <p className="text-sm text-white/60">Logos will appear here automatically.</p>
+          </div>
+        )}
+
+        {error && (
+          <div className="mt-4 flex items-center gap-2 rounded-lg border border-red-400/30 bg-red-400/10 px-3 py-2.5 text-sm text-red-300">
+            <AlertCircle className="h-4 w-4" /> {error}
+          </div>
+        )}
+
+        {packs.length > 0 && (
+          <button
+            type="button"
+            onClick={save}
+            disabled={saving || !chosen}
+            className="mt-5 inline-flex w-full items-center justify-center gap-2 rounded-lg bg-lime-400 px-4 py-3 text-sm font-semibold text-black transition-colors hover:bg-lime-300 disabled:cursor-not-allowed disabled:bg-white/10 disabled:text-white/40"
+          >
+            {saving ? <><Loader2 className="h-4 w-4 animate-spin" /> Saving…</> : saved ? <><Check className="h-4 w-4" /> Update choice</> : <>Use this logo <ArrowRight className="h-4 w-4" /></>}
+          </button>
+        )}
+      </div>
+    </div>
+  );
+}
