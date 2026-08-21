@@ -6,6 +6,7 @@ import { PenTool, Loader2, Check, RefreshCw, ArrowRight, AlertCircle } from "luc
 import { cn } from "@/lib/utils";
 import { logReceipt } from "@/lib/pipelineUtils";
 import { LOGO_STYLES } from "@/lib/designPrompts";
+import BackButton from "@/components/client/BackButton";
 
 // Step: Logo Generator. Generates 10 distinct logos for the client's epoxy
 // business (from their Business Profile name), lets them pick one, and saves
@@ -91,6 +92,7 @@ export default function LogoGenerator() {
 
   return (
     <div className="mx-auto max-w-5xl">
+      <BackButton to="/content-generator" />
       <div className="rounded-xl border border-lime-400/40 bg-lime-400/5 p-5 sm:p-6">
         <div className="flex flex-wrap items-center gap-2">
           <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-lime-400">

@@ -89,9 +89,12 @@ import MyPackage from '@/pages/MyPackage';
 import Assistant from '@/pages/Assistant';
 import Signatures from '@/pages/Signatures';
 import BusinessProfile from '@/pages/BusinessProfile';
+import ContentGenerator from '@/pages/ContentGenerator';
 import LogoGenerator from '@/pages/LogoGenerator';
 import BrandGenerator from '@/pages/BrandGenerator';
 import DesignDirection from '@/pages/DesignDirection';
+import SocialMediaGenerator from '@/pages/SocialMediaGenerator';
+import VideoGenerator from '@/pages/VideoGenerator';
 import YourDesigns from '@/pages/YourDesigns';
 
 const AuthenticatedApp = () => {
@@ -137,9 +140,12 @@ const AuthenticatedApp = () => {
           <Route path="/my-package" element={<MyPackage />} />
           <Route path="/assistant" element={<Assistant />} />
           <Route path="/business-profile" element={<BusinessProfile />} />
+          <Route path="/content-generator" element={<ContentGenerator />} />
           <Route path="/logo-generator" element={<LogoGenerator />} />
           <Route path="/brand-generator" element={<BrandGenerator />} />
           <Route path="/design-direction" element={<DesignDirection />} />
+          <Route path="/social-media" element={<SocialMediaGenerator />} />
+          <Route path="/video-generator" element={<VideoGenerator />} />
           <Route path="/your-designs" element={<YourDesigns />} />
           <Route path="/signatures" element={<Signatures />} />
           <Route path="/discovery" element={<BusinessDiscovery />} />

@@ -93,6 +93,33 @@ export function useStepGate(step, user) {
           } catch {
             if (!cancelled) setState({ isComplete: false, loading: false, pendingLabel: "Couldn't verify status" });
           }
+        } else if (step.gate === "content") {
+          try {
+            const me = await base44.auth.me();
+            const done = !!(me && me.contentTemplatesChosen);
+            if (!cancelled)
+              setState({ isComplete: done, loading: false, pendingLabel: done ? "" : "Pick your content tone" });
+          } catch {
+            if (!cancelled) setState({ isComplete: false, loading: false, pendingLabel: "Couldn't verify status" });
+          }
+        } else if (step.gate === "social") {
+          try {
+            const me = await base44.auth.me();
+            const done = !!(me && me.socialMediaChosen);
+            if (!cancelled)
+              setState({ isComplete: done, loading: false, pendingLabel: done ? "" : "Approve your social media pack" });
+          } catch {
+            if (!cancelled) setState({ isComplete: false, loading: false, pendingLabel: "Couldn't verify status" });
+          }
+        } else if (step.gate === "video") {
+          try {
+            const me = await base44.auth.me();
+            const done = !!(me && me.videoChosen);
+            if (!cancelled)
+              setState({ isComplete: done, loading: false, pendingLabel: done ? "" : "Approve your video concepts" });
+          } catch {
+            if (!cancelled) setState({ isComplete: false, loading: false, pendingLabel: "Couldn't verify status" });
+          }
         }
       } catch (e) {
         if (!cancelled) setState({ isComplete: false, loading: false, pendingLabel: "Couldn't verify status" });

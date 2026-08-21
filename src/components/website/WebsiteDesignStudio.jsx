@@ -6,6 +6,7 @@ import { cn } from "@/lib/utils";
 import { logReceipt } from "@/lib/pipelineUtils";
 import { PALETTES, WEBSITE_LAYOUTS, buildTheme, SECTION_META } from "@/components/website/websiteLayouts";
 import WebsitePreview, { ScaledPreview } from "@/components/website/WebsitePreview";
+import BackButton from "@/components/client/BackButton";
 
 const REVISE_CHIPS = ["Different layout", "Different colors", "Different content", "Different images", "Too plain", "Not local enough", "Doesn't match my brand", "Other"];
 
@@ -167,7 +168,7 @@ export default function WebsiteDesignStudio() {
       try { await logReceipt({ action: "Website layout approved", entityType: "User", entityId: "self", status: "success", notes: `Layout ${selectedId} · palette ${paletteId}` }); } catch {}
       setSaved(true);
       try { localStorage.setItem("coach:done:/design-direction", "1"); } catch {}
-      setTimeout(() => navigate("/your-designs"), 800);
+      setTimeout(() => navigate("/social-media"), 800);
     } catch (e) { setError("Couldn't save. Please try again."); }
     finally { setSaving(false); }
   };
@@ -188,6 +189,7 @@ export default function WebsiteDesignStudio() {
 
   return (
     <div className="mx-auto max-w-6xl">
+      <BackButton to="/brand-generator" />
       <div className="rounded-xl border border-lime-400/40 bg-lime-400/5 p-5 sm:p-6">
         <div className="flex flex-wrap items-center gap-2">
           <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-lime-400">

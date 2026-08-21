@@ -6,6 +6,7 @@ import { Shirt, Loader2, Check, RefreshCw, ArrowRight, AlertCircle, Eye, Message
 import { logReceipt } from "@/lib/pipelineUtils";
 import { BRAND_TYPES } from "@/lib/designPrompts";
 import BrandPackPreview from "@/components/client/BrandPackPreview";
+import BackButton from "@/components/client/BackButton";
 
 // Step: Brand Generator. Uses the client's chosen logo to generate 10 brand
 // mockups (business card, brochure, t-shirt, hat, app, vehicle wrap, …).
@@ -147,6 +148,7 @@ export default function BrandGenerator() {
 
   return (
     <div className="mx-auto max-w-5xl">
+      <BackButton to="/logo-generator" />
       <div className="rounded-xl border border-lime-400/40 bg-lime-400/5 p-5 sm:p-6">
         <div className="flex flex-wrap items-center gap-2">
           <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-lime-400">

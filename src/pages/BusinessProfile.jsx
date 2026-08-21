@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { base44 } from "@/api/base44Client";
 import { Building2, Upload, Loader2, CheckCircle2, X, MapPin, Star, Shield } from "lucide-react";
+import BackButton from "@/components/client/BackButton";
 
 // Step 2 of the epoxy website build: a constrained, multiple-choice intake.
 // No open-ended prose, no AI chat — every field is an exact answer or a
@@ -150,7 +151,7 @@ export default function BusinessProfile() {
       setGallery([]);
       setSaved(true);
       try { localStorage.setItem("coach:done:/business-profile", "1"); } catch {}
-      setTimeout(() => navigate("/logo-generator"), 1000);
+      setTimeout(() => navigate("/content-generator"), 1000);
     } catch (err) {
       setError("Something went wrong saving your profile. Please try again.");
     } finally {
@@ -160,6 +161,7 @@ export default function BusinessProfile() {
 
   return (
     <div className="mx-auto max-w-2xl">
+      <BackButton to="/my-package" />
       <div className="rounded-xl border border-lime-400/40 bg-lime-400/5 p-5 sm:p-6">
         <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-lime-400">
           <Building2 className="h-4 w-4" /> Business Profile
