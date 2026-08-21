@@ -37,32 +37,32 @@ export default function StepCoach() {
   };
 
   return (
-    <div className="fixed bottom-5 right-5 z-50 w-[min(92vw,380px)] animate-in fade-in slide-in-from-bottom-4 rounded-xl border border-lime-400/50 bg-zinc-950 p-4 shadow-2xl">
-      <div className="flex items-start gap-3">
-        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-lime-400/15">
-          <Lightbulb className="h-4 w-4 text-lime-400" />
-        </div>
-        <div className="min-w-0 flex-1">
-          <h3 className="text-sm font-semibold text-white">{step.title}</h3>
-          <p className="mt-1 text-xs leading-relaxed text-white/60">{step.body}</p>
-          <div className="mt-3 flex items-center gap-2">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4 animate-in fade-in">
+      <div className="w-[min(92vw,440px)] rounded-2xl border border-lime-400/50 bg-zinc-950 p-6 shadow-2xl animate-in zoom-in-90">
+        <div className="flex flex-col items-center text-center">
+          <div className="flex h-12 w-12 items-center justify-center rounded-full bg-lime-400/15">
+            <Lightbulb className="h-5 w-5 text-lime-400" />
+          </div>
+          <h3 className="mt-4 text-lg font-semibold text-white">{step.title}</h3>
+          <p className="mt-2 text-sm leading-relaxed text-white/70">{step.body}</p>
+          <div className="mt-6 flex w-full items-center justify-center gap-2">
             {step.nextTo && (
               <button
                 onClick={goNext}
-                className="inline-flex items-center gap-1.5 rounded-lg bg-lime-400 px-3 py-1.5 text-xs font-semibold text-black transition-colors hover:bg-lime-300"
+                className="inline-flex items-center gap-1.5 rounded-lg bg-lime-400 px-4 py-2 text-sm font-semibold text-black transition-colors hover:bg-lime-300"
               >
-                {step.nextLabel} <ArrowRight className="h-3.5 w-3.5" />
+                {step.nextLabel} <ArrowRight className="h-4 w-4" />
               </button>
             )}
             <button
               onClick={dismiss}
-              className="rounded-lg border border-white/15 px-3 py-1.5 text-xs font-medium text-white/60 transition-colors hover:bg-white/5 hover:text-white"
+              className="rounded-lg border border-white/15 px-4 py-2 text-sm font-medium text-white/70 transition-colors hover:bg-white/5 hover:text-white"
             >
               Got it
             </button>
           </div>
         </div>
-        <button onClick={dismiss} className="shrink-0 text-white/40 transition-colors hover:text-white">
+        <button onClick={dismiss} className="absolute right-4 top-4 text-white/40 transition-colors hover:text-white">
           <X className="h-4 w-4" />
         </button>
       </div>
