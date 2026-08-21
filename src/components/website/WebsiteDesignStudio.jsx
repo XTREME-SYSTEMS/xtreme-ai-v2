@@ -101,6 +101,21 @@ export default function WebsiteDesignStudio() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [profile]);
 
+  // Auto-generate max-quality images when the client did NOT upload any
+  // project photos. Uses their full onboarding brief (industry, sub-industry,
+  // location, services, answers) to produce ultra-high-quality, trade-specific
+  // gallery images. Only runs once, and only if they have no uploads and no
+  // previously generated set.
+  const uploadedGallery = profile?.galleryUrls && profile.galleryUrls.length > 0;
+  useEffect(() => {
+    if (!profile || !content) return;
+    if (uploadedGallery) return;            // client uploaded their own photos — use those
+    if (images && images.length > 0) return; // already have a generated set
+    if (enhancingImages) return;
+    enhanceImages();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [profile, content, uploadedGallery]);
+
   const palette = PALETTES.find((p) => p.id === paletteId) || PALETTES[0];
   const theme = buildTheme(palette, light);
 
@@ -118,8 +133,17 @@ export default function WebsiteDesignStudio() {
     setEnhancingImages(true); setSectionMsg("");
     try {
       const res = await base44.functions.invoke("regenerateWebsiteImages", {
-        businessName: profile?.businessName || "", services: profile?.services || [],
-        location: profile?.primaryLocation || "", count: 6,
+        businessName: profile?.businessName || "",
+        services: profile?.services || [],
+        location: profile?.primaryLocation || "",
+        count: 6,
+        industry: profile?.industry || "",
+        subIndustry: profile?.subIndustry || profile?.customSubIndustry || "",
+        businessType: Array.isArray(profile?.businessType) ? profile?.businessType.join(", ") : (profile?.businessType || ""),
+        differentiators: profile?.differentiators || [],
+        yearsInBusiness: profile?.yearsInBusiness || "",
+        financialIntelligence: hookUser?.financialIntelligence || null,
+        industryAnswers: hookUser?.industryAnswers || null,
       });
       const imgs = res?.data?.images || [];
       if (imgs.length) {
