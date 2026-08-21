@@ -1,0 +1,111 @@
+{
+  "name": "SocialAccount",
+  "type": "object",
+  "description": "A client's social media account (Instagram, Facebook, Google Business Profile, etc.) registered through the client portal so the team knows where to publish and can track each channel.",
+  "properties": {
+    "client_email": {
+      "type": "string",
+      "description": "Email of the client who owns this account. Used for row-level isolation."
+    },
+    "platform": {
+      "type": "string",
+      "enum": [
+        "instagram",
+        "facebook",
+        "google_business",
+        "linkedin",
+        "tiktok",
+        "youtube",
+        "twitter_x",
+        "pinterest",
+        "nextdoor",
+        "other"
+      ]
+    },
+    "handle": {
+      "type": "string",
+      "description": "The @handle or page name on the platform"
+    },
+    "url": {
+      "type": "string",
+      "description": "Full URL to the profile or page"
+    },
+    "follower_count": {
+      "type": "number",
+      "default": 0,
+      "description": "Current follower / like count (optional, for reporting)"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "pending_setup",
+        "active",
+        "needs_access",
+        "paused"
+      ],
+      "default": "pending_setup"
+    },
+    "access_notes": {
+      "type": "string",
+      "description": "How the team accesses this account (e.g. 'manager invited', 'page admin granted')"
+    },
+    "notes": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "client_email",
+    "platform",
+    "handle"
+  ],
+  "rls": {
+    "read": {
+      "$or": [
+        {
+          "data.client_email": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "create": {
+      "$or": [
+        {
+          "data.client_email": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "update": {
+      "$or": [
+        {
+          "data.client_email": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "delete": {
+      "$or": [
+        {
+          "data.client_email": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    }
+  }
+}

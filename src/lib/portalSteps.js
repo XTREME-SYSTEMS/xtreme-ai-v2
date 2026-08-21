@@ -176,6 +176,7 @@ export const DEFAULT_STEPS = FULL_BUILD_PLUS_MEDIA;
 // Utility nav items (not part of the build journey)
 export const CLIENT_UTILITIES = [
   { to: "/client-portal", label: "Client Portal", icon: LayoutDashboard, end: true },
+  { to: "/social-media-studio", label: "Social Media Studio", icon: Share2, end: true },
   { to: "/walkthrough-studio", label: "3D Walkthrough", icon: Box, end: true },
   { to: "/settings", label: "Settings", icon: Settings, end: true },
 ];

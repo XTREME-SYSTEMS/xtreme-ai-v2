@@ -175,6 +175,10 @@ export default function SocialMediaGenerator() {
           </>
         )}
 
+        <a href="/social-media-studio" className="mt-4 inline-flex items-center gap-1.5 rounded-lg border border-lime-400/30 bg-lime-400/5 px-3 py-2 text-xs font-medium text-lime-300 hover:bg-lime-400/10">
+          <Share2 className="h-3.5 w-3.5" /> Open Social Media Studio — connect accounts, upload photos & manage your calendar
+        </a>
+
         {error && <p className="mt-4 text-sm text-red-400">{error}</p>}
 
         {templates.length > 0 && (

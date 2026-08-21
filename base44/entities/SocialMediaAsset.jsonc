@@ -1,0 +1,108 @@
+{
+  "name": "SocialMediaAsset",
+  "type": "object",
+  "description": "Media library item for a client's social media \u2014 a user-uploaded image/video or an AI-generated template image \u2014 that can be assigned to content calendar posts.",
+  "properties": {
+    "client_email": {
+      "type": "string",
+      "description": "Email of the client who owns this asset. Used for row-level isolation."
+    },
+    "type": {
+      "type": "string",
+      "enum": [
+        "image",
+        "video"
+      ],
+      "default": "image"
+    },
+    "url": {
+      "type": "string",
+      "description": "Uploaded file URL or AI-generated image URL"
+    },
+    "caption": {
+      "type": "string",
+      "description": "Optional caption / description for this asset"
+    },
+    "tags": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Free-form tags (e.g. 'before-after', 'team', 'promo')"
+    },
+    "source": {
+      "type": "string",
+      "enum": [
+        "upload",
+        "generated"
+      ],
+      "default": "upload"
+    },
+    "template_id": {
+      "type": "string",
+      "description": "If source=generated, the template id from the social media pack (profile, cover, story, post1...)"
+    },
+    "platform_usage": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Which platforms this asset is intended for"
+    }
+  },
+  "required": [
+    "client_email",
+    "url",
+    "source"
+  ],
+  "rls": {
+    "read": {
+      "$or": [
+        {
+          "data.client_email": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "create": {
+      "$or": [
+        {
+          "data.client_email": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "update": {
+      "$or": [
+        {
+          "data.client_email": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "delete": {
+      "$or": [
+        {
+          "data.client_email": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    }
+  }
+}

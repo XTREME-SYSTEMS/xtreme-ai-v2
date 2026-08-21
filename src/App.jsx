@@ -97,6 +97,7 @@ import LogoGenerator from '@/pages/LogoGenerator';
 import BrandGenerator from '@/pages/BrandGenerator';
 import DesignDirection from '@/pages/DesignDirection';
 import SocialMediaGenerator from '@/pages/SocialMediaGenerator';
+import SocialMediaStudio from '@/pages/SocialMediaStudio';
 import VideoGenerator from '@/pages/VideoGenerator';
 import YourDesigns from '@/pages/YourDesigns';
 import Enhancements from '@/pages/Enhancements';
@@ -156,6 +157,7 @@ const AuthenticatedApp = () => {
           <Route path="/brand-generator" element={<BrandGenerator />} />
           <Route path="/design-direction" element={<DesignDirection />} />
           <Route path="/social-media" element={<SocialMediaGenerator />} />
+          <Route path="/social-media-studio" element={<SocialMediaStudio />} />
           <Route path="/video-generator" element={<VideoGenerator />} />
           <Route path="/your-designs" element={<YourDesigns />} />
           <Route path="/enhancements" element={<Enhancements />} />
