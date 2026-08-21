@@ -2,28 +2,36 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { base44 } from "@/api/base44Client";
 import { Image } from "@/components/ui/image";
-import { LayoutTemplate, PenTool, Shirt, Globe, ArrowRight, Eye, Sparkles, MessageSquareText, Share2, Video, RefreshCw, AlertCircle, Check, X } from "lucide-react";
+import { LayoutTemplate, PenTool, Shirt, Globe, ArrowRight, Eye, Sparkles, MessageSquareText, Share2, Video, RefreshCw, AlertCircle, Check, X, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import BackButton from "@/components/client/BackButton";
 import { notifyStepComplete } from "@/lib/pipelineNotify";
 import { WEBSITE_LAYOUTS, PALETTES, buildTheme } from "@/components/website/websiteLayouts";
 import WebsitePreview, { ScaledPreview } from "@/components/website/WebsitePreview";
+import { BRAND_TYPES } from "@/lib/designPrompts";
 
 // Final compilation step: shows every creative choice the client made —
 // content tone, logo, brand mockups, live website design, social media kit,
 // and video concepts — together on one page. Each section has a selection
 // checkbox (all auto-checked); the continue button is blocked until every
-// section is confirmed, with a clear flag for anything unchecked.
+// section is confirmed. Each individual card also has its own checkbox and
+// regenerate button for granular control.
 export default function YourDesigns() {
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [checks, setChecks] = useState({ content: true, logo: true, brand: true, website: true, social: true, video: true });
   const [showFlag, setShowFlag] = useState(false);
+  const [itemChecks, setItemChecks] = useState({ brand: {}, social: {}, video: {} });
+  const [regeneratingBrandId, setRegeneratingBrandId] = useState(null);
+  const [logoUrl, setLogoUrl] = useState("");
 
   useEffect(() => {
     document.title = "Your Designs · Lead Gen Near You";
-    base44.auth.me().then(setUser).catch(() => {}).finally(() => setLoading(false));
+    base44.auth.me().then((u) => {
+      setUser(u);
+      setLogoUrl(u?.chosenLogoUrl || "");
+    }).catch(() => {}).finally(() => setLoading(false));
   }, []);
 
   if (loading) {
@@ -37,11 +45,8 @@ export default function YourDesigns() {
   const contentTemplates = user?.contentTemplates?.templates || [];
   const chosenContent = contentTemplates.find((t) => t.id === user?.chosenContentTemplate) || contentTemplates[0] || null;
 
-  // Logo
-  const logoUrl = user?.chosenLogoUrl || "";
-
-  // Brand
-  const brandImages = user?.chosenBrandImages || [];
+  // Brand — use brandPacks (has id, label, url) for per-item regenerate
+  const brandPacks = user?.brandPacks || [];
 
   // Website — the ACTUAL chosen layout, rendered live
   const chosenLayoutId = user?.chosenWebsiteLayout || "";
@@ -61,6 +66,37 @@ export default function YourDesigns() {
   const toggle = (key) => {
     setChecks((c) => ({ ...c, [key]: !c[key] }));
     setShowFlag(false);
+  };
+
+  const toggleItem = (section, id) => {
+    setItemChecks((prev) => ({
+      ...prev,
+      [section]: { ...prev[section], [id]: prev[section]?.[id] === false ? true : false },
+    }));
+  };
+
+  const isItemChecked = (section, id) => itemChecks[section]?.[id] !== false;
+
+  // Regenerate a single brand mockup in-place using the client's logo
+  const regenerateBrandItem = async (pack) => {
+    if (regeneratingBrandId) return;
+    const brandType = BRAND_TYPES.find((b) => b.id === pack.id);
+    if (!brandType) return;
+    setRegeneratingBrandId(pack.id);
+    try {
+      const res = await base44.integrations.Core.GenerateImage({
+        prompt: brandType.prompt(businessName),
+        existing_image_urls: logoUrl ? [logoUrl] : undefined,
+      });
+      const next = brandPacks.map((p) => (p.id === pack.id ? { ...p, url: res.url } : p));
+      const updatedUser = { ...user, brandPacks: next, chosenBrandImages: next.map((p) => p.url) };
+      setUser(updatedUser);
+      try { await base44.auth.updateMe({ brandPacks: next, chosenBrandImages: next.map((p) => p.url) }); } catch {}
+    } catch (e) {
+      // best effort
+    } finally {
+      setRegeneratingBrandId(null);
+    }
   };
 
   const continueToSign = () => {
@@ -116,7 +152,7 @@ export default function YourDesigns() {
           )}
         </DesignSection>
 
-        {/* Logo — checkerboard background to show transparency */}
+        {/* Logo — plain img for transparent PNG display */}
         <DesignSection
           icon={PenTool} title="Your Logo" count={logoUrl ? 1 : 0}
           checked={checks.logo} onToggle={() => toggle("logo")}
@@ -126,26 +162,55 @@ export default function YourDesigns() {
         >
           {logoUrl && (
             <div className="overflow-hidden rounded-xl border border-white/10 p-6" style={{ backgroundColor: "#1a1a1a", backgroundImage: "linear-gradient(45deg, #333 25%, transparent 25%), linear-gradient(-45deg, #333 25%, transparent 25%), linear-gradient(45deg, transparent 75%, #333 75%), linear-gradient(-45deg, transparent 75%, #333 75%)", backgroundSize: "20px 20px", backgroundPosition: "0 0, 0 10px, 10px -10px, -10px 0px" }}>
-              <Image src={logoUrl} alt="Chosen logo" fittingType="fit" className="mx-auto h-32 w-auto" />
+              <img src={logoUrl} alt="Chosen logo" className="mx-auto h-32 w-auto object-contain" />
             </div>
           )}
         </DesignSection>
 
-        {/* Brand Mockups */}
+        {/* Brand Mockups — per-item checkbox + regenerate */}
         <DesignSection
-          icon={Shirt} title="Brand Mockups" count={brandImages.length}
+          icon={Shirt} title="Brand Mockups" count={brandPacks.length}
           checked={checks.brand} onToggle={() => toggle("brand")}
           onRegenerate={() => navigate("/brand-generator")}
-          empty={brandImages.length === 0}
+          empty={brandPacks.length === 0}
           emptyText="No brand mockups chosen yet."
         >
-          {brandImages.length > 0 && (
+          {brandPacks.length > 0 && (
             <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
-              {brandImages.map((url) => (
-                <div key={url} className="overflow-hidden rounded-xl border border-white/10 bg-white">
-                  <Image src={url} alt="Brand mockup" fittingType="fit" className="h-32 w-full" />
-                </div>
-              ))}
+              {brandPacks.map((pack) => {
+                const itemOn = isItemChecked("brand", pack.id);
+                const regen = regeneratingBrandId === pack.id;
+                return (
+                  <div key={pack.id} className="overflow-hidden rounded-xl border border-white/10 bg-white">
+                    <div className="relative">
+                      <Image src={pack.url} alt={pack.label} fittingType="fit" className="h-32 w-full" />
+                      <button
+                        type="button"
+                        onClick={() => toggleItem("brand", pack.id)}
+                        className={cn("absolute left-1.5 top-1.5 flex h-5 w-5 items-center justify-center rounded border-2", itemOn ? "border-lime-400 bg-lime-400 text-black" : "border-white/30 bg-transparent")}
+                      >
+                        {itemOn && <Check className="h-3.5 w-3.5" />}
+                      </button>
+                      {regen && (
+                        <div className="absolute inset-0 flex items-center justify-center bg-black/70">
+                          <Loader2 className="h-6 w-6 animate-spin text-lime-400" />
+                        </div>
+                      )}
+                    </div>
+                    <div className="p-2">
+                      <div className="truncate text-xs font-semibold text-white">{pack.label}</div>
+                      <button
+                        type="button"
+                        onClick={() => regenerateBrandItem(pack)}
+                        disabled={!!regeneratingBrandId}
+                        className="mt-1.5 inline-flex w-full items-center justify-center gap-1 rounded-md border border-white/15 px-2 py-1 text-[10px] font-medium text-white/70 hover:border-lime-400/50 hover:text-lime-300 disabled:opacity-50"
+                      >
+                        <RefreshCw className={cn("h-3 w-3", regen && "animate-spin")} /> {regen ? "Regenerating…" : "Regenerate"}
+                      </button>
+                    </div>
+                  </div>
+                );
+              })}
             </div>
           )}
         </DesignSection>
@@ -171,7 +236,7 @@ export default function YourDesigns() {
           )}
         </DesignSection>
 
-        {/* Social Media */}
+        {/* Social Media — per-item checkbox */}
         <DesignSection
           icon={Share2} title="Social Media Kit" count={socialTemplates.length}
           checked={checks.social} onToggle={() => toggle("social")}
@@ -182,11 +247,21 @@ export default function YourDesigns() {
           {socialTemplates.length > 0 && (
             <>
               <div className="grid grid-cols-2 gap-2 sm:grid-cols-4 lg:grid-cols-5">
-                {socialTemplates.slice(0, 10).map((t) => (
-                  <div key={t.id} className="overflow-hidden rounded-lg border border-white/10 bg-white">
-                    <Image src={t.url} alt={t.label} fittingType="fit" className="h-20 w-full" />
-                  </div>
-                ))}
+                {socialTemplates.slice(0, 10).map((t) => {
+                  const itemOn = isItemChecked("social", t.id);
+                  return (
+                    <div key={t.id} className="relative overflow-hidden rounded-lg border border-white/10 bg-white">
+                      <Image src={t.url} alt={t.label} fittingType="fit" className="h-20 w-full" />
+                      <button
+                        type="button"
+                        onClick={() => toggleItem("social", t.id)}
+                        className={cn("absolute left-1 top-1 flex h-4 w-4 items-center justify-center rounded border-2", itemOn ? "border-lime-400 bg-lime-400 text-black" : "border-white/30 bg-transparent")}
+                      >
+                        {itemOn && <Check className="h-3 w-3" />}
+                      </button>
+                    </div>
+                  );
+                })}
               </div>
               {socialPosts.length > 0 && (
                 <p className="mt-2 text-xs text-white/50">Includes a {socialPosts.length}-day content calendar with captions &amp; posting times.</p>
@@ -195,7 +270,7 @@ export default function YourDesigns() {
           )}
         </DesignSection>
 
-        {/* Videos */}
+        {/* Videos — per-item checkbox */}
         <DesignSection
           icon={Video} title="Video Concepts" count={videoConcepts.length}
           checked={checks.video} onToggle={() => toggle("video")}
@@ -205,15 +280,25 @@ export default function YourDesigns() {
         >
           {videoConcepts.length > 0 && (
             <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-5">
-              {videoConcepts.slice(0, 10).map((c) => (
-                <div key={c.id} className="overflow-hidden rounded-lg border border-white/10 bg-zinc-900">
-                  {c.videoUrl ? (
-                    <video src={c.videoUrl} className="aspect-video w-full object-cover" muted />
-                  ) : (
-                    <Image src={c.thumbnailUrl} alt={c.title} fittingType="fill" className="aspect-video w-full" />
-                  )}
-                </div>
-              ))}
+              {videoConcepts.slice(0, 10).map((c) => {
+                const itemOn = isItemChecked("video", c.id);
+                return (
+                  <div key={c.id} className="relative overflow-hidden rounded-lg border border-white/10 bg-zinc-900">
+                    {c.videoUrl ? (
+                      <video src={c.videoUrl} className="aspect-video w-full object-cover" muted />
+                    ) : (
+                      <Image src={c.thumbnailUrl} alt={c.title} fittingType="fill" className="aspect-video w-full" />
+                    )}
+                    <button
+                      type="button"
+                      onClick={() => toggleItem("video", c.id)}
+                      className={cn("absolute left-1 top-1 flex h-4 w-4 items-center justify-center rounded border-2", itemOn ? "border-lime-400 bg-lime-400 text-black" : "border-white/30 bg-transparent")}
+                    >
+                      {itemOn && <Check className="h-3 w-3" />}
+                    </button>
+                  </div>
+                );
+              })}
             </div>
           )}
         </DesignSection>

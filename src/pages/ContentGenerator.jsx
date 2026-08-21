@@ -95,6 +95,10 @@ export default function ContentGenerator() {
 
   const templates = data?.templates || [];
   const recIdx = data?.recommendedIndex ?? -1;
+  // Recommended card always renders first in the gallery
+  const sortedTemplates = recIdx >= 0 && templates[recIdx]
+    ? [templates[recIdx], ...templates.filter((_, i) => i !== recIdx)]
+    : templates;
 
   return (
     <div className="mx-auto max-w-5xl">
@@ -153,9 +157,9 @@ export default function ContentGenerator() {
             )}
 
             <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
-              {templates.map((t, i) => {
+              {sortedTemplates.map((t, i) => {
                 const on = selectedId === t.id;
-                const isRec = i === recIdx;
+                const isRec = t.id === templates[recIdx]?.id;
                 return (
                   <div key={t.id} className={cn("relative overflow-hidden rounded-xl border-2 bg-zinc-950 transition-all", on ? "border-lime-400 ring-2 ring-lime-400/40" : "border-white/10 hover:border-white/25")}>
                     {isRec && (

@@ -5,7 +5,7 @@ import { Image } from "@/components/ui/image";
 import { PenTool, Loader2, Check, RefreshCw, ArrowRight, AlertCircle } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { logReceipt } from "@/lib/pipelineUtils";
-import { LOGO_STYLES } from "@/lib/designPrompts";
+import { LOGO_STYLES, ACCENT_COLORS } from "@/lib/designPrompts";
 import BackButton from "@/components/client/BackButton";
 import { notifyStepComplete } from "@/lib/pipelineNotify";
 
@@ -22,6 +22,7 @@ export default function LogoGenerator() {
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
   const [error, setError] = useState("");
+  const [regeneratingId, setRegeneratingId] = useState(null);
 
   useEffect(() => {
     document.title = "Logo Generator · Lead Gen Near You";
@@ -60,6 +61,28 @@ export default function LogoGenerator() {
       setError("Logo generation hit a snag. Please try again.");
     } finally {
       setGenerating(false);
+    }
+  };
+
+  // Regenerate a single logo with a new accent color.
+  const regenerateWithColor = async (pack, accent) => {
+    if (regeneratingId) return;
+    setRegeneratingId(pack.id);
+    setError("");
+    try {
+      const style = LOGO_STYLES.find((s) => s.id === pack.id);
+      const res = await base44.integrations.Core.GenerateImage({
+        prompt: style.prompt(businessName, accent),
+      });
+      const next = packs.map((p) =>
+        p.id === pack.id ? { ...p, url: res.url, accentColor: accent } : p
+      );
+      setPacks(next);
+      try { await base44.auth.updateMe({ logoPacks: next }); } catch {}
+    } catch (e) {
+      setError("Couldn't regenerate that logo. Try again.");
+    } finally {
+      setRegeneratingId(null);
     }
   };
 
@@ -129,26 +152,53 @@ export default function LogoGenerator() {
             <div className="mt-5 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
               {packs.map((p) => {
                 const on = chosen === p.url;
+                const regen = regeneratingId === p.id;
                 return (
-                  <button
+                  <div
                     key={p.url}
-                    type="button"
-                    onClick={() => setChosen(p.url)}
                     className={cn(
                       "group relative overflow-hidden rounded-xl border-2 bg-zinc-950 text-left transition-all",
                       on ? "border-lime-400 ring-2 ring-lime-400/40" : "border-white/10 hover:border-white/25"
                     )}
                   >
-                    <div className="relative aspect-square w-full overflow-hidden bg-white">
-                      <Image src={p.url} alt={p.label} fittingType="fit" className="h-full w-full" />
-                      {on && (
-                        <div className="absolute right-1.5 top-1.5 flex h-6 w-6 items-center justify-center rounded-full bg-lime-400 text-black">
-                          <Check className="h-4 w-4" />
-                        </div>
-                      )}
+                    <button
+                      type="button"
+                      onClick={() => setChosen(p.url)}
+                      className="block w-full text-left"
+                    >
+                      <div className="relative aspect-square w-full overflow-hidden bg-white">
+                        <Image src={p.url} alt={p.label} fittingType="fit" className="h-full w-full" />
+                        {on && (
+                          <div className="absolute right-1.5 top-1.5 flex h-6 w-6 items-center justify-center rounded-full bg-lime-400 text-black">
+                            <Check className="h-4 w-4" />
+                          </div>
+                        )}
+                        {regen && (
+                          <div className="absolute inset-0 flex items-center justify-center bg-black/70">
+                            <Loader2 className="h-6 w-6 animate-spin text-lime-400" />
+                          </div>
+                        )}
+                      </div>
+                      <div className="p-2.5 text-xs font-semibold text-white">{p.label}</div>
+                    </button>
+                    {/* Color swatches — click to regenerate with a new accent color */}
+                    <div className="flex flex-wrap gap-1 border-t border-white/10 px-2 pb-2 pt-1.5">
+                      {ACCENT_COLORS.map((c) => (
+                        <button
+                          key={c.value}
+                          type="button"
+                          onClick={() => regenerateWithColor(p, c.value)}
+                          disabled={!!regeneratingId}
+                          title={c.name}
+                          className={cn(
+                            "h-4 w-4 rounded-full border-2 transition-transform hover:scale-125 disabled:opacity-50",
+                            p.accentColor === c.value ? "border-white" : "border-white/20"
+                          )}
+                          style={{ backgroundColor: c.hex }}
+                        />
+                      ))}
                     </div>
-                    <div className="p-2.5 text-xs font-semibold text-white">{p.label}</div>
-                  </button>
+                  </div>
                 );
               })}
             </div>

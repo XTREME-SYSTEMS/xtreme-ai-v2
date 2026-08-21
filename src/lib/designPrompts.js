@@ -4,19 +4,35 @@
 // brochure, apparel, app, vehicle, …) that uses the client's chosen logo as a
 // visual reference so the generated mockups stay on-brand.
 
+// Accent color swatches shown under each logo card. Clicking a swatch
+// regenerates that logo with the chosen accent color.
+export const ACCENT_COLORS = [
+  { name: "Lime", value: "lime green", hex: "#84CC16" },
+  { name: "Blue", value: "blue", hex: "#3B82F6" },
+  { name: "Navy", value: "navy", hex: "#1E3A8A" },
+  { name: "Orange", value: "orange", hex: "#F97316" },
+  { name: "Red", value: "red", hex: "#EF4444" },
+  { name: "Gold", value: "gold", hex: "#EAB308" },
+  { name: "Purple", value: "purple", hex: "#A855F7" },
+  { name: "Teal", value: "teal", hex: "#14B8A6" },
+  { name: "Black", value: "black", hex: "#171717" },
+  { name: "Silver", value: "silver", hex: "#C0C0C0" },
+];
+
 // All logos are generated with a transparent background so they render
-// correctly on both light and dark website themes.
+// correctly on both light and dark website themes. The optional `accent`
+// parameter lets the user pick a custom accent color for the logo.
 export const LOGO_STYLES = [
-  { id: "monogram", label: "Minimalist Monogram", prompt: (n) => `A clean minimalist logo for an epoxy floor contractor named "${n}". A bold monogram built from the initials, simple geometric lines, a single lime-green accent. TRANSPARENT BACKGROUND, no background, isolated logo, PNG with alpha channel, flat vector style, no extra text, no border, no card.` },
-  { id: "industrial", label: "Bold Industrial", prompt: (n) => `A bold industrial logo badge for an epoxy contractor named "${n}". Hexagonal or shield emblem, concrete texture, dark charcoal and orange, strong geometric type. TRANSPARENT BACKGROUND, no background, isolated logo, PNG with alpha channel, vector, no extra text, no border, no card.` },
-  { id: "geometric", label: "Geometric Abstract", prompt: (n) => `A modern abstract geometric logo for epoxy contractor "${n}". Overlapping polished concrete shapes forming a subtle floor-gloss mark, two-tone. TRANSPARENT BACKGROUND, no background, isolated logo, PNG with alpha channel, vector, no extra text, no border, no card.` },
-  { id: "emblem", label: "Classic Emblem", prompt: (n) => `A classic circular emblem logo for epoxy contractor "${n}". Ring with the business name, polished concrete diamond in the center, navy and silver. TRANSPARENT BACKGROUND, no background, isolated logo, PNG with alpha channel, vector, no extra text, no border, no card.` },
-  { id: "wordmark", label: "Modern Wordmark", prompt: (n) => `A modern wordmark logo for epoxy contractor "${n}". The business name in a strong condensed sans-serif, a single lime-green underline accent. TRANSPARENT BACKGROUND, no background, isolated logo, PNG with alpha channel, vector, no extra text, no border, no card.` },
-  { id: "stamp", label: "Concrete Stamp", prompt: (n) => `A logo for epoxy contractor "${n}" styled as a concrete stamp seal. The business name embossed in a polished concrete surface, monochrome. TRANSPARENT BACKGROUND, no background, isolated logo, PNG with alpha channel, photoreal, no extra text, no border, no card.` },
-  { id: "neon", label: "Neon Glow", prompt: (n) => `A neon-glow logo for epoxy contractor "${n}". The business name in glowing lime-green neon tube lettering. TRANSPARENT BACKGROUND, no background, isolated logo, PNG with alpha channel, no extra text, no border, no card.` },
-  { id: "rustic", label: "Hand-drawn Rustic", prompt: (n) => `A hand-drawn rustic logo for epoxy contractor "${n}". Sketched trowel and floor icon with the business name, warm earthy tones. TRANSPARENT BACKGROUND, no background, isolated logo, PNG with alpha channel, illustration style, no extra text, no border, no card.` },
-  { id: "luxury", label: "Premium Luxury", prompt: (n) => `A premium luxury logo for epoxy contractor "${n}". The business name in an elegant serif, gold foil accent line, black and gold. TRANSPARENT BACKGROUND, no background, isolated logo, PNG with alpha channel, vector, no extra text, no border, no card.` },
-  { id: "gradient", label: "Vibrant Gradient", prompt: (n) => `A vibrant gradient logo for epoxy contractor "${n}". The business name with a blue-to-lime gradient fill, fluid glossy floor shape behind it. TRANSPARENT BACKGROUND, no background, isolated logo, PNG with alpha channel, vector, no extra text, no border, no card.` },
+  { id: "monogram", label: "Minimalist Monogram", prompt: (n, accent) => `A clean minimalist logo for an epoxy floor contractor named "${n}". A bold monogram built from the initials, simple geometric lines, a single ${accent || "lime-green"} accent. TRANSPARENT BACKGROUND, no background, isolated logo, PNG with alpha channel, flat vector style, no extra text, no border, no card.` },
+  { id: "industrial", label: "Bold Industrial", prompt: (n, accent) => `A bold industrial logo badge for an epoxy contractor named "${n}". Hexagonal or shield emblem, concrete texture, dark charcoal and ${accent || "orange"}, strong geometric type. TRANSPARENT BACKGROUND, no background, isolated logo, PNG with alpha channel, vector, no extra text, no border, no card.` },
+  { id: "geometric", label: "Geometric Abstract", prompt: (n, accent) => `A modern abstract geometric logo for epoxy contractor "${n}". Overlapping polished concrete shapes forming a subtle floor-gloss mark, two-tone with ${accent || "lime-green"} accent. TRANSPARENT BACKGROUND, no background, isolated logo, PNG with alpha channel, vector, no extra text, no border, no card.` },
+  { id: "emblem", label: "Classic Emblem", prompt: (n, accent) => `A classic circular emblem logo for epoxy contractor "${n}". Ring with the business name, polished concrete diamond in the center, navy and ${accent || "silver"}. TRANSPARENT BACKGROUND, no background, isolated logo, PNG with alpha channel, vector, no extra text, no border, no card.` },
+  { id: "wordmark", label: "Modern Wordmark", prompt: (n, accent) => `A modern wordmark logo for epoxy contractor "${n}". The business name in a strong condensed sans-serif, a single ${accent || "lime-green"} underline accent. TRANSPARENT BACKGROUND, no background, isolated logo, PNG with alpha channel, vector, no extra text, no border, no card.` },
+  { id: "stamp", label: "Concrete Stamp", prompt: (n, accent) => `A logo for epoxy contractor "${n}" styled as a concrete stamp seal. The business name embossed in a polished concrete surface, monochrome with ${accent || "lime-green"} tint. TRANSPARENT BACKGROUND, no background, isolated logo, PNG with alpha channel, photoreal, no extra text, no border, no card.` },
+  { id: "neon", label: "Neon Glow", prompt: (n, accent) => `A neon-glow logo for epoxy contractor "${n}". The business name in glowing ${accent || "lime-green"} neon tube lettering. TRANSPARENT BACKGROUND, no background, isolated logo, PNG with alpha channel, no extra text, no border, no card.` },
+  { id: "rustic", label: "Hand-drawn Rustic", prompt: (n, accent) => `A hand-drawn rustic logo for epoxy contractor "${n}". Sketched trowel and floor icon with the business name, warm earthy tones with ${accent || "lime-green"} accent. TRANSPARENT BACKGROUND, no background, isolated logo, PNG with alpha channel, illustration style, no extra text, no border, no card.` },
+  { id: "luxury", label: "Premium Luxury", prompt: (n, accent) => `A premium luxury logo for epoxy contractor "${n}". The business name in an elegant serif, ${accent || "gold"} foil accent line, black and ${accent || "gold"}. TRANSPARENT BACKGROUND, no background, isolated logo, PNG with alpha channel, vector, no extra text, no border, no card.` },
+  { id: "gradient", label: "Vibrant Gradient", prompt: (n, accent) => `A vibrant gradient logo for epoxy contractor "${n}". The business name with a blue-to-${accent || "lime"} gradient fill, fluid glossy floor shape behind it. TRANSPARENT BACKGROUND, no background, isolated logo, PNG with alpha channel, vector, no extra text, no border, no card.` },
 ];
 
 export const BRAND_TYPES = [
