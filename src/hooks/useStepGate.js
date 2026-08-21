@@ -56,6 +56,15 @@ export function useStepGate(step, user) {
               pendingLabel: count > 0 ? `${count} approval${count > 1 ? "s" : ""} pending` : "",
             });
           }
+        } else if (step.gate === "profile") {
+          try {
+            const me = await base44.auth.me();
+            const done = !!(me && me.epoxyProfileSubmitted);
+            if (!cancelled)
+              setState({ isComplete: done, loading: false, pendingLabel: done ? "" : "Business profile needed" });
+          } catch {
+            if (!cancelled) setState({ isComplete: false, loading: false, pendingLabel: "Couldn't verify status" });
+          }
         }
       } catch (e) {
         if (!cancelled) setState({ isComplete: false, loading: false, pendingLabel: "Couldn't verify status" });

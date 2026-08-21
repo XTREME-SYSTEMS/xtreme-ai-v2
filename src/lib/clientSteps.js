@@ -1,56 +1,69 @@
 import {
-  Package, FileSignature, CheckCircle, ScrollText, Bot, Settings, LayoutDashboard,
+  Package, Building2, FileSignature, ShieldCheck, Rocket, Settings, LayoutDashboard,
 } from "lucide-react";
 
-// The ordered journey a client should follow, with the directions shown in
-// the pop-up coach on each page. `step` is the 1-based number shown in the nav
-// (null = utility link, not a numbered step).
+// The ordered journey a client follows to get their epoxy contractor website
+// built by Xtreme Polishing Systems & Polished Concrete University. Each step
+// gates the next so the client only ever sees the one thing they need to do.
+// `step` is the 1-based number shown in the timeline (null = utility link).
 export const CLIENT_STEPS = [
   {
     to: "/my-package",
-    label: "My Package",
+    label: "Welcome",
     icon: Package,
     step: 1,
     gate: "auto",
     activityLabel: "Review your package",
-    title: "Step 1 · Review Your Package",
-    body: "Here's everything you purchased and your active services. Take a look at what's included, then start the activity to move on to Signatures.",
-    nextLabel: "Go to Signatures",
+    title: "Step 1 · Welcome to Your Website Build",
+    body: "Here's everything included in your epoxy contractor website package from Xtreme Polishing Systems & Polished Concrete University. Review what's included, then continue to tell us about your business.",
+    nextLabel: "Go to Business Profile",
+    nextTo: "/business-profile",
+  },
+  {
+    to: "/business-profile",
+    label: "Business Profile",
+    icon: Building2,
+    step: 2,
+    gate: "profile",
+    activityLabel: "Complete your business profile",
+    title: "Step 2 · Tell Us About Your Epoxy Business",
+    body: "Fill out your business details below — name, services, service area, logo and photos. Our team uses this to build your website, so the more complete it is, the better your site will be. You must complete this before we can start designing.",
+    nextLabel: "Go to Sign Agreement",
     nextTo: "/signatures",
   },
   {
     to: "/signatures",
-    label: "Signatures",
+    label: "Sign Agreement",
     icon: FileSignature,
-    step: 2,
+    step: 3,
     gate: "signatures",
-    activityLabel: "Sign your agreement",
-    title: "Step 2 · Sign Your Agreement",
-    body: "Review and sign your service agreement below. You must sign all pending documents before you can continue — your team starts work once it's signed.",
-    nextLabel: "Go to Approvals",
+    activityLabel: "Sign your service agreement",
+    title: "Step 3 · Sign Your Service Agreement",
+    body: "Review and sign your service agreement below. You must sign all pending documents before we can begin building — your team starts work the moment it's signed.",
+    nextLabel: "Go to Design Approval",
     nextTo: "/approvals",
   },
   {
     to: "/approvals",
-    label: "Approvals",
-    icon: CheckCircle,
-    step: 3,
+    label: "Design Approval",
+    icon: ShieldCheck,
+    step: 4,
     gate: "approvals",
-    activityLabel: "Approve your deliverables",
-    title: "Step 3 · Approve Your Deliverables",
-    body: "Sign off on each pending deliverable below. You must clear all pending approvals before you can continue — nothing goes live until you approve it.",
-    nextLabel: "Go to Activity",
+    activityLabel: "Approve your website design",
+    title: "Step 4 · Approve Your Website Design",
+    body: "Review and approve your website design below. You must clear all pending approvals before we can launch your site — nothing goes live until you approve it.",
+    nextLabel: "Go to Launch",
     nextTo: "/receipts",
   },
   {
     to: "/receipts",
-    label: "Activity",
-    icon: ScrollText,
-    step: 4,
+    label: "Launch",
+    icon: Rocket,
+    step: 5,
     gate: "auto",
-    activityLabel: "Review your activity",
-    title: "Step 4 · Track Your Activity",
-    body: "Every action your team takes on your account — approvals, signatures, and updates — is logged here for full transparency. Review it, then finish.",
+    activityLabel: "Track your launch",
+    title: "Step 5 · Your Website Is Launching",
+    body: "Every action your team takes to build and launch your epoxy contractor website is logged here for full transparency. Sit back — your site is going live.",
     nextLabel: null,
     nextTo: null,
   },
@@ -59,11 +72,9 @@ export const CLIENT_STEPS = [
 // Utility links (not numbered steps).
 export const CLIENT_UTILITIES = [
   { to: "/client-portal", label: "Client Portal", icon: LayoutDashboard, end: true },
-  { to: "/assistant", label: "AI Assistant", icon: Bot, end: true },
   { to: "/settings", label: "Settings", icon: Settings, end: true },
 ];
 
-// Full nav list in display order: numbered steps first, then utilities.
 export const CLIENT_NAV = [...CLIENT_STEPS, ...CLIENT_UTILITIES];
 
 // Look up the step entry for a given pathname.
