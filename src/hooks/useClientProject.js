@@ -1,4 +1,5 @@
 import { useEffect, useState, useCallback } from "react";
+import { useLocation } from "react-router-dom";
 import { base44 } from "@/api/base44Client";
 import { usePreview } from "@/lib/PreviewContext";
 
@@ -10,6 +11,7 @@ import { usePreview } from "@/lib/PreviewContext";
 // project (creates if missing, updates if exists).
 export function useClientProject(user) {
   const { previewAsClient, previewClientEmail } = usePreview();
+  const location = useLocation();
   const [project, setProject] = useState(null);
   const [loading, setLoading] = useState(true);
 
@@ -38,9 +40,11 @@ export function useClientProject(user) {
     }
   }, [effectiveEmail]);
 
+  // Refetch on route change so the persistent timeline picks up freshly-saved
+  // project data and fills in circles as the user completes each step.
   useEffect(() => {
     load();
-  }, [load]);
+  }, [load, location.pathname]);
 
   const saveProject = useCallback(async (data) => {
     if (!effectiveEmail) return null;

@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useLocation } from "react-router-dom";
 import { base44 } from "@/api/base44Client";
 import { usePreview } from "@/lib/PreviewContext";
 
@@ -7,8 +8,13 @@ import { usePreview } from "@/lib/PreviewContext";
 //   User entity record so every page displays the client's real data
 //   (profile, logos, brand packs, step completion, etc.).
 // - Otherwise, returns the current authenticated user via base44.auth.me().
+//
+// Refetches on every route change so the persistent timeline (which lives in
+// the Layout and doesn't remount between steps) sees freshly-saved data and
+// its circles fill in as the user completes each step.
 export function useClientUser() {
   const { previewAsClient, previewClientEmail } = usePreview();
+  const location = useLocation();
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
@@ -35,7 +41,7 @@ export function useClientUser() {
     };
     load();
     return () => { cancelled = true; };
-  }, [previewAsClient, previewClientEmail]);
+  }, [previewAsClient, previewClientEmail, location.pathname]);
 
   return { user, loading };
 }
