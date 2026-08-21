@@ -6,14 +6,25 @@ import { Video, Loader2, Check, RefreshCw, ArrowRight, AlertCircle, X, Send, Mes
 import { cn } from "@/lib/utils";
 import { logReceipt } from "@/lib/pipelineUtils";
 import BackButton from "@/components/client/BackButton";
+import VideoClipPlayer from "@/components/video/VideoClipPlayer";
 import { useClientUser } from "@/hooks/useClientUser";
 import { useClientUpdate } from "@/hooks/useClientUpdate";
 import { notifyStepComplete } from "@/lib/pipelineNotify";
 
+// Duration options for generated videos. The platform generates up to 8
+// seconds per clip, so longer videos are composed of multiple 8-second clips
+// played back-to-back as one continuous video.
+const DURATION_OPTIONS = [
+  { value: "15", label: "15s", clips: 2, note: "2 scenes" },
+  { value: "30", label: "30s", clips: 4, note: "4 scenes" },
+  { value: "45", label: "45s", clips: 6, note: "6 scenes" },
+  { value: "8", label: "8s", clips: 1, note: "1 scene" },
+];
+
 // Step: Video Generator. Generates 10 video concept cards (thumbnail +
 // description + production script) using the client's onboarding, content
-// tone, logo, and brand. The client can generate the actual short video for
-// any concept on demand (controls cost). All concepts are auto-included.
+// tone, logo, and brand. The client can generate the actual video for any
+// concept on demand at their chosen length (8s, 15s, 30s, or 45s).
 export default function VideoGenerator() {
   const navigate = useNavigate();
   const [profile, setProfile] = useState(null);
@@ -31,6 +42,8 @@ export default function VideoGenerator() {
   const [reviseSent, setReviseSent] = useState(false);
   const [reviseError, setReviseError] = useState("");
   const [generatingVideoId, setGeneratingVideoId] = useState("");
+  const [genProgress, setGenProgress] = useState("");
+  const [videoDuration, setVideoDuration] = useState("15");
   const [preview, setPreview] = useState(null);
 
   const { user } = useClientUser();
@@ -70,22 +83,30 @@ export default function VideoGenerator() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [profile]);
 
-  // Generate the actual short video for a single concept (on demand).
-  const generateVideo = async (concept) => {
+  // Generate the actual video for a single concept at the selected duration.
+  // Longer videos (15s/30s/45s) are composed of multiple 8-second clips
+  // generated sequentially and played back-to-back as one continuous video.
+  const generateVideo = async (concept, durationValue = videoDuration) => {
     if (generatingVideoId) return;
     setGeneratingVideoId(concept.id);
+    const opt = DURATION_OPTIONS.find((o) => o.value === durationValue) || DURATION_OPTIONS[0];
     try {
-      const res = await base44.integrations.Core.GenerateVideo({
-        prompt: concept.videoPrompt || `A short promotional video for ${profile?.businessName || "an epoxy contractor"}. ${concept.description}`,
-        duration: 6, aspect_ratio: "16:9", generate_audio: false,
-      });
-      if (res?.url) {
-        const next = { ...data, concepts: data.concepts.map((c) => c.id === concept.id ? { ...c, videoUrl: res.url } : c) };
+      const clips = [];
+      for (let i = 0; i < opt.clips; i++) {
+        setGenProgress(`Scene ${i + 1} of ${opt.clips}…`);
+        const res = await base44.integrations.Core.GenerateVideo({
+          prompt: `${concept.videoPrompt || `A promotional video for ${profile?.businessName || "a local business"}. ${concept.description}`} Scene ${i + 1} of ${opt.clips}.`,
+          duration: 8, aspect_ratio: "16:9", generate_audio: false,
+        });
+        if (res?.url) clips.push({ url: res.url, duration: 8, label: `Scene ${i + 1}` });
+      }
+      if (clips.length) {
+        const next = { ...data, concepts: data.concepts.map((c) => c.id === concept.id ? { ...c, videoClips: clips, videoUrl: clips[0].url } : c) };
         setData(next);
         try { await update({ videoPack: next }); } catch {}
       }
     } catch (e) { /* best effort */ }
-    finally { setGeneratingVideoId(""); }
+    finally { setGeneratingVideoId(""); setGenProgress(""); }
   };
 
   const save = async () => {
@@ -112,6 +133,7 @@ export default function VideoGenerator() {
   };
 
   const concepts = data?.concepts || [];
+  const selDur = DURATION_OPTIONS.find((o) => o.value === videoDuration) || DURATION_OPTIONS[0];
 
   return (
     <div className="mx-auto max-w-5xl">
@@ -125,6 +147,17 @@ export default function VideoGenerator() {
           We created 10 video concepts using your onboarding, content tone, logo, and brand. Preview each concept, then generate the
           actual video for any you like. All concepts are included — use them on your website, social media, or YouTube.
         </p>
+
+        <div className="mt-4 flex flex-wrap items-center gap-2">
+          <span className="text-xs font-medium text-white/50">Video length:</span>
+          {DURATION_OPTIONS.map((o) => (
+            <button key={o.value} type="button" onClick={() => setVideoDuration(o.value)}
+              className={cn("rounded-lg border px-3 py-1.5 text-xs font-semibold transition-colors",
+                videoDuration === o.value ? "border-lime-400 bg-lime-400 text-black" : "border-white/15 text-white/70 hover:border-lime-400/50 hover:text-lime-300")}>
+              {o.label} <span className="opacity-60">· {o.note}</span>
+            </button>
+          ))}
+        </div>
 
         {saved && (
           <div className="mt-4 flex items-center gap-2 rounded-lg border border-lime-400/50 bg-lime-400/10 px-3 py-2.5 text-sm text-lime-300">
@@ -156,16 +189,21 @@ export default function VideoGenerator() {
                   <div key={c.id} className="overflow-hidden rounded-xl border-2 border-lime-400/40 bg-zinc-950">
                     <button type="button" onClick={() => setPreview(c)} className="block w-full text-left">
                       <div className="relative aspect-video w-full overflow-hidden bg-zinc-900">
-                        {c.videoUrl ? (
-                          <video src={c.videoUrl} className="h-full w-full object-cover" muted loop autoPlay />
+                        {(c.videoClips?.length || c.videoUrl) ? (
+                          <VideoClipPlayer clips={c.videoClips || [{ url: c.videoUrl }]} className="h-full w-full" />
                         ) : (
-                          <Image src={c.thumbnailUrl} alt={c.title} fittingType="fill" className="h-full w-full" />
+                          <>
+                            <Image src={c.thumbnailUrl} alt={c.title} fittingType="fill" className="h-full w-full" />
+                            <div className="absolute inset-0 flex items-center justify-center bg-black/30">
+                              <Play className="h-8 w-8 text-white/80" />
+                            </div>
+                          </>
                         )}
-                        <div className="absolute inset-0 flex items-center justify-center bg-black/30">
-                          <Play className="h-8 w-8 text-white/80" />
-                        </div>
                         <span className="absolute left-1.5 top-1.5 rounded-full bg-lime-400/90 px-1.5 py-0.5 text-[9px] font-bold uppercase text-black">Included</span>
-                        {busy && <div className="absolute inset-0 flex items-center justify-center bg-black/70"><Loader2 className="h-6 w-6 animate-spin text-lime-400" /></div>}
+                        {(c.videoClips?.length || c.videoUrl) && (
+                          <span className="absolute right-1.5 top-1.5 rounded-full bg-black/70 px-1.5 py-0.5 text-[9px] font-bold text-lime-300">{c.videoClips ? `${c.videoClips.length} scenes` : "ready"}</span>
+                        )}
+                        {busy && <div className="absolute inset-0 flex flex-col items-center justify-center gap-1 bg-black/80"><Loader2 className="h-6 w-6 animate-spin text-lime-400" /><span className="text-[10px] text-white/70">{genProgress}</span></div>}
                       </div>
                     </button>
                     <div className="p-2.5">
@@ -174,10 +212,10 @@ export default function VideoGenerator() {
                       <button
                         type="button"
                         onClick={() => generateVideo(c)}
-                        disabled={!!generatingVideoId || !!c.videoUrl}
+                        disabled={!!generatingVideoId}
                         className="mt-2 inline-flex w-full items-center justify-center gap-1.5 rounded-md border border-white/15 px-2 py-1.5 text-[10px] font-medium text-white/70 hover:border-lime-400/50 hover:text-lime-300 disabled:opacity-50"
                       >
-                        {busy ? <><Loader2 className="h-3 w-3 animate-spin" /> Generating…</> : c.videoUrl ? <><Check className="h-3 w-3" /> Video ready</> : <><Film className="h-3 w-3" /> Generate video</>}
+                        {busy ? <><Loader2 className="h-3 w-3 animate-spin" /> {genProgress || "Generating…"}</> : (c.videoClips?.length || c.videoUrl) ? <><RefreshCw className="h-3 w-3" /> Regenerate {selDur.label}</> : <><Film className="h-3 w-3" /> Generate {selDur.label}</>}
                       </button>
                     </div>
                   </div>
@@ -231,8 +269,8 @@ export default function VideoGenerator() {
               <h2 className="text-sm font-semibold text-white">{preview.title}</h2>
               <button onClick={() => setPreview(null)} className="flex h-8 w-8 items-center justify-center rounded-lg text-white/60 hover:bg-white/5"><X className="h-5 w-5" /></button>
             </div>
-            {preview.videoUrl ? (
-              <video src={preview.videoUrl} className="mt-3 w-full rounded-lg" controls />
+            {(preview.videoClips?.length || preview.videoUrl) ? (
+              <VideoClipPlayer clips={preview.videoClips || [{ url: preview.videoUrl }]} className="mt-3 aspect-video w-full rounded-lg overflow-hidden" />
             ) : (
               <Image src={preview.thumbnailUrl} alt={preview.title} fittingType="fill" className="mt-3 aspect-video w-full rounded-lg" />
             )}
@@ -245,7 +283,7 @@ export default function VideoGenerator() {
             )}
             {!preview.videoUrl && (
               <button type="button" onClick={() => { generateVideo(preview); setPreview(null); }} disabled={!!generatingVideoId} className="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-lg bg-lime-400 px-4 py-2.5 text-sm font-semibold text-black hover:bg-lime-300 disabled:opacity-50">
-                <Film className="h-4 w-4" /> Generate this video
+                <Film className="h-4 w-4" /> Generate {selDur.label} video
               </button>
             )}
           </div>

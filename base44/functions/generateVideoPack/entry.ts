@@ -22,7 +22,7 @@ export default async function(req) {
     const ref = logoUrl ? [logoUrl] : undefined;
 
     const CONCEPTS = [
-      { id: "hero", title: "Brand Hero Video", desc: `A 15-second cinematic hero showing your best ${ind} work with your logo.`, prompt: `Cinematic 15-second hero video thumbnail for ${ind} "${biz}". Slow pan over professional work, dramatic lighting, professional, high-end.` },
+      { id: "hero", title: "Brand Hero Video", desc: `A cinematic hero showing your best ${ind} work with your logo.`, prompt: `Cinematic hero video thumbnail for ${ind} "${biz}". Slow pan over professional work, dramatic lighting, professional, high-end.` },
       { id: "before-after", title: "Before & After", desc: `A satisfying before-and-after ${ind} transformation.`, prompt: `Before and after ${ind} transformation, split screen, professional photo, dramatic improvement.` },
       { id: "process", title: "The Process", desc: `Fast-paced time-lapse of a ${ind} project from start to finish.`, prompt: `Time-lapse of ${ind} work process: prep, execution, finishing. Professional at work.` },
       { id: "testimonial", title: "Customer Story", desc: `A happy customer reacts to their new ${ind} project.`, prompt: `A homeowner smiling and showing off their new ${ind} project, professional, warm lighting.` },
@@ -48,7 +48,7 @@ export default async function(req) {
 
     // Generate scripts using the best AI model.
     const scriptRes = await base44.integrations.Core.InvokeLLM({
-      prompt: `Write a short 15-30 second video script for each of these 10 video concepts for ${ind} "${biz}"${subInd ? ` (${subInd})` : ""} in ${loc}. Services: ${svc}. Tone: ${tone}. Make scripts specific to the ${ind} industry. Return one script per concept id.\n\nConcepts: ${JSON.stringify(concepts.map((c) => ({ id: c.id, title: c.title, description: c.description })))}`,
+      prompt: `Write a compelling video script for each of these 10 video concepts for ${ind} "${biz}"${subInd ? ` (${subInd})` : ""} in ${loc}. Services: ${svc}. Tone: ${tone}. Make scripts specific to the ${ind} industry. Return one script per concept id.\n\nConcepts: ${JSON.stringify(concepts.map((c) => ({ id: c.id, title: c.title, description: c.description })))}`,
       model: "claude_opus_4_8",
       response_json_schema: {
         type: "object",
