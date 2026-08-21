@@ -1,0 +1,78 @@
+import { useEffect, useState } from "react";
+import { base44 } from "@/api/base44Client";
+import { usePreviewEmail } from "@/hooks/usePreviewEmail";
+
+// Checks whether the current step's gated activity is actually complete by
+// inspecting real data (not just a button click).
+//  - "auto" steps (review/view): always complete.
+//  - "signatures": complete when the user has no pending unsigned EsignDocuments.
+//  - "approvals": complete when the user has no pending Approvals.
+// Re-checks automatically via realtime subscriptions when the underlying data changes.
+export function useStepGate(step, user) {
+  const { effectiveEmail } = usePreviewEmail(user);
+  const [state, setState] = useState({ isComplete: true, loading: true, pendingLabel: "" });
+
+  useEffect(() => {
+    if (!step) return;
+
+    if (step.gate === "auto" || !step.gate) {
+      setState({ isComplete: true, loading: false, pendingLabel: "" });
+      return;
+    }
+    if (!effectiveEmail) {
+      setState({ isComplete: false, loading: true, pendingLabel: "" });
+      return;
+    }
+
+    let cancelled = false;
+
+    const check = async () => {
+      try {
+        if (step.gate === "signatures") {
+          const all = await base44.entities.EsignDocument.list("-created_date", 200);
+          const mine = (all || []).filter((d) =>
+            (d.signers || []).some((s) => s.email && s.email.toLowerCase() === effectiveEmail.toLowerCase())
+          );
+          const pending = mine.filter((d) => {
+            const signer = (d.signers || []).find((s) => s.email?.toLowerCase() === effectiveEmail.toLowerCase()) || {};
+            return !signer.signed && d.status !== "signed";
+          });
+          if (!cancelled) {
+            setState({
+              isComplete: pending.length === 0,
+              loading: false,
+              pendingLabel: pending.length > 0 ? `${pending.length} document${pending.length > 1 ? "s" : ""} to sign` : "",
+            });
+          }
+        } else if (step.gate === "approvals") {
+          const pending = await base44.entities.Approval.filter(
+            { status: "pending", client_email: effectiveEmail }, "-created_date", 50
+          );
+          const count = (pending || []).length;
+          if (!cancelled) {
+            setState({
+              isComplete: count === 0,
+              loading: false,
+              pendingLabel: count > 0 ? `${count} approval${count > 1 ? "s" : ""} pending` : "",
+            });
+          }
+        }
+      } catch (e) {
+        if (!cancelled) setState({ isComplete: false, loading: false, pendingLabel: "Couldn't verify status" });
+      }
+    };
+
+    check();
+
+    let unsub;
+    if (step.gate === "signatures") {
+      unsub = base44.entities.EsignDocument.subscribe(() => check());
+    } else if (step.gate === "approvals") {
+      unsub = base44.entities.Approval.subscribe(() => check());
+    }
+
+    return () => { cancelled = true; if (unsub) unsub(); };
+  }, [step?.to, step?.gate, effectiveEmail]);
+
+  return state;
+}
