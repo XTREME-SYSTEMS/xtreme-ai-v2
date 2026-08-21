@@ -578,13 +578,21 @@ export default function BusinessProfile() {
                 </label>
               </div>
               <div>
-                <label className="mb-2 block text-sm font-medium text-white">Project photos</label>
-                {galleryUrls.length > 0 && (
+                <label className="mb-2 block text-sm font-medium text-white">Project photos <span className="text-white/40">(up to 15)</span></label>
+                {(galleryUrls.length > 0 || gallery.length > 0) && (
                   <div className="mb-2 flex flex-wrap gap-2">
                     {galleryUrls.map((url, i) => (
-                      <div key={i} className="relative">
+                      <div key={`u-${i}`} className="relative">
                         <img src={url} alt="" className="h-16 w-16 rounded-lg border border-white/10 object-cover" />
                         <button type="button" onClick={() => setGalleryUrls((g) => g.filter((_, idx) => idx !== i))} className="absolute -right-1.5 -top-1.5 flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-white">
+                          <X className="h-3 w-3" />
+                        </button>
+                      </div>
+                    ))}
+                    {gallery.map((file, i) => (
+                      <div key={`l-${i}`} className="relative">
+                        <img src={URL.createObjectURL(file)} alt="" className="h-16 w-16 rounded-lg border border-lime-400/40 object-cover" />
+                        <button type="button" onClick={() => setGallery((g) => g.filter((_, idx) => idx !== i))} className="absolute -right-1.5 -top-1.5 flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-white">
                           <X className="h-3 w-3" />
                         </button>
                       </div>
@@ -593,9 +601,23 @@ export default function BusinessProfile() {
                 )}
                 <label className="flex cursor-pointer items-center gap-2 rounded-lg border border-dashed border-white/20 bg-zinc-950 px-4 py-3 text-sm text-white/60 hover:border-lime-400/50">
                   <Upload className="h-4 w-4" />
-                  {gallery.length ? `${gallery.length} photo(s) selected` : "Upload project photos"}
-                  <input type="file" accept="image/*" multiple className="hidden" onChange={(e) => setGallery(Array.from(e.target.files || []))} />
+                  {gallery.length + galleryUrls.length > 0 ? `${gallery.length + galleryUrls.length} photo(s) selected · Add more` : "Upload project photos"}
+                  <input
+                    type="file"
+                    accept="image/*"
+                    multiple
+                    className="hidden"
+                    onChange={(e) => {
+                      const incoming = Array.from(e.target.files || []);
+                      const remaining = 15 - galleryUrls.length - gallery.length;
+                      setGallery((g) => [...g, ...incoming].slice(0, Math.max(0, remaining)));
+                      e.target.value = "";
+                    }}
+                  />
                 </label>
+                {(gallery.length + galleryUrls.length) >= 15 && (
+                  <p className="mt-1 text-xs text-amber-400">Maximum 15 photos reached.</p>
+                )}
               </div>
             </Section>
           </div>
