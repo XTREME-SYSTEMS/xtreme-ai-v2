@@ -167,7 +167,7 @@ export default function YourDesigns() {
 
   return (
     <div className="mx-auto max-w-4xl">
-      <BackButton to="/video-generator" />
+      <BackButton to="/enhancements" />
       {isDemo && <DemoPaywallBanner businessName={businessName} />}
       <div className="rounded-xl border border-lime-400/40 bg-lime-400/5 p-5 sm:p-6">
         <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-lime-400">

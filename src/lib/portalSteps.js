@@ -90,23 +90,23 @@ export const PORTAL_STEPS = {
     activityLabel: "Approve your video concepts",
     title: "Your Video Concepts",
     body: "We created 10 video concepts using your onboarding, content tone, logo, and brand. Preview each, generate the actual video for any you like, and use them on your site, social media, or YouTube.",
-    nextLabel: "Go to Your Designs", nextTo: "/your-designs",
+    nextLabel: "Go to Enhancements", nextTo: "/enhancements",
   },
   "your-designs": {
     key: "your-designs",
     to: "/your-designs", label: "Your Designs", icon: LayoutTemplate, gate: "auto",
     activityLabel: "Review your finished brand package",
     title: "Your Finished Brand Package",
-    body: "Everything you picked — your content tone, logo, brand mockups, website design, social media kit, and videos — is compiled here. Review it all, then continue to choose any enhancements.",
-    nextLabel: "Go to Enhancements", nextTo: "/enhancements",
+    body: "Everything you picked — your content tone, logo, brand mockups, website design, social media kit, and videos — is compiled here. Review it all, then continue to sign your agreement.",
+    nextLabel: "Go to Sign Agreement", nextTo: "/signatures",
   },
   enhancements: {
     key: "enhancements",
     to: "/enhancements", label: "Enhancements", icon: Sparkles, gate: "auto",
     activityLabel: "Choose optional add-ons",
     title: "Enhance Your Package",
-    body: "Add optional enhancements to supercharge your launch — rush delivery, extra pages, blog content, Google Business Profile setup, and more. Skip if you're happy with your current package.",
-    nextLabel: "Go to Sign Agreement", nextTo: "/signatures",
+    body: "Browse every AI tool and add-on available for your business. Try a live, branded demo of each, check the ones you want, and approve to add them to your contract before signing.",
+    nextLabel: "Go to Your Designs", nextTo: "/your-designs",
   },
   signatures: {
     key: "signatures",
@@ -141,16 +141,18 @@ export const PORTAL_STEPS = {
 // a new package, add its productId here with the steps it should show.
 // ─────────────────────────────────────────────────────────────────────────
 
-// Standard build — no social media or video pack
+// Standard build — no social media or video pack. Enhancements appear
+// BEFORE Your Designs so the customer can add optional AI tools and add-ons
+// to their contract before reviewing the final package and signing.
 const FULL_BUILD = [
   "welcome", "business-name", "business-profile", "content", "logo", "brand", "website",
-  "your-designs", "enhancements", "signatures", "approvals", "launch",
+  "enhancements", "your-designs", "signatures", "approvals", "launch",
 ];
 
 // Build with social media + video pack included
 const FULL_BUILD_PLUS_MEDIA = [
   "welcome", "business-name", "business-profile", "content", "logo", "brand", "website",
-  "social", "video", "your-designs", "enhancements", "signatures",
+  "social", "video", "enhancements", "your-designs", "signatures",
   "approvals", "launch",
 ];
 

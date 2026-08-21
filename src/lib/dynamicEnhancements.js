@@ -1,89 +1,80 @@
 import {
-  Zap, FileText, MapPin, Star, Phone, Calendar, Globe, Camera, Mail, ShoppingCart, Search, Shield, Megaphone, Video,
+  Zap, FileText, MapPin, Star, Phone, Calendar, Globe, Camera, Mail, ShoppingCart,
+  Search, Shield, Megaphone, Video, MessageCircle,
 } from "lucide-react";
 
-// Base enhancements available to all industries
-const BASE_ENHANCEMENTS = [
-  { id: "rush", name: "Priority Rush Delivery", description: "Get your website built and launched in 3 business days instead of the standard 2-week timeline.", price: 500, icon: Zap },
-  { id: "extra_page", name: "Additional Service Page", description: "Add a fully-designed, SEO-optimized page for an additional service.", price: 150, icon: FileText },
-  { id: "gbp", name: "Google Business Profile Setup", description: "Complete setup and optimization of your Google Business Profile for maximum local search visibility.", price: 300, icon: MapPin },
-  { id: "reviews", name: "Review Management System", description: "Automated review request system that sends review links to your customers after job completion.", price: 400, icon: Star },
-  { id: "call_tracking", name: "Call Tracking Number", description: "Dedicated tracking phone number with call recording and analytics to measure your lead flow.", price: 200, icon: Phone },
-  { id: "social_mgmt", name: "Social Media Management (3 months)", description: "We manage your social media posting for 3 months using your generated content calendar.", price: 900, icon: Calendar },
+// Enhancement catalog — a wide variety across four price tiers: free, low,
+// mid, and premium. Each enhancement has a `demoType` that drives a branded
+// live preview in the EnhancementDemoModal (rendered with the client's actual
+// logo, brand palette, and business name so every demo matches their system).
+// Industry recommendations are surfaced first and pre-selected.
+
+export const ENHANCEMENT_TIERS = [
+  { id: "free", label: "Free Included", blurb: "On the house — added to every package at no cost." },
+  { id: "low", label: "Low Cost", blurb: "Quick wins under $400." },
+  { id: "mid", label: "Mid Cost", blurb: "High-impact add-ons $400–$799." },
+  { id: "premium", label: "Premium", blurb: "Full-service upgrades $800+." },
 ];
 
-// Industry-specific enhancements — these are RECOMMENDED based on the client's industry
-const INDUSTRY_ENHANCEMENTS = {
-  "home-services": [
-    { id: "before_after", name: "Before/After Photo Gallery", description: "Showcase your work with a stunning before/after photo gallery on your website.", price: 250, icon: Camera, recommended: true },
-    { id: "booking", name: "Online Booking System", description: "Let customers book appointments directly on your website with calendar integration.", price: 600, icon: Calendar, recommended: true },
-    { id: "multi_loc", name: "Multi-Location SEO (per location)", description: "Additional location pages with local SEO optimization for each service area you cover.", price: 600, icon: MapPin },
-  ],
-  "contracting": [
-    { id: "before_after", name: "Project Portfolio Gallery", description: "Showcase completed projects with photos, descriptions, and project details.", price: 350, icon: Camera, recommended: true },
-    { id: "quote_form", name: "Advanced Quote Calculator", description: "Interactive quote form that estimates project costs based on square footage and materials.", price: 500, icon: FileText, recommended: true },
-    { id: "multi_loc", name: "Multi-Location SEO (per location)", description: "Additional location pages with local SEO optimization for each service area.", price: 600, icon: MapPin },
-  ],
-  "professional-services": [
-    { id: "appointment", name: "Online Appointment Scheduling", description: "Clients book consultations directly on your website with automated reminders.", price: 500, icon: Calendar, recommended: true },
-    { id: "intake", name: "Client Intake Forms", description: "Custom online intake forms that capture client info before your first consultation.", price: 350, icon: FileText, recommended: true },
-    { id: "email_campaign", name: "Email Marketing Campaign (3 months)", description: "Monthly email newsletters to your client list with industry insights and offers.", price: 750, icon: Mail },
-  ],
-  "retail": [
-    { id: "ecommerce", name: "E-Commerce Integration", description: "Online store with product catalog, shopping cart, and secure checkout.", price: 1200, icon: ShoppingCart, recommended: true },
-    { id: "inventory", name: "Inventory Sync System", description: "Real-time inventory sync between your website and POS system.", price: 600, icon: Search },
-    { id: "loyalty", name: "Loyalty Program Integration", description: "Digital loyalty program that rewards repeat customers and drives referrals.", price: 400, icon: Star },
-  ],
-  "health-wellness": [
-    { id: "booking", name: "Online Booking System", description: "Let clients book appointments with calendar sync and automated reminders.", price: 600, icon: Calendar, recommended: true },
-    { id: "hipaa", name: "HIPAA-Compliant Contact Forms", description: "Secure, encrypted contact and intake forms for healthcare practices.", price: 450, icon: Shield, recommended: true },
-    { id: "wellness_blog", name: "Wellness Blog Pack (10 articles)", description: "10 SEO-optimized wellness articles targeting local health searches.", price: 750, icon: FileText },
-  ],
-  "automotive": [
-    { id: "service_menu", name: "Digital Service Menu", description: "Interactive service menu with pricing, descriptions, and online booking.", price: 400, icon: FileText, recommended: true },
-    { id: "vehicle_gallery", name: "Vehicle Showcase Gallery", description: "Photo gallery showcasing vehicles, before/after results, and specialty services.", price: 300, icon: Camera },
-    { id: "parts_catalog", name: "Parts & Accessories Catalog", description: "Online catalog of parts and accessories with inquiry forms.", price: 800, icon: ShoppingCart },
-  ],
-  "food-hospitality": [
-    { id: "menu_online", name: "Digital Menu Integration", description: "Your menu displayed beautifully online with photos, prices, and dietary info.", price: 400, icon: FileText, recommended: true },
-    { id: "reservations", name: "Online Reservation System", description: "Table booking and reservation management directly on your website.", price: 600, icon: Calendar, recommended: true },
-    { id: "ordering", name: "Online Ordering System", description: "Take orders directly from your website with pickup and delivery options.", price: 900, icon: ShoppingCart },
-  ],
+const CATALOG = [
+  // ── FREE ──
+  { id: "faq_page", name: "SEO FAQ Page", description: "A search-optimized FAQ page answering the top questions your customers ask, with schema markup for rich Google results.", price: 0, tier: "free", icon: FileText, demoType: "faq" },
+  { id: "privacy_terms", name: "Privacy & Terms Generator", description: "Auto-generated privacy policy and terms of service, customized to your business and jurisdiction.", price: 0, tier: "free", icon: Shield, demoType: "legal" },
+  { id: "contact_widget", name: "Floating Contact Widget", description: "A click-to-call and quick-message button floating on every page so customers reach you in one tap.", price: 0, tier: "free", icon: MessageCircle, demoType: "widget" },
+
+  // ── LOW COST ──
+  { id: "extra_page", name: "Additional Service Page", description: "A fully-designed, SEO-optimized page for an additional service you offer.", price: 150, tier: "low", icon: FileText, demoType: "page" },
+  { id: "call_tracking", name: "Call Tracking Number", description: "A dedicated tracking phone number with call recording and analytics to measure your lead flow.", price: 200, tier: "low", icon: Phone, demoType: "call" },
+  { id: "before_after", name: "Before/After Photo Gallery", description: "A stunning before/after gallery showcasing your work with interactive swipe sliders.", price: 250, tier: "low", icon: Camera, demoType: "gallery" },
+  { id: "gbp", name: "Google Business Profile Setup", description: "Complete setup and optimization of your Google Business Profile for maximum local search visibility.", price: 300, tier: "low", icon: MapPin, demoType: "gbp" },
+
+  // ── MID COST ──
+  { id: "reviews", name: "Review Management System", description: "Automated review-request system that texts review links to customers after each completed job.", price: 400, tier: "mid", icon: Star, demoType: "reviews" },
+  { id: "quote_form", name: "Advanced Quote Calculator", description: "Interactive quote form that estimates project costs from square footage and materials.", price: 500, tier: "mid", icon: FileText, demoType: "quote" },
+  { id: "rush", name: "Priority Rush Delivery", description: "Get your website built and launched in 3 business days instead of the standard 2-week timeline.", price: 500, tier: "mid", icon: Zap, demoType: "rush" },
+  { id: "booking", name: "Online Booking System", description: "Let customers book appointments directly on your website with calendar integration and reminders.", price: 600, tier: "mid", icon: Calendar, demoType: "booking" },
+  { id: "landing_pages", name: "Landing Page Pack (5 pages)", description: "5 high-converting landing pages for specific services or ad campaigns.", price: 600, tier: "mid", icon: Megaphone, demoType: "landing" },
+  { id: "email_campaign", name: "Email Marketing Campaign (3 months)", description: "Monthly email newsletters to your client list with industry insights and offers.", price: 750, tier: "mid", icon: Mail, demoType: "email" },
+  { id: "blog_pack", name: "Blog Content Pack (10 articles)", description: "10 SEO-optimized blog articles targeting local search terms, written and ready to publish.", price: 750, tier: "mid", icon: FileText, demoType: "blog" },
+
+  // ── PREMIUM ──
+  { id: "social_mgmt", name: "Social Media Management (3 months)", description: "We manage your social posting for 3 months using your generated content calendar.", price: 900, tier: "premium", icon: Calendar, demoType: "social" },
+  { id: "ecommerce", name: "E-Commerce Integration", description: "Online store with product catalog, shopping cart, and secure checkout.", price: 1200, tier: "premium", icon: ShoppingCart, demoType: "ecommerce" },
+  { id: "video_testimonial", name: "Video Testimonial Production", description: "Professional video testimonials with your customers, filmed and edited for your site.", price: 1200, tier: "premium", icon: Video, demoType: "video_testimonial" },
+  { id: "multi_loc", name: "Multi-Location SEO (per location)", description: "Additional location pages with local SEO optimization for each service area you cover.", price: 800, tier: "premium", icon: Globe, demoType: "multi_loc" },
+];
+
+// Industry → recommended enhancement IDs (surfaced first + pre-selected)
+const INDUSTRY_RECOMMENDATIONS = {
+  "home-services": ["before_after", "booking", "reviews"],
+  "contracting": ["before_after", "quote_form", "reviews"],
+  "professional-services": ["booking", "email_campaign", "blog_pack"],
+  "retail": ["ecommerce", "reviews", "email_campaign"],
+  "health-wellness": ["booking", "reviews", "email_campaign"],
+  "automotive": ["before_after", "booking", "reviews"],
+  "food-hospitality": ["booking", "reviews", "social_mgmt"],
 };
 
-// Blog pack is universal
-const UNIVERSAL_ENHANCEMENTS = [
-  { id: "blog_pack", name: "Blog Content Pack (10 articles)", description: "10 SEO-optimized blog articles targeting local search terms, written and ready to publish.", price: 750, icon: FileText },
-  { id: "video_testimonial", name: "Video Testimonial Production", description: "Professional video testimonials with your customers, edited and ready for your site.", price: 1200, icon: Video },
-  { id: "landing_pages", name: "Landing Page Pack (5 pages)", description: "5 high-converting landing pages for specific services or ad campaigns.", price: 600, icon: Megaphone },
-];
+const TIER_ORDER = { free: 0, low: 1, mid: 2, premium: 3 };
 
 // Returns the full enhancement catalog for a given industry, with recommended
-// items first, then industry-specific, then universal, then base.
+// items first, then sorted by tier (free → low → mid → premium).
 export function getEnhancementsForIndustry(industry) {
-  const industrySpecific = INDUSTRY_ENHANCEMENTS[industry] || [];
-  const recommended = [...industrySpecific].filter((e) => e.recommended);
-  const rest = [...industrySpecific].filter((e) => !e.recommended);
-
-  // Recommended first, then industry-specific non-recommended, then base, then universal
-  const all = [
-    ...recommended,
-    ...rest,
-    ...BASE_ENHANCEMENTS,
-    ...UNIVERSAL_ENHANCEMENTS,
-  ];
-
-  // Deduplicate by id
-  const seen = new Set();
-  return all.filter((e) => {
-    if (seen.has(e.id)) return false;
-    seen.add(e.id);
-    return true;
+  const recommended = INDUSTRY_RECOMMENDATIONS[industry] || [];
+  const sorted = [...CATALOG].sort((a, b) => {
+    const ar = recommended.includes(a.id) ? 0 : 1;
+    const br = recommended.includes(b.id) ? 0 : 1;
+    if (ar !== br) return ar - br;
+    return (TIER_ORDER[a.tier] ?? 9) - (TIER_ORDER[b.tier] ?? 9);
   });
+  return sorted;
 }
 
 // Returns just the recommended enhancement IDs for an industry
 export function getRecommendedEnhancementIds(industry) {
-  const industrySpecific = INDUSTRY_ENHANCEMENTS[industry] || [];
-  return industrySpecific.filter((e) => e.recommended).map((e) => e.id);
+  return INDUSTRY_RECOMMENDATIONS[industry] || [];
+}
+
+export function getEnhancementById(id) {
+  return CATALOG.find((e) => e.id === id);
 }
