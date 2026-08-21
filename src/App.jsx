@@ -98,6 +98,7 @@ import VideoGenerator from '@/pages/VideoGenerator';
 import YourDesigns from '@/pages/YourDesigns';
 import Enhancements from '@/pages/Enhancements';
 import AdminPackages from '@/pages/AdminPackages';
+import AdminPromoCodes from '@/pages/AdminPromoCodes';
 import ClientSetup from '@/pages/ClientSetup';
 
 const AuthenticatedApp = () => {
@@ -215,6 +216,7 @@ const AuthenticatedApp = () => {
           <Route path="/pipeline-dashboard" element={<PipelineDashboard />} />
           <Route path="/domain-acquisition" element={<DomainAcquisition />} />
           <Route path="/admin-packages" element={<AdminPackages />} />
+          <Route path="/admin-promo-codes" element={<AdminPromoCodes />} />
           <Route path="/client-setup" element={<ClientSetup />} />
         </Route>
       </Route>

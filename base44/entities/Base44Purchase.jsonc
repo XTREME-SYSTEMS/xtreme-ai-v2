@@ -43,6 +43,10 @@
     "currency": {
       "type": "string"
     },
+    "promoCode": {
+      "type": "string",
+      "description": "Promo code applied at checkout, if any."
+    },
     "subscriptionId": {
       "type": "string"
     },

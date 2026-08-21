@@ -1,0 +1,88 @@
+{
+  "name": "PromoCode",
+  "type": "object",
+  "description": "Discount codes that can be applied at checkout for a percentage or fixed amount off. Managed by admins.",
+  "properties": {
+    "code": {
+      "type": "string",
+      "description": "The promo code string (stored uppercase, matched case-insensitively)"
+    },
+    "description": {
+      "type": "string",
+      "description": "Internal note about what this code is for"
+    },
+    "discountType": {
+      "type": "string",
+      "enum": [
+        "percentage",
+        "fixed"
+      ],
+      "default": "percentage",
+      "description": "percentage = % off, fixed = $ off"
+    },
+    "discountValue": {
+      "type": "number",
+      "description": "Percentage (0-100) or fixed amount in USD"
+    },
+    "active": {
+      "type": "boolean",
+      "default": true
+    },
+    "maxUses": {
+      "type": "number",
+      "default": 0,
+      "description": "0 = unlimited"
+    },
+    "usedCount": {
+      "type": "number",
+      "default": 0
+    },
+    "validFrom": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "validUntil": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "applicableProductIds": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Empty = all products"
+    },
+    "minOrderAmount": {
+      "type": "number",
+      "default": 0,
+      "description": "Minimum order total required to use this code"
+    }
+  },
+  "required": [
+    "code",
+    "discountType",
+    "discountValue"
+  ],
+  "rls": {
+    "read": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "create": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

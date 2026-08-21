@@ -3,6 +3,7 @@ import { motion } from "framer-motion";
 import { Check, Sparkles, ArrowRight, Loader2 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { startCheckout } from "@/lib/checkout";
+import PromoCodeInput from "@/components/PromoCodeInput";
 
 const TIERS = [
   {
@@ -30,11 +31,12 @@ const TIERS = [
 export default function PricingSection({ showHeader = true }) {
   const [annual, setAnnual] = useState(false);
   const [loading, setLoading] = useState(null);
+  const [promoCode, setPromoCode] = useState(null);
 
   const handleCheckout = async (productId, tierName) => {
     setLoading(tierName);
     try {
-      await startCheckout(productId);
+      await startCheckout(productId, promoCode);
     } catch (e) {
       alert(e.message || "Checkout failed. Please try again.");
     }
@@ -54,6 +56,13 @@ export default function PricingSection({ showHeader = true }) {
             <div className="mt-7 inline-flex items-center gap-3 rounded-full border border-black/15 bg-white p-1">
               <button onClick={() => setAnnual(false)} className={`rounded-full px-4 py-1.5 text-sm font-semibold transition-all ${!annual ? "bg-lime-400 text-black" : "text-black/60"}`}>Monthly</button>
               <button onClick={() => setAnnual(true)} className={`rounded-full px-4 py-1.5 text-sm font-semibold transition-all ${annual ? "bg-lime-400 text-black" : "text-black/60"}`}>Annual <span className="text-xs opacity-70">Save 2 mo</span></button>
+            </div>
+
+            {/* Promo code */}
+            <div className="mt-5 flex justify-center">
+              <div className="w-full max-w-xs">
+                <PromoCodeInput onValidated={setPromoCode} />
+              </div>
             </div>
           </motion.div>
         )}

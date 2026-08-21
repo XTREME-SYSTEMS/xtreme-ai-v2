@@ -150,6 +150,60 @@ Deno.serve(async (req: Request) => {
         return new Response(JSON.stringify({ error: "Could not resolve enhancement total" }), { status: 500 });
       }
     }
+    // ===== PROMO CODE =====
+    // If the buyer provided a promo code, validate it SERVER-SIDE (never trust
+    // the client) and apply the discount to the unit price. The UI calls
+    // validate-promo-code first to show the discounted price, but this is the
+    // authoritative check — it runs again here before the Wix charge.
+    let appliedPromoCode: string | null = null;
+    const requestedPromoCode = String(body.promoCode ?? "").trim().toUpperCase();
+    if (requestedPromoCode) {
+      try {
+        const promos = await base44.asServiceRole.entities.PromoCode.filter({ code: requestedPromoCode });
+        const promo = promos?.[0];
+        if (!promo) {
+          return new Response(JSON.stringify({ error: "Invalid promo code" }), { status: 400 });
+        }
+        if (!promo.active) {
+          return new Response(JSON.stringify({ error: "This promo code is no longer active" }), { status: 400 });
+        }
+        const now = new Date();
+        if (promo.validFrom && new Date(promo.validFrom) > now) {
+          return new Response(JSON.stringify({ error: "This promo code is not yet active" }), { status: 400 });
+        }
+        if (promo.validUntil && new Date(promo.validUntil) < now) {
+          return new Response(JSON.stringify({ error: "This promo code has expired" }), { status: 400 });
+        }
+        if (promo.maxUses > 0 && (promo.usedCount || 0) >= promo.maxUses) {
+          return new Response(JSON.stringify({ error: "This promo code has reached its usage limit" }), { status: 400 });
+        }
+        if (promo.applicableProductIds?.length > 0 && !promo.applicableProductIds.includes(productId)) {
+          return new Response(JSON.stringify({ error: "This promo code is not valid for this product" }), { status: 400 });
+        }
+        if (promo.minOrderAmount > 0 && parseFloat(price) < promo.minOrderAmount) {
+          return new Response(JSON.stringify({ error: `Minimum order of $${promo.minOrderAmount} required for this promo code` }), { status: 400 });
+        }
+        // Apply the discount to the unit price.
+        let discount = 0;
+        if (promo.discountType === "percentage") {
+          discount = parseFloat(price) * (promo.discountValue / 100);
+        } else {
+          discount = promo.discountValue;
+        }
+        if (discount > parseFloat(price)) discount = parseFloat(price);
+        price = (parseFloat(price) - discount).toFixed(2);
+        appliedPromoCode = promo.code;
+        // Increment the usage counter atomically.
+        await base44.asServiceRole.entities.PromoCode.update(promo.id, {
+          usedCount: (promo.usedCount || 0) + 1,
+        });
+        console.log("create-checkout: promo code applied", { code: promo.code, discount: discount.toFixed(2) });
+      } catch (e) {
+        console.error("create-checkout: promo code validation failed", e?.message || e);
+        return new Response(JSON.stringify({ error: "Could not validate promo code" }), { status: 500 });
+      }
+    }
+
     // For a SUBSCRIPTION set this to Wix's subscriptionInfo; leave null for a one-time payment.
     const subscriptionInfo = product.subscription
       ? { subscriptionSettings: { frequency: product.subscription.frequency }, title: product.name, description: product.name }
@@ -223,6 +277,7 @@ Deno.serve(async (req: Request) => {
       // Charged total (unit price × quantity), so the record matches what Wix charged.
       amount: total.toFixed(2),
       currency,
+      ...(appliedPromoCode ? { promoCode: appliedPromoCode } : {}),
     });
 
     return new Response(JSON.stringify({ redirectUrl }), {

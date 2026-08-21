@@ -6,7 +6,7 @@ import {
   Lightbulb, Palette, Monitor, Megaphone, Boxes, Factory, Database, Eye,
   Hammer, ShieldCheck, FileText, TrendingUp, FlaskConical, Dna, Network, BarChart3,
   BookMarked, CheckCircle, ScrollText, Plug, Settings, LogOut, Menu, X,
-  MapPin, Plus, Rocket, Bot, LayoutTemplate, Copy, Wand2, Crosshair, Activity, Radar, Package, UserPlus,
+  MapPin, Plus, Rocket, Bot, LayoutTemplate, Copy, Wand2, Crosshair, Activity, Radar, Package, UserPlus, Tag,
 } from "lucide-react";
 import { Image } from "@/components/ui/image";
 import { cn } from "@/lib/utils";
@@ -88,6 +88,7 @@ const NAV = [
   { section: "Governance" },
   { to: "/client-setup", label: "Client Setup", icon: UserPlus },
   { to: "/admin-packages", label: "Package Gallery", icon: Package },
+  { to: "/admin-promo-codes", label: "Promo Codes", icon: Tag },
   { to: "/approvals", label: "Approvals", icon: CheckCircle },
   { to: "/receipts", label: "Receipts", icon: ScrollText },
   { to: "/connectors", label: "Connectors", icon: Plug },

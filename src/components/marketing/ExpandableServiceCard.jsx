@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { ChevronDown, Check, ArrowRight, Loader2, BarChart3, FileText, Download } from "lucide-react";
 import { startCheckout } from "@/lib/checkout";
 import ContractPreview from "@/components/marketing/ContractPreview";
+import PromoCodeInput from "@/components/PromoCodeInput";
 
 // An expandable service card. Collapsed: shows name, price, tagline, buy button.
 // Expanded: shows full description, itemized features, statistics, and a
@@ -11,6 +12,7 @@ export default function ExpandableServiceCard({ service, index }) {
   const [expanded, setExpanded] = useState(false);
   const [loading, setLoading] = useState(false);
   const [contractOpen, setContractOpen] = useState(false);
+  const [promoCode, setPromoCode] = useState(null);
   const Icon = service.icon;
 
   const handleBuy = async () => {
@@ -21,7 +23,7 @@ export default function ExpandableServiceCard({ service, index }) {
     setContractOpen(false);
     setLoading(true);
     try {
-      await startCheckout(service.productId);
+      await startCheckout(service.productId, promoCode);
     } catch (e) {
       alert(e.message || "Checkout failed. Please try again.");
     }
@@ -114,6 +116,15 @@ export default function ExpandableServiceCard({ service, index }) {
                     </li>
                   ))}
                 </ul>
+
+                {/* Promo code */}
+                <div className="mt-5">
+                  <PromoCodeInput
+                    productId={service.productId}
+                    originalPrice={service.price}
+                    onValidated={setPromoCode}
+                  />
+                </div>
 
                 {/* Delivery + contract button */}
                 <div className="mt-5 flex items-center justify-between rounded-xl border border-black/10 bg-white p-4">
