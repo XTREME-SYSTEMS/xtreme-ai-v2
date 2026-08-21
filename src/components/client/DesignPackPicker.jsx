@@ -2,9 +2,10 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { base44 } from "@/api/base44Client";
 import { Image } from "@/components/ui/image";
-import { Check, Loader2, Sparkles } from "lucide-react";
+import { Check, Loader2, Sparkles, Eye } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { logReceipt } from "@/lib/pipelineUtils";
+import DesignPackPreview from "@/components/client/DesignPackPreview";
 
 // 10 curated epoxy-contractor logo & web design packs, each a distinct color
 // palette + style. Generated with the platform's best image model. The client
@@ -31,6 +32,8 @@ export default function DesignPackPicker() {
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
   const [error, setError] = useState("");
+  const [profile, setProfile] = useState(null);
+  const [preview, setPreview] = useState(null);
 
   useEffect(() => {
     base44
@@ -38,6 +41,7 @@ export default function DesignPackPicker() {
       .then((u) => {
         if (u?.designPacks) setSelected(u.designPacks);
         if (u?.designPacksChosen) setSaved(true);
+        setProfile(u?.epoxyProfile || null);
       })
       .catch(() => {});
   }, []);
@@ -120,37 +124,50 @@ export default function DesignPackPicker() {
             const on = selected.includes(p.id);
             const disabled = !on && selected.length >= MAX;
             return (
-              <button
+              <div
                 key={p.id}
-                type="button"
-                onClick={() => toggle(p.id)}
                 className={cn(
                   "group relative overflow-hidden rounded-xl border-2 bg-zinc-950 text-left transition-all",
                   on ? "border-lime-400 ring-2 ring-lime-400/40" : "border-white/10 hover:border-white/25",
                   disabled && "opacity-40"
                 )}
               >
-                <div className="relative aspect-[4/3] w-full overflow-hidden">
-                  <Image src={p.img} alt={p.name} fittingType="fill" className="h-full w-full" />
-                  {on && (
-                    <div className="absolute right-1.5 top-1.5 flex h-6 w-6 items-center justify-center rounded-full bg-lime-400 text-black">
-                      <Check className="h-4 w-4" />
-                    </div>
-                  )}
-                </div>
-                <div className="p-2.5">
-                  <div className="text-xs font-semibold text-white">{p.name}</div>
-                  <div className="mt-1.5 flex items-center gap-1">
-                    {p.colors.map((c) => (
-                      <span
-                        key={c}
-                        className="h-3 w-3 rounded-full border border-white/20"
-                        style={{ backgroundColor: c }}
-                      />
-                    ))}
+                <button
+                  type="button"
+                  onClick={() => toggle(p.id)}
+                  className="block w-full text-left"
+                >
+                  <div className="relative aspect-[4/3] w-full overflow-hidden">
+                    <Image src={p.img} alt={p.name} fittingType="fill" className="h-full w-full" />
+                    {on && (
+                      <div className="absolute right-1.5 top-1.5 flex h-6 w-6 items-center justify-center rounded-full bg-lime-400 text-black">
+                        <Check className="h-4 w-4" />
+                      </div>
+                    )}
                   </div>
+                </button>
+                <div className="flex items-center gap-2 p-2.5">
+                  <button type="button" onClick={() => toggle(p.id)} className="min-w-0 flex-1 text-left">
+                    <div className="truncate text-xs font-semibold text-white">{p.name}</div>
+                    <div className="mt-1.5 flex items-center gap-1">
+                      {p.colors.map((c) => (
+                        <span
+                          key={c}
+                          className="h-3 w-3 rounded-full border border-white/20"
+                          style={{ backgroundColor: c }}
+                        />
+                      ))}
+                    </div>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setPreview(p)}
+                    className="flex shrink-0 items-center gap-1 rounded-md border border-white/15 px-2 py-1 text-[10px] font-medium text-white/70 hover:border-lime-400/50 hover:text-lime-300"
+                  >
+                    <Eye className="h-3 w-3" /> Preview
+                  </button>
                 </div>
-              </button>
+              </div>
             );
           })}
         </div>
@@ -176,6 +193,16 @@ export default function DesignPackPicker() {
           )}
         </button>
       </div>
+
+      {preview && (
+        <DesignPackPreview
+          pack={preview}
+          profile={profile}
+          selected={selected.includes(preview.id)}
+          onSelect={() => toggle(preview.id)}
+          onClose={() => setPreview(null)}
+        />
+      )}
     </div>
   );
 }
