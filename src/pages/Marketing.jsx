@@ -1,5 +1,5 @@
 import MarketingNav from "@/components/marketing/MarketingNav";
-import Hero from "@/components/marketing/Hero";
+import HeroInteractive from "@/components/marketing/HeroInteractive";
 import AwardBadges from "@/components/marketing/AwardBadges";
 import AllInOneTabs from "@/components/marketing/AllInOneTabs";
 import Pillars from "@/components/marketing/Pillars";
@@ -15,7 +15,7 @@ export default function Marketing() {
     <div className="min-h-screen bg-white">
       <MarketingNav />
       <main>
-        <Hero />
+        <HeroInteractive />
         <AwardBadges />
         <AllInOneTabs />
         <Pillars />
