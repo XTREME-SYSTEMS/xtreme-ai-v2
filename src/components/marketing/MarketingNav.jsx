@@ -39,7 +39,7 @@ export default function MarketingNav() {
 
           <div className="hidden items-center gap-3 md:flex">
             <Link to="/login" className="text-sm font-medium text-black/70 hover:text-lime-600">Login</Link>
-            <Link to="/register" className="rounded-lg bg-lime-400 px-4 py-2 text-sm font-semibold text-black transition-all hover:bg-lime-300 hover:shadow-lg hover:shadow-lime-400/40">Start 14-day trial</Link>
+            <Link to="/pricing" className="rounded-lg bg-lime-400 px-4 py-2 text-sm font-semibold text-black transition-all hover:bg-lime-300 hover:shadow-lg hover:shadow-lime-400/40">Get Started</Link>
           </div>
 
           <button onClick={() => setOpen(!open)} className="md:hidden text-black"><Menu className="h-6 w-6" /></button>
@@ -55,7 +55,7 @@ export default function MarketingNav() {
           <div className="flex flex-col gap-1 px-4 py-6">
             {LINKS.map((l) => <a key={l.label} href={l.to} onClick={() => setOpen(false)} className="rounded-lg px-3 py-3 text-base font-medium text-black/80 hover:bg-lime-400/10 hover:text-lime-600">{l.label}</a>)}
             <Link to="/login" onClick={() => setOpen(false)} className="rounded-lg px-3 py-3 text-base font-medium text-black/80 hover:bg-lime-400/10">Login</Link>
-            <Link to="/register" onClick={() => setOpen(false)} className="mt-2 rounded-lg bg-lime-400 px-3 py-3 text-center text-base font-semibold text-black">Start 14-day trial</Link>
+            <Link to="/pricing" onClick={() => setOpen(false)} className="mt-2 rounded-lg bg-lime-400 px-3 py-3 text-center text-base font-semibold text-black">Get Started</Link>
           </div>
         </div>
       )}

@@ -6,8 +6,8 @@ import { startCheckout } from "@/lib/checkout";
 
 const TIERS = [
   {
-    name: "Free Starter", monthly: 0, tagline: "Test the waters",
-    features: ["1 AI Tool Access", "Basic Presence Audit", "Community Support", "Starter Dashboard"],
+    name: "Free Starter", monthly: 0, tagline: "Full Elite access — try the entire workflow",
+    features: ["Unlimited AI Tools", "Full Brand & Website Build", "SEO + AEO Optimization", "Social Media Pack", "Video Pack", "Approval-Gated Workflow", "Client Dashboard", "Up to 2 Free Iterations"],
     cta: "Start Free", highlight: false, free: true,
   },
   {
@@ -48,8 +48,8 @@ export default function PricingSection({ showHeader = true }) {
           <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.5 }}
           className="mx-auto max-w-2xl text-center">
             <div className="mb-3 inline-flex items-center gap-2 rounded-full bg-lime-400/15 px-3 py-1 text-xs font-bold uppercase tracking-wider text-lime-700">Pricing</div>
-            <h2 className="text-3xl font-bold tracking-tight text-black sm:text-5xl">Start with a FREE 14-day trial</h2>
-            <p className="mt-4 text-lg text-black/60">Unlimited contacts, unlimited users. Scale your business without a tax on growth.</p>
+            <h2 className="text-3xl font-bold tracking-tight text-black sm:text-5xl">Choose Your Plan</h2>
+            <p className="mt-4 text-lg text-black/60">Start free with full Elite access, or pick a paid plan. No credit card required to get started.</p>
 
             <div className="mt-7 inline-flex items-center gap-3 rounded-full border border-black/15 bg-white p-1">
               <button onClick={() => setAnnual(false)} className={`rounded-full px-4 py-1.5 text-sm font-semibold transition-all ${!annual ? "bg-lime-400 text-black" : "text-black/60"}`}>Monthly</button>
@@ -73,7 +73,7 @@ export default function PricingSection({ showHeader = true }) {
               {annual && t.yearly ? <div className="mt-1 text-xs text-lime-700">Billed ${t.yearly.toLocaleString()}/yr</div> : <div className="mt-1 text-xs text-black/20">&nbsp;</div>}
 
               {t.free ? (
-                <Link to="/client-portal" className="mt-5 inline-flex items-center justify-center gap-1.5 rounded-xl border border-black/20 px-4 py-3 text-sm font-bold text-black transition-all hover:bg-black hover:text-white">
+                <Link to="/register" className="mt-5 inline-flex items-center justify-center gap-1.5 rounded-xl bg-lime-400 px-4 py-3 text-sm font-bold text-black transition-all hover:bg-lime-300">
                   {t.cta} <ArrowRight className="h-4 w-4" />
                 </Link>
               ) : t.contact ? (

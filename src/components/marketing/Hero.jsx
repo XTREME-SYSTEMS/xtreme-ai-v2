@@ -77,8 +77,8 @@ export default function Hero() {
 
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5, duration: 0.6 }}
             className="mt-8">
-            <Link to="/register" className="group inline-flex items-center justify-center gap-2 rounded-xl bg-lime-400 px-7 py-4 text-base font-bold text-black transition-all hover:bg-lime-300 hover:shadow-xl hover:shadow-lime-400/40">
-              Start 14 Day Free Trial <ArrowRight className="h-5 w-5 transition-transform group-hover:translate-x-1" />
+            <Link to="/pricing" className="group inline-flex items-center justify-center gap-2 rounded-xl bg-lime-400 px-7 py-4 text-base font-bold text-black transition-all hover:bg-lime-300 hover:shadow-xl hover:shadow-lime-400/40">
+              Get Started <ArrowRight className="h-5 w-5 transition-transform group-hover:translate-x-1" />
             </Link>
           </motion.div>
         </div>

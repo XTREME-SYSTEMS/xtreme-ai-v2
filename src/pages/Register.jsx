@@ -46,9 +46,16 @@ export default function Register() {
       if (result?.access_token) {
         base44.auth.setToken(result.access_token);
       }
+      // Grant full Elite access for presentation purposes (free starter).
+      try {
+        await base44.functions.invoke("grantStarterAccess", {});
+      } catch (e) {
+        // Best effort — user can still access the portal; admin can grant manually.
+        console.error("grantStarterAccess failed:", e);
+      }
       const dest = safeReturnTo();
       // Default logged-in users to the dashboard, not the public marketing page.
-      window.location.href = dest === "/" ? "/client-portal" : dest;
+      window.location.href = dest === "/" ? "/my-package" : dest;
     } catch (err) {
       setError(err.message || "Invalid verification code");
     } finally {

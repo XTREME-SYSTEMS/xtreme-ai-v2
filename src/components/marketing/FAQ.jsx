@@ -3,7 +3,7 @@ import { motion } from "framer-motion";
 import { ChevronDown } from "lucide-react";
 
 const FAQS = [
-  { q: "Is there a free trial?", a: "Yes — every plan starts with a 14-day free trial. No credit card required." },
+  { q: "Is there a free plan?", a: "Yes — our Free Starter plan gives you full Elite access so you can experience the entire workflow end-to-end. No credit card required." },
   { q: "Are contacts and users really unlimited?", a: "Correct. We never tax you for growth — unlimited contacts and unlimited users on every plan." },
   { q: "Can I change plans later?", a: "Absolutely. Upgrade or downgrade anytime; changes apply at the next billing cycle." },
   { q: "What about usage-based charges?", a: "SMS, email, and AI Voice are usage-based. You only pay for what you send, at industry-leading rates." },
