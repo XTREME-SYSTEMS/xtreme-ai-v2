@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { base44 } from "@/api/base44Client";
 import { Package, ChevronRight } from "lucide-react";
 import { getProductDetails } from "@/lib/productDetails";
@@ -13,7 +14,16 @@ export default function MyPackage() {
   const [loading, setLoading] = useState(true);
   const [activePurchase, setActivePurchase] = useState(null);
   const [user, setUser] = useState(null);
+  const navigate = useNavigate();
   const { effectiveEmail, isScoped, isPreviewing } = usePreviewEmail(user);
+
+  // Reviewing the package completes the Welcome step and advances the client
+  // to onboarding (Business Profile) — the epoxy intake questions live there.
+  const continueToOnboarding = () => {
+    setActivePurchase(null);
+    try { localStorage.setItem("coach:done:/my-package", "1"); } catch {}
+    navigate("/business-profile");
+  };
 
   useEffect(() => { base44.auth.me().then(setUser).catch(() => {}); }, []);
 
@@ -110,7 +120,12 @@ export default function MyPackage() {
         )}
       </div>
 
-      <PurchaseDetailModal purchase={activePurchase} onClose={() => setActivePurchase(null)} />
+      <PurchaseDetailModal
+        purchase={activePurchase}
+        onClose={() => setActivePurchase(null)}
+        onContinue={continueToOnboarding}
+        continueLabel="Continue to Business Profile"
+      />
     </div>
   );
 }

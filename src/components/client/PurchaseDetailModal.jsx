@@ -1,10 +1,21 @@
+import { useEffect } from "react";
 import { X, CheckCircle, Calendar, Hash, Mail, CreditCard } from "lucide-react";
 import { getProductDetails } from "@/lib/productDetails";
 
-// Modal showing full details for a single purchased item.
-export default function PurchaseDetailModal({ purchase, onClose }) {
+// Modal showing full details for a single purchased item. The footer button
+// advances (onContinue) when provided — used on the Welcome step so reviewing
+// the package moves the client forward — otherwise it just closes.
+export default function PurchaseDetailModal({ purchase, onClose, onContinue, continueLabel = "Continue" }) {
+  const detail = purchase ? getProductDetails(purchase.productId) : null;
+
+  useEffect(() => {
+    if (!purchase) return;
+    const onKey = (e) => { if (e.key === "Escape") onClose?.(); };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [purchase, onClose]);
+
   if (!purchase) return null;
-  const detail = getProductDetails(purchase.productId);
   const Icon = detail.icon;
 
   const fmtMoney = (p) => {
@@ -19,7 +30,7 @@ export default function PurchaseDetailModal({ purchase, onClose }) {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+    <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
       <div className="absolute inset-0 bg-black/70" onClick={onClose} />
       <div className="relative z-10 w-full max-w-lg overflow-hidden rounded-2xl border border-white/15 bg-zinc-950 shadow-2xl">
         {/* Header banner */}
@@ -83,10 +94,10 @@ export default function PurchaseDetailModal({ purchase, onClose }) {
 
         <div className="border-t border-white/10 p-4">
           <button
-            onClick={onClose}
+            onClick={onContinue || onClose}
             className="w-full rounded-lg bg-lime-400 px-4 py-2.5 text-sm font-semibold text-black transition-colors hover:bg-lime-300"
           >
-            Close
+            {onContinue ? continueLabel : "Close"}
           </button>
         </div>
       </div>
