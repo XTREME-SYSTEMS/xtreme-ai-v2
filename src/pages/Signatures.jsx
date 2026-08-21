@@ -7,6 +7,7 @@ import PreviewBanner from "@/components/client/PreviewBanner";
 import BackButton from "@/components/client/BackButton";
 import { usePreviewEmail } from "@/hooks/usePreviewEmail";
 import { useClientUser } from "@/hooks/useClientUser";
+import { useClientUpdate } from "@/hooks/useClientUpdate";
 import { logReceipt } from "@/lib/pipelineUtils";
 import { notifyStepComplete } from "@/lib/pipelineNotify";
 import { cn } from "@/lib/utils";
@@ -27,6 +28,7 @@ const REVISION_LINKS = [
 export default function Signatures() {
   const navigate = useNavigate();
   const { user } = useClientUser();
+  const { update } = useClientUpdate();
   const [docs, setDocs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [active, setActive] = useState(null);
@@ -94,7 +96,7 @@ export default function Signatures() {
     if (!kickoffDate) return;
     setSavingKickoff(true);
     try {
-      await base44.auth.updateMe({ kickoffCallDate: kickoffDate });
+      await update({ kickoffCallDate: kickoffDate });
       try {
         await logReceipt({ action: "Kickoff call scheduled", entityType: "User", entityId: "self", status: "success", notes: `Preferred date: ${kickoffDate}` });
       } catch {}

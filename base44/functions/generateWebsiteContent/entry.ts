@@ -1,9 +1,9 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.40';
 
-// Generates rich, location-aware website copy for a client's epoxy site using
-// real web context about their area. Fed into the Website Design Studio so
-// every layout preview shows the actual content the client will get — no
-// ambiguity at approval time.
+// Generates rich, location-aware website copy for a client's site using
+// real web context about their area. Industry-aware: uses the client's actual
+// industry, subIndustry, businessType, financial intelligence, and industry
+// answers instead of hardcoded "epoxy contractor".
 export default async function(req) {
   try {
     const base44 = createClientFromRequest(req);
@@ -11,30 +11,55 @@ export default async function(req) {
     const {
       businessName, services, serviceArea, city, state,
       differentiators, yearsInBusiness, phone, email,
+      industry, subIndustry, businessType, financialIntelligence, industryAnswers,
     } = body;
 
-    const biz = businessName || "your epoxy business";
+    const biz = businessName || "your business";
+    const ind = industry || "epoxy flooring contractor";
+    const subInd = subIndustry || "";
+    const bizType = businessType || "local service business";
     const loc = [city, state].filter(Boolean).join(", ").trim() || (serviceArea || "your area");
     const svc = Array.isArray(services) && services.length
       ? services.join(", ")
-      : "epoxy flooring, polished concrete, concrete coatings";
+      : "professional services";
     const area = serviceArea || loc;
     const diff = Array.isArray(differentiators) && differentiators.length
       ? differentiators.join("; ")
       : "";
 
-    const prompt = `You are writing the website copy for a local epoxy contractor. Make it specific, high-converting, and locally relevant — no generic filler.
+    // Build financial intelligence context
+    let finContext = "";
+    if (financialIntelligence) {
+      const fi = financialIntelligence;
+      const parts = [];
+      if (fi.competitorPricing?.length) {
+        parts.push(`Competitor pricing: ${fi.competitorPricing.map(c => `${c.name}: ${c.price || c.range || "N/A"}`).join("; ")}`);
+      }
+      if (fi.averagePrice) parts.push(`Average market price: ${fi.averagePrice}`);
+      if (fi.marketInsights) parts.push(`Market insights: ${fi.marketInsights}`);
+      if (parts.length) finContext = `\n\nFINANCIAL INTELLIGENCE:\n${parts.join("\n")}`;
+    }
+
+    // Build industry answers context
+    let answersContext = "";
+    if (industryAnswers && typeof industryAnswers === "object" && Object.keys(industryAnswers).length > 0) {
+      answersContext = `\n\nCLIENT-SPECIFIC ANSWERS:\n${Object.entries(industryAnswers).map(([k, v]) => `- ${k}: ${v}`).join("\n")}`;
+    }
+
+    const prompt = `You are writing the website copy for a local ${ind} business. Make it specific, high-converting, and locally relevant — no generic filler.
 
 Business name: ${biz}
+Industry: ${ind}${subInd ? ` (${subInd})` : ""}
+Business type: ${bizType}
 Primary location: ${loc}
 Service area: ${area}
 Services offered: ${svc}
 Years in business: ${yearsInBusiness || "n/a"}
 Differentiators: ${diff || "n/a"}
 Phone: ${phone || "n/a"}
-Email: ${email || "n/a"}
+Email: ${email || "n/a"}${finContext}${answersContext}
 
-Using real, current information about ${loc} (the real surrounding cities/communities, local landmarks, climate, and common residential/commercial concrete needs there), write website copy that feels native to ${loc}. Reference the actual area and local trust signals where natural.
+Using real, current information about ${loc} (the real surrounding cities/communities, local landmarks, climate, and common needs there), write website copy that feels native to ${loc}. Reference the actual area and local trust signals where natural. Make all copy specific to the ${ind} industry — use industry-appropriate terminology, pain points, and benefits.
 
 Return JSON with exactly these fields:
 - heroHeadline: punchy headline (mention the core service + location)
@@ -75,8 +100,6 @@ Return JSON with exactly these fields:
       },
     });
 
-    // Web-search context can leak citation links into the copy as raw
-    // markdown "[text](url)" or bare urls. Strip them so the site text is clean.
     const clean = (v) => {
       if (typeof v === "string") {
         return v

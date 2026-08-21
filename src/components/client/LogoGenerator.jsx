@@ -8,6 +8,7 @@ import { logReceipt } from "@/lib/pipelineUtils";
 import { LOGO_STYLES, ACCENT_COLORS } from "@/lib/designPrompts";
 import BackButton from "@/components/client/BackButton";
 import { useClientUser } from "@/hooks/useClientUser";
+import { useClientUpdate } from "@/hooks/useClientUpdate";
 import { notifyStepComplete } from "@/lib/pipelineNotify";
 
 // Step: Logo Generator. Generates 10 distinct logos for the client's epoxy
@@ -25,6 +26,7 @@ export default function LogoGenerator() {
   const [error, setError] = useState("");
   const [regeneratingId, setRegeneratingId] = useState(null);
   const { user } = useClientUser();
+  const { update } = useClientUpdate();
 
   useEffect(() => {
     document.title = "Logo Generator · Lead Gen Near You";
@@ -39,6 +41,7 @@ export default function LogoGenerator() {
   }, [user]);
 
   const businessName = profile?.businessName?.trim() || "";
+  const industry = profile?.industry || "";
 
   const generate = async () => {
     if (!businessName) {
@@ -50,14 +53,14 @@ export default function LogoGenerator() {
     try {
       const results = await Promise.allSettled(
         LOGO_STYLES.map(async (s) => {
-          const res = await base44.integrations.Core.GenerateImage({ prompt: s.prompt(businessName) });
+          const res = await base44.integrations.Core.GenerateImage({ prompt: s.prompt(businessName, undefined, industry) });
           return { id: s.id, label: s.label, url: res.url };
         })
       );
       const ok = results.map((r) => r.value).filter(Boolean);
       if (ok.length === 0) throw new Error("generation failed");
       setPacks(ok);
-      await base44.auth.updateMe({ logoPacks: ok });
+      await update({ logoPacks: ok });
     } catch (e) {
       setError("Logo generation hit a snag. Please try again.");
     } finally {
@@ -73,13 +76,13 @@ export default function LogoGenerator() {
     try {
       const style = LOGO_STYLES.find((s) => s.id === pack.id);
       const res = await base44.integrations.Core.GenerateImage({
-        prompt: style.prompt(businessName, accent),
+        prompt: style.prompt(businessName, accent, industry),
       });
       const next = packs.map((p) =>
         p.id === pack.id ? { ...p, url: res.url, accentColor: accent } : p
       );
       setPacks(next);
-      try { await base44.auth.updateMe({ logoPacks: next }); } catch {}
+      try { await update({ logoPacks: next }); } catch {}
     } catch (e) {
       setError("Couldn't regenerate that logo. Try again.");
     } finally {
@@ -101,7 +104,7 @@ export default function LogoGenerator() {
     setSaving(true);
     setError("");
     try {
-      await base44.auth.updateMe({ chosenLogoUrl: chosen, logoPacksChosen: true });
+      await update({ chosenLogoUrl: chosen, logoPacksChosen: true });
       try {
         await logReceipt({ action: "Logo chosen", entityType: "User", entityId: "self", status: "success", notes: `Logo selected` });
       } catch {}

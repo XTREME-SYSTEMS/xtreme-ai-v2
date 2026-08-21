@@ -18,10 +18,14 @@ export const STEP_LABELS: Record<string, string> = {
 
 // When step X is revised, these downstream steps must be redone because they
 // depend on X's output (e.g. revising the logo invalidates brand mockups).
+// profile → everything (business profile change invalidates all downstream)
+// content → website + social + video (all use the content tone)
+// logo → brand + website + social (brand and social use the logo)
 export const CASCADE: Record<string, string[]> = {
-  content: ["website"],
-  logo: ["brand", "website"],
-  brand: [],
+  profile: ["content", "logo", "brand", "website", "social", "video", "designs", "enhancements"],
+  content: ["website", "social", "video"],
+  logo: ["brand", "website", "social"],
+  brand: ["website"],
   website: ["social", "video"],
   social: [],
   video: [],
@@ -29,8 +33,9 @@ export const CASCADE: Record<string, string[]> = {
 
 // User profile fields to clear when a step is reset (revision cascade).
 export const STEP_RESET_FIELDS: Record<string, string[]> = {
-  content: ["contentTemplatesChosen", "contentTemplates", "chosenContentTemplate"],
-  logo: ["chosenLogoUrl", "logoPacks"],
+  profile: ["epoxyProfileSubmitted", "epoxyProfile", "financialIntelligence", "industryAnswers"],
+  content: ["contentTemplatesChosen", "contentTemplates", "chosenContentTemplate", "chosenContentTone"],
+  logo: ["chosenLogoUrl", "logoPacks", "logoPacksChosen"],
   brand: ["brandPacksChosen", "chosenBrandImages", "brandPacks"],
   website: ["designPacksChosen", "chosenWebsiteLayout", "chosenPalette", "websiteContent", "websiteImages"],
   social: ["socialMediaChosen", "socialMediaPack"],

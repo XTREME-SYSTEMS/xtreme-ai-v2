@@ -7,6 +7,7 @@ import {
 import BackButton from "@/components/client/BackButton";
 import { notifyStepComplete } from "@/lib/pipelineNotify";
 import { useClientUser } from "@/hooks/useClientUser";
+import { useClientUpdate } from "@/hooks/useClientUpdate";
 import { logReceipt } from "@/lib/pipelineUtils";
 
 // Step: Enhancements — upsell page shown after Your Designs and before Sign
@@ -27,6 +28,7 @@ const ENHANCEMENTS = [
 export default function Enhancements() {
   const navigate = useNavigate();
   const { user } = useClientUser();
+  const { update } = useClientUpdate();
   const [selected, setSelected] = useState([]);
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
@@ -56,7 +58,7 @@ export default function Enhancements() {
     setSaving(true);
     setError("");
     try {
-      await base44.auth.updateMe({
+      await update({
         enhancements: selected,
         enhancementsTotal: total,
         enhancementsChosen: true,

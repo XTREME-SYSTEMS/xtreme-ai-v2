@@ -8,6 +8,7 @@ import { PALETTES, WEBSITE_LAYOUTS, buildTheme, SECTION_META } from "@/component
 import WebsitePreview, { ScaledPreview } from "@/components/website/WebsitePreview";
 import BackButton from "@/components/client/BackButton";
 import { useClientUser } from "@/hooks/useClientUser";
+import { useClientUpdate } from "@/hooks/useClientUpdate";
 import { notifyStepComplete } from "@/lib/pipelineNotify";
 
 const REVISE_CHIPS = ["Different layout", "Different colors", "Different content", "Different images", "Too plain", "Not local enough", "Doesn't match my brand", "Other"];
@@ -27,6 +28,7 @@ function shuffle(pool, excludeIds, n) {
 export default function WebsiteDesignStudio() {
   const navigate = useNavigate();
   const { user: hookUser } = useClientUser();
+  const { update } = useClientUpdate();
   const [user, setUser] = useState(null);
   const [profile, setProfile] = useState(null);
   const [logoUrl, setLogoUrl] = useState("");
@@ -75,6 +77,10 @@ export default function WebsiteDesignStudio() {
       serviceArea: p?.primaryLocation || "", city: p?.primaryLocation || "", state: "",
       differentiators: p?.differentiators || [], yearsInBusiness: p?.yearsInBusiness || "",
       phone: p?.phone || "", email: p?.email || "",
+      industry: p?.industry || "", subIndustry: p?.subIndustry || "",
+      businessType: p?.businessType || "",
+      financialIntelligence: hookUser?.financialIntelligence || null,
+      industryAnswers: hookUser?.industryAnswers || null,
     });
     return res?.data?.content;
   };
@@ -85,7 +91,7 @@ export default function WebsiteDesignStudio() {
       const c = await callGenerate(p);
       if (!c) throw new Error("no content");
       setContent(c);
-      try { await base44.auth.updateMe({ websiteContent: c }); } catch {}
+      try { await update({ websiteContent: c }); } catch {}
     } catch (e) { setGenError("Couldn't generate your website content. You can retry."); }
     finally { setGenerating(false); }
   };
@@ -102,7 +108,7 @@ export default function WebsiteDesignStudio() {
     setEnhancingContent(true); setSectionMsg("");
     try {
       const c = await callGenerate(profile);
-      if (c) { setContent(c); try { await base44.auth.updateMe({ websiteContent: c }); } catch {} setSectionMsg("Content enhanced."); }
+      if (c) { setContent(c); try { await update({ websiteContent: c }); } catch {} setSectionMsg("Content enhanced."); }
       else setSectionMsg("Couldn't enhance content. Try again.");
     } catch (e) { setSectionMsg("Couldn't enhance content. Try again."); }
     finally { setEnhancingContent(false); }
@@ -118,7 +124,7 @@ export default function WebsiteDesignStudio() {
       const imgs = res?.data?.images || [];
       if (imgs.length) {
         setImages(imgs);
-        try { await base44.auth.updateMe({ websiteImages: imgs }); } catch {}
+        try { await update({ websiteImages: imgs }); } catch {}
         setSectionMsg("Images enhanced.");
       } else setSectionMsg("Couldn't generate new images. Try again.");
     } catch (e) { setSectionMsg("Couldn't generate new images. Try again."); }
@@ -152,7 +158,7 @@ export default function WebsiteDesignStudio() {
       if (updates) {
         const next = { ...content, ...updates };
         setContent(next);
-        try { await base44.auth.updateMe({ websiteContent: next }); } catch {}
+        try { await update({ websiteContent: next }); } catch {}
         setSectionMsg(`${SECTION_META[section]?.label || section} regenerated.`);
       } else setSectionMsg("Couldn't regenerate. Try again.");
     } catch (e) { setSectionMsg("Couldn't regenerate. Try again."); }
@@ -163,7 +169,7 @@ export default function WebsiteDesignStudio() {
     if (!selectedId) { setError("Pick a layout to approve."); return; }
     setSaving(true); setError("");
     try {
-      await base44.auth.updateMe({
+      await update({
         chosenWebsiteLayout: selectedId, chosenPalette: paletteId,
         websiteContent: content, websiteImages: images, designPacksChosen: true,
       });

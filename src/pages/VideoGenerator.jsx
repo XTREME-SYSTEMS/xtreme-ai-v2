@@ -7,6 +7,7 @@ import { cn } from "@/lib/utils";
 import { logReceipt } from "@/lib/pipelineUtils";
 import BackButton from "@/components/client/BackButton";
 import { useClientUser } from "@/hooks/useClientUser";
+import { useClientUpdate } from "@/hooks/useClientUpdate";
 import { notifyStepComplete } from "@/lib/pipelineNotify";
 
 // Step: Video Generator. Generates 10 video concept cards (thumbnail +
@@ -33,6 +34,7 @@ export default function VideoGenerator() {
   const [preview, setPreview] = useState(null);
 
   const { user } = useClientUser();
+  const { update } = useClientUpdate();
 
   useEffect(() => { document.title = "Video Generator · Lead Gen Near You"; }, []);
 
@@ -52,11 +54,13 @@ export default function VideoGenerator() {
       const res = await base44.functions.invoke("generateVideoPack", {
         businessName: profile.businessName, primaryLocation: profile.primaryLocation,
         services: profile.services || [], contentTone, logoUrl,
+        industry: profile.industry || "", subIndustry: profile.subIndustry || "",
+        businessType: profile.businessType || "",
       });
       const d = res?.data?.data;
       if (!d?.concepts?.length) throw new Error("no data");
       setData(d);
-      try { await base44.auth.updateMe({ videoPack: d }); } catch {}
+      try { await update({ videoPack: d }); } catch {}
     } catch (e) { setGenError("Couldn't generate video concepts. Try again."); }
     finally { setGenerating(false); }
   };
@@ -78,7 +82,7 @@ export default function VideoGenerator() {
       if (res?.url) {
         const next = { ...data, concepts: data.concepts.map((c) => c.id === concept.id ? { ...c, videoUrl: res.url } : c) };
         setData(next);
-        try { await base44.auth.updateMe({ videoPack: next }); } catch {}
+        try { await update({ videoPack: next }); } catch {}
       }
     } catch (e) { /* best effort */ }
     finally { setGeneratingVideoId(""); }
@@ -87,7 +91,7 @@ export default function VideoGenerator() {
   const save = async () => {
     setSaving(true); setError("");
     try {
-      await base44.auth.updateMe({ videoChosen: true });
+      await update({ videoChosen: true });
       try { await logReceipt({ action: "Video pack approved", entityType: "User", entityId: "self", status: "success", notes: `${data?.concepts?.length || 0} concepts` }); } catch {}
       await notifyStepComplete("video", { businessName: profile?.businessName || "" });
       setSaved(true);

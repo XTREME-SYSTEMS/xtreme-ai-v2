@@ -8,6 +8,7 @@ import { BRAND_TYPES } from "@/lib/designPrompts";
 import BrandPackPreview from "@/components/client/BrandPackPreview";
 import BackButton from "@/components/client/BackButton";
 import { useClientUser } from "@/hooks/useClientUser";
+import { useClientUpdate } from "@/hooks/useClientUpdate";
 import { notifyStepComplete } from "@/lib/pipelineNotify";
 
 // Step: Brand Generator. Uses the client's chosen logo to generate 10 brand
@@ -32,7 +33,9 @@ export default function BrandGenerator() {
   const [sendingRevise, setSendingRevise] = useState(false);
   const [reviseSent, setReviseSent] = useState(false);
   const [reviseError, setReviseError] = useState("");
+  const [industry, setIndustry] = useState("");
   const { user } = useClientUser();
+  const { update } = useClientUpdate();
 
   useEffect(() => {
     document.title = "Brand Generator · Lead Gen Near You";
@@ -43,6 +46,7 @@ export default function BrandGenerator() {
     setLogoUrl(user?.chosenLogoUrl || "");
     setBusinessName(user?.epoxyProfile?.businessName || "");
     setUserEmail(user?.email || "");
+    setIndustry(user?.epoxyProfile?.industry || "");
     if (user?.brandPacks?.length) setPacks(user.brandPacks);
     if (user?.brandPacksChosen) setSaved(true);
   }, [user]);
@@ -58,7 +62,7 @@ export default function BrandGenerator() {
       const results = await Promise.allSettled(
         BRAND_TYPES.map(async (b) => {
           const res = await base44.integrations.Core.GenerateImage({
-            prompt: b.prompt(businessName || "your epoxy business"),
+            prompt: b.prompt(businessName || "your business", industry),
             existing_image_urls: [logoUrl],
           });
           return { id: b.id, label: b.label, url: res.url };
@@ -67,7 +71,7 @@ export default function BrandGenerator() {
       const ok = results.map((r) => r.value).filter(Boolean);
       if (ok.length === 0) throw new Error("generation failed");
       setPacks(ok);
-      await base44.auth.updateMe({ brandPacks: ok });
+      await update({ brandPacks: ok });
     } catch (e) {
       setError("Brand generation hit a snag. Please try again.");
     } finally {
@@ -88,12 +92,12 @@ export default function BrandGenerator() {
     setError("");
     try {
       const res = await base44.integrations.Core.GenerateImage({
-        prompt: b.prompt(businessName || "your epoxy business"),
+        prompt: b.prompt(businessName || "your business", industry),
         existing_image_urls: [logoUrl],
       });
       const next = packs.map((p) => (p.id === pack.id ? { ...p, url: res.url } : p));
       setPacks(next);
-      try { await base44.auth.updateMe({ brandPacks: next }); } catch {}
+      try { await update({ brandPacks: next }); } catch {}
     } catch (e) {
       setError("Couldn't regenerate that item. Try again.");
     } finally {
@@ -109,7 +113,7 @@ export default function BrandGenerator() {
     setSaving(true);
     setError("");
     try {
-      await base44.auth.updateMe({
+      await update({
         chosenBrandImages: packs.map((p) => p.url),
         brandPacksChosen: true,
       });

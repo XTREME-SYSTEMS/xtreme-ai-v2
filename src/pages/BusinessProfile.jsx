@@ -7,6 +7,7 @@ import {
 } from "lucide-react";
 import BackButton from "@/components/client/BackButton";
 import { useClientUser } from "@/hooks/useClientUser";
+import { useClientUpdate } from "@/hooks/useClientUpdate";
 import { notifyStepComplete } from "@/lib/pipelineNotify";
 import {
   BUSINESS_STAGES, BUSINESS_TYPES, INDUSTRIES, RADIUS_OPTIONS, YEARS_OPTIONS,
@@ -29,6 +30,7 @@ const STEPS = [
 export default function BusinessProfile() {
   const navigate = useNavigate();
   const { user } = useClientUser();
+  const { update } = useClientUpdate();
 
   const [step, setStep] = useState(0);
   const [form, setForm] = useState({
@@ -213,7 +215,7 @@ export default function BusinessProfile() {
         submittedAt: new Date().toISOString(),
       };
 
-      await base44.auth.updateMe({ epoxyProfile: profile, epoxyProfileSubmitted: true });
+      await update({ epoxyProfile: profile, epoxyProfileSubmitted: true, financialIntelligence: financialIntel, industryAnswers });
       setLogoUrl(finalLogo);
       setGalleryUrls(finalGallery);
       setLogo(null);

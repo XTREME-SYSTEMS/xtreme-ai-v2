@@ -7,6 +7,7 @@ import { cn } from "@/lib/utils";
 import BackButton from "@/components/client/BackButton";
 import { notifyStepComplete } from "@/lib/pipelineNotify";
 import { useClientUser } from "@/hooks/useClientUser";
+import { useClientUpdate } from "@/hooks/useClientUpdate";
 import { WEBSITE_LAYOUTS, PALETTES, buildTheme } from "@/components/website/websiteLayouts";
 import WebsitePreview, { ScaledPreview } from "@/components/website/WebsitePreview";
 import { BRAND_TYPES } from "@/lib/designPrompts";
@@ -20,6 +21,7 @@ import { BRAND_TYPES } from "@/lib/designPrompts";
 export default function YourDesigns() {
   const navigate = useNavigate();
   const { user: hookUser, loading } = useClientUser();
+  const { update } = useClientUpdate();
   const [user, setUser] = useState(null);
   const [checks, setChecks] = useState({ content: true, logo: true, brand: true, website: true, social: true, video: true });
   const [showFlag, setShowFlag] = useState(false);
@@ -90,13 +92,13 @@ export default function YourDesigns() {
     setRegeneratingBrandId(pack.id);
     try {
       const res = await base44.integrations.Core.GenerateImage({
-        prompt: brandType.prompt(businessName),
+        prompt: brandType.prompt(businessName, profile?.industry),
         existing_image_urls: logoUrl ? [logoUrl] : undefined,
       });
       const next = brandPacks.map((p) => (p.id === pack.id ? { ...p, url: res.url } : p));
       const updatedUser = { ...user, brandPacks: next, chosenBrandImages: next.map((p) => p.url) };
       setUser(updatedUser);
-      try { await base44.auth.updateMe({ brandPacks: next, chosenBrandImages: next.map((p) => p.url) }); } catch {}
+      try { await update({ brandPacks: next, chosenBrandImages: next.map((p) => p.url) }); } catch {}
     } catch (e) {
       // best effort
     } finally {

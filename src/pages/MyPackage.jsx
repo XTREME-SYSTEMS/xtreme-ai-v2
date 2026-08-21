@@ -7,6 +7,7 @@ import PurchaseDetailModal from "@/components/client/PurchaseDetailModal";
 import PreviewBanner from "@/components/client/PreviewBanner";
 import { usePreviewEmail } from "@/hooks/usePreviewEmail";
 import { useClientUser } from "@/hooks/useClientUser";
+import { useClientUpdate } from "@/hooks/useClientUpdate";
 import { notifyStepComplete } from "@/lib/pipelineNotify";
 import BrandedButton from "@/components/client/BrandedButton";
 
@@ -17,6 +18,7 @@ export default function MyPackage() {
   const [loading, setLoading] = useState(true);
   const [activePurchase, setActivePurchase] = useState(null);
   const { user } = useClientUser();
+  const { update } = useClientUpdate();
   const [revising, setRevising] = useState(false);
   const [reviseComment, setReviseComment] = useState("");
   const [sendingRevise, setSendingRevise] = useState(false);

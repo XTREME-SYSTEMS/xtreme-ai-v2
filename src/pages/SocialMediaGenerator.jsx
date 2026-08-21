@@ -7,6 +7,7 @@ import { cn } from "@/lib/utils";
 import { logReceipt } from "@/lib/pipelineUtils";
 import BackButton from "@/components/client/BackButton";
 import { useClientUser } from "@/hooks/useClientUser";
+import { useClientUpdate } from "@/hooks/useClientUpdate";
 import { notifyStepComplete } from "@/lib/pipelineNotify";
 
 // Step: Social Media Generator. Generates 10 on-brand social media template
@@ -31,6 +32,7 @@ export default function SocialMediaGenerator() {
   const [reviseError, setReviseError] = useState("");
 
   const { user } = useClientUser();
+  const { update } = useClientUpdate();
 
   useEffect(() => { document.title = "Social Media · Lead Gen Near You"; }, []);
 
@@ -49,11 +51,13 @@ export default function SocialMediaGenerator() {
       const res = await base44.functions.invoke("generateSocialMediaPack", {
         businessName: profile.businessName, primaryLocation: profile.primaryLocation,
         services: profile.services || [], logoUrl,
+        industry: profile.industry || "", subIndustry: profile.subIndustry || "",
+        businessType: profile.businessType || "",
       });
       const d = res?.data?.data;
       if (!d?.templates?.length) throw new Error("no data");
       setData(d);
-      try { await base44.auth.updateMe({ socialMediaPack: d }); } catch {}
+      try { await update({ socialMediaPack: d }); } catch {}
     } catch (e) { setGenError("Couldn't generate social media pack. Try again."); }
     finally { setGenerating(false); }
   };
@@ -66,7 +70,7 @@ export default function SocialMediaGenerator() {
   const save = async () => {
     setSaving(true); setError("");
     try {
-      await base44.auth.updateMe({ socialMediaChosen: true });
+      await update({ socialMediaChosen: true });
       try { await logReceipt({ action: "Social media pack approved", entityType: "User", entityId: "self", status: "success", notes: `${data?.templates?.length || 0} templates + ${data?.posts?.length || 0} posts` }); } catch {}
       await notifyStepComplete("social", { businessName: profile?.businessName || "" });
       setSaved(true);

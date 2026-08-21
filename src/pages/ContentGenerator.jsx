@@ -6,6 +6,7 @@ import { cn } from "@/lib/utils";
 import { logReceipt } from "@/lib/pipelineUtils";
 import BackButton from "@/components/client/BackButton";
 import { useClientUser } from "@/hooks/useClientUser";
+import { useClientUpdate } from "@/hooks/useClientUpdate";
 import { notifyStepComplete } from "@/lib/pipelineNotify";
 
 // Step: Content Generator. Scrapes the client's market (location, industry,
@@ -30,6 +31,7 @@ export default function ContentGenerator() {
   const [reviseSent, setReviseSent] = useState(false);
   const [reviseError, setReviseError] = useState("");
   const { user } = useClientUser();
+  const { update } = useClientUpdate();
 
   useEffect(() => { document.title = "Content Generator · Lead Gen Near You"; }, []);
 
@@ -50,12 +52,16 @@ export default function ContentGenerator() {
         primaryLocation: profile.primaryLocation, website: profile.website || "",
         differentiators: profile.differentiators || [], yearsInBusiness: profile.yearsInBusiness || "",
         phone: profile.phone || "", email: profile.email || "",
+        industry: profile.industry || "", subIndustry: profile.subIndustry || "",
+        businessType: profile.businessType || "",
+        financialIntelligence: user?.financialIntelligence || null,
+        industryAnswers: user?.industryAnswers || null,
       });
       const d = res?.data?.data;
       if (!d?.templates?.length) throw new Error("no templates");
       setData(d);
       setSelectedId(d.templates[d.recommendedIndex]?.id || "");
-      try { await base44.auth.updateMe({ contentTemplates: d }); } catch {}
+      try { await update({ contentTemplates: d }); } catch {}
     } catch (e) { setGenError("Couldn't generate content templates. Try again."); }
     finally { setGenerating(false); }
   };
@@ -70,7 +76,7 @@ export default function ContentGenerator() {
     setSaving(true); setError("");
     try {
       const chosen = data.templates.find((t) => t.id === selectedId);
-      await base44.auth.updateMe({
+      await update({
         chosenContentTemplate: selectedId,
         chosenContentTone: chosen?.tone || "",
         contentTemplatesChosen: true,
