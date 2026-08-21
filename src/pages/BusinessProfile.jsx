@@ -2,10 +2,11 @@ import { useEffect, useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { base44 } from "@/api/base44Client";
 import {
-  Building2, Upload, Loader2, CheckCircle2, X, MapPin, Star, Shield,
+  Building2, Upload, Loader2, CheckCircle2, Camera, MapPin, Star, Shield,
   RefreshCw, Sparkles, Rocket, Briefcase, DollarSign,
 } from "lucide-react";
 import BackButton from "@/components/client/BackButton";
+import CategoryImageUploader from "@/components/onboarding/CategoryImageUploader";
 import { useClientUser } from "@/hooks/useClientUser";
 import { useClientUpdate } from "@/hooks/useClientUpdate";
 import { useClientProject } from "@/hooks/useClientProject";
@@ -60,8 +61,15 @@ export default function BusinessProfile() {
   const [loadingFinancial, setLoadingFinancial] = useState(false);
   const [logo, setLogo] = useState(null);
   const [logoUrl, setLogoUrl] = useState("");
-  const [gallery, setGallery] = useState([]);
-  const [galleryUrls, setGalleryUrls] = useState([]);
+  // Categorized business images — owner, team, work/projects, other. The
+  // categories let downstream generators place each image in the right spot
+  // (owner/team on the About page, work photos in galleries/social, etc.).
+  const [photos, setPhotos] = useState({
+    owner: { urls: [], files: [] },
+    team: { urls: [], files: [] },
+    work: { urls: [], files: [] },
+    other: { urls: [], files: [] },
+  });
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
   const [error, setError] = useState("");
@@ -137,7 +145,12 @@ export default function BusinessProfile() {
       setIndustryAnswers(p.industryAnswers || {});
       setFinancialIntel(p.financialIntelligence || null);
       setLogoUrl(p.logoUrl || "");
-      setGalleryUrls(p.galleryUrls || []);
+      setPhotos({
+        owner: { urls: p.ownerPhotos || [], files: [] },
+        team: { urls: p.teamPhotos || [], files: [] },
+        work: { urls: p.workPhotos || p.galleryUrls || [], files: [] },
+        other: { urls: p.otherPhotos || [], files: [] },
+      });
       if (user.epoxyProfileSubmitted) setSaved(true);
     }
   }, [user]);
@@ -238,11 +251,20 @@ export default function BusinessProfile() {
     try {
       let finalLogo = logoUrl;
       if (logo) finalLogo = await uploadOne(logo);
-      const finalGallery = [...galleryUrls];
-      for (const f of gallery) {
-        const url = await uploadOne(f);
-        finalGallery.push(url);
-      }
+      // Upload pending files for each category and merge with existing urls
+      const uploadCategory = async (cat) => {
+        const { urls = [], files = [] } = photos[cat] || {};
+        const uploaded = [];
+        for (const f of files) {
+          try { uploaded.push(await uploadOne(f)); } catch {}
+        }
+        return [...urls, ...uploaded];
+      };
+      const ownerPhotos = await uploadCategory("owner");
+      const teamPhotos = await uploadCategory("team");
+      const workPhotos = await uploadCategory("work");
+      const otherPhotos = await uploadCategory("other");
+      const galleryUrls = workPhotos; // backward compat for downstream readers
 
       // Extract services + differentiators from dynamic answers for backward compat
       const services = industryAnswers.services_offered || [];
@@ -258,7 +280,11 @@ export default function BusinessProfile() {
         industryAnswers,
         financialIntelligence: financialIntel,
         logoUrl: finalLogo,
-        galleryUrls: finalGallery,
+        galleryUrls,
+        ownerPhotos,
+        teamPhotos,
+        workPhotos,
+        otherPhotos,
         submitted: true,
         submittedAt: new Date().toISOString(),
       };
@@ -280,9 +306,13 @@ export default function BusinessProfile() {
       // D5 — clear draft since profile is saved
       try { localStorage.removeItem(DRAFT_KEY); } catch {}
       setLogoUrl(finalLogo);
-      setGalleryUrls(finalGallery);
+      setPhotos({
+        owner: { urls: ownerPhotos, files: [] },
+        team: { urls: teamPhotos, files: [] },
+        work: { urls: workPhotos, files: [] },
+        other: { urls: otherPhotos, files: [] },
+      });
       setLogo(null);
-      setGallery([]);
       setSaved(true);
       try { localStorage.setItem("coach:done:/business-profile", "1"); } catch {}
       await notifyStepComplete("profile", { businessName: form.businessName || "" });
@@ -563,7 +593,7 @@ export default function BusinessProfile() {
         {/* ─── Step 4: Logo & Photos ─── */}
         {step === 4 && (
           <div className="space-y-5">
-            <Section title="Your logo & project photos" icon={Upload}>
+            <Section title="Your logo" icon={Upload}>
               <div>
                 <label className="mb-2 block text-sm font-medium text-white">Logo</label>
                 {logoUrl && !logo && (
@@ -577,47 +607,41 @@ export default function BusinessProfile() {
                   <input type="file" accept="image/*" className="hidden" onChange={(e) => setLogo(e.target.files?.[0] || null)} />
                 </label>
               </div>
-              <div>
-                <label className="mb-2 block text-sm font-medium text-white">Project photos <span className="text-white/40">(up to 15)</span></label>
-                {(galleryUrls.length > 0 || gallery.length > 0) && (
-                  <div className="mb-2 flex flex-wrap gap-2">
-                    {galleryUrls.map((url, i) => (
-                      <div key={`u-${i}`} className="relative">
-                        <img src={url} alt="" className="h-16 w-16 rounded-lg border border-white/10 object-cover" />
-                        <button type="button" onClick={() => setGalleryUrls((g) => g.filter((_, idx) => idx !== i))} className="absolute -right-1.5 -top-1.5 flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-white">
-                          <X className="h-3 w-3" />
-                        </button>
-                      </div>
-                    ))}
-                    {gallery.map((file, i) => (
-                      <div key={`l-${i}`} className="relative">
-                        <img src={URL.createObjectURL(file)} alt="" className="h-16 w-16 rounded-lg border border-lime-400/40 object-cover" />
-                        <button type="button" onClick={() => setGallery((g) => g.filter((_, idx) => idx !== i))} className="absolute -right-1.5 -top-1.5 flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-white">
-                          <X className="h-3 w-3" />
-                        </button>
-                      </div>
-                    ))}
-                  </div>
-                )}
-                <label className="flex cursor-pointer items-center gap-2 rounded-lg border border-dashed border-white/20 bg-zinc-950 px-4 py-3 text-sm text-white/60 hover:border-lime-400/50">
-                  <Upload className="h-4 w-4" />
-                  {gallery.length + galleryUrls.length > 0 ? `${gallery.length + galleryUrls.length} photo(s) selected · Add more` : "Upload project photos"}
-                  <input
-                    type="file"
-                    accept="image/*"
-                    multiple
-                    className="hidden"
-                    onChange={(e) => {
-                      const incoming = Array.from(e.target.files || []);
-                      const remaining = 15 - galleryUrls.length - gallery.length;
-                      setGallery((g) => [...g, ...incoming].slice(0, Math.max(0, remaining)));
-                      e.target.value = "";
-                    }}
-                  />
-                </label>
-                {(gallery.length + galleryUrls.length) >= 15 && (
-                  <p className="mt-1 text-xs text-amber-400">Maximum 15 photos reached.</p>
-                )}
+            </Section>
+
+            <Section title="Business photos" icon={Camera} hint="Categorized so the system places each one in the right spot">
+              <p className="mb-3 text-xs text-white/50">
+                Upload real photos of your business and we'll enhance them and install them across your website, social media, and content — each in the right place.
+              </p>
+              <div className="space-y-3">
+                <CategoryImageUploader
+                  label="Business Owner"
+                  description="Photos of the owner/founder — used on your About page and trust sections."
+                  value={photos.owner}
+                  onChange={(v) => setPhotos((p) => ({ ...p, owner: v }))}
+                  max={4}
+                />
+                <CategoryImageUploader
+                  label="Team Members"
+                  description="Photos of your crew/team — used on your About and team sections."
+                  value={photos.team}
+                  onChange={(v) => setPhotos((p) => ({ ...p, team: v }))}
+                  max={8}
+                />
+                <CategoryImageUploader
+                  label="Work / Project Photos"
+                  description="Before/after and completed job photos — used in your galleries and social media."
+                  value={photos.work}
+                  onChange={(v) => setPhotos((p) => ({ ...p, work: v }))}
+                  max={15}
+                />
+                <CategoryImageUploader
+                  label="Other Business Images"
+                  description="Storefront, vehicles, equipment, signage — used for context and social posts."
+                  value={photos.other}
+                  onChange={(v) => setPhotos((p) => ({ ...p, other: v }))}
+                  max={10}
+                />
               </div>
             </Section>
           </div>
