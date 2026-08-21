@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { base44 } from "@/api/base44Client";
 import { Image } from "@/components/ui/image";
-import { Shirt, Loader2, Check, RefreshCw, ArrowRight, AlertCircle, Eye } from "lucide-react";
+import { Shirt, Loader2, Check, RefreshCw, ArrowRight, AlertCircle, Eye, MessageSquare, Send, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { logReceipt } from "@/lib/pipelineUtils";
 import { BRAND_TYPES } from "@/lib/designPrompts";
@@ -25,6 +25,12 @@ export default function BrandGenerator() {
   const [saved, setSaved] = useState(false);
   const [error, setError] = useState("");
   const [preview, setPreview] = useState(null);
+  const [userEmail, setUserEmail] = useState("");
+  const [revising, setRevising] = useState(false);
+  const [reviseComment, setReviseComment] = useState("");
+  const [sendingRevise, setSendingRevise] = useState(false);
+  const [reviseSent, setReviseSent] = useState(false);
+  const [reviseError, setReviseError] = useState("");
 
   useEffect(() => {
     document.title = "Brand Generator · Lead Gen Near You";
@@ -33,6 +39,7 @@ export default function BrandGenerator() {
       .then((u) => {
         setLogoUrl(u?.chosenLogoUrl || "");
         setBusinessName(u?.epoxyProfile?.businessName || "");
+        setUserEmail(u?.email || "");
         if (u?.brandPacks?.length) setPacks(u.brandPacks);
         if (u?.chosenBrandImages) setSelected(u.chosenBrandImages);
         if (u?.brandPacksChosen) setSaved(true);
@@ -97,6 +104,28 @@ export default function BrandGenerator() {
       setError("Couldn't save your selection. Please try again.");
     } finally {
       setSaving(false);
+    }
+  };
+
+  // Sends the client's brand revision note to the team: creates a pending
+  // Approval (admin-visible) and emails every admin immediately.
+  const requestRevision = async () => {
+    if (!reviseComment.trim()) { setReviseError("Add a note for our team."); return; }
+    setSendingRevise(true);
+    setReviseError("");
+    try {
+      await base44.functions.invoke("submitRevisionRequest", {
+        comment: reviseComment.trim(),
+        pipelineStep: "brand",
+        clientEmail: userEmail || "",
+      });
+      setReviseSent(true);
+      setReviseComment("");
+      setRevising(false);
+    } catch (e) {
+      setReviseError("Couldn't send. Please try again.");
+    } finally {
+      setSendingRevise(false);
     }
   };
 
@@ -198,14 +227,62 @@ export default function BrandGenerator() {
         )}
 
         {packs.length > 0 && (
-          <button
-            type="button"
-            onClick={save}
-            disabled={saving || selected.length === 0}
-            className="mt-5 inline-flex w-full items-center justify-center gap-2 rounded-lg bg-lime-400 px-4 py-3 text-sm font-semibold text-black transition-colors hover:bg-lime-300 disabled:cursor-not-allowed disabled:bg-white/10 disabled:text-white/40"
-          >
-            {saving ? <><Loader2 className="h-4 w-4 animate-spin" /> Saving…</> : saved ? <><Check className="h-4 w-4" /> Update selection</> : <>Save my brand <ArrowRight className="h-4 w-4" /></>}
-          </button>
+          <div className="mt-5 space-y-2 border-t border-white/10 pt-4">
+            {reviseSent ? (
+              <div className="flex items-center gap-2 rounded-lg border border-lime-400/50 bg-lime-400/10 px-3 py-2.5 text-sm text-lime-300">
+                <Check className="h-4 w-4" /> Your revision request was sent to our team — we'll be in touch shortly.
+              </div>
+            ) : revising ? (
+              <div className="space-y-2">
+                <label className="text-xs font-semibold uppercase tracking-wider text-lime-400">What needs to change?</label>
+                <textarea
+                  value={reviseComment}
+                  onChange={(e) => setReviseComment(e.target.value)}
+                  rows={3}
+                  placeholder="Tell our team what you'd like revised about your brand mockups…"
+                  className="w-full resize-none rounded-lg border border-white/15 bg-zinc-950 px-3 py-2 text-sm text-white placeholder-white/30 focus:border-lime-400 focus:outline-none"
+                />
+                {reviseError && <p className="text-xs text-red-400">{reviseError}</p>}
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={requestRevision}
+                    disabled={sendingRevise}
+                    className="inline-flex items-center gap-1.5 rounded-lg bg-lime-400 px-3 py-2 text-xs font-semibold text-black hover:bg-lime-300 disabled:opacity-50"
+                  >
+                    {sendingRevise ? <><Loader2 className="h-3.5 w-3.5 animate-spin" /> Sending…</> : <><Send className="h-3.5 w-3.5" /> Send to admin</>}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => { setRevising(false); setReviseError(""); setReviseComment(""); }}
+                    className="inline-flex items-center gap-1.5 rounded-lg border border-white/15 px-3 py-2 text-xs font-medium text-white/70 hover:border-white/30"
+                  >
+                    <X className="h-3.5 w-3.5" /> Cancel
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <>
+                <div>
+                  <button
+                    type="button"
+                    onClick={() => setRevising(true)}
+                    className="inline-flex items-center gap-1.5 rounded-lg border border-white/15 px-3 py-2 text-xs font-medium text-white/70 hover:border-lime-400/50 hover:text-lime-300"
+                  >
+                    <MessageSquare className="h-3.5 w-3.5" /> Request Revision
+                  </button>
+                </div>
+                <button
+                  type="button"
+                  onClick={save}
+                  disabled={saving || selected.length === 0}
+                  className="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-lime-400 px-4 py-3 text-sm font-semibold text-black transition-colors hover:bg-lime-300 disabled:cursor-not-allowed disabled:bg-white/10 disabled:text-white/40"
+                >
+                  {saving ? <><Loader2 className="h-4 w-4 animate-spin" /> Saving…</> : saved ? <><Check className="h-4 w-4" /> Update selection</> : <>Approve Brand <ArrowRight className="h-4 w-4" /></>}
+                </button>
+              </>
+            )}
+          </div>
         )}
       </div>
 

@@ -10,7 +10,7 @@ export default async function(req) {
   try {
     const base44 = createClientFromRequest(req);
     const body = await req.json().catch(() => ({}));
-    const { comment, purchaseId, clientEmail } = body;
+    const { comment, purchaseId, clientEmail, pipelineStep } = body;
     if (!comment || !String(comment).trim()) {
       return Response.json({ error: "comment required" }, { status: 400 });
     }
@@ -26,7 +26,7 @@ export default async function(req) {
         entity_type: "Base44Purchase",
         entity_id: purchaseId || "",
         requested_action: "Revise package — client requested changes",
-        pipeline_step: "welcome",
+        pipeline_step: pipelineStep || "welcome",
         client_email: email,
         risk_level: "yellow",
         status: "pending",
@@ -51,6 +51,7 @@ export default async function(req) {
             body:
               `A client just requested a revision to their package.\n\n` +
               `Client: ${email || "(unknown)"}\n` +
+              `Step: ${pipelineStep || "welcome"}\n` +
               `Purchase ID: ${purchaseId || "(none)"}\n\n` +
               `Their note:\n${note}\n\n` +
               `Review pending approvals: ${appUrl}/approvals`,
