@@ -99,7 +99,7 @@ export default function StepCoach() {
 
   // Phase 2 — sticky gated bar
   return (
-    <div className="fixed bottom-0 left-0 right-0 z-40 border-t border-lime-400/30 bg-zinc-950/95 px-4 py-3 shadow-2xl backdrop-blur md:left-60">
+    <div className="fixed bottom-0 left-0 right-0 z-40 border-t border-lime-400/30 bg-zinc-950/95 px-4 py-3 shadow-2xl backdrop-blur">
       <div className="mx-auto flex max-w-3xl items-center gap-3">
         <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-lime-400/15">
           {loading ? (
