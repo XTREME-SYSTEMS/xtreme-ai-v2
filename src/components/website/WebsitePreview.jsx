@@ -22,7 +22,7 @@ export function ScaledPreview({ designWidth, children, aspect = 0.6 }) {
   );
 }
 
-export default function WebsitePreview({ layout, content, profile, theme, mobile, logoUrl }) {
+export default function WebsitePreview({ layout, content, profile, theme, mobile, logoUrl, images, annotate, onSectionClick }) {
   const c = content || {};
   const p = profile || {};
   const businessName = p.businessName || "Your Epoxy Business";
@@ -35,7 +35,7 @@ export default function WebsitePreview({ layout, content, profile, theme, mobile
   const services = rawServices.slice(0, 6);
   const faqs = c.faq || [];
   const differentiators = p.differentiators || [];
-  const gallery = (p.galleryUrls || []).slice(0, 6);
+  const gallery = (images && images.length ? images : (p.galleryUrls || [])).slice(0, 6);
   const data = {
     businessName, phone, email, location, services, faqs, differentiators, gallery,
     heroHeadline: c.heroHeadline || `${services[0]?.title || "Epoxy Flooring"} in ${location}`,
@@ -53,7 +53,28 @@ export default function WebsitePreview({ layout, content, profile, theme, mobile
       {layout.sections.map((s, i) => {
         const Comp = sectionMap[s.type];
         if (!Comp) return null;
-        return <Comp key={i} variant={s.variant} theme={theme} mobile={mobile} logoUrl={logoUrl} data={data} />;
+        const inner = <Comp variant={s.variant} theme={theme} mobile={mobile} logoUrl={logoUrl} data={data} />;
+        if (!annotate) return <div key={i}>{inner}</div>;
+        return (
+          <div
+            key={i}
+            className="group/sect relative cursor-pointer"
+            onClick={(e) => { e.stopPropagation(); onSectionClick?.(s.type, s.variant); }}
+          >
+            {inner}
+            <div
+              className="pointer-events-none absolute inset-0 opacity-0 transition-opacity group-hover/sect:opacity-100"
+              style={{ outline: `2px dashed ${theme.accent}`, outlineOffset: -3, backgroundColor: `${theme.accent}1a` }}
+            >
+              <div
+                className="absolute right-2 top-2 rounded-md px-2 py-1 text-[10px] font-semibold"
+                style={{ backgroundColor: theme.accent, color: theme.accentText }}
+              >
+                ✎ Comment / Regenerate
+              </div>
+            </div>
+          </div>
+        );
       })}
     </div>
   );

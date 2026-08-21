@@ -100,4 +100,59 @@ export const WEBSITE_LAYOUTS = [
     { type: "about", variant: "panel" }, { type: "gallery", variant: "grid" }, { type: "faq", variant: "plain" },
     { type: "cta", variant: "banner" }, { type: "footer", variant: "rich" },
   ]},
+  { id: "bold-center", name: "Bold Center", tagline: "Centered hero · 3-col services · accordion", sections: [
+    { type: "nav", variant: "split" }, { type: "hero", variant: "centered" }, { type: "services", variant: "grid3" },
+    { type: "about", variant: "stats" }, { type: "gallery", variant: "grid" }, { type: "faq", variant: "accordion" },
+    { type: "cta", variant: "banner" }, { type: "footer", variant: "rich" },
+  ]},
+  { id: "dark-card", name: "Dark Card", tagline: "Card hero · card services · story", sections: [
+    { type: "nav", variant: "centered" }, { type: "hero", variant: "card" }, { type: "services", variant: "cards" },
+    { type: "about", variant: "story" }, { type: "gallery", variant: "masonry" }, { type: "faq", variant: "plain" },
+    { type: "cta", variant: "split" }, { type: "footer", variant: "simple" },
+  ]},
+  { id: "split-grid", name: "Split Grid", tagline: "Split hero · 3-col services", sections: [
+    { type: "nav", variant: "minimal" }, { type: "hero", variant: "split" }, { type: "services", variant: "grid3" },
+    { type: "about", variant: "panel" }, { type: "gallery", variant: "grid" }, { type: "faq", variant: "twocol" },
+    { type: "cta", variant: "card" }, { type: "footer", variant: "rich" },
+  ]},
+  { id: "full-rows", name: "Full Rows", tagline: "Full-bleed hero · row services", sections: [
+    { type: "nav", variant: "split" }, { type: "hero", variant: "fullbleed" }, { type: "services", variant: "rows" },
+    { type: "about", variant: "stats" }, { type: "gallery", variant: "strip" }, { type: "faq", variant: "accordion" },
+    { type: "cta", variant: "banner" }, { type: "footer", variant: "simple" },
+  ]},
+  { id: "center-cards", name: "Center Cards", tagline: "Centered hero · card services · masonry", sections: [
+    { type: "nav", variant: "centered" }, { type: "hero", variant: "centered" }, { type: "services", variant: "cards" },
+    { type: "about", variant: "story" }, { type: "gallery", variant: "masonry" }, { type: "faq", variant: "plain" },
+    { type: "cta", variant: "split" }, { type: "footer", variant: "rich" },
+  ]},
+  { id: "minimal-rows", name: "Minimal Rows", tagline: "Centered hero · row services · panel", sections: [
+    { type: "nav", variant: "minimal" }, { type: "hero", variant: "centered" }, { type: "services", variant: "rows" },
+    { type: "about", variant: "panel" }, { type: "gallery", variant: "grid" }, { type: "faq", variant: "twocol" },
+    { type: "cta", variant: "card" }, { type: "footer", variant: "simple" },
+  ]},
+  { id: "premium-grid", name: "Premium Grid", tagline: "Card hero · 2-col services · masonry", sections: [
+    { type: "nav", variant: "split" }, { type: "hero", variant: "card" }, { type: "services", variant: "grid2" },
+    { type: "about", variant: "stats" }, { type: "gallery", variant: "masonry" }, { type: "faq", variant: "accordion" },
+    { type: "cta", variant: "split" }, { type: "footer", variant: "rich" },
+  ]},
+  { id: "wide-story", name: "Wide Story", tagline: "Full-bleed hero · 3-col services · story", sections: [
+    { type: "nav", variant: "centered" }, { type: "hero", variant: "fullbleed" }, { type: "services", variant: "grid3" },
+    { type: "about", variant: "story" }, { type: "gallery", variant: "strip" }, { type: "faq", variant: "plain" },
+    { type: "cta", variant: "banner" }, { type: "footer", variant: "rich" },
+  ]},
 ];
+
+// Per-section metadata for the in-preview annotation panel: a human label,
+// preset comment chips that help the client describe what to fix, and whether
+// the section can be regenerated in place (content + gallery can; nav/cta/
+// footer are layout-driven and go through Request Revision instead).
+export const SECTION_META = {
+  hero: { label: "Hero", chips: ["Make headline punchier", "Too long", "Not local enough", "Change the image", "Too plain"], canRegen: true },
+  services: { label: "Services", chips: ["Add more services", "Descriptions too short", "Too many services", "Reorder services"], canRegen: true },
+  about: { label: "About", chips: ["Make it more personal", "Too long", "Not local enough", "Add trust badges"], canRegen: true },
+  gallery: { label: "Gallery / Images", chips: ["Different images", "More project photos", "Better quality", "Show before/after"], canRegen: true },
+  faq: { label: "FAQ", chips: ["Add more questions", "Answers too short", "Not relevant", "Reorder"], canRegen: true },
+  cta: { label: "Call to Action", chips: ["Stronger call to action", "Different button text", "Too pushy", "Add phone prominently"], canRegen: false },
+  nav: { label: "Navigation", chips: ["Simpler", "Add more links", "Too cluttered"], canRegen: false },
+  footer: { label: "Footer", chips: ["Simpler", "Add more links", "Too cluttered"], canRegen: false },
+};
