@@ -11,6 +11,37 @@ import { useClientUser } from "@/hooks/useClientUser";
 import { useClientUpdate } from "@/hooks/useClientUpdate";
 import { notifyStepComplete } from "@/lib/pipelineNotify";
 
+// Second-pass prompt that strips the background off a generated logo so it
+// renders cleanly on both light and dark website themes (no visible box).
+// Uses the image-edit mode of GenerateImage (existing_image_urls) to isolate
+// the logo onto a true transparent / alpha-channel PNG.
+const REMOVE_BG_PROMPT =
+  "This image is a logo on a solid background. Remove the ENTIRE background completely so only the logo artwork itself remains. " +
+  "Output the logo on a fully transparent background as a PNG with a true alpha channel. " +
+  "Preserve the logo's exact colors, shapes, lines, and any text exactly as they are. " +
+  "Do NOT add any border, card, shadow, backdrop, frame, or white/colored box. " +
+  "The result must be an isolated logo with transparency everywhere except the logo itself.";
+
+// Two-step logo generation: (1) generate the logo concept, (2) run a
+// background-removal edit pass so the final PNG has a transparent background.
+// Returns the transparent logo URL, falling back to the original if the
+// remove-background step fails.
+async function generateTransparentLogo(prompt) {
+  const r1 = await base44.integrations.Core.GenerateImage({ prompt });
+  let url = r1?.url;
+  if (!url) throw new Error("generation failed");
+  try {
+    const r2 = await base44.integrations.Core.GenerateImage({
+      prompt: REMOVE_BG_PROMPT,
+      existing_image_urls: [url],
+    });
+    if (r2?.url) url = r2.url;
+  } catch {
+    // Keep the original if the background-removal edit pass fails.
+  }
+  return url;
+}
+
 // Step: Logo Generator. Generates 10 distinct logos for the client's epoxy
 // business (from their Business Profile name), lets them pick one, and saves
 // the choice to their user record. Generated logos are cached on the user so
@@ -53,8 +84,8 @@ export default function LogoGenerator() {
     try {
       const results = await Promise.allSettled(
         LOGO_STYLES.map(async (s) => {
-          const res = await base44.integrations.Core.GenerateImage({ prompt: s.prompt(businessName, undefined, industry) });
-          return { id: s.id, label: s.label, url: res.url };
+          const url = await generateTransparentLogo(s.prompt(businessName, undefined, industry));
+          return { id: s.id, label: s.label, url };
         })
       );
       const ok = results.map((r) => r.value).filter(Boolean);
@@ -75,11 +106,9 @@ export default function LogoGenerator() {
     setError("");
     try {
       const style = LOGO_STYLES.find((s) => s.id === pack.id);
-      const res = await base44.integrations.Core.GenerateImage({
-        prompt: style.prompt(businessName, accent, industry),
-      });
+      const url = await generateTransparentLogo(style.prompt(businessName, accent, industry));
       const next = packs.map((p) =>
-        p.id === pack.id ? { ...p, url: res.url, accentColor: accent } : p
+        p.id === pack.id ? { ...p, url, accentColor: accent } : p
       );
       setPacks(next);
       try { await update({ logoPacks: next }); } catch {}
@@ -170,7 +199,16 @@ export default function LogoGenerator() {
                       onClick={() => setChosen(p.url)}
                       className="block w-full text-left"
                     >
-                      <div className="relative aspect-square w-full overflow-hidden bg-white">
+                      <div
+                        className="relative aspect-square w-full overflow-hidden"
+                        style={{
+                          backgroundColor: "#f3f4f6",
+                          backgroundImage:
+                            "linear-gradient(45deg, #d1d5db 25%, transparent 25%), linear-gradient(-45deg, #d1d5db 25%, transparent 25%), linear-gradient(45deg, transparent 75%, #d1d5db 75%), linear-gradient(-45deg, transparent 75%, #d1d5db 75%)",
+                          backgroundSize: "16px 16px",
+                          backgroundPosition: "0 0, 0 8px, 8px -8px, -8px 0",
+                        }}
+                      >
                         <Image src={p.url} alt={p.label} fittingType="fit" className="h-full w-full" />
                         {on && (
                           <div className="absolute right-1.5 top-1.5 flex h-6 w-6 items-center justify-center rounded-full bg-lime-400 text-black">
