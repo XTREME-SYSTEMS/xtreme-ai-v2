@@ -106,10 +106,12 @@ export function useStepGate(step, user) {
       unsub = base44.entities.Approval.subscribe(() => check());
     }
 
-    // Polling fallback: re-check every few seconds in case the realtime
-    // subscription doesn't fire (e.g. service-role updates from backend
-    // functions). Stops naturally when the step changes / component unmounts.
-    const interval = setInterval(check, 4000);
+    // M2 — Polling fallback: re-check every 15 seconds (was 4s — too aggressive,
+    // 15 API calls/min/step) only when the tab is visible. Realtime
+    // subscriptions + focus listener cover the rest.
+    const interval = setInterval(() => {
+      if (!document.hidden) check();
+    }, 15000);
     const onFocus = () => check();
     window.addEventListener("focus", onFocus);
 

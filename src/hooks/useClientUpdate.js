@@ -41,6 +41,8 @@ export function useClientUpdate() {
       }
 
       // G1 — Dual-write to ClientProject (best effort, non-blocking)
+      // M4 — Log errors so divergence between User and ClientProject is
+      // diagnosable instead of silently swallowed.
       if (email && hasProjectFields(data)) {
         try {
           const projectData = mapUserToProject(data);
@@ -59,7 +61,9 @@ export function useClientUpdate() {
               });
             }
           }
-        } catch {}
+        } catch (dualWriteErr) {
+          console.error("useClientUpdate: ClientProject dual-write failed", dualWriteErr?.message || dualWriteErr);
+        }
       }
 
       return null;

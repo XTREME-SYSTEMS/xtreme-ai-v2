@@ -28,18 +28,26 @@ export default function StepCoach() {
   const introKey = step ? `coach:intro:${step.to}` : null;
   const doneKey = step ? `coach:done:${step.to}` : null;
 
+  const { isComplete, loading, pendingLabel } = useStepGate(step, user);
+
   useEffect(() => {
     if (!step || !introKey || !doneKey) { setPhase("done"); return; }
     try {
       const completed = localStorage.getItem(doneKey) === "1";
       const introShown = localStorage.getItem(introKey) === "1";
+      // H2 — If the step was marked done but the gate now says it's NOT complete
+      // (user undid their work), clear the done key and re-show the coach.
+      if (completed && !loading && !isComplete && step.gate !== "auto") {
+        localStorage.removeItem(doneKey);
+        localStorage.removeItem(introKey);
+        setPhase("intro");
+        return;
+      }
       if (completed) setPhase("done");
       else if (introShown) setPhase("gate");
       else setPhase("intro");
     } catch { setPhase("intro"); }
-  }, [step?.to, introKey, doneKey]);
-
-  const { isComplete, loading, pendingLabel } = useStepGate(step, user);
+  }, [step?.to, introKey, doneKey, isComplete, loading]);
   const currentIdx = visibleSteps.findIndex((s) => s.to === step?.to);
   const isLast = currentIdx === -1 || currentIdx === visibleSteps.length - 1;
 

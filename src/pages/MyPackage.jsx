@@ -64,7 +64,24 @@ export default function MyPackage() {
   const load = async () => {
     const query = { status: "paid" };
     if (isScoped) query.buyerEmail = effectiveEmail;
-    const paid = await base44.entities.Base44Purchase.filter(query, "-paidAt", 20);
+    let paid = await base44.entities.Base44Purchase.filter(query, "-paidAt", 20);
+    // C1 — Free starter users have plan="elite" but no purchase record.
+    // Synthesize a purchase from their plan so they can proceed past step 1.
+    if ((!paid || paid.length === 0) && (user?.plan === "elite" || user?.plan === "pro")) {
+      const planProduct = user.plan === "elite" ? "elite-monthly" : "pro-monthly";
+      paid = [{
+        id: `plan-${user.plan}`,
+        productId: planProduct,
+        productName: user.plan === "elite" ? "Elite Plan (Free Starter)" : "Pro Plan (Free Starter)",
+        buyerEmail: user?.email || "",
+        amount: "0",
+        currency: "USD",
+        quantity: 1,
+        paidAt: user?.created_date || new Date().toISOString(),
+        status: "paid",
+        _synthetic: true,
+      }];
+    }
     setPurchases(paid);
   };
 
@@ -216,7 +233,25 @@ export default function MyPackage() {
 
         {purchases.length > 0 && (
           <div className="mt-5 space-y-2 border-t border-white/10 pt-4">
-            {reviseSent ? (
+            {/* H3 — Fixed dead branch: thread panel shows when sent + threads exist */}
+            {reviseSent && threads.length > 0 ? (
+              <div className="space-y-3">
+                <div className="flex items-center gap-2 rounded-lg border border-lime-400/50 bg-lime-400/10 px-3 py-2.5 text-sm text-lime-300">
+                  <CheckCircle className="h-4 w-4" /> Your revision request was sent. Chat with our team below.
+                </div>
+                <RevisionThreadPanel
+                  thread={threads[0]}
+                  onSend={(body) => sendMessage(threads[0].id, body)}
+                />
+                <button
+                  type="button"
+                  onClick={() => setRevising(true)}
+                  className="inline-flex items-center gap-1.5 rounded-lg border border-white/15 px-3 py-2 text-xs font-medium text-white/70 hover:border-lime-400/50 hover:text-lime-300"
+                >
+                  <MessageSquare className="h-3.5 w-3.5" /> Request Another Revision
+                </button>
+              </div>
+            ) : reviseSent ? (
               <div className="flex items-center gap-2 rounded-lg border border-lime-400/50 bg-lime-400/10 px-3 py-2.5 text-sm text-lime-300">
                 <CheckCircle className="h-4 w-4" /> Your revision request was sent to our team — we'll be in touch shortly.
               </div>
@@ -248,23 +283,6 @@ export default function MyPackage() {
                     <X className="h-3.5 w-3.5" /> Cancel
                   </button>
                 </div>
-              </div>
-            ) : reviseSent && threads.length > 0 ? (
-              <div className="space-y-3">
-                <div className="flex items-center gap-2 rounded-lg border border-lime-400/50 bg-lime-400/10 px-3 py-2.5 text-sm text-lime-300">
-                  <CheckCircle className="h-4 w-4" /> Your revision request was sent. Chat with our team below.
-                </div>
-                <RevisionThreadPanel
-                  thread={threads[0]}
-                  onSend={(body) => sendMessage(threads[0].id, body)}
-                />
-                <button
-                  type="button"
-                  onClick={() => setRevising(true)}
-                  className="inline-flex items-center gap-1.5 rounded-lg border border-white/15 px-3 py-2 text-xs font-medium text-white/70 hover:border-lime-400/50 hover:text-lime-300"
-                >
-                  <MessageSquare className="h-3.5 w-3.5" /> Request Another Revision
-                </button>
               </div>
             ) : (
               <>

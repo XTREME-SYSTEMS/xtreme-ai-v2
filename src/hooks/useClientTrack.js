@@ -1,51 +1,47 @@
-import { useEffect, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { base44 } from "@/api/base44Client";
 import { getTrack, TRACKS, PRODUCT_TO_TRACK, PRIORITY } from "@/lib/onboardingTracks";
+import { usePreviewEmail } from "@/hooks/usePreviewEmail";
 
-// Resolves the onboarding track AND the active productId for a client based
-// on their paid purchases. The productId drives the universal portal —
-// portalSteps.js maps it to the exact steps the client sees.
-// Falls back to user.plan (set by grantStarterAccess) when there are no
-// purchases yet.
-// Pass `null` for users who shouldn't trigger a fetch (e.g. admins).
+// L1 — Uses React Query for automatic deduplication: ClientTimeline and
+// StepCoach both call this hook, but the purchase fetch only runs once
+// per cache window (60s staleTime).
+// C2 — Filters purchases by the effective email (client or previewed client)
+// so admin preview resolves the correct product, not all purchases.
 export function useClientTrack(user) {
-  const [track, setTrack] = useState(TRACKS.default);
-  const [productId, setProductId] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const { effectiveEmail, isScoped } = usePreviewEmail(user);
+  const email = effectiveEmail || user?.email;
 
-  useEffect(() => {
-    if (!user) {
-      setLoading(false);
-      return;
-    }
-    let cancelled = false;
-    (async () => {
-      try {
-        const purchases = await base44.entities.Base44Purchase.filter({ status: "paid" }, "-created_date", 20);
-        if (cancelled) return;
-        setTrack(getTrack(purchases));
+  const query = useQuery({
+    queryKey: ["clientTrack", email, isScoped],
+    queryFn: async () => {
+      const query = { status: "paid" };
+      if (email) query.buyerEmail = email;
+      const purchases = await base44.entities.Base44Purchase.filter(query, "-created_date", 20);
+      const track = getTrack(purchases);
 
-        // Resolve the active productId from purchases (highest-priority track wins)
-        const keys = (purchases || []).map((p) => PRODUCT_TO_TRACK[p.productId]).filter(Boolean);
-        const topTrack = PRIORITY.find((k) => keys.includes(k));
-        if (topTrack) {
-          const topPurchase = (purchases || []).find((p) => PRODUCT_TO_TRACK[p.productId] === topTrack);
-          setProductId(topPurchase?.productId || null);
-        } else if (user.plan === "elite" || user.role === "admin") {
-          setProductId("elite-monthly");
-        } else if (user.plan === "pro") {
-          setProductId("pro-monthly");
-        } else {
-          setProductId(null); // getVisibleSteps falls back to DEFAULT_STEPS
-        }
-      } catch (e) {
-        if (!cancelled) setTrack(getTrack([]));
-      } finally {
-        if (!cancelled) setLoading(false);
+      // Resolve the active productId from purchases (highest-priority track wins)
+      const keys = (purchases || []).map((p) => PRODUCT_TO_TRACK[p.productId]).filter(Boolean);
+      const topTrack = PRIORITY.find((k) => keys.includes(k));
+      let productId = null;
+      if (topTrack) {
+        const topPurchase = (purchases || []).find((p) => PRODUCT_TO_TRACK[p.productId] === topTrack);
+        productId = topPurchase?.productId || null;
+      } else if (user.plan === "elite" || user.role === "admin") {
+        productId = "elite-monthly";
+      } else if (user.plan === "pro") {
+        productId = "pro-monthly";
       }
-    })();
-    return () => { cancelled = true; };
-  }, [user]);
 
-  return { track, productId, loading };
+      return { track, productId };
+    },
+    enabled: !!user,
+    staleTime: 60000,
+  });
+
+  return {
+    track: query.data?.track || TRACKS.default,
+    productId: query.data?.productId || null,
+    loading: query.isLoading,
+  };
 }
