@@ -45,21 +45,23 @@ export function useStepGate(step, user) {
           });
           if (!cancelled) {
             setState({
-              isComplete: pending.length === 0,
+              isComplete: mine.length > 0 && pending.length === 0,
               loading: false,
-              pendingLabel: pending.length > 0 ? `${pending.length} document${pending.length > 1 ? "s" : ""} to sign` : "",
+              pendingLabel: pending.length > 0 ? `${pending.length} document${pending.length > 1 ? "s" : ""} to sign` : (mine.length === 0 ? "Waiting for documents" : ""),
             });
           }
         } else if (step.gate === "approvals") {
-          const pending = await base44.entities.Approval.filter(
-            { status: "pending", client_email: effectiveEmail }, "-created_date", 50
+          const all = await base44.entities.Approval.filter(
+            { client_email: effectiveEmail }, "-created_date", 50
           );
-          const count = (pending || []).length;
+          const pending = (all || []).filter((a) => a.status === "pending");
+          const count = pending.length;
+          const total = (all || []).length;
           if (!cancelled) {
             setState({
-              isComplete: count === 0,
+              isComplete: total > 0 && count === 0,
               loading: false,
-              pendingLabel: count > 0 ? `${count} approval${count > 1 ? "s" : ""} pending` : "",
+              pendingLabel: count > 0 ? `${count} approval${count > 1 ? "s" : ""} pending` : (total === 0 ? "Waiting for approvals" : ""),
             });
           }
         } else if (step.gate === "profile") {

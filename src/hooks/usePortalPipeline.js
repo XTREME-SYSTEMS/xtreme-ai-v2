@@ -58,7 +58,13 @@ export function usePortalPipeline(user) {
     const gate = step.gate;
 
     if (gate === "auto" || !gate) {
-      completed = true;
+      // "auto" steps (review/view) are complete only when the user has gone
+      // through the StepCoach for that page — tracked by localStorage
+      // coach:done:<path>. Without this, every "auto" step shows a checkmark
+      // even before the user has visited it.
+      try {
+        completed = localStorage.getItem(`coach:done:${step.to}`) === "1";
+      } catch { completed = false; }
     } else if (gate === "profile") {
       completed = !!(user?.epoxyProfileSubmitted);
     } else if (gate === "logo") {
@@ -82,10 +88,14 @@ export function usePortalPipeline(user) {
         const signer = (d.signers || []).find((s) => s.email?.toLowerCase() === effectiveEmail?.toLowerCase()) || {};
         return !signer.signed && d.status !== "signed";
       });
-      completed = pending.length === 0;
+      // Only complete when documents exist AND all are signed — not vacuously
+      // true when nothing has been sent yet.
+      completed = mine.length > 0 && pending.length === 0;
     } else if (gate === "approvals") {
       const pending = (approvals || []).filter((a) => a.status === "pending");
-      completed = pending.length === 0;
+      // Only complete when approvals exist AND all are decided — not vacuously
+      // true when none have been created yet.
+      completed = (approvals || []).length > 0 && pending.length === 0;
       if (pending.length > 0) pendingApproval = pending[0];
     }
 
