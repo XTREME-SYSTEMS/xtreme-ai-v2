@@ -1,62 +1,19 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Link } from "react-router-dom";
-import { base44 } from "@/api/base44Client";
-import { UNIVERSAL_PIPELINE } from "@/lib/universalPipeline";
-import {
-  computePipelineState,
-  currentPipelineStep,
-  pipelineProgress,
-} from "@/lib/pipelineState";
-import { usePreviewEmail } from "@/hooks/usePreviewEmail";
+import { usePortalPipeline } from "@/hooks/usePortalPipeline";
 import {
   Sparkles, CheckCircle2, Clock, Lock, ArrowRight, ShieldCheck, PenLine, ChevronDown,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-// A clear, numbered, step-by-step timeline that sits at the top of the client
-// portal landing page. It shows the user exactly where they are, what they've
-// finished, and the precise next action to take — so there is never any
-// ambiguity about what to do.
+// H1 — Now uses the unified portal pipeline (usePortalPipeline) so the
+// "Start Here" timeline shows the same product-aware steps as the timeline
+// and dashboard, not the old UNIVERSAL_PIPELINE.
 export default function ClientStartHere({ user }) {
-  const [approvals, setApprovals] = useState([]);
-  const [signals, setSignals] = useState({});
-  const [loading, setLoading] = useState(true);
   const [showAll, setShowAll] = useState(false);
-  const { effectiveEmail } = usePreviewEmail(user);
+  const { states, currentStep, progress, loading } = usePortalPipeline(user);
 
-  useEffect(() => {
-    if (!effectiveEmail) { setLoading(false); return; }
-    let cancelled = false;
-    const run = async () => {
-      try {
-        const [a, sigRes] = await Promise.all([
-          base44.entities.Approval.filter(
-            { client_email: effectiveEmail },
-            "-created_date",
-            100
-          ),
-          base44.functions
-            .invoke("getPipelineSignals", { email: effectiveEmail })
-            .then((r) => r.data || {})
-            .catch(() => ({})),
-        ]);
-        if (cancelled) return;
-        setApprovals(a || []);
-        setSignals(sigRes);
-      } catch (e) {
-        /* ignore */
-      }
-      if (!cancelled) setLoading(false);
-    };
-    run();
-    return () => { cancelled = true; };
-  }, [effectiveEmail]);
-
-  const states = computePipelineState(user, approvals, signals);
-  const current = currentPipelineStep(user, approvals, signals);
-  const prog = pipelineProgress(user, approvals, signals);
-
-  const pendingApprovalCount = approvals.filter((a) => a.status === "pending").length;
+  const pendingApprovalCount = states.filter((s) => s.pendingApproval).length;
   const currentIdx = states.findIndex((s) => s.isCurrent);
 
   return (
@@ -67,35 +24,35 @@ export default function ClientStartHere({ user }) {
           <Sparkles className="h-4 w-4" /> Start Here
         </div>
         <span className="rounded-full border border-white/15 px-2 py-0.5 text-[10px] font-medium uppercase tracking-wider text-white/50">
-          Step {Math.min(currentIdx + 1, UNIVERSAL_PIPELINE.length)} of {UNIVERSAL_PIPELINE.length}
+          Step {Math.min(currentIdx + 1, states.length)} of {states.length}
         </span>
         <div className="ml-auto flex items-center gap-2">
           <div className="h-1.5 w-24 overflow-hidden rounded-full bg-white/10 sm:w-40">
-            <div className="h-full rounded-full bg-lime-400 transition-all" style={{ width: `${prog.percent}%` }} />
+            <div className="h-full rounded-full bg-lime-400 transition-all" style={{ width: `${progress.percent}%` }} />
           </div>
-          <span className="text-[11px] font-medium text-white/50">{prog.percent}%</span>
+          <span className="text-[11px] font-medium text-white/50">{progress.percent}%</span>
         </div>
       </div>
 
-      {/* Current action callout — the single most important instruction */}
-      {!loading && current && (
+      {/* Current action callout */}
+      {!loading && currentStep && (
         <CurrentActionCallout
-          step={current.step}
-          pendingApproval={current.pendingApproval}
+          step={currentStep.step}
+          pendingApproval={currentStep.pendingApproval}
           pendingApprovalCount={pendingApprovalCount}
-          doneCount={prog.done}
-          totalCount={prog.total}
+          doneCount={progress.done}
+          totalCount={progress.total}
         />
       )}
 
-      {/* Collapsible full timeline — hidden by default to avoid overwhelm */}
+      {/* Collapsible full timeline */}
       {!loading && (
         <div className="mt-4">
           <button
             onClick={() => setShowAll((v) => !v)}
             className="flex w-full items-center justify-center gap-1.5 rounded-lg border border-white/10 bg-zinc-950 px-3 py-2 text-xs font-medium text-white/60 transition-colors hover:border-lime-400/40 hover:text-white"
           >
-            {showAll ? "Hide steps" : `View all ${UNIVERSAL_PIPELINE.length} steps`}
+            {showAll ? "Hide steps" : `View all ${states.length} steps`}
             <ChevronDown className={cn("h-3.5 w-3.5 transition-transform", showAll && "rotate-180")} />
           </button>
 
@@ -119,7 +76,7 @@ export default function ClientStartHere({ user }) {
                       index={i + 1}
                       icon={Icon}
                       label={s.step.label}
-                      desc={s.step.desc}
+                      desc={s.step.body || s.step.desc}
                       gate={s.step.gate}
                       to={s.step.to}
                       status={status}
@@ -152,21 +109,15 @@ function CurrentActionCallout({ step, pendingApproval, pendingApprovalCount, don
     ctaLabel = "Open Approvals";
     ctaTo = "/approvals";
     CtaIcon = ShieldCheck;
-  } else if (step.key === "onboarding") {
-    title = "Step 1: Complete your onboarding";
-    body = "Tell us about your business so your team can get to work. Use the Assistant chat to answer a few quick questions about your company, services and service area.";
-    ctaLabel = "Open Assistant";
-    ctaTo = "/assistant";
-    CtaIcon = Sparkles;
   } else if (step.to) {
     title = `You're on: ${step.label}`;
-    body = `${step.desc} This step runs automatically on our end${step.gate ? " — we'll pause for your approval before moving on." : "."}`;
-    ctaLabel = "View work";
+    body = step.body || step.desc || "";
+    ctaLabel = step.activityLabel || "Open this step";
     ctaTo = step.to;
     CtaIcon = ArrowRight;
   } else {
     title = `You're on: ${step.label}`;
-    body = step.desc;
+    body = step.body || step.desc || "";
     ctaLabel = null;
     ctaTo = null;
     CtaIcon = null;
@@ -234,7 +185,6 @@ function TimelineRow({ index, icon: Icon, label, desc, gate, to, status, isLast 
           to && status !== "locked" && "hover:border-lime-400/50"
         )}
       >
-        {/* Number / status dot + connector */}
         <div className="flex flex-col items-center">
           <div className={cn(
             "flex h-8 w-8 shrink-0 items-center justify-center rounded-full border text-xs font-bold",
@@ -248,7 +198,6 @@ function TimelineRow({ index, icon: Icon, label, desc, gate, to, status, isLast 
           {!isLast && <div className="mt-1 h-full w-px flex-1 bg-white/10" />}
         </div>
 
-        {/* Content */}
         <div className="flex-1 pb-1">
           <div className="flex flex-wrap items-center gap-2">
             <Icon className="h-4 w-4 shrink-0 text-lime-400" />

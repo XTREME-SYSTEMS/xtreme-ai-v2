@@ -3,19 +3,19 @@ import { Link } from "react-router-dom";
 import {
   Sparkles, ArrowRight, ShieldCheck, CheckCircle2, Package,
 } from "lucide-react";
-import { UNIVERSAL_PIPELINE } from "@/lib/universalPipeline";
-import { cn } from "@/lib/utils";
+import { usePortalPipeline } from "@/hooks/usePortalPipeline";
 import { useClientUser } from "@/hooks/useClientUser";
 
-// The landing page of the client portal. A clear, top-down, step-by-step
-// walkthrough of how the portal works and the universal build pipeline every
-// implementation follows — with approval-gated steps called out explicitly.
+// H1 — Now uses the unified portal pipeline (usePortalPipeline) so the
+// dashboard shows the SAME product-aware steps the timeline shows, not the
+// old UNIVERSAL_PIPELINE which had different names and numbering.
 export default function ClientDashboard() {
   const { user } = useClientUser();
+  const { states, progress, loading } = usePortalPipeline(user);
 
   useEffect(() => { document.title = "Client Portal · Lead Gen Near You"; }, []);
 
-  const approvalSteps = UNIVERSAL_PIPELINE.filter((s) => s.gate);
+  const approvalSteps = states.filter((s) => s.step.gate);
 
   return (
     <div className="mx-auto max-w-3xl space-y-10">
@@ -81,7 +81,7 @@ export default function ClientDashboard() {
         </ol>
       </section>
 
-      {/* The universal pipeline */}
+      {/* The portal pipeline */}
       <section id="pipeline">
         <div className="flex items-center gap-2">
           <h2 className="text-xs font-semibold uppercase tracking-wider text-lime-400">Your build pipeline</h2>
@@ -90,11 +90,12 @@ export default function ClientDashboard() {
           </span>
         </div>
         <p className="mt-2 text-sm text-white/70">
-          Every build follows the same eight steps. Steps marked <span className="font-semibold text-lime-400">Approval</span> pause for your sign-off before we continue.
+          Every build follows the same steps. Steps marked <span className="font-semibold text-lime-400">Approval</span> pause for your sign-off before we continue.
         </p>
 
         <div className="mt-6 space-y-3">
-          {UNIVERSAL_PIPELINE.map((step, i) => {
+          {states.map((s, i) => {
+            const step = s.step;
             const Icon = step.icon;
             const StepTag = step.to ? Link : "div";
             const stepProps = step.to ? { to: step.to } : {};
@@ -105,10 +106,14 @@ export default function ClientDashboard() {
                 className={`flex gap-4 rounded-xl border border-white/10 bg-zinc-950 p-4 ${step.to ? "transition-colors hover:border-lime-400/40" : ""}`}
               >
                 <div className="flex flex-col items-center">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-full border border-white/15 bg-zinc-900 text-sm font-bold text-white/80">
-                    {i + 1}
+                  <div className={`flex h-10 w-10 items-center justify-center rounded-full border text-sm font-bold ${
+                    s.completed ? "border-lime-400 bg-lime-400/10 text-lime-400" :
+                    s.isCurrent ? "border-lime-400 bg-lime-400/15 text-lime-400" :
+                    "border-white/15 bg-zinc-900 text-white/80"
+                  }`}>
+                    {s.completed ? <CheckCircle2 className="h-5 w-5 text-lime-400" /> : i + 1}
                   </div>
-                  {i < UNIVERSAL_PIPELINE.length - 1 && (
+                  {i < states.length - 1 && (
                     <div className="mt-1 h-full w-px flex-1 bg-white/10" />
                   )}
                 </div>
@@ -125,9 +130,14 @@ export default function ClientDashboard() {
                         Automatic
                       </span>
                     )}
-                    {step.to && <ArrowRight className="ml-auto h-3.5 w-3.5 shrink-0 text-white/30" />}
+                    {s.completed && (
+                      <span className="ml-auto inline-flex items-center gap-1 text-[10px] font-medium text-lime-400">
+                        <CheckCircle2 className="h-3 w-3" /> Done
+                      </span>
+                    )}
+                    {step.to && !s.completed && <ArrowRight className="ml-auto h-3.5 w-3.5 shrink-0 text-white/30" />}
                   </div>
-                  <p className="mt-1.5 text-sm text-white/60">{step.desc}</p>
+                  <p className="mt-1.5 text-sm text-white/60">{step.body || step.desc}</p>
                 </div>
               </StepTag>
             );
@@ -144,15 +154,19 @@ export default function ClientDashboard() {
         <p className="mt-1 text-xs text-white/50">
           These are the moments where we pause and wait for your sign-off. You'll find them all in the Approvals tab.
         </p>
-        <ul className="mt-4 space-y-2">
-          {approvalSteps.map((s, i) => (
-            <li key={s.key} className="flex items-center gap-2.5 text-sm">
-              <CheckCircle2 className="h-4 w-4 shrink-0 text-amber-400" />
-              <span className="font-medium text-white">{s.label}</span>
-              <span className="text-white/40">— {s.desc}</span>
-            </li>
-          ))}
-        </ul>
+        {approvalSteps.length > 0 ? (
+          <ul className="mt-4 space-y-2">
+            {approvalSteps.map((s) => (
+              <li key={s.step.key} className="flex items-center gap-2.5 text-sm">
+                <CheckCircle2 className={`h-4 w-4 shrink-0 ${s.completed ? "text-lime-400" : "text-amber-400"}`} />
+                <span className="font-medium text-white">{s.step.label}</span>
+                <span className="text-white/40">— {s.step.body || s.step.desc}</span>
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <p className="mt-3 text-sm text-white/50">No approval-gated steps for your package.</p>
+        )}
         <Link
           to="/approvals"
           className="mt-5 inline-flex items-center gap-1.5 rounded-lg bg-lime-400 px-3.5 py-2 text-sm font-semibold text-black hover:bg-lime-300"

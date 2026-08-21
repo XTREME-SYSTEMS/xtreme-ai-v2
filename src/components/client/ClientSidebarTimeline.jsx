@@ -1,46 +1,35 @@
-import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { CheckCircle2, Lock, ShieldCheck } from "lucide-react";
-import { base44 } from "@/api/base44Client";
-import { UNIVERSAL_PIPELINE } from "@/lib/universalPipeline";
-import { computePipelineState } from "@/lib/pipelineState";
-import { usePipelineSignals } from "@/hooks/usePipelineSignals";
-import { usePreviewEmail } from "@/hooks/usePreviewEmail";
+import { usePortalPipeline } from "@/hooks/usePortalPipeline";
 import { cn } from "@/lib/utils";
 
+// H1 — Now uses the unified portal pipeline (usePortalPipeline) so the
+// sidebar shows the same product-aware steps as the timeline and dashboard.
 // Compact, read-only progress timeline shown in the client portal sidebar.
-// Uses the single universal pipeline that applies to every system
-// implementation, with approval-gated steps marked explicitly. Subscribes
-// to live Approval changes so the timeline refreshes without a page reload.
 export default function ClientSidebarTimeline({ user }) {
-  const [approvals, setApprovals] = useState([]);
-  const { effectiveEmail, isScoped } = usePreviewEmail(user);
-  const { signals } = usePipelineSignals(effectiveEmail);
+  const { states, loading } = usePortalPipeline(user);
 
-  useEffect(() => {
-    if (!user) return;
-    let cancelled = false;
-    const load = async () => {
-      try {
-        const list = await base44.entities.Approval.list("-created_date", 50);
-        const scoped = isScoped
-          ? (list || []).filter((a) => (a.client_email || "").toLowerCase() === effectiveEmail.toLowerCase())
-          : (list || []);
-        if (!cancelled) setApprovals(scoped);
-      } catch (e) {
-        if (!cancelled) setApprovals([]);
-      }
-    };
-    load();
-    // Live-refresh when any Approval record changes.
-    const unsubscribe = base44.entities.Approval.subscribe(() => { load(); });
-    return () => { cancelled = true; unsubscribe(); };
-  }, [user, isScoped, effectiveEmail]);
+  let currentIndex = states.findIndex((s) => s.isCurrent);
+  if (currentIndex === -1) currentIndex = states.length - 1;
 
-  const steps = UNIVERSAL_PIPELINE;
-  const states = computePipelineState(user, approvals, signals);
-  let currentIndex = states.findIndex((s) => !s.completed && !s.locked);
-  if (currentIndex === -1) currentIndex = steps.length - 1;
+  if (loading) {
+    return (
+      <div className="mt-5 px-2">
+        <div className="mb-2 flex items-center gap-1.5 px-1 text-[10px] font-semibold uppercase tracking-wider text-white/40">
+          Your Progress
+          <ShieldCheck className="h-3 w-3 text-lime-400/70" />
+        </div>
+        <div className="space-y-2.5">
+          {[1, 2, 3, 4, 5].map((i) => (
+            <div key={i} className="flex items-center gap-2.5">
+              <div className="h-6 w-6 rounded-full bg-white/5" />
+              <div className="h-3 w-24 rounded bg-white/5" />
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="mt-5 px-2">
@@ -51,21 +40,21 @@ export default function ClientSidebarTimeline({ user }) {
       <div className="relative">
         <div className="absolute left-[11px] top-2 bottom-2 w-px bg-white/10" />
         <div className="space-y-2.5">
-          {steps.map((step, i) => {
-            const st = states[i];
+          {states.map((s, i) => {
+            const step = s.step;
             const isCurrent = i === currentIndex;
             let dotClass, statusLabel, statusClass, inner;
-            if (st.completed) {
+            if (s.completed) {
               dotClass = "bg-lime-400 text-black";
               statusLabel = "Done";
               statusClass = "text-lime-400";
               inner = <CheckCircle2 className="h-3.5 w-3.5" />;
-            } else if (st.pendingApproval) {
+            } else if (s.pendingApproval) {
               dotClass = "bg-amber-400 text-black ring-2 ring-amber-400/30";
               statusLabel = "Awaiting approval";
               statusClass = "text-amber-400";
               inner = <span className="text-[10px] font-bold">{i + 1}</span>;
-            } else if (st.locked) {
+            } else if (s.locked) {
               dotClass = "bg-zinc-900 text-white/30 border border-white/10";
               statusLabel = "Locked";
               statusClass = "text-white/30";
@@ -93,7 +82,7 @@ export default function ClientSidebarTimeline({ user }) {
                 <div className="flex-1 min-w-0 pt-0.5">
                   <div className={cn(
                     "truncate text-xs",
-                    isCurrent || st.pendingApproval ? "font-semibold text-white" : "text-white/70"
+                    isCurrent || s.pendingApproval ? "font-semibold text-white" : "text-white/70"
                   )}>
                     {step.label}
                   </div>
@@ -109,7 +98,7 @@ export default function ClientSidebarTimeline({ user }) {
               </div>
             );
 
-            return st.pendingApproval ? (
+            return s.pendingApproval ? (
               <Link key={step.key} to="/approvals" className="block rounded-md hover:bg-white/5">
                 {row}
               </Link>
