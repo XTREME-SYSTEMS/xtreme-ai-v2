@@ -1,0 +1,184 @@
+import {
+  Package, Building2, MessageSquareText, PenTool, Shirt, Palette, Share2,
+  Video, LayoutTemplate, FileSignature, ShieldCheck, Rocket, Sparkles,
+  LayoutDashboard, Settings,
+} from "lucide-react";
+
+// ─────────────────────────────────────────────────────────────────────────
+// UNIVERSAL STEP LIBRARY
+// The single source of truth for every possible client-portal step. Each
+// product in the catalog declares which step keys it includes (see
+// PRODUCT_STEPS below). The portal builds the journey dynamically from that
+// list — so when you add a new package, you just list its step keys and the
+// portal adapts automatically. No other code changes needed.
+//
+// `nextLabel` / `nextTo` are defaults only — getVisibleSteps() overrides
+// them with computed values based on the actual next step in the product's
+// list, so the chain is always correct regardless of which steps are included.
+// ─────────────────────────────────────────────────────────────────────────
+
+export const PORTAL_STEPS = {
+  welcome: {
+    key: "welcome",
+    to: "/my-package", label: "Welcome", icon: Package, gate: "auto",
+    activityLabel: "Review your package",
+    title: "Welcome to Your Build",
+    body: "Here's everything included in your package. Review what's included, then continue to tell us about your business.",
+    nextLabel: "Go to Business Profile", nextTo: "/business-profile",
+  },
+  "business-profile": {
+    key: "business-profile",
+    to: "/business-profile", label: "Business Profile", icon: Building2, gate: "profile",
+    activityLabel: "Complete your business profile",
+    title: "Tell Us About Your Business",
+    body: "Fill out your business details — industry, name, services, service area, logo and photos. Our team uses this to build everything else.",
+    nextLabel: "Go to Content Generator", nextTo: "/content-generator",
+  },
+  content: {
+    key: "content",
+    to: "/content-generator", label: "Content Generator", icon: MessageSquareText, gate: "content",
+    activityLabel: "Pick your content tone",
+    title: "Choose Your Website's Voice",
+    body: "We researched your market — competitors, pricing, and what local customers respond to — and wrote 10 different messaging tones. Pick the one that fits your business. We've recommended the best one.",
+    nextLabel: "Go to Logo Generator", nextTo: "/logo-generator",
+  },
+  logo: {
+    key: "logo",
+    to: "/logo-generator", label: "Logo Generator", icon: PenTool, gate: "logo",
+    activityLabel: "Pick your logo",
+    title: "Pick Your Logo",
+    body: "We generated 10 logo concepts for your business. All are created with transparent backgrounds so they look perfect on any website theme. Tap the one that feels right.",
+    nextLabel: "Go to Brand Generator", nextTo: "/brand-generator",
+    // Stage-aware: skip logo generation for rebranding clients (they keep their existing logo)
+    skipIf: (user) => user?.epoxyProfile?.businessStage === "rebrand",
+  },
+  brand: {
+    key: "brand",
+    to: "/brand-generator", label: "Brand Generator", icon: Shirt, gate: "brand",
+    activityLabel: "Approve your brand mockups",
+    title: "See Your Brand Come to Life",
+    body: "We applied your logo to 10 real-world mockups — business cards, brochures, apparel, a vehicle wrap and more. All are included. Don't like one? Regenerate just that item.",
+    nextLabel: "Go to Website Design", nextTo: "/design-direction",
+  },
+  website: {
+    key: "website",
+    to: "/design-direction", label: "Website Design", icon: Palette, gate: "design",
+    activityLabel: "Pick your website design",
+    title: "Pick Your Website Design",
+    body: "We wrote your site copy from your onboarding and real local data, then designed 10 distinct website layouts with your logo and brand colors. Preview each (desktop + mobile), hover any section to comment or regenerate just that part, and pick the one you love.",
+    nextLabel: "Go to Social Media", nextTo: "/social-media",
+  },
+  social: {
+    key: "social",
+    to: "/social-media", label: "Social Media", icon: Share2, gate: "social",
+    activityLabel: "Approve your social media pack",
+    title: "Your Social Media Brand Kit",
+    body: "We designed 10 on-brand social templates with your logo — profile, cover, stories, posts, favicon, icons — plus a full 30-day content calendar with captions and best posting times. All included.",
+    nextLabel: "Go to Video Generator", nextTo: "/video-generator",
+  },
+  video: {
+    key: "video",
+    to: "/video-generator", label: "Video Generator", icon: Video, gate: "video",
+    activityLabel: "Approve your video concepts",
+    title: "Your Video Concepts",
+    body: "We created 10 video concepts using your onboarding, content tone, logo, and brand. Preview each, generate the actual video for any you like, and use them on your site, social media, or YouTube.",
+    nextLabel: "Go to Your Designs", nextTo: "/your-designs",
+  },
+  "your-designs": {
+    key: "your-designs",
+    to: "/your-designs", label: "Your Designs", icon: LayoutTemplate, gate: "auto",
+    activityLabel: "Review your finished brand package",
+    title: "Your Finished Brand Package",
+    body: "Everything you picked — your content tone, logo, brand mockups, website design, social media kit, and videos — is compiled here. Review it all, then continue to choose any enhancements.",
+    nextLabel: "Go to Enhancements", nextTo: "/enhancements",
+  },
+  enhancements: {
+    key: "enhancements",
+    to: "/enhancements", label: "Enhancements", icon: Sparkles, gate: "auto",
+    activityLabel: "Choose optional add-ons",
+    title: "Enhance Your Package",
+    body: "Add optional enhancements to supercharge your launch — rush delivery, extra pages, blog content, Google Business Profile setup, and more. Skip if you're happy with your current package.",
+    nextLabel: "Go to Sign Agreement", nextTo: "/signatures",
+  },
+  signatures: {
+    key: "signatures",
+    to: "/signatures", label: "Sign Agreement", icon: FileSignature, gate: "signatures",
+    activityLabel: "Sign your service agreement",
+    title: "Sign Your Service Agreement",
+    body: "Review and sign your service agreement below. You must sign all pending documents before we can begin building. Need to change something? Go back to any step.",
+    nextLabel: "Go to Design Approval", nextTo: "/approvals",
+  },
+  approvals: {
+    key: "approvals",
+    to: "/approvals", label: "Design Approval", icon: ShieldCheck, gate: "approvals",
+    activityLabel: "Approve your website design",
+    title: "Approve Your Website Design",
+    body: "Review and approve your website design below. Nothing goes live until you approve it.",
+    nextLabel: "Go to Launch", nextTo: "/receipts",
+  },
+  launch: {
+    key: "launch",
+    to: "/receipts", label: "Launch", icon: Rocket, gate: "auto",
+    activityLabel: "Track your launch",
+    title: "Your Website Is Launching",
+    body: "Every action your team takes to build and launch your website is logged here for full transparency.",
+    nextLabel: null, nextTo: null,
+  },
+};
+
+// ─────────────────────────────────────────────────────────────────────────
+// PRODUCT → STEP MAPPING
+// Each productId (matching create-checkout + serviceCatalog) maps to the
+// ordered list of step keys that product's portal includes. When you create
+// a new package, add its productId here with the steps it should show.
+// ─────────────────────────────────────────────────────────────────────────
+
+// Standard build — no social media or video pack
+const FULL_BUILD = [
+  "welcome", "business-profile", "content", "logo", "brand", "website",
+  "your-designs", "enhancements", "signatures", "approvals", "launch",
+];
+
+// Build with social media + video pack included
+const FULL_BUILD_PLUS_MEDIA = [
+  "welcome", "business-profile", "content", "logo", "brand", "website",
+  "social", "video", "your-designs", "enhancements", "signatures",
+  "approvals", "launch",
+];
+
+export const PRODUCT_STEPS = {
+  "elite-monthly": FULL_BUILD,
+  "elite-annual": FULL_BUILD,
+  "pro-monthly": FULL_BUILD,
+  "pro-annual": FULL_BUILD,
+  "web-pack": FULL_BUILD,
+  "app-pack": FULL_BUILD_PLUS_MEDIA,
+  "deposit": FULL_BUILD_PLUS_MEDIA,
+  "ai-tool": FULL_BUILD,
+};
+
+// Fallback for users with no purchase and no plan — matches the Elite build
+// since grantStarterAccess gives all new users Elite access.
+export const DEFAULT_STEPS = FULL_BUILD;
+
+// Utility nav items (not part of the build journey)
+export const CLIENT_UTILITIES = [
+  { to: "/client-portal", label: "Client Portal", icon: LayoutDashboard, end: true },
+  { to: "/settings", label: "Settings", icon: Settings, end: true },
+];
+
+// Look up the ordered step keys for a productId (falls back to DEFAULT_STEPS)
+export function getProductStepKeys(productId) {
+  return PRODUCT_STEPS[productId] || DEFAULT_STEPS;
+}
+
+// Get a step definition by its route path
+export function getStepByPath(path) {
+  return Object.values(PORTAL_STEPS).find((s) => s.to === path) || null;
+}
+
+// Check if a step should be skipped for this user's stage
+export function shouldSkipStep(step, user) {
+  if (step?.skipIf && step.skipIf(user)) return true;
+  return false;
+}

@@ -119,7 +119,7 @@ export default function AdminPackages() {
             <p className="mt-1 text-xs text-white/60">
               Prices are resolved server-side in the <code className="text-lime-400">create-checkout</code> backend function (the <code className="text-lime-400">PRODUCTS</code> map).
               Product details (features, statistics, descriptions) are in <code className="text-lime-400">src/lib/serviceCatalog.js</code>.
-              Update both to keep the catalog and checkout in sync.
+              Portal steps per package are in <code className="text-lime-400">src/lib/portalSteps.js</code> (the <code className="text-lime-400">PRODUCT_STEPS</code> map) — add your product ID there with the steps it should show, and the client portal adapts automatically.
             </p>
           </div>
         </div>

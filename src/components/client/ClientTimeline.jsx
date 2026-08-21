@@ -1,7 +1,7 @@
 import { useEffect, useRef } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { Check, Lock } from "lucide-react";
-import { CLIENT_STEPS, getStepByPath, getVisibleSteps } from "@/lib/clientSteps";
+import { getStepByPath, getVisibleSteps } from "@/lib/clientSteps";
 import { useClientUser } from "@/hooks/useClientUser";
 import { useClientTrack } from "@/hooks/useClientTrack";
 import { cn } from "@/lib/utils";
@@ -16,8 +16,8 @@ export default function ClientTimeline() {
   const navigate = useNavigate();
   const scrollRef = useRef(null);
   const { user } = useClientUser();
-  const { track } = useClientTrack(user);
-  const visibleSteps = getVisibleSteps(track?.key || "default", user);
+  const { productId } = useClientTrack(user);
+  const visibleSteps = getVisibleSteps(productId, user);
   const current = visibleSteps.find((s) => s.to === location.pathname) || getStepByPath(location.pathname);
   const currentIdx = current ? visibleSteps.findIndex((s) => s.to === current.to) : -1;
 

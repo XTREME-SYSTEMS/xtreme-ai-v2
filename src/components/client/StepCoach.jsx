@@ -21,8 +21,8 @@ export default function StepCoach() {
   const navigate = useNavigate();
   const step = getStepByPath(location.pathname);
   const { user } = useClientUser();
-  const { track } = useClientTrack(user);
-  const visibleSteps = getVisibleSteps(track?.key || "default", user);
+  const { productId } = useClientTrack(user);
+  const visibleSteps = getVisibleSteps(productId, user);
   const [phase, setPhase] = useState("intro"); // "intro" | "gate" | "done"
 
   const introKey = step ? `coach:intro:${step.to}` : null;
@@ -54,12 +54,11 @@ export default function StepCoach() {
   const finish = () => {
     try { localStorage.setItem(doneKey, "1"); } catch {}
     setPhase("done");
-    // G3 — Navigate to the next VISIBLE step (skips filtered-out steps)
-    const currentIdx = visibleSteps.findIndex((s) => s.to === step?.to);
-    if (currentIdx >= 0 && currentIdx < visibleSteps.length - 1) {
-      navigate(visibleSteps[currentIdx + 1].to);
-    } else if (step?.nextTo) {
-      navigate(step.nextTo);
+    // Navigate to the next VISIBLE step — computed dynamically from the
+    // product's step list, so it always goes to the right next step.
+    const idx = visibleSteps.findIndex((s) => s.to === step?.to);
+    if (idx >= 0 && idx < visibleSteps.length - 1) {
+      navigate(visibleSteps[idx + 1].to);
     }
   };
 

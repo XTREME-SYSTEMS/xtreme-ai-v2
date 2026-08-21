@@ -16,7 +16,7 @@ export const PRODUCT_TO_TRACK = {
 };
 
 // Highest-priority track wins when a user owns multiple products.
-const PRIORITY = ["elite", "pro", "deposit", "web-pack", "app-pack", "ai-tool"];
+export const PRIORITY = ["elite", "pro", "deposit", "web-pack", "app-pack", "ai-tool"];
 
 export const TRACKS = {
   elite: {
