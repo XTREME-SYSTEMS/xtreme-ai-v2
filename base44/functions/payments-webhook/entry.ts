@@ -253,7 +253,7 @@ async function handleOrderApproved(db: any, eventData: any): Promise<Response> {
   return new Response("OK", { status: 200 });
 }
 
-async function handleSubscriptionEnded(db: any, eventData: any): Promise<Response> {
+async function handleSubscriptionEnded(db: any, eventData: any, eventType: string): Promise<Response> {
   // Canceled = ended early; Expired = ran all billing cycles. Both revoke access.
   // Mirrors the order path (actionEvent.body.<entity> first); keep the flat fallbacks since
   // the subscription contract webhook body isn't as tightly documented as order_approved.
@@ -287,6 +287,31 @@ async function handleSubscriptionEnded(db: any, eventData: any): Promise<Respons
   // ===== APP-SPECIFIC =====
   if (purchase.appUserId) {
     await db.entities.User.update(purchase.appUserId, { plan: "free", has_paid: false });
+  }
+
+  // Notify the buyer that their subscription ended and access was revoked.
+  // eventType distinguishes "canceled" (ended early) from "expired" (ran all cycles).
+  if (purchase.buyerEmail) {
+    try {
+      const appUrl = Deno.env.get("WIX_CHECKOUT_APP_URL") || "";
+      const isCanceled = eventType === SUBSCRIPTION_CANCELED;
+      const emailBody = accountModifiedEmail({
+        email: purchase.buyerEmail,
+        changeType: isCanceled ? "Subscription Canceled" : "Subscription Expired",
+        changeSummary: isCanceled
+          ? "Your subscription has been canceled and your paid access has been revoked. You will no longer be billed. You can resubscribe anytime from your portal."
+          : "Your subscription has completed all billing cycles and expired. Your paid access has been revoked. You can resubscribe anytime from your portal.",
+        appUrl,
+        hasAccount: !!purchase.appUserId,
+      });
+      await db.integrations.Core.SendEmail({
+        to: purchase.buyerEmail,
+        subject: isCanceled ? "Your Subscription Has Been Canceled" : "Your Subscription Has Expired",
+        body: emailBody,
+      });
+    } catch (emailErr) {
+      console.error("payments-webhook: subscription-ended email failed", emailErr);
+    }
   }
   // ===== END APP-SPECIFIC =====
 
