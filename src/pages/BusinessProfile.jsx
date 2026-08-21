@@ -1,6 +1,11 @@
 import { useEffect, useState } from "react";
 import { base44 } from "@/api/base44Client";
-import { Building2, Upload, Loader2, CheckCircle2, X } from "lucide-react";
+import { Building2, Upload, Loader2, CheckCircle2, X, MapPin, Star, Shield } from "lucide-react";
+
+// Step 2 of the epoxy website build: a constrained, multiple-choice intake.
+// No open-ended prose, no AI chat — every field is an exact answer or a
+// visual pick so there's no ambiguity and little room for customization.
+// Saved to the user record via updateMe and gated by the "profile" step gate.
 
 const SERVICE_OPTIONS = [
   "Epoxy Floor Coatings",
@@ -13,20 +18,51 @@ const SERVICE_OPTIONS = [
   "Residential Epoxy",
 ];
 
-// Step 2 of the epoxy website build: the client tells us about their business
-// so our team can build their site. Saved to the user record via updateMe and
-// gated by the "profile" step gate (epoxyProfileSubmitted flag).
+const RANGE_OPTIONS = [
+  "Single city",
+  "Metro area",
+  "Statewide",
+  "Multi-state region",
+  "Nationwide",
+];
+
+const YEARS_OPTIONS = [
+  "Just started",
+  "1-2 years",
+  "3-5 years",
+  "6-10 years",
+  "10+ years",
+];
+
+const DIFFERENTIATOR_OPTIONS = [
+  "Family-owned",
+  "Veteran-owned",
+  "Woman-owned",
+  "Licensed & insured",
+  "BBB accredited",
+  "Free estimates",
+  "24/7 emergency service",
+  "Same-day service",
+  "Weekend availability",
+  "5-star rated on Google",
+  "Eco-friendly materials",
+  "Commercial & residential",
+  "Insurance / restoration work",
+  "Free consultations",
+];
+
 export default function BusinessProfile() {
   const [form, setForm] = useState({
     businessName: "",
     phone: "",
     email: "",
     website: "",
-    serviceArea: "",
-    yearsInBusiness: "",
-    about: "",
+    primaryLocation: "",
   });
   const [services, setServices] = useState([]);
+  const [serviceRange, setServiceRange] = useState([]);
+  const [yearsInBusiness, setYearsInBusiness] = useState("");
+  const [differentiators, setDifferentiators] = useState([]);
   const [logo, setLogo] = useState(null);
   const [logoUrl, setLogoUrl] = useState("");
   const [gallery, setGallery] = useState([]);
@@ -47,11 +83,12 @@ export default function BusinessProfile() {
             phone: p.phone || "",
             email: p.email || "",
             website: p.website || "",
-            serviceArea: p.serviceArea || "",
-            yearsInBusiness: p.yearsInBusiness || "",
-            about: p.about || "",
+            primaryLocation: p.primaryLocation || p.serviceArea || "",
           });
           setServices(p.services || []);
+          setServiceRange(p.serviceRange || []);
+          setYearsInBusiness(p.yearsInBusiness || "");
+          setDifferentiators(p.differentiators || []);
           setLogoUrl(p.logoUrl || "");
           setGalleryUrls(p.galleryUrls || []);
           if (u.epoxyProfileSubmitted) setSaved(true);
@@ -61,8 +98,8 @@ export default function BusinessProfile() {
   }, []);
 
   const set = (k) => (e) => setForm((f) => ({ ...f, [k]: e.target.value }));
-  const toggleService = (s) =>
-    setServices((prev) => (prev.includes(s) ? prev.filter((x) => x !== s) : [...prev, s]));
+  const toggle = (list, setList, val) =>
+    setList((prev) => (prev.includes(val) ? prev.filter((x) => x !== val) : [...prev, val]));
 
   const uploadOne = async (file) => {
     const res = await base44.integrations.Core.UploadFile({ file });
@@ -73,6 +110,14 @@ export default function BusinessProfile() {
     e.preventDefault();
     if (!form.businessName.trim()) {
       setError("Business name is required.");
+      return;
+    }
+    if (services.length === 0) {
+      setError("Pick at least one service you offer.");
+      return;
+    }
+    if (!form.primaryLocation.trim()) {
+      setError("Enter your primary city & state.");
       return;
     }
     setSaving(true);
@@ -88,6 +133,9 @@ export default function BusinessProfile() {
       const profile = {
         ...form,
         services,
+        serviceRange,
+        yearsInBusiness,
+        differentiators,
         logoUrl: finalLogo,
         galleryUrls: finalGallery,
         submitted: true,
@@ -112,12 +160,9 @@ export default function BusinessProfile() {
         <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-lime-400">
           <Building2 className="h-4 w-4" /> Business Profile
         </div>
-        <h1 className="mt-2 text-xl font-semibold text-white sm:text-2xl">
-          Tell us about your epoxy business
-        </h1>
+        <h1 className="mt-2 text-xl font-semibold text-white sm:text-2xl">Tell us about your epoxy business</h1>
         <p className="mt-1 text-sm text-white/60">
-          Our team uses this to build your website. The more complete it is, the better your site
-          will be.
+          Tap your answers below — no typing essays. Our team builds your site from these exact picks.
         </p>
 
         {saved && (
@@ -126,148 +171,91 @@ export default function BusinessProfile() {
           </div>
         )}
 
-        <form onSubmit={submit} className="mt-5 space-y-5">
-          <Field label="Business name" required>
-            <input
-              value={form.businessName}
-              onChange={set("businessName")}
-              placeholder="Acme Epoxy Floors LLC"
-              className={inputCls}
-            />
-          </Field>
-
-          <div className="grid gap-4 sm:grid-cols-2">
-            <Field label="Phone">
-              <input value={form.phone} onChange={set("phone")} placeholder="(555) 123-4567" className={inputCls} />
+        <form onSubmit={submit} className="mt-5 space-y-6">
+          {/* Exact facts */}
+          <Section title="Your business" icon={Building2}>
+            <Field label="Business name" required>
+              <input value={form.businessName} onChange={set("businessName")} placeholder="Acme Epoxy Floors LLC" className={inputCls} />
             </Field>
-            <Field label="Email">
-              <input value={form.email} onChange={set("email")} placeholder="info@acmeepoxy.com" className={inputCls} />
-            </Field>
-          </div>
-
-          <Field label="Current website (if any)">
-            <input value={form.website} onChange={set("website")} placeholder="https://acmeepoxy.com" className={inputCls} />
-          </Field>
-
-          <Field label="Service area" hint="Cities, counties or states you serve">
-            <input
-              value={form.serviceArea}
-              onChange={set("serviceArea")}
-              placeholder="Dallas-Fort Worth metroplex, TX"
-              className={inputCls}
-            />
-          </Field>
-
-          <div>
-            <label className="mb-2 block text-sm font-medium text-white">Services you offer</label>
-            <div className="flex flex-wrap gap-2">
-              {SERVICE_OPTIONS.map((s) => {
-                const on = services.includes(s);
-                return (
-                  <button
-                    key={s}
-                    type="button"
-                    onClick={() => toggleService(s)}
-                    className={
-                      "rounded-lg border px-3 py-1.5 text-xs font-medium transition-colors " +
-                      (on
-                        ? "border-lime-400 bg-lime-400/15 text-lime-300"
-                        : "border-white/15 bg-zinc-950 text-white/60 hover:border-white/30")
-                    }
-                  >
-                    {s}
-                  </button>
-                );
-              })}
+            <div className="grid gap-4 sm:grid-cols-2">
+              <Field label="Phone">
+                <input value={form.phone} onChange={set("phone")} placeholder="(555) 123-4567" className={inputCls} />
+              </Field>
+              <Field label="Email">
+                <input value={form.email} onChange={set("email")} placeholder="info@acmeepoxy.com" className={inputCls} />
+              </Field>
             </div>
-          </div>
-
-          <div className="grid gap-4 sm:grid-cols-2">
-            <Field label="Years in business">
-              <input value={form.yearsInBusiness} onChange={set("yearsInBusiness")} placeholder="5" className={inputCls} />
+            <Field label="Current website (if any)">
+              <input value={form.website} onChange={set("website")} placeholder="https://acmeepoxy.com" className={inputCls} />
             </Field>
-          </div>
+          </Section>
 
-          <Field label="About your business" hint="What makes you different — for your website's About section">
-            <textarea
-              value={form.about}
-              onChange={set("about")}
-              rows={4}
-              placeholder="Family-owned epoxy flooring company serving DFW since 2015…"
-              className={inputCls + " resize-none"}
-            />
-          </Field>
+          {/* Services — visual multi-choice */}
+          <Section title="Services you offer" icon={Star} hint="Pick all that apply">
+            <Chips options={SERVICE_OPTIONS} selected={services} onToggle={(v) => toggle(services, setServices, v)} />
+          </Section>
 
-          {/* Logo */}
-          <div>
-            <label className="mb-2 block text-sm font-medium text-white">Logo</label>
-            {logoUrl && !logo && (
-              <div className="mb-2 inline-flex items-center gap-2 rounded-lg border border-white/10 bg-zinc-950 px-3 py-2 text-xs text-white/60">
-                <CheckCircle2 className="h-3.5 w-3.5 text-lime-400" /> Logo uploaded
-              </div>
-            )}
-            <label className="flex cursor-pointer items-center gap-2 rounded-lg border border-dashed border-white/20 bg-zinc-950 px-4 py-3 text-sm text-white/60 hover:border-lime-400/50">
-              <Upload className="h-4 w-4" />
-              {logo ? logo.name : logoUrl ? "Replace logo" : "Upload logo (PNG/SVG)"}
-              <input
-                type="file"
-                accept="image/*"
-                className="hidden"
-                onChange={(e) => setLogo(e.target.files?.[0] || null)}
-              />
-            </label>
-          </div>
+          {/* Service area — exact + range */}
+          <Section title="Where you serve" icon={MapPin}>
+            <Field label="Primary city & state" required>
+              <input value={form.primaryLocation} onChange={set("primaryLocation")} placeholder="Dallas, TX" className={inputCls} />
+            </Field>
+            <Field label="How far do you travel?" hint="Pick one">
+              <Chips options={RANGE_OPTIONS} selected={serviceRange} onToggle={(v) => toggle(serviceRange, setServiceRange, v)} single />
+            </Field>
+          </Section>
 
-          {/* Gallery */}
-          <div>
-            <label className="mb-2 block text-sm font-medium text-white">Project photos</label>
-            {galleryUrls.length > 0 && (
-              <div className="mb-2 flex flex-wrap gap-2">
-                {galleryUrls.map((url, i) => (
-                  <div key={i} className="relative">
-                    <img src={url} alt="" className="h-16 w-16 rounded-lg border border-white/10 object-cover" />
-                    <button
-                      type="button"
-                      onClick={() => setGalleryUrls((g) => g.filter((_, idx) => idx !== i))}
-                      className="absolute -right-1.5 -top-1.5 flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-white"
-                    >
-                      <X className="h-3 w-3" />
-                    </button>
-                  </div>
-                ))}
-              </div>
-            )}
-            <label className="flex cursor-pointer items-center gap-2 rounded-lg border border-dashed border-white/20 bg-zinc-950 px-4 py-3 text-sm text-white/60 hover:border-lime-400/50">
-              <Upload className="h-4 w-4" />
-              {gallery.length ? `${gallery.length} photo(s) selected` : "Upload project photos"}
-              <input
-                type="file"
-                accept="image/*"
-                multiple
-                className="hidden"
-                onChange={(e) => setGallery(Array.from(e.target.files || []))}
-              />
-            </label>
-          </div>
+          {/* Years — exact select */}
+          <Section title="Years in business" icon={Shield}>
+            <Chips options={YEARS_OPTIONS} selected={yearsInBusiness ? [yearsInBusiness] : []} onToggle={(v) => setYearsInBusiness(v)} single />
+          </Section>
+
+          {/* Differentiators — visual multi-choice (replaces open-ended "about") */}
+          <Section title="What makes you different" hint="Pick all that apply — we'll write your About section from these">
+            <Chips options={DIFFERENTIATOR_OPTIONS} selected={differentiators} onToggle={(v) => toggle(differentiators, setDifferentiators, v)} />
+          </Section>
+
+          {/* Visuals */}
+          <Section title="Your logo & project photos" icon={Upload}>
+            <div>
+              <label className="mb-2 block text-sm font-medium text-white">Logo</label>
+              {logoUrl && !logo && (
+                <div className="mb-2 inline-flex items-center gap-2 rounded-lg border border-white/10 bg-zinc-950 px-3 py-2 text-xs text-white/60">
+                  <CheckCircle2 className="h-3.5 w-3.5 text-lime-400" /> Logo uploaded
+                </div>
+              )}
+              <label className="flex cursor-pointer items-center gap-2 rounded-lg border border-dashed border-white/20 bg-zinc-950 px-4 py-3 text-sm text-white/60 hover:border-lime-400/50">
+                <Upload className="h-4 w-4" />
+                {logo ? logo.name : logoUrl ? "Replace logo" : "Upload logo (PNG/SVG)"}
+                <input type="file" accept="image/*" className="hidden" onChange={(e) => setLogo(e.target.files?.[0] || null)} />
+              </label>
+            </div>
+            <div>
+              <label className="mb-2 block text-sm font-medium text-white">Project photos</label>
+              {galleryUrls.length > 0 && (
+                <div className="mb-2 flex flex-wrap gap-2">
+                  {galleryUrls.map((url, i) => (
+                    <div key={i} className="relative">
+                      <img src={url} alt="" className="h-16 w-16 rounded-lg border border-white/10 object-cover" />
+                      <button type="button" onClick={() => setGalleryUrls((g) => g.filter((_, idx) => idx !== i))} className="absolute -right-1.5 -top-1.5 flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-white">
+                        <X className="h-3 w-3" />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
+              <label className="flex cursor-pointer items-center gap-2 rounded-lg border border-dashed border-white/20 bg-zinc-950 px-4 py-3 text-sm text-white/60 hover:border-lime-400/50">
+                <Upload className="h-4 w-4" />
+                {gallery.length ? `${gallery.length} photo(s) selected` : "Upload project photos"}
+                <input type="file" accept="image/*" multiple className="hidden" onChange={(e) => setGallery(Array.from(e.target.files || []))} />
+              </label>
+            </div>
+          </Section>
 
           {error && <p className="text-sm text-red-400">{error}</p>}
 
-          <button
-            type="submit"
-            disabled={saving}
-            className="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-lime-400 px-4 py-3 text-sm font-semibold text-black transition-colors hover:bg-lime-300 disabled:cursor-not-allowed disabled:bg-white/10 disabled:text-white/40"
-          >
-            {saving ? (
-              <>
-                <Loader2 className="h-4 w-4 animate-spin" /> Saving…
-              </>
-            ) : saved ? (
-              <>
-                <CheckCircle2 className="h-4 w-4" /> Saved — update profile
-              </>
-            ) : (
-              "Save & continue"
-            )}
+          <button type="submit" disabled={saving} className="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-lime-400 px-4 py-3 text-sm font-semibold text-black transition-colors hover:bg-lime-300 disabled:cursor-not-allowed disabled:bg-white/10 disabled:text-white/40">
+            {saving ? (<><Loader2 className="h-4 w-4 animate-spin" /> Saving…</>) : saved ? (<><CheckCircle2 className="h-4 w-4" /> Saved — update profile</>) : ("Save & continue")}
           </button>
         </form>
       </div>
@@ -278,6 +266,19 @@ export default function BusinessProfile() {
 const inputCls =
   "w-full rounded-lg border border-white/15 bg-zinc-950 px-3 py-2.5 text-sm text-white placeholder:text-white/30 focus:border-lime-400 focus:outline-none focus:ring-1 focus:ring-lime-400";
 
+function Section({ title, hint, icon: Icon, children }) {
+  return (
+    <div className="rounded-lg border border-white/10 bg-zinc-950/50 p-4">
+      <div className="mb-3 flex items-center gap-2">
+        {Icon && <Icon className="h-4 w-4 text-lime-400" />}
+        <h3 className="text-sm font-semibold text-white">{title}</h3>
+        {hint && <span className="text-xs text-white/40">· {hint}</span>}
+      </div>
+      <div className="space-y-3">{children}</div>
+    </div>
+  );
+}
+
 function Field({ label, hint, required, children }) {
   return (
     <div>
@@ -286,6 +287,32 @@ function Field({ label, hint, required, children }) {
       </label>
       {children}
       {hint && <p className="mt-1 text-xs text-white/40">{hint}</p>}
+    </div>
+  );
+}
+
+// Multiple-choice chip picker. `single` restricts to one selection (radio-style).
+function Chips({ options, selected, onToggle, single }) {
+  return (
+    <div className="flex flex-wrap gap-2">
+      {options.map((opt) => {
+        const on = single ? selected[0] === opt : selected.includes(opt);
+        return (
+          <button
+            key={opt}
+            type="button"
+            onClick={() => onToggle(opt)}
+            className={
+              "rounded-lg border px-3 py-1.5 text-xs font-medium transition-colors " +
+              (on
+                ? "border-lime-400 bg-lime-400/15 text-lime-300"
+                : "border-white/15 bg-zinc-950 text-white/60 hover:border-white/30")
+            }
+          >
+            {opt}
+          </button>
+        );
+      })}
     </div>
   );
 }

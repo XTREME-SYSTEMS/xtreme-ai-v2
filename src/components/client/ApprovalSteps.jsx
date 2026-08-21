@@ -4,7 +4,6 @@ import { CheckCircle2, Lock, Loader2, X, MessageSquare, ArrowRight } from "lucid
 import { UNIVERSAL_PIPELINE } from "@/lib/universalPipeline";
 import { computePipelineState } from "@/lib/pipelineState";
 import { usePipelineSignals } from "@/hooks/usePipelineSignals";
-import ClientOnboarding from "@/components/ClientOnboarding";
 
 // Step-by-step approval timeline for the client, driven by the universal
 // pipeline. The step they're currently on glows green and flashes; gated steps
@@ -75,13 +74,6 @@ export default function ApprovalSteps({ user, approvals = [], onDecide }) {
                   <span className={`ml-auto text-xs font-medium ${statusClass}`}>{statusLabel}</span>
                 </div>
                 <div className="mt-0.5 text-xs text-white/50">{step.desc}</div>
-
-                {/* Inline onboarding for step 1 */}
-                {step.key === "onboarding" && !completed && !locked && (
-                  <div className="mt-3 border-t border-white/10 pt-3">
-                    <ClientOnboarding user={user} />
-                  </div>
-                )}
 
                 {/* Deep-link for completed non-gate steps with a route */}
                 {step.to && !pendingApproval && (
