@@ -97,6 +97,7 @@ import SocialMediaGenerator from '@/pages/SocialMediaGenerator';
 import VideoGenerator from '@/pages/VideoGenerator';
 import YourDesigns from '@/pages/YourDesigns';
 import Enhancements from '@/pages/Enhancements';
+import AdminPackages from '@/pages/AdminPackages';
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin, isAuthenticated } = useAuth();
@@ -212,6 +213,7 @@ const AuthenticatedApp = () => {
           <Route path="/serp-blueprint" element={<SerpBlueprint />} />
           <Route path="/pipeline-dashboard" element={<PipelineDashboard />} />
           <Route path="/domain-acquisition" element={<DomainAcquisition />} />
+          <Route path="/admin-packages" element={<AdminPackages />} />
         </Route>
       </Route>
       <Route path="*" element={<PageNotFound />} />

@@ -1,31 +1,21 @@
+import { useState } from "react";
+import { motion } from "framer-motion";
 import MarketingNav from "@/components/marketing/MarketingNav";
 import PricingSection from "@/components/marketing/PricingSection";
-import Contact from "@/components/marketing/Contact";
+import ConsultBooking from "@/components/marketing/ConsultBooking";
 import MarketingFooter from "@/components/marketing/MarketingFooter";
-import { motion } from "framer-motion";
-import { Check, Loader2, ArrowRight } from "lucide-react";
-import { useState } from "react";
-import { startCheckout } from "@/lib/checkout";
-
-const ADDONS = [
-  { name: "AI Tools", desc: "Buy individual AI chatbots, calculators, estimators, and lead tools.", price: "From $99", productId: "ai-tool" },
-  { name: "Web Packs", desc: "Complete website packages — design, build, SEO, and launch.", price: "From $299", productId: "web-pack" },
-  { name: "App Packs", desc: "Custom web apps, client portals, and internal tools.", price: "From $499", productId: "app-pack" },
-];
+import ExpandableServiceCard from "@/components/marketing/ExpandableServiceCard";
+import { CATEGORIES, getServicesByCategory } from "@/lib/serviceCatalog";
 
 export default function Pricing() {
-  const [loading, setLoading] = useState(null);
-
-  const handleCheckout = async (productId, name) => {
-    setLoading(name);
-    try { await startCheckout(productId); } catch (e) { alert(e.message || "Checkout failed."); }
-    setLoading(null);
-  };
+  const [activeCategory, setActiveCategory] = useState("package");
+  const services = getServicesByCategory(activeCategory);
 
   return (
     <div className="min-h-screen bg-white">
       <MarketingNav />
       <main className="pt-16">
+        {/* Hero */}
         <section className="relative overflow-hidden bg-black">
           <video autoPlay muted loop playsInline className="absolute inset-0 h-full w-full object-cover"
             poster="https://media.base44.com/images/public/6a79444e821211169a147eee/3ef1d67ff_generated_image.png">
@@ -48,44 +38,55 @@ export default function Pricing() {
             </motion.h1>
             <motion.p initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3, duration: 0.6 }}
               className="mx-auto mt-6 max-w-xl text-lg font-medium text-white drop-shadow-[0_1px_6px_rgba(0,0,0,0.8)] sm:text-xl">
-              Choose a plan or buy individual tools, web packs, and app packs. Done-for-you services start with a deposit.
+              Choose a plan or buy individual tools, web packs, and services. Every purchase includes a contract preview so you know exactly what you're getting.
             </motion.p>
           </div>
         </section>
 
+        {/* Subscription plans */}
         <PricingSection showHeader={false} />
 
-        <section className="bg-white py-20 sm:py-28">
+        {/* À la carte — all services with expandable cards */}
+        <section className="bg-zinc-50 py-20 sm:py-28">
           <div className="mx-auto max-w-7xl px-4 sm:px-6">
             <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.5 }}
               className="mx-auto max-w-2xl text-center">
-              <div className="mb-3 inline-flex items-center gap-2 rounded-full bg-lime-400/15 px-3 py-1 text-xs font-bold uppercase tracking-wider text-lime-600">Buy What You Need</div>
-              <h2 className="text-3xl font-black tracking-tight text-black sm:text-5xl">À La Carte Add-Ons.</h2>
-              <p className="mt-4 text-lg text-black/60">Not ready for a full plan? Buy individual AI tools, web packs, or app packs — pay online, get instant access.</p>
+              <div className="mb-3 inline-flex items-center gap-2 rounded-full bg-lime-400/15 px-3 py-1 text-xs font-bold uppercase tracking-wider text-lime-700">Buy What You Need</div>
+              <h2 className="text-3xl font-black tracking-tight text-black sm:text-5xl">À La Carte Services.</h2>
+              <p className="mt-4 text-lg text-black/60">Not ready for a full plan? Buy individual AI tools, web packs, app packs, or services — pay online, get instant access. Click any card to see what's included, statistics, and review the contract before you buy.</p>
             </motion.div>
-            <div className="mt-12 grid gap-5 sm:grid-cols-3">
-              {ADDONS.map((a, i) => (
-                <motion.div key={a.name} initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.4, delay: i * 0.1 }}
-                  className="rounded-2xl border border-black/10 bg-white p-7 transition-all hover:border-black hover:shadow-xl">
-                  <h3 className="text-xl font-bold text-black">{a.name}</h3>
-                  <p className="mt-2 text-sm text-black/60">{a.desc}</p>
-                  <div className="mt-4 text-2xl font-black text-black">{a.price}</div>
-                  <ul className="mt-4 space-y-2 text-sm text-black/70">
-                    <li className="flex items-center gap-2"><Check className="h-4 w-4 text-lime-600" /> Pay online (Stripe / Wix)</li>
-                    <li className="flex items-center gap-2"><Check className="h-4 w-4 text-lime-600" /> Instant dashboard access</li>
-                    <li className="flex items-center gap-2"><Check className="h-4 w-4 text-lime-600" /> Approval-gated delivery</li>
-                  </ul>
-                  <button onClick={() => handleCheckout(a.productId, a.name)} disabled={loading === a.name}
-                    className="mt-5 inline-flex w-full items-center justify-center gap-1.5 rounded-xl bg-black px-4 py-3 text-sm font-bold text-white transition-all hover:bg-lime-400 hover:text-black disabled:opacity-50">
-                    {loading === a.name ? <Loader2 className="h-4 w-4 animate-spin" /> : <>Buy Now <ArrowRight className="h-4 w-4" /></>}
+
+            {/* Category tabs */}
+            <div className="mt-10 flex flex-wrap justify-center gap-2">
+              {CATEGORIES.filter((c) => c.id !== "plan").map((cat) => {
+                const Icon = cat.icon;
+                return (
+                  <button
+                    key={cat.id}
+                    onClick={() => setActiveCategory(cat.id)}
+                    className={`inline-flex items-center gap-2 rounded-full px-5 py-2.5 text-sm font-bold transition-all ${
+                      activeCategory === cat.id
+                        ? "bg-black text-white"
+                        : "border border-black/15 text-black/60 hover:border-black hover:text-black"
+                    }`}
+                  >
+                    <Icon className="h-4 w-4" /> {cat.label}
                   </button>
-                </motion.div>
+                );
+              })}
+            </div>
+
+            {/* Service grid */}
+            <div className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+              {services.map((service, i) => (
+                <ExpandableServiceCard key={service.id} service={service} index={i} />
               ))}
             </div>
           </div>
         </section>
 
-        <Contact />
+        {/* 15-min consult booking */}
+        <ConsultBooking />
       </main>
       <MarketingFooter />
     </div>

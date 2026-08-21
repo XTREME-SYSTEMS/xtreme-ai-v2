@@ -155,6 +155,93 @@ async function handleOrderApproved(db: any, eventData: any): Promise<Response> {
     const plan = planMap[purchase.productId] || "free";
     await db.entities.User.update(purchase.appUserId, { plan, has_paid: true });
   }
+
+  // Send a welcome/receipt email to the buyer + notify all admins.
+  if (buyerEmail) {
+    try {
+      const productNames: Record<string, string> = {
+        "pro-monthly": "Pro Plan (Monthly)", "pro-annual": "Pro Plan (Annual)",
+        "elite-monthly": "Elite Plan (Monthly)", "elite-annual": "Elite Plan (Annual)",
+        "ai-tool": "AI Tool", "web-pack": "Web Pack", "app-pack": "App Pack",
+        "deposit": "Done-For-You Service Deposit",
+      };
+      const pName = productNames[purchase.productId] || purchase.productName || "Your Purchase";
+      const amount = purchase.amount ? `$${purchase.amount}` : "";
+      const dateStr = new Date().toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" });
+      const loginLink = `${Deno.env.get("WIX_CHECKOUT_APP_URL") || ""}/login`;
+      const registerLink = `${Deno.env.get("WIX_CHECKOUT_APP_URL") || ""}/register`;
+
+      const emailBody = `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+          <div style="background: #000; color: #fff; padding: 30px; border-radius: 12px 12px 0 0; text-align: center;">
+            <h1 style="margin: 0; font-size: 24px;">Payment Received ✅</h1>
+            <p style="margin: 8px 0 0; color: #D4FF4D; font-size: 14px;">Welcome to Lead Generation Near You</p>
+          </div>
+          <div style="background: #f9f9f9; padding: 30px; border-radius: 0 0 12px 12px;">
+            <h2 style="color: #000; font-size: 20px;">Your Receipt</h2>
+            <table style="width: 100%; border-collapse: collapse; margin: 15px 0;">
+              <tr><td style="padding: 8px 0; color: #666; font-size: 14px;">Product:</td><td style="padding: 8px 0; font-weight: bold; font-size: 14px; text-align: right;">${pName}</td></tr>
+              <tr><td style="padding: 8px 0; color: #666; font-size: 14px;">Amount:</td><td style="padding: 8px 0; font-weight: bold; font-size: 14px; text-align: right;">${amount}</td></tr>
+              <tr><td style="padding: 8px 0; color: #666; font-size: 14px;">Date:</td><td style="padding: 8px 0; font-weight: bold; font-size: 14px; text-align: right;">${dateStr}</td></tr>
+              <tr><td style="padding: 8px 0; color: #666; font-size: 14px;">Email:</td><td style="padding: 8px 0; font-weight: bold; font-size: 14px; text-align: right;">${buyerEmail}</td></tr>
+            </table>
+
+            <h2 style="color: #000; font-size: 20px; margin-top: 30px;">What Happens Next</h2>
+            <ol style="color: #333; font-size: 14px; line-height: 1.8; padding-left: 20px;">
+              <li><strong>Create your account</strong> — Use this email to set your password and access your client portal.<br/>
+                ${purchase.appUserId
+                  ? `<a href="${loginLink}" style="color: #D4FF4D; font-weight: bold;">Click here to log in →</a>`
+                  : `<a href="${registerLink}" style="color: #D4FF4D; font-weight: bold;">Click here to create your account →</a>`
+                }
+              </li>
+              <li><strong>Complete your Business Profile</strong> — Tell us about your epoxy business so our team can start building.</li>
+              <li><strong>Approve each step</strong> — You'll review and approve your logo, brand, website, content, social media, and videos. Nothing ships without your sign-off.</li>
+              <li><strong>Get your deliverables</strong> — The moment you finish the process, you get instant access to all files in your client portal.</li>
+            </ol>
+
+            <div style="background: #D4FF4D; padding: 15px; border-radius: 8px; margin: 20px 0;">
+              <p style="margin: 0; font-size: 14px; color: #000;"><strong>⏱ Estimated Delivery: 7 days</strong><br/>
+              This is a placeholder estimate. In reality, the moment you finish the onboarding process, you get instant access to all your files and deliverables.</p>
+            </div>
+
+            <h2 style="color: #000; font-size: 20px; margin-top: 30px;">What's Included</h2>
+            <p style="color: #333; font-size: 14px;">Your purchase includes everything listed in your service agreement. You get <strong>up to 2 iterations free of charge</strong> on all deliverables. Each step has a "Request Revision" button so you can ask for changes at any time.</p>
+
+            <h2 style="color: #000; font-size: 20px; margin-top: 30px;">Need Help?</h2>
+            <p style="color: #333; font-size: 14px;">Reply to this email or call us at <strong>(772) 209-0266</strong>. We're here Monday–Saturday, 8 AM – 8 PM ET.</p>
+
+            <div style="text-align: center; margin-top: 30px; padding-top: 20px; border-top: 1px solid #ddd;">
+              <p style="color: #999; font-size: 12px;">Lead Generation Near You · 2200 NW 32nd St #700, Pompano Beach, FL 33069</p>
+            </div>
+          </div>
+        </div>
+      `;
+
+      await db.integrations.Core.SendEmail({
+        to: buyerEmail,
+        subject: "Payment Received — Welcome to Lead Generation Near You!",
+        body: emailBody,
+      });
+
+      // Notify all admins
+      try {
+        const admins = await db.entities.User.filter({ role: "admin" });
+        for (const admin of admins) {
+          if (admin.email && admin.email !== buyerEmail) {
+            await db.integrations.Core.SendEmail({
+              to: admin.email,
+              subject: `🔔 New Purchase: ${pName} (${amount})`,
+              body: `<p><strong>New purchase from:</strong> ${buyerEmail}</p><p><strong>Product:</strong> ${pName}</p><p><strong>Amount:</strong> ${amount}</p><p><strong>Date:</strong> ${dateStr}</p><p><strong>Purchase ID:</strong> ${purchase.id}</p><p><strong>App User ID:</strong> ${purchase.appUserId || "Anonymous (signup pending)"}</p>`,
+            });
+          }
+        }
+      } catch (adminErr) {
+        console.error("payments-webhook: admin notification failed", adminErr);
+      }
+    } catch (emailErr) {
+      console.error("payments-webhook: welcome email failed", emailErr);
+    }
+  }
   // ===== END APP-SPECIFIC =====
 
   // Mark paid LAST, so "paid" always implies the grant above completed. The idempotency

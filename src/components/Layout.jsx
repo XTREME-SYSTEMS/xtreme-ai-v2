@@ -6,7 +6,7 @@ import {
   Lightbulb, Palette, Monitor, Megaphone, Boxes, Factory, Database, Eye,
   Hammer, ShieldCheck, FileText, TrendingUp, FlaskConical, Dna, Network, BarChart3,
   BookMarked, CheckCircle, ScrollText, Plug, Settings, LogOut, Menu, X,
-  MapPin, Plus, Rocket, Bot, LayoutTemplate, Copy, Wand2, Crosshair, Activity, Radar,
+  MapPin, Plus, Rocket, Bot, LayoutTemplate, Copy, Wand2, Crosshair, Activity, Radar, Package,
 } from "lucide-react";
 import { Image } from "@/components/ui/image";
 import { cn } from "@/lib/utils";
@@ -85,6 +85,7 @@ const NAV = [
   { section: "Lab" },
   { to: "/test-lab", label: "Test Lab", icon: FlaskConical },
   { section: "Governance" },
+  { to: "/admin-packages", label: "Package Gallery", icon: Package },
   { to: "/approvals", label: "Approvals", icon: CheckCircle },
   { to: "/receipts", label: "Receipts", icon: ScrollText },
   { to: "/connectors", label: "Connectors", icon: Plug },
