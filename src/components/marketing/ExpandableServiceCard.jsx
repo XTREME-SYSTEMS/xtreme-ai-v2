@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ChevronDown, Check, ArrowRight, Loader2, BarChart3, FileText } from "lucide-react";
+import { ChevronDown, Check, ArrowRight, Loader2, BarChart3, FileText, Download } from "lucide-react";
 import { startCheckout } from "@/lib/checkout";
 import ContractPreview from "@/components/marketing/ContractPreview";
 
@@ -46,6 +46,11 @@ export default function ExpandableServiceCard({ service, index }) {
             <div className="min-w-0 flex-1">
               <h3 className="text-lg font-bold text-black">{service.name}</h3>
               <p className="mt-0.5 text-sm text-black/50">{service.tagline}</p>
+              {service.downloadable && (
+                <span className="mt-1.5 inline-flex items-center gap-1 rounded-full border border-lime-400/40 bg-lime-400/10 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-lime-700">
+                  <Download className="h-3 w-3" /> Downloadable
+                </span>
+              )}
             </div>
             <div className="shrink-0 text-right">
               <div className="text-xl font-black text-black">{service.priceLabel}</div>

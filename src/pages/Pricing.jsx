@@ -8,7 +8,7 @@ import ExpandableServiceCard from "@/components/marketing/ExpandableServiceCard"
 import { CATEGORIES, getServicesByCategory } from "@/lib/serviceCatalog";
 
 export default function Pricing() {
-  const [activeCategory, setActiveCategory] = useState("package");
+  const [activeCategory, setActiveCategory] = useState("web-pack");
   const services = getServicesByCategory(activeCategory);
 
   return (
@@ -53,7 +53,7 @@ export default function Pricing() {
               className="mx-auto max-w-2xl text-center">
               <div className="mb-3 inline-flex items-center gap-2 rounded-full bg-lime-400/15 px-3 py-1 text-xs font-bold uppercase tracking-wider text-lime-700">Buy What You Need</div>
               <h2 className="text-3xl font-black tracking-tight text-black sm:text-5xl">À La Carte Services.</h2>
-              <p className="mt-4 text-lg text-black/60">Not ready for a full plan? Buy individual AI tools, web packs, app packs, or services — pay online, get instant access. Click any card to see what's included, statistics, and review the contract before you buy.</p>
+              <p className="mt-4 text-lg text-black/60">Not ready for a full plan? Buy individual AI tools, web packs, app packs, or services — pay online, get instant access. Items marked <span className="inline-flex items-center gap-0.5 font-semibold text-lime-700">"Downloadable"</span> deliver files you can use without the portal. Click any card to see what's included and review the contract before you buy.</p>
             </motion.div>
 
             {/* Category tabs */}

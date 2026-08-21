@@ -8,7 +8,7 @@ import { SERVICE_CATALOG } from "@/lib/serviceCatalog";
 // Base44Purchase record so it shows in their client portal / My Package page).
 
 // Only plans and packages are assignable to a portal track.
-const ASSIGNABLE = SERVICE_CATALOG.filter((s) => s.category === "plan" || s.category === "package");
+const ASSIGNABLE = SERVICE_CATALOG.filter((s) => s.category === "plan" || s.category === "web-pack" || s.category === "app-pack");
 
 export default function ClientSetup() {
   const [users, setUsers] = useState([]);

@@ -153,8 +153,15 @@ async function handleOrderApproved(db: any, eventData: any): Promise<Response> {
       "elite-monthly": "elite", "elite-annual": "elite",
       "enterprise": "enterprise",
     };
-    const plan = planMap[purchase.productId] || "free";
-    await db.entities.User.update(purchase.appUserId, { plan, has_paid: true });
+    // Only update the plan for subscription products. One-time purchases
+    // (AI tools, web packs, app packs, services) must NOT change the plan —
+    // otherwise a Pro user buying a $99 tool gets downgraded to "free".
+    const plan = planMap[purchase.productId];
+    if (plan) {
+      await db.entities.User.update(purchase.appUserId, { plan, has_paid: true });
+    } else {
+      await db.entities.User.update(purchase.appUserId, { has_paid: true });
+    }
   }
 
   // Send a polished receipt email to the buyer + notify all admins.
@@ -163,6 +170,18 @@ async function handleOrderApproved(db: any, eventData: any): Promise<Response> {
       const productNames: Record<string, string> = {
         "pro-monthly": "Pro Plan (Monthly)", "pro-annual": "Pro Plan (Annual)",
         "elite-monthly": "Elite Plan (Monthly)", "elite-annual": "Elite Plan (Annual)",
+        "web-pack-starter": "Starter Web Pack", "web-pack-pro": "Pro Web Pack",
+        "web-pack-ecommerce": "E-Commerce Web Pack", "web-pack-landing": "Landing Page Pack",
+        "app-pack-ios": "iOS App Pack", "app-pack-android": "Android App Pack",
+        "app-pack-both": "iOS + Android App Pack", "app-pack-pwa": "PWA Pack",
+        "ai-tool-logo": "AI Logo Generator", "ai-tool-content": "AI Content Generator",
+        "ai-tool-social": "AI Social Media Generator", "ai-tool-video": "AI Video Generator",
+        "ai-tool-brand": "AI Brand Designer", "ai-tool-rank": "Rank Engine",
+        "ai-tool-citation": "Citation Builder", "ai-tool-backlink": "Backlink Outreach",
+        "ai-tool-chatbot": "AI Lead Chatbot",
+        "service-seo-audit": "SEO Audit", "service-gbp": "Google Business Profile Setup",
+        "service-call-tracking": "Call Tracking Number", "service-rush": "Priority Rush Delivery",
+        "service-reviews": "Review Management System",
         "ai-tool": "AI Tool", "web-pack": "Web Pack", "app-pack": "App Pack",
         "deposit": "Done-For-You Service Deposit",
         "enhancements": "Package Enhancements",

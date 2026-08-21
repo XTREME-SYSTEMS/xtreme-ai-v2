@@ -84,10 +84,38 @@ Deno.serve(async (req: Request) => {
     }
     // Server-side product catalog — authoritative prices, never trust client-sent price.
     const PRODUCTS: Record<string, { name: string; price: string; subscription?: { frequency: string } }> = {
+      // ── Subscriptions ──
       "pro-monthly":   { name: "Pro Plan (Monthly)",   price: "499.00",   subscription: { frequency: "MONTH" } },
       "pro-annual":    { name: "Pro Plan (Annual)",    price: "4990.00",  subscription: { frequency: "YEAR" } },
       "elite-monthly": { name: "Elite Plan (Monthly)", price: "1499.00",  subscription: { frequency: "MONTH" } },
       "elite-annual":  { name: "Elite Plan (Annual)",  price: "14990.00", subscription: { frequency: "YEAR" } },
+      // ── Web Packs (one-time, downloadable) ──
+      "web-pack-starter":   { name: "Starter Web Pack",      price: "299.00" },
+      "web-pack-pro":       { name: "Pro Web Pack",          price: "599.00" },
+      "web-pack-ecommerce": { name: "E-Commerce Web Pack",   price: "899.00" },
+      "web-pack-landing":   { name: "Landing Page Pack",     price: "199.00" },
+      // ── App Packs (one-time) ──
+      "app-pack-ios":     { name: "iOS App Pack",        price: "499.00" },
+      "app-pack-android": { name: "Android App Pack",    price: "499.00" },
+      "app-pack-both":    { name: "iOS + Android App Pack", price: "899.00" },
+      "app-pack-pwa":     { name: "PWA Pack",            price: "299.00" },
+      // ── AI Tools (one-time, downloadable, $99 each) ──
+      "ai-tool-logo":     { name: "AI Logo Generator",       price: "99.00" },
+      "ai-tool-content":  { name: "AI Content Generator",    price: "99.00" },
+      "ai-tool-social":   { name: "AI Social Media Generator", price: "99.00" },
+      "ai-tool-video":    { name: "AI Video Generator",      price: "99.00" },
+      "ai-tool-brand":    { name: "AI Brand Designer",        price: "99.00" },
+      "ai-tool-rank":     { name: "Rank Engine",              price: "99.00" },
+      "ai-tool-citation": { name: "Citation Builder",         price: "99.00" },
+      "ai-tool-backlink": { name: "Backlink Outreach",        price: "99.00" },
+      "ai-tool-chatbot":  { name: "AI Lead Chatbot",          price: "99.00" },
+      // ── Individual Services (one-time) ──
+      "service-seo-audit":      { name: "SEO Audit",                price: "149.00" },
+      "service-gbp":            { name: "Google Business Profile Setup", price: "300.00" },
+      "service-call-tracking":  { name: "Call Tracking Number",     price: "200.00" },
+      "service-rush":           { name: "Priority Rush Delivery",   price: "500.00" },
+      "service-reviews":        { name: "Review Management System",  price: "400.00" },
+      // ── Legacy / other ──
       "ai-tool":       { name: "AI Tool",              price: "99.00" },
       "web-pack":      { name: "Web Pack",             price: "299.00" },
       "app-pack":      { name: "App Pack",             price: "499.00" },
