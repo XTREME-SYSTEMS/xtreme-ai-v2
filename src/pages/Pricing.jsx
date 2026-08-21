@@ -60,6 +60,7 @@ export default function Pricing() {
             <div className="mt-10 flex flex-wrap justify-center gap-2">
               {CATEGORIES.filter((c) => c.id !== "plan").map((cat) => {
                 const Icon = cat.icon;
+                const count = getServicesByCategory(cat.id).length;
                 return (
                   <button
                     key={cat.id}
@@ -71,6 +72,7 @@ export default function Pricing() {
                     }`}
                   >
                     <Icon className="h-4 w-4" /> {cat.label}
+                    <span className={`rounded-full px-1.5 py-0.5 text-[10px] font-bold ${activeCategory === cat.id ? "bg-lime-400 text-black" : "bg-black/10 text-black/50"}`}>{count}</span>
                   </button>
                 );
               })}
