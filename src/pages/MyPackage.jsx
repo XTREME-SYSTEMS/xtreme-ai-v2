@@ -4,7 +4,6 @@ import { Package, ChevronRight } from "lucide-react";
 import { getProductDetails } from "@/lib/productDetails";
 import PurchaseDetailModal from "@/components/client/PurchaseDetailModal";
 import PreviewBanner from "@/components/client/PreviewBanner";
-import ClientStartHere from "@/components/client/ClientStartHere";
 import { usePreviewEmail } from "@/hooks/usePreviewEmail";
 
 // Dedicated page for the client's purchased package — the top-level
@@ -54,8 +53,6 @@ export default function MyPackage() {
   return (
     <div className="space-y-5">
       {isPreviewing && <PreviewBanner />}
-      {/* Step-by-step timeline so the client always knows exactly what to do */}
-      <ClientStartHere user={user} />
       {/* What you paid for — the source of truth the whole system keys off */}
       <div className="rounded-xl border border-lime-400/40 bg-lime-400/5 p-5">
         <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-lime-400">
