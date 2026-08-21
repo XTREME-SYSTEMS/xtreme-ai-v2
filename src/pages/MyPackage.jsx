@@ -111,7 +111,7 @@ export default function MyPackage() {
                   <div className="grid grid-cols-2 gap-2 border-b border-white/10 bg-black/30 p-3 text-xs sm:grid-cols-4">
                     <Fact label="Status" value="Active" valueClass="text-lime-400" />
                     <Fact label="Paid on" value={fmtDate(p.paidAt) || "—"} />
-                    <Fact label="Order" value={p.orderId ? p.orderId.slice(0, 12) : "—"} />
+                    <Fact label="Order" value={`#${String(idx + 1).padStart(3, "0")}`} />
                     <Fact label="Buyer" value={p.buyerEmail || "—"} />
                   </div>
 
