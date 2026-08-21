@@ -56,6 +56,8 @@ export default function WebsiteDesignStudio() {
   const [reviseError, setReviseError] = useState("");
   const [sectionBusy, setSectionBusy] = useState("");
   const [sectionMsg, setSectionMsg] = useState("");
+  const [imageSource, setImageSource] = useState("uploads"); // "uploads" | "ai"
+  const [aiFromUploadsDone, setAiFromUploadsDone] = useState(false);
 
   useEffect(() => { document.title = "Website Design · Lead Gen Near You"; }, []);
 
@@ -69,6 +71,11 @@ export default function WebsiteDesignStudio() {
     if (hookUser?.chosenPalette) setPaletteId(hookUser.chosenPalette);
     if (hookUser?.chosenWebsiteLayout) setSelectedId(hookUser.chosenWebsiteLayout);
     if (hookUser?.designPacksChosen) setSaved(true);
+    // Default the gallery view to the client's uploaded photos when they have
+    // them; otherwise fall back to the AI-generated set.
+    const hasUploads = hookUser?.epoxyProfile?.galleryUrls && hookUser.epoxyProfile.galleryUrls.length > 0;
+    setImageSource(hasUploads ? (hookUser?.chosenImageSource || "uploads") : "ai");
+    if (hookUser?.websiteImages && hookUser.websiteImages.length > 0) setAiFromUploadsDone(true);
   }, [hookUser]);
 
   const callGenerate = async (p) => {
@@ -155,6 +162,43 @@ export default function WebsiteDesignStudio() {
     finally { setEnhancingImages(false); }
   };
 
+  // Generate a fresh AI image set that matches the STYLE of the client's
+  // uploaded photos (vision-analyzed + used as direct visual reference), so
+  // the "AI-Generated" view looks like their real work without reusing the
+  // exact uploaded photos.
+  const generateAiFromUploads = async () => {
+    setEnhancingImages(true); setSectionMsg("");
+    try {
+      const res = await base44.functions.invoke("regenerateWebsiteImages", {
+        businessName: profile?.businessName || "",
+        services: profile?.services || [],
+        location: profile?.primaryLocation || "",
+        count: 6,
+        industry: profile?.industry || "",
+        subIndustry: profile?.subIndustry || profile?.customSubIndustry || "",
+        businessType: Array.isArray(profile?.businessType) ? profile?.businessType.join(", ") : (profile?.businessType || ""),
+        differentiators: profile?.differentiators || [],
+        yearsInBusiness: profile?.yearsInBusiness || "",
+        financialIntelligence: hookUser?.financialIntelligence || null,
+        industryAnswers: hookUser?.industryAnswers || null,
+        referenceImages: profile?.galleryUrls || [],
+      });
+      const imgs = res?.data?.images || [];
+      if (imgs.length) {
+        setImages(imgs);
+        setAiFromUploadsDone(true);
+        try { await update({ websiteImages: imgs }); } catch {}
+        setSectionMsg("AI images matched to your photo style.");
+      } else setSectionMsg("Couldn't generate style-matched images. Try again.");
+    } catch (e) { setSectionMsg("Couldn't generate style-matched images. Try again."); }
+    finally { setEnhancingImages(false); }
+  };
+
+  // Which image set is currently displayed in the previews.
+  const displayImages = imageSource === "uploads" && uploadedGallery
+    ? profile.galleryUrls
+    : images;
+
   const regenerateLayouts = () => {
     setRegeneratingLayouts(true);
     setTimeout(() => {
@@ -195,9 +239,9 @@ export default function WebsiteDesignStudio() {
     try {
       await update({
         chosenWebsiteLayout: selectedId, chosenPalette: paletteId,
-        websiteContent: content, websiteImages: images, designPacksChosen: true,
+        websiteContent: content, websiteImages: images, chosenImageSource: imageSource, designPacksChosen: true,
       });
-      try { await logReceipt({ action: "Website layout approved", entityType: "User", entityId: "self", status: "success", notes: `Layout ${selectedId} · palette ${paletteId}` }); } catch {}
+      try { await logReceipt({ action: "Website layout approved", entityType: "User", entityId: "self", status: "success", notes: `Layout ${selectedId} · palette ${paletteId} · images ${imageSource}` }); } catch {}
       await notifyStepComplete("website", { businessName: profile?.businessName || "" });
       setSaved(true);
       try { localStorage.setItem("coach:done:/design-direction", "1"); } catch {}
@@ -258,6 +302,34 @@ export default function WebsiteDesignStudio() {
           </div>
         </div>
 
+        {/* Image source toggle — only when the client uploaded their own photos.
+            Lets them compare their real photos vs an AI-generated set that
+            matches their style, and pick which to use on the site. */}
+        {uploadedGallery && (
+          <div className="mt-4">
+            <div className="mb-2 text-xs font-semibold uppercase tracking-wider text-lime-400">Gallery images</div>
+            <div className="flex flex-wrap items-center gap-2">
+              <div className="flex items-center gap-1 rounded-lg border border-white/10 bg-zinc-900 p-0.5">
+                <button type="button" onClick={() => setImageSource("uploads")}
+                  className={cn("inline-flex items-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-medium", imageSource === "uploads" ? "bg-lime-400 text-black" : "text-white/60 hover:text-white")}>
+                  <Images className="h-3.5 w-3.5" /> My Photos
+                </button>
+                <button type="button" onClick={() => { setImageSource("ai"); if (!images.length && !aiFromUploadsDone && !enhancingImages) generateAiFromUploads(); }}
+                  className={cn("inline-flex items-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-medium", imageSource === "ai" ? "bg-lime-400 text-black" : "text-white/60 hover:text-white")}>
+                  {enhancingImages && imageSource === "ai" ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Sparkles className="h-3.5 w-3.5" />} AI-Generated
+                </button>
+              </div>
+              <span className="text-[11px] text-white/40">
+                {imageSource === "uploads"
+                  ? "Showing your uploaded project photos."
+                  : enhancingImages
+                    ? "Generating images that match your photo style…"
+                    : "AI images styled after your photos — pick the set you like best."}
+              </span>
+            </div>
+          </div>
+        )}
+
         {/* Global controls */}
         <div className="mt-4 flex flex-wrap items-center gap-2">
           <div className="flex items-center gap-1 rounded-lg border border-white/10 bg-zinc-900 p-0.5">
@@ -314,7 +386,7 @@ export default function WebsiteDesignStudio() {
                   </div>
                   <button type="button" onClick={() => setPreview(L)} className="block w-full text-left">
                     <ScaledPreview designWidth={isMobile ? 390 : 1280} aspect={isMobile ? 1.5 : 0.62}>
-                      <WebsitePreview layout={L} content={content} images={images} profile={profile} theme={theme} mobile={isMobile} logoUrl={logoUrl} />
+                      <WebsitePreview layout={L} content={content} images={displayImages} profile={profile} theme={theme} mobile={isMobile} logoUrl={logoUrl} />
                     </ScaledPreview>
                   </button>
                   <div className="flex items-center gap-2 p-2.5">
@@ -338,7 +410,7 @@ export default function WebsiteDesignStudio() {
           <div className="mt-5 flex flex-wrap gap-2 border-t border-white/10 pt-4">
             <ActionBtn onClick={regenerateLayouts} loading={regeneratingLayouts} icon={RefreshCw} label="Regenerate layouts" />
             <ActionBtn onClick={enhanceContent} loading={enhancingContent} icon={Wand2} label="Enhance content" />
-            <ActionBtn onClick={enhanceImages} loading={enhancingImages} icon={Images} label="Enhance images" />
+            <ActionBtn onClick={uploadedGallery ? generateAiFromUploads : enhanceImages} loading={enhancingImages} icon={Images} label={uploadedGallery ? "Regenerate AI images" : "Enhance images"} />
             {sectionMsg && <span className="self-center text-xs text-lime-300">{sectionMsg}</span>}
           </div>
         )}
@@ -391,7 +463,7 @@ export default function WebsiteDesignStudio() {
 
       {preview && (
         <PreviewModal
-          layout={preview} content={content} images={images} profile={profile} palette={palette} logoUrl={logoUrl}
+          layout={preview} content={content} images={displayImages} profile={profile} palette={palette} logoUrl={logoUrl}
           selected={selectedId === preview.id} onSelect={() => setSelectedId(preview.id)} onClose={() => { setPreview(null); setSectionMsg(""); }}
           onSubmitSectionComment={submitSectionComment} onRegenerateSection={regenerateSection}
           sectionBusy={sectionBusy} sectionMsg={sectionMsg}
