@@ -1,27 +1,19 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { base44 } from "@/api/base44Client";
-import { FileSignature, Loader2, ShieldCheck, CheckCircle2, X, PenLine, Clock, ArrowRight, RotateCcw, Calendar } from "lucide-react";
+import { FileSignature, Loader2, ShieldCheck, CheckCircle2, X, PenLine, Clock, ArrowRight, Calendar } from "lucide-react";
 import SignaturePad from "@/components/client/SignaturePad";
 import PreviewBanner from "@/components/client/PreviewBanner";
 import BackButton from "@/components/client/BackButton";
 import { usePreviewEmail } from "@/hooks/usePreviewEmail";
 import { useClientUser } from "@/hooks/useClientUser";
 import { useClientUpdate } from "@/hooks/useClientUpdate";
+import { useClientProject } from "@/hooks/useClientProject";
+import { useClientTrack } from "@/hooks/useClientTrack";
+import ContractReview from "@/components/client/ContractReview";
 import { logReceipt } from "@/lib/pipelineUtils";
 import { notifyStepComplete } from "@/lib/pipelineNotify";
 import { cn } from "@/lib/utils";
-
-const REVISION_LINKS = [
-  { to: "/business-profile", label: "Business Profile" },
-  { to: "/content-generator", label: "Content" },
-  { to: "/logo-generator", label: "Logo" },
-  { to: "/brand-generator", label: "Brand" },
-  { to: "/design-direction", label: "Website" },
-  { to: "/social-media", label: "Social" },
-  { to: "/video-generator", label: "Video" },
-  { to: "/your-designs", label: "Your Designs" },
-];
 
 // Client-facing Signatures page: lists contracts assigned to the logged-in
 // user and lets them sign inline on mobile (touch) or desktop (mouse).
@@ -35,6 +27,8 @@ export default function Signatures() {
     if (user?.plan === "demo") navigate("/pricing", { replace: true });
   }, [user?.plan, navigate]);
   const { update } = useClientUpdate();
+  const { project } = useClientProject(user);
+  const { productId } = useClientTrack(user);
   const [docs, setDocs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [active, setActive] = useState(null);
@@ -204,20 +198,7 @@ export default function Signatures() {
         <span className="ml-auto hidden rounded-md border border-white/15 px-2 py-1 text-[10px] font-semibold uppercase tracking-wider text-white/40 sm:inline">E-Sign</span>
       </div>
 
-      {/* Revision navigation — go back to any step to fix something */}
-      <div className="mb-6 rounded-xl border border-white/10 bg-zinc-950 p-4">
-        <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-white/50">
-          <RotateCcw className="h-3.5 w-3.5" /> Need to change something?
-        </div>
-        <p className="mt-1 text-xs text-white/40">Go back to any step to revise your choices. Revising a step will also reset any steps that depend on it.</p>
-        <div className="mt-3 flex flex-wrap gap-2">
-          {REVISION_LINKS.map((l) => (
-            <button key={l.to} onClick={() => navigate(l.to)} className="inline-flex items-center gap-1 rounded-md border border-white/15 px-2.5 py-1.5 text-xs font-medium text-white/60 hover:border-lime-400/50 hover:text-lime-300">
-              {l.label}
-            </button>
-          ))}
-        </div>
-      </div>
+      <ContractReview user={user} project={project} productId={productId} />
 
       {loading ? (
         <div className="flex items-center gap-2 text-sm text-white/50">

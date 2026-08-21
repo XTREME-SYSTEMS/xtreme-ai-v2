@@ -6,10 +6,11 @@ import { getAdminEmails } from '../../shared/pipelineNotifications.ts';
 // business profile data to personalize the contract. Idempotent — if a
 // draft contract already exists for the client, it returns that instead.
 //
-// G6 — The contract is created with status "draft" so an admin can review
-// and edit it before it becomes visible to the client. Admins are notified
-// by email. The admin changes the status to "sent" from the E-Sign Documents
-// page, which makes it appear on the client's Signatures page.
+// The contract is created with status "sent" so the client can review and
+// sign it immediately on the Signatures page. The client's actual decisions
+// from every step are folded into the body so the agreement reflects exactly
+// what they chose. Admins are notified by email and can review the signed
+// agreement from the E-Sign Documents page.
 export default async function(req) {
   try {
     const base44 = createClientFromRequest(req);
@@ -45,6 +46,53 @@ export default async function(req) {
     const enhancements = user.enhancements || [];
     const enhancementsTotal = user.enhancementsTotal || 0;
 
+    // Pull the client's creative decisions from their ClientProject so the
+    // contract reflects exactly what they chose at each portal step.
+    let project = null;
+    try {
+      const projects = await base44.asServiceRole.entities.ClientProject.filter(
+        { client_email: clientEmail }, "-created_date", 1
+      );
+      project = projects?.[0] || null;
+    } catch (e) {
+      console.error("autoGenerateClientContract: project fetch failed", e?.message || e);
+    }
+
+    const decisionsLines = [];
+    decisionsLines.push(`Business: ${businessName} (${industry})`);
+    if (profile.businessStage) decisionsLines.push(`Stage: ${profile.businessStage}`);
+    if (profile.primaryLocation) decisionsLines.push(`Location: ${profile.primaryLocation}`);
+    if (profile.businessType) {
+      const bt = Array.isArray(profile.businessType) ? profile.businessType.join(", ") : profile.businessType;
+      if (bt) decisionsLines.push(`Customer base: ${bt}`);
+    }
+    if (profile.radius) decisionsLines.push(`Service radius: ${profile.radius}`);
+    if (profile.yearsInBusiness) decisionsLines.push(`Years in business: ${profile.yearsInBusiness}`);
+    const ia = profile.industryAnswers || {};
+    for (const [k, v] of Object.entries(ia)) {
+      if (!v || (Array.isArray(v) && v.length === 0)) continue;
+      decisionsLines.push(`- ${k.replace(/_/g, " ")}: ${Array.isArray(v) ? v.join(", ") : v}`);
+    }
+    if (project) {
+      if (project.chosen_content_template) decisionsLines.push(`Content tone: ${project.chosen_content_template}`);
+      if (project.chosen_logo_url) decisionsLines.push(`Logo: chosen`);
+      const bi = (project.chosen_brand_images || []).length;
+      if (bi) decisionsLines.push(`Brand mockups chosen: ${bi}`);
+      if (project.chosen_website_layout) decisionsLines.push(`Website layout: ${project.chosen_website_layout}`);
+      if (project.chosen_palette) decisionsLines.push(`Color palette: ${project.chosen_palette}`);
+      if (project.social_media_chosen) decisionsLines.push(`Social media kit: approved`);
+      if (project.video_chosen) decisionsLines.push(`Video concepts: approved`);
+    }
+    const ownerPhotos = (profile.ownerPhotos || []).length;
+    const teamPhotos = (profile.teamPhotos || []).length;
+    const workPhotos = (profile.workPhotos || profile.galleryUrls || []).length;
+    const otherPhotos = (profile.otherPhotos || []).length;
+    if (ownerPhotos || teamPhotos || workPhotos || otherPhotos) {
+      decisionsLines.push(`Photos provided — owner: ${ownerPhotos}, team: ${teamPhotos}, work: ${workPhotos}, other: ${otherPhotos}`);
+    }
+    if (enhancements.length) decisionsLines.push(`Enhancements: ${enhancements.join(", ")} (total $${enhancementsTotal})`);
+    const decisionsSummary = decisionsLines.join("\n");
+
     const scope = businessStage === "rebrand"
       ? `Complete brand refresh and website redesign for ${businessName}, including new logo, brand identity, website design, social media kit, and video concepts.`
       : businessStage === "scale"
@@ -65,19 +113,23 @@ Scope of work: ${scope}${enhancementNote}
 Price: As quoted in selected package and enhancements
 Terms: 50% deposit due at signing, balance due upon project completion. Net 15.
 
+Client decisions & specifications (incorporate these into a "Project Specifications" section as a bulleted review of exactly what the client chose at each step):
+${decisionsSummary}
+
 Include these sections:
 1. Parties (Lead Gen Near You and ${businessName})
 2. Scope of Services (based on the project description above)
-3. Project Timeline (standard 2-week build, or 3 business days if rush delivery selected)
-4. Fees & Payment (deposit structure, enhancement costs)
-5. Client Responsibilities (providing content, photos, timely feedback)
-6. Revision Policy (unlimited revisions during build phase, 30-day post-launch support)
-7. Intellectual Property (client owns final deliverables upon full payment)
-8. Confidentiality
-9. Limitation of Liability
-10. Cancellation & Refund Policy
-11. Governing Law
-12. Signatures
+3. Project Specifications (list every item from the client decisions summary above as bullets so the client can review their choices)
+4. Project Timeline (standard 2-week build, or 3 business days if rush delivery selected)
+5. Fees & Payment (deposit structure, enhancement costs)
+6. Client Responsibilities (providing content, photos, timely feedback)
+7. Revision Policy (unlimited revisions during build phase, 30-day post-launch support)
+8. Intellectual Property (client owns final deliverables upon full payment)
+9. Confidentiality
+10. Limitation of Liability
+11. Cancellation & Refund Policy
+12. Governing Law
+13. Signatures
 
 Make it professional, enforceable, and easy to read. Use clear headings and bullet points where appropriate.`;
 
@@ -87,13 +139,13 @@ Make it professional, enforceable, and easy to read. Use clear headings and bull
       response_json_schema: { type: "object", properties: { body: { type: "string" } } },
     });
 
-    // G6 — Create as "draft" so admins can review before sending to client
+    // Create as "sent" so the client can review and sign immediately
     const doc = await base44.asServiceRole.entities.EsignDocument.create({
       title: `Service Agreement — ${businessName}`,
       body: res.body,
       account_name: businessName,
       deal_name: businessStage === "rebrand" ? "Brand Refresh" : businessStage === "scale" ? "Growth Package" : "Launch Package",
-      status: "draft",
+      status: "sent",
       signers: [{
         name: user.full_name || businessName,
         email: clientEmail,
@@ -111,10 +163,10 @@ Make it professional, enforceable, and easy to read. Use clear headings and bull
         try {
           await base44.integrations.Core.SendEmail({
             to: adminEmail,
-            subject: `Contract needs review: ${businessName}`,
+            subject: `Contract sent to client: ${businessName}`,
             body:
-              `A service agreement was auto-generated for ${businessName} (${clientEmail}).\n\n` +
-              `It's in "draft" status — please review and click "Send" to make it visible to the client.\n\n` +
+              `A service agreement was auto-generated and sent to ${businessName} (${clientEmail}) for signature.\n\n` +
+              `It includes the client's chosen options from every step. You can review the signed agreement from the E-Sign Documents page.\n\n` +
               `Review: ${appUrl}/esign/documents`,
           });
         } catch (e) {
