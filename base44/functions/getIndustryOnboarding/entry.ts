@@ -25,28 +25,28 @@ const FALLBACK_QUESTIONS = [
   {
     id: "target_customer",
     question: "Who is your ideal customer?",
-    type: "single",
+    type: "multi",
     options: ["Homeowners", "Small businesses", "Large corporations", "Government/municipal", "All of the above"],
     why: "Targets your messaging and ad campaigns.",
   },
   {
     id: "project_size",
     question: "What's your typical project size?",
-    type: "single",
+    type: "multi",
     options: ["Under $1k", "$1k–$5k", "$5k–$20k", "$20k–$50k", "$50k+"],
     why: "Helps us recommend the right package and pricing.",
   },
   {
     id: "lead_source",
     question: "Where do most of your leads come from today?",
-    type: "single",
+    type: "multi",
     options: ["Word of mouth", "Google/SEO", "Social media", "Paid ads", "Referrals", "Cold outreach"],
     why: "Guides our marketing strategy and channel focus.",
   },
   {
     id: "biggest_challenge",
     question: "What's your biggest business challenge right now?",
-    type: "single",
+    type: "multi",
     options: ["Not enough leads", "Low-quality leads", "Beating competitors", "Online presence", "Pricing/profitability", "Hiring/staffing"],
     why: "Shapes our recommendations and priority services.",
   },
@@ -82,7 +82,8 @@ RULES:
 - The remaining 4-6 questions must be SPECIFIC to ${industry}${subIndustry ? ` / ${subIndustry}` : ""} — NOT generic business questions
 - Think about what a ${industry} business owner MUST tell us so we can build them the best possible website, brand, and marketing system
 - Consider industry-specific regulations, certifications, equipment, project types, customer concerns, seasonal factors, and competitive dynamics
-- Each question needs: id (snake_case), question (clear text), type ("single"|"multi"|"text"), options (array of strings, empty for text), why (why this matters)
+- Each question needs: id (snake_case), question (clear text), type ("multi"|"text"), options (array of strings, empty for text), why (why this matters)
+- IMPORTANT: Use type "multi" for ALL option-based questions — the user must always be able to select one OR more answers, never forced to pick just one. Only use "text" for open-ended freeform answers.
 
 Return a JSON object with a "questions" array.`;
 

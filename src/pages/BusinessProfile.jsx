@@ -513,7 +513,7 @@ export default function BusinessProfile() {
               industryQuestions.map((q) => {
                 const ans = industryAnswers[q.id];
                 return (
-                  <Section key={q.id} title={q.question} hint={q.why ? `· ${q.why}` : ""}>
+                  <Section key={q.id} title={q.question} hint={q.type === "text" ? (q.why ? `· ${q.why}` : "") : `Select all that apply${q.why ? ` · ${q.why}` : ""}`}>
                     {q.type === "text" ? (
                       <input
                         value={ans || ""}
@@ -521,19 +521,16 @@ export default function BusinessProfile() {
                         placeholder="Type your answer…"
                         className={inputCls}
                       />
-                    ) : q.type === "single" ? (
-                      <Chips
-                        options={q.options || []}
-                        selected={ans ? [ans] : []}
-                        onToggle={(v) => setIndustryAnswers((a) => ({ ...a, [q.id]: v }))}
-                        single
-                      />
                     ) : (
+                      // Universal multi-select: both "single" and "multi" type questions
+                      // allow the user to pick one OR more answers — they're never forced
+                      // to provide just one. Legacy "single" answers (stored as a string)
+                      // are normalized to an array on first interaction.
                       <Chips
                         options={q.options || []}
-                        selected={ans || []}
+                        selected={Array.isArray(ans) ? ans : (ans ? [ans] : [])}
                         onToggle={(v) => setIndustryAnswers((a) => {
-                          const cur = a[q.id] || [];
+                          const cur = Array.isArray(a[q.id]) ? a[q.id] : (a[q.id] ? [a[q.id]] : []);
                           return { ...a, [q.id]: cur.includes(v) ? cur.filter((x) => x !== v) : [...cur, v] };
                         })}
                       />
