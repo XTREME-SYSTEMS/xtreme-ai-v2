@@ -300,3 +300,66 @@ export function adminNotificationEmail(opts: {
     </div>
   `;
 }
+
+// Account modification email — sent when a user's package or account is
+// changed (subscription canceled/expired, plan upgraded/downgraded by admin,
+// access granted/revoked). Includes a prominent portal link so the user can
+// navigate directly to their dashboard from the email.
+export function accountModifiedEmail(opts: {
+  email: string;
+  changeType: string;
+  changeSummary: string;
+  appUrl: string;
+  hasAccount: boolean;
+}): string {
+  const { email, changeType, changeSummary, appUrl, hasAccount } = opts;
+  const portalLink = `${appUrl}/my-package`;
+  const loginLink = `${appUrl}/login`;
+  const profileLink = `${appUrl}/business-profile`;
+  const designsLink = `${appUrl}/your-designs`;
+
+  return `
+    <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 0; background: ${LIGHT_GRAY};">
+      <!-- Header -->
+      <div style="background: ${BLACK}; padding: 32px 24px; text-align: center; border-radius: 16px 16px 0 0;">
+        <div style="display: inline-block; background: ${LIME}; color: ${BLACK}; font-size: 11px; font-weight: 800; letter-spacing: 1.5px; padding: 4px 14px; border-radius: 20px; text-transform: uppercase; margin-bottom: 12px;">Account Update</div>
+        <h1 style="margin: 0; font-size: 26px; font-weight: 900; color: ${WHITE}; letter-spacing: -0.5px;">${changeType}</h1>
+        <p style="margin: 8px 0 0; font-size: 15px; color: ${LIME}; font-weight: 500;">Your account has been updated</p>
+      </div>
+
+      <!-- Body -->
+      <div style="background: ${WHITE}; padding: 32px 24px; border-radius: 0 0 16px 16px;">
+        <p style="margin: 0 0 16px; font-size: 15px; line-height: 1.6; color: #333;">Hi there,</p>
+        <p style="margin: 0 0 20px; font-size: 15px; line-height: 1.6; color: #333;">${changeSummary}</p>
+
+        <!-- Portal button -->
+        <div style="text-align: center; margin: 28px 0;">
+          <a href="${hasAccount ? portalLink : loginLink}" style="display: inline-block; background: ${LIME}; color: ${BLACK}; font-size: 16px; font-weight: 800; padding: 16px 40px; border-radius: 12px; text-decoration: none; box-shadow: 0 4px 12px rgba(212, 255, 77, 0.3);">${hasAccount ? "Go to Your Portal →" : "Log In to Your Portal →"}</a>
+        </div>
+
+        <!-- Quick links -->
+        <div style="background: ${LIGHT_GRAY}; border-radius: 12px; padding: 20px; margin: 24px 0;">
+          <h3 style="margin: 0 0 12px; font-size: 14px; font-weight: 700; color: ${BLACK};">Quick Links</h3>
+          <table style="width: 100%; border-collapse: collapse;">
+            <tr>
+              <td style="padding: 6px 0;"><a href="${hasAccount ? portalLink : loginLink}" style="font-size: 14px; font-weight: 600; color: ${BLACK}; text-decoration: none; border-bottom: 2px solid ${LIME};">View Your Package</a></td>
+            </tr>
+            <tr>
+              <td style="padding: 6px 0;"><a href="${hasAccount ? profileLink : loginLink}" style="font-size: 14px; font-weight: 600; color: ${BLACK}; text-decoration: none; border-bottom: 2px solid ${LIME};">Business Profile</a></td>
+            </tr>
+            <tr>
+              <td style="padding: 6px 0;"><a href="${hasAccount ? designsLink : loginLink}" style="font-size: 14px; font-weight: 600; color: ${BLACK}; text-decoration: none; border-bottom: 2px solid ${LIME};">Your Designs</a></td>
+            </tr>
+          </table>
+        </div>
+
+        <!-- Support -->
+        <div style="text-align: center; margin-top: 24px; padding: 16px; background: ${LIGHT_GRAY}; border-radius: 10px;">
+          <p style="margin: 0; font-size: 13px; color: ${GRAY};">Questions about this change? Reply to this email or call <strong style="color: ${BLACK};">(772) 209-0266</strong></p>
+        </div>
+
+        ${emailFooter()}
+      </div>
+    </div>
+  `;
+}

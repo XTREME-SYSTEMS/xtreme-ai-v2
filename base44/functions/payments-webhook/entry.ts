@@ -12,7 +12,7 @@
 
 import { createClientFromRequest } from "npm:@base44/sdk@0.8.31";
 import { importSPKI, jwtVerify } from "npm:jose@5.9.6";
-import { receiptEmail, adminNotificationEmail } from "../../shared/emailTemplates.ts";
+import { receiptEmail, adminNotificationEmail, accountModifiedEmail } from "../../shared/emailTemplates.ts";
 
 // Wix event types (verbatim from Wix docs).
 const ORDER_APPROVED = "wix.ecom.v1.order_approved";
@@ -89,7 +89,7 @@ Deno.serve(async (req: Request) => {
     }
 
     if (eventType === SUBSCRIPTION_CANCELED || eventType === SUBSCRIPTION_EXPIRED) {
-      return await handleSubscriptionEnded(db, eventData);
+      return await handleSubscriptionEnded(db, eventData, eventType);
     }
 
     // Unknown/irrelevant event — acknowledge so Wix stops retrying.
