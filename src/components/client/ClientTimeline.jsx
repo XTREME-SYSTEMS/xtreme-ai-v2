@@ -1,20 +1,25 @@
 import { useEffect, useRef } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { Check, Lock } from "lucide-react";
-import { CLIENT_STEPS, getStepByPath } from "@/lib/clientSteps";
+import { CLIENT_STEPS, getStepByPath, getVisibleSteps } from "@/lib/clientSteps";
+import { useClientUser } from "@/hooks/useClientUser";
+import { useClientTrack } from "@/hooks/useClientTrack";
 import { cn } from "@/lib/utils";
 
 // Horizontal step-by-step timeline pinned to the top of the client portal.
 // On mobile it's a compact, horizontally scrollable strip that auto-centers
 // the current step — no overflow, no icons going off-screen. On desktop the
 // same strip shows with labels. Completed steps are checked and clickable;
-// future steps are locked.
+// future steps are locked. D3 — steps are filtered by track and D2 — by stage.
 export default function ClientTimeline() {
   const location = useLocation();
   const navigate = useNavigate();
   const scrollRef = useRef(null);
-  const current = getStepByPath(location.pathname);
-  const currentIdx = current ? CLIENT_STEPS.findIndex((s) => s.to === current.to) : -1;
+  const { user } = useClientUser();
+  const { track } = useClientTrack(user);
+  const visibleSteps = getVisibleSteps(track?.key || "default", user);
+  const current = visibleSteps.find((s) => s.to === location.pathname) || getStepByPath(location.pathname);
+  const currentIdx = current ? visibleSteps.findIndex((s) => s.to === current.to) : -1;
 
   // Auto-scroll the current step into view on mount and whenever the step changes.
   useEffect(() => {
@@ -27,7 +32,7 @@ export default function ClientTimeline() {
       {/* Mobile: compact "Step X of 13" header with current step label */}
       <div className="flex items-center justify-between px-4 pt-2 sm:hidden">
         <span className="text-[11px] font-semibold uppercase tracking-wider text-lime-400">
-          Step {Math.max(currentIdx + 1, 1)} of {CLIENT_STEPS.length}
+          Step {Math.max(currentIdx + 1, 1)} of {visibleSteps.length}
         </span>
         <span className="truncate pl-2 text-[11px] font-medium text-white/60">
           {current?.label || ""}
@@ -39,7 +44,7 @@ export default function ClientTimeline() {
         ref={scrollRef}
         className="flex items-center gap-1 overflow-x-auto px-4 py-2.5 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden sm:gap-1.5 sm:py-3"
       >
-        {CLIENT_STEPS.map((step, i) => {
+        {visibleSteps.map((step, i) => {
           const Icon = step.icon;
           const isCurrent = i === currentIdx;
           const isDone = currentIdx > i;
@@ -75,7 +80,7 @@ export default function ClientTimeline() {
                   {step.label}
                 </span>
               </button>
-              {i < CLIENT_STEPS.length - 1 && (
+              {i < visibleSteps.length - 1 && (
                 <div
                   className={cn(
                     "mx-0.5 h-0.5 w-3 shrink-0 rounded-full sm:mx-1 sm:w-5",

@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { base44 } from "@/api/base44Client";
 import { Image } from "@/components/ui/image";
-import { LayoutTemplate, PenTool, Shirt, Globe, ArrowRight, Eye, Sparkles, MessageSquareText, Share2, Video, RefreshCw, AlertCircle, Check, X, Loader2 } from "lucide-react";
+import { LayoutTemplate, PenTool, Shirt, Globe, ArrowRight, Eye, Sparkles, MessageSquareText, Share2, Video, RefreshCw, AlertCircle, Check, X, Loader2, Download } from "lucide-react";
 import { cn } from "@/lib/utils";
 import BackButton from "@/components/client/BackButton";
 import { notifyStepComplete } from "@/lib/pipelineNotify";
@@ -119,6 +119,32 @@ export default function YourDesigns() {
   const uncheckedSections = Object.entries(checks).filter(([, v]) => !v).map(([k]) => k);
   const sectionLabels = { content: "Content Tone", logo: "Logo", brand: "Brand Mockups", website: "Website Design", social: "Social Media", video: "Videos" };
 
+  // D4 — Asset download: triggers a browser download for a single URL
+  const downloadAsset = (url, filename) => {
+    if (!url) return;
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = filename || "asset";
+    a.target = "_blank";
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+  };
+
+  // D4 — Download all brand mockups (opens each in sequence)
+  const downloadAllBrand = () => {
+    brandPacks.forEach((p, i) => {
+      setTimeout(() => downloadAsset(p.url, `${p.label || "brand-" + i}.png`), i * 300);
+    });
+  };
+
+  // D4 — Download all social templates
+  const downloadAllSocial = () => {
+    socialTemplates.forEach((t, i) => {
+      setTimeout(() => downloadAsset(t.url, `${t.label || "social-" + i}.png`), i * 300);
+    });
+  };
+
   return (
     <div className="mx-auto max-w-4xl">
       <BackButton to="/video-generator" />
@@ -164,6 +190,7 @@ export default function YourDesigns() {
           icon={PenTool} title="Your Logo" count={logoUrl ? 1 : 0}
           checked={checks.logo} onToggle={() => toggle("logo")}
           onRegenerate={() => navigate("/logo-generator")}
+          onDownload={logoUrl ? () => downloadAsset(logoUrl, "logo.png") : null}
           empty={!logoUrl}
           emptyText="No logo chosen yet."
         >
@@ -179,6 +206,7 @@ export default function YourDesigns() {
           icon={Shirt} title="Brand Mockups" count={brandPacks.length}
           checked={checks.brand} onToggle={() => toggle("brand")}
           onRegenerate={() => navigate("/brand-generator")}
+          onDownload={brandPacks.length > 0 ? downloadAllBrand : null}
           empty={brandPacks.length === 0}
           emptyText="No brand mockups chosen yet."
         >
@@ -248,6 +276,7 @@ export default function YourDesigns() {
           icon={Share2} title="Social Media Kit" count={socialTemplates.length}
           checked={checks.social} onToggle={() => toggle("social")}
           onRegenerate={() => navigate("/social-media")}
+          onDownload={socialTemplates.length > 0 ? downloadAllSocial : null}
           empty={socialTemplates.length === 0}
           emptyText="No social media pack chosen yet."
         >
@@ -330,7 +359,7 @@ export default function YourDesigns() {
 
 // A section card with a selection checkbox (top-left), a regenerate button,
 // and an empty state. The checkbox gates the continue button.
-function DesignSection({ icon: Icon, title, count, checked, onToggle, onRegenerate, empty, emptyText, children }) {
+function DesignSection({ icon: Icon, title, count, checked, onToggle, onRegenerate, onDownload, empty, emptyText, children }) {
   return (
     <section className={cn("mt-6 rounded-xl border p-4 transition-colors", checked ? "border-white/10 bg-zinc-950/50" : "border-amber-400/40 bg-amber-400/5")}>
       <div className="mb-3 flex items-center gap-2">
@@ -344,10 +373,19 @@ function DesignSection({ icon: Icon, title, count, checked, onToggle, onRegenera
         <Icon className="h-4 w-4 text-lime-400" />
         <h2 className="text-sm font-semibold uppercase tracking-wider text-white/80">{title}</h2>
         {count > 0 && <span className="rounded-full bg-lime-400/15 px-1.5 py-0.5 text-[10px] font-bold text-lime-300">{count}</span>}
+        {onDownload && (
+          <button
+            type="button"
+            onClick={onDownload}
+            className="ml-auto inline-flex items-center gap-1 rounded-md border border-lime-400/30 bg-lime-400/10 px-2 py-1 text-[10px] font-medium text-lime-300 hover:border-lime-400/60 hover:bg-lime-400/20"
+          >
+            <Download className="h-3 w-3" /> Download
+          </button>
+        )}
         <button
           type="button"
           onClick={onRegenerate}
-          className="ml-auto inline-flex items-center gap-1 rounded-md border border-white/15 px-2 py-1 text-[10px] font-medium text-white/60 hover:border-lime-400/50 hover:text-lime-300"
+          className={cn("inline-flex items-center gap-1 rounded-md border border-white/15 px-2 py-1 text-[10px] font-medium text-white/60 hover:border-lime-400/50 hover:text-lime-300", onDownload ? "ml-0" : "ml-auto")}
         >
           <RefreshCw className="h-3 w-3" /> Regenerate
         </button>

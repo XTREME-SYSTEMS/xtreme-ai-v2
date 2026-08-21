@@ -1,0 +1,214 @@
+{
+  "name": "ClientProject",
+  "type": "object",
+  "description": "Offloads creative work from the User record \u2014 stores all generated assets (content, logo, brand, website, social, video) for a client's project, keyed by client email. One project per client.",
+  "properties": {
+    "client_email": {
+      "type": "string",
+      "description": "Email of the client who owns this project. Used for row-level isolation."
+    },
+    "business_name": {
+      "type": "string"
+    },
+    "industry": {
+      "type": "string"
+    },
+    "sub_industry": {
+      "type": "string"
+    },
+    "business_type": {
+      "type": "string"
+    },
+    "business_stage": {
+      "type": "string",
+      "description": "new, rebrand, scale \u2014 controls which steps are shown"
+    },
+    "profile": {
+      "type": "object",
+      "description": "Full business profile from the onboarding wizard",
+      "properties": {
+        "phone": {
+          "type": "string"
+        },
+        "email": {
+          "type": "string"
+        },
+        "website": {
+          "type": "string"
+        },
+        "primary_location": {
+          "type": "string"
+        },
+        "address": {
+          "type": "string"
+        },
+        "zip": {
+          "type": "string"
+        },
+        "radius": {
+          "type": "string"
+        },
+        "years_in_business": {
+          "type": "string"
+        },
+        "industry_answers": {
+          "type": "object"
+        },
+        "financial_intelligence": {
+          "type": "object"
+        },
+        "logo_url": {
+          "type": "string"
+        },
+        "gallery_urls": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "content_templates": {
+      "type": "array",
+      "items": {
+        "type": "object"
+      }
+    },
+    "chosen_content_template": {
+      "type": "string"
+    },
+    "content_templates_chosen": {
+      "type": "boolean",
+      "default": false
+    },
+    "logo_options": {
+      "type": "array",
+      "items": {
+        "type": "object"
+      }
+    },
+    "chosen_logo_url": {
+      "type": "string"
+    },
+    "brand_packs": {
+      "type": "array",
+      "items": {
+        "type": "object"
+      }
+    },
+    "chosen_brand_images": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "website_content": {
+      "type": "object"
+    },
+    "website_images": {
+      "type": "array",
+      "items": {
+        "type": "object"
+      }
+    },
+    "chosen_website_layout": {
+      "type": "string"
+    },
+    "chosen_palette": {
+      "type": "string"
+    },
+    "design_packs_chosen": {
+      "type": "boolean",
+      "default": false
+    },
+    "social_media_pack": {
+      "type": "object"
+    },
+    "social_media_chosen": {
+      "type": "boolean",
+      "default": false
+    },
+    "video_pack": {
+      "type": "object"
+    },
+    "video_chosen": {
+      "type": "boolean",
+      "default": false
+    },
+    "enhancements": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "enhancements_total": {
+      "type": "number",
+      "default": 0
+    },
+    "enhancements_chosen": {
+      "type": "boolean",
+      "default": false
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "draft",
+        "onboarding",
+        "generating",
+        "review",
+        "approved",
+        "launched"
+      ],
+      "default": "draft"
+    },
+    "current_step": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "client_email"
+  ],
+  "rls": {
+    "read": {
+      "$or": [
+        {
+          "data.client_email": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "create": {
+      "$or": [
+        {
+          "data.client_email": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "update": {
+      "$or": [
+        {
+          "data.client_email": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

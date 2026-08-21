@@ -10,6 +10,8 @@ import { useClientUser } from "@/hooks/useClientUser";
 import { useClientUpdate } from "@/hooks/useClientUpdate";
 import { notifyStepComplete } from "@/lib/pipelineNotify";
 import BrandedButton from "@/components/client/BrandedButton";
+import { useRevisionThreads } from "@/hooks/useRevisionThreads";
+import RevisionThreadPanel from "@/components/client/RevisionThreadPanel";
 
 // Dedicated page for the client's purchased package — the top-level
 // destination of the client portal. Shows only the package and its items.
@@ -26,6 +28,7 @@ export default function MyPackage() {
   const [reviseError, setReviseError] = useState("");
   const navigate = useNavigate();
   const { effectiveEmail, isScoped, isPreviewing } = usePreviewEmail(user);
+  const { threads, sendMessage } = useRevisionThreads(user);
 
   // Reviewing the package completes the Welcome step and advances the client
   // to onboarding (Business Profile) — the epoxy intake questions live there.
@@ -245,6 +248,23 @@ export default function MyPackage() {
                     <X className="h-3.5 w-3.5" /> Cancel
                   </button>
                 </div>
+              </div>
+            ) : reviseSent && threads.length > 0 ? (
+              <div className="space-y-3">
+                <div className="flex items-center gap-2 rounded-lg border border-lime-400/50 bg-lime-400/10 px-3 py-2.5 text-sm text-lime-300">
+                  <CheckCircle className="h-4 w-4" /> Your revision request was sent. Chat with our team below.
+                </div>
+                <RevisionThreadPanel
+                  thread={threads[0]}
+                  onSend={(body) => sendMessage(threads[0].id, body)}
+                />
+                <button
+                  type="button"
+                  onClick={() => setRevising(true)}
+                  className="inline-flex items-center gap-1.5 rounded-lg border border-white/15 px-3 py-2 text-xs font-medium text-white/70 hover:border-lime-400/50 hover:text-lime-300"
+                >
+                  <MessageSquare className="h-3.5 w-3.5" /> Request Another Revision
+                </button>
               </div>
             ) : (
               <>

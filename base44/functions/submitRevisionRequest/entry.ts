@@ -89,7 +89,31 @@ export default async function(req) {
       console.error("submitRevisionRequest: receipt failed", e?.message || e);
     }
 
-    return Response.json({ ok: true, approvalId, cascadedSteps });
+    // 5) D6 — Create a RevisionThread for two-way messaging
+    let threadId = null;
+    try {
+      const thread = await base44.asServiceRole.entities.RevisionThread.create({
+        client_email: email,
+        step_key: stepKey,
+        step_label: stepLabel,
+        subject: `Revision: ${stepLabel}`,
+        status: "open",
+        messages: [{
+          sender: "client",
+          sender_email: email,
+          body: note,
+          sent_at: new Date().toISOString(),
+        }],
+        last_message_at: new Date().toISOString(),
+        client_unread_count: 0,
+        admin_unread_count: 1,
+      });
+      threadId = thread?.id || null;
+    } catch (e) {
+      console.error("submitRevisionRequest: thread create failed", e?.message || e);
+    }
+
+    return Response.json({ ok: true, approvalId, threadId, cascadedSteps });
   } catch (error) {
     console.error("submitRevisionRequest error", error?.message || error);
     return Response.json({ error: error?.message || "server error" }, { status: 500 });

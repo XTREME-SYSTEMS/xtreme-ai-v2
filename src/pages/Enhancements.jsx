@@ -9,21 +9,11 @@ import { notifyStepComplete } from "@/lib/pipelineNotify";
 import { useClientUser } from "@/hooks/useClientUser";
 import { useClientUpdate } from "@/hooks/useClientUpdate";
 import { logReceipt } from "@/lib/pipelineUtils";
+import { getEnhancementsForIndustry, getRecommendedEnhancementIds } from "@/lib/dynamicEnhancements";
 
 // Step: Enhancements — upsell page shown after Your Designs and before Sign
-// Agreement. The client can add optional enhancements (rush delivery, extra
-// pages, blog pack, GBP setup, etc.) to their package. The total is
-// calculated live and saved to their profile for the team to invoice.
-const ENHANCEMENTS = [
-  { id: "rush", name: "Priority Rush Delivery", description: "Get your website built and launched in 3 business days instead of the standard 2-week timeline.", price: 500, icon: Zap },
-  { id: "extra_page", name: "Additional Service Page", description: "Add a fully-designed, SEO-optimized page for an additional service (e.g. garage floor coatings, commercial epoxy).", price: 150, icon: FileText },
-  { id: "blog_pack", name: "Blog Content Pack (10 articles)", description: "10 SEO-optimized blog articles targeting local epoxy search terms, written and ready to publish.", price: 750, icon: FileText },
-  { id: "gbp", name: "Google Business Profile Setup", description: "Complete setup and optimization of your Google Business Profile for maximum local search visibility.", price: 300, icon: MapPin },
-  { id: "reviews", name: "Review Management System", description: "Automated review request system that sends review links to your customers after job completion.", price: 400, icon: Star },
-  { id: "call_tracking", name: "Call Tracking Number", description: "Dedicated tracking phone number with call recording and analytics to measure your lead flow.", price: 200, icon: Phone },
-  { id: "multi_loc", name: "Multi-Location SEO (per location)", description: "Additional location pages with local SEO optimization for each service area you cover.", price: 600, icon: MapPin },
-  { id: "social_mgmt", name: "Social Media Management (3 months)", description: "We manage your social media posting for 3 months using your generated content calendar.", price: 900, icon: Calendar },
-];
+// Agreement. The enhancement catalog is now DYNAMIC — it adapts to the
+// client's industry with industry-specific recommendations surfaced first.
 
 export default function Enhancements() {
   const navigate = useNavigate();
@@ -34,6 +24,11 @@ export default function Enhancements() {
   const [saved, setSaved] = useState(false);
   const [error, setError] = useState("");
 
+  // D8 — Dynamic industry-aware enhancements
+  const industry = user?.epoxyProfile?.industry || "";
+  const ENHANCEMENTS = getEnhancementsForIndustry(industry);
+  const recommendedIds = getRecommendedEnhancementIds(industry);
+
   useEffect(() => {
     document.title = "Enhancements · Lead Gen Near You";
   }, []);
@@ -41,7 +36,9 @@ export default function Enhancements() {
   useEffect(() => {
     if (!user) return;
     if (user?.enhancements) setSelected(user.enhancements);
+    else if (recommendedIds.length > 0) setSelected(recommendedIds); // pre-select recommended
     if (user?.enhancementsChosen) setSaved(true);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user]);
 
   const toggle = (id) => {
@@ -105,9 +102,16 @@ export default function Enhancements() {
           </div>
         )}
 
+        {recommendedIds.length > 0 && (
+          <div className="mt-4 flex items-center gap-2 rounded-lg border border-lime-400/30 bg-lime-400/5 px-3 py-2 text-xs text-lime-300">
+            <Sparkles className="h-3.5 w-3.5" /> Recommended for your industry — pre-selected for you.
+          </div>
+        )}
+
         <div className="mt-5 space-y-3">
           {ENHANCEMENTS.map((e) => {
             const on = selected.includes(e.id);
+            const isRecommended = recommendedIds.includes(e.id);
             const Icon = e.icon;
             return (
               <button
@@ -124,6 +128,7 @@ export default function Enhancements() {
                 <div className="min-w-0 flex-1">
                   <div className="flex items-center gap-2">
                     <h3 className="text-sm font-semibold text-white">{e.name}</h3>
+                    {isRecommended && <span className="rounded-full bg-lime-400/15 px-1.5 py-0.5 text-[9px] font-bold uppercase text-lime-300">Recommended</span>}
                     {on && <Check className="h-4 w-4 text-lime-400" />}
                   </div>
                   <p className="mt-0.5 text-xs text-white/50">{e.description}</p>

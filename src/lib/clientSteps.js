@@ -34,6 +34,8 @@ export const CLIENT_STEPS = [
     title: "Step 4 · Pick Your Logo",
     body: "We generated 10 logo concepts for your business. All are created with transparent backgrounds so they look perfect on any website theme. Tap the one that feels right.",
     nextLabel: "Go to Brand Generator", nextTo: "/brand-generator",
+    // D2 — Stage-aware: skip logo generation for rebranding clients (they keep their existing logo)
+    skipIf: (user) => user?.epoxyProfile?.businessStage === "rebrand",
   },
   {
     to: "/brand-generator", label: "Brand Generator", icon: Shirt, step: 5, gate: "brand",
@@ -55,6 +57,8 @@ export const CLIENT_STEPS = [
     title: "Step 7 · Your Social Media Brand Kit",
     body: "We designed 10 on-brand social templates with your logo — profile, cover, stories, posts, favicon, icons — plus a full 30-day content calendar with captions and best posting times. All included.",
     nextLabel: "Go to Video Generator", nextTo: "/video-generator",
+    // D3 — Track-aware: social media not included in web-pack
+    tracks: ["deposit", "default", "app-pack"],
   },
   {
     to: "/video-generator", label: "Video Generator", icon: Video, step: 8, gate: "video",
@@ -62,6 +66,8 @@ export const CLIENT_STEPS = [
     title: "Step 8 · Your Video Concepts",
     body: "We created 10 video concepts using your onboarding, content tone, logo, and brand. Preview each, generate the actual video for any you like, and use them on your site, social media, or YouTube.",
     nextLabel: "Go to Your Designs", nextTo: "/your-designs",
+    // D3 — Track-aware: video not included in web-pack
+    tracks: ["deposit", "default", "app-pack"],
   },
   {
     to: "/your-designs", label: "Your Designs", icon: LayoutTemplate, step: 9, gate: "auto",
@@ -109,4 +115,23 @@ export const CLIENT_NAV = [...CLIENT_STEPS, ...CLIENT_UTILITIES];
 
 export function getStepByPath(path) {
   return CLIENT_STEPS.find((s) => s.to === path) || null;
+}
+
+// D2 + D3 — Returns the visible steps for a given track and user stage.
+// Filters out steps that are skipped by stage (skipIf) or not included in the track.
+export function getVisibleSteps(track, user) {
+  const stage = user?.epoxyProfile?.businessStage || "";
+  return CLIENT_STEPS.filter((step) => {
+    // D2 — Stage-aware skip
+    if (step.skipIf && step.skipIf(user)) return false;
+    // D3 — Track-aware filtering
+    if (step.tracks && !step.tracks.includes(track)) return false;
+    return true;
+  });
+}
+
+// D2 — Check if a specific step should be skipped for this user
+export function shouldSkipStep(step, user) {
+  if (step.skipIf && step.skipIf(user)) return true;
+  return false;
 }

@@ -7,6 +7,7 @@ import PreviewBanner from "@/components/client/PreviewBanner";
 import { logReceipt } from "@/lib/pipelineUtils";
 import EntityTable from "@/components/EntityTable";
 import StatusBadge from "@/components/StatusBadge";
+import AdminRevisionThreads from "@/components/admin/AdminRevisionThreads";
 import { CheckCircle } from "lucide-react";
 
 export default function Approvals() {
@@ -77,21 +78,24 @@ export default function Approvals() {
   // Admin governance view (not previewing).
   if (!isClientView) {
     return (
-      <EntityTable
-        entity="Approval"
-        title="Approval Center"
-        subtitle="Governance approvals — green (auto), yellow (preview), red (production locked)."
-        emptyIcon={CheckCircle}
-        emptyTitle="No approvals yet"
-        columns={[
-          { key: "client_email", label: "Client" },
-          { key: "pipeline_step", label: "Step" },
-          { key: "requested_action", label: "Action" },
-          { key: "risk_level", label: "Risk", render: (it) => <span className={`text-xs font-medium ${it.risk_level === "red" ? "text-rose-400" : it.risk_level === "yellow" ? "text-amber-400" : "text-emerald-400"}`}>{it.risk_level}</span> },
-          { key: "decision_by", label: "By" },
-          { key: "status", label: "Status", render: (it) => <StatusBadge status={it.status} /> },
-        ]}
-      />
+      <div>
+        <EntityTable
+          entity="Approval"
+          title="Approval Center"
+          subtitle="Governance approvals — green (auto), yellow (preview), red (production locked)."
+          emptyIcon={CheckCircle}
+          emptyTitle="No approvals yet"
+          columns={[
+            { key: "client_email", label: "Client" },
+            { key: "pipeline_step", label: "Step" },
+            { key: "requested_action", label: "Action" },
+            { key: "risk_level", label: "Risk", render: (it) => <span className={`text-xs font-medium ${it.risk_level === "red" ? "text-rose-400" : it.risk_level === "yellow" ? "text-amber-400" : "text-emerald-400"}`}>{it.risk_level}</span> },
+            { key: "decision_by", label: "By" },
+            { key: "status", label: "Status", render: (it) => <StatusBadge status={it.status} /> },
+          ]}
+        />
+        <AdminRevisionThreads />
+      </div>
     );
   }
 

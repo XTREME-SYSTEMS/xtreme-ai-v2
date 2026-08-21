@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { base44 } from "@/api/base44Client";
 import { usePreviewEmail } from "@/hooks/usePreviewEmail";
+import { shouldSkipStep } from "@/lib/clientSteps";
 
 // Checks whether the current step's gated activity is actually complete by
 // inspecting real data (not just a button click).
@@ -16,6 +17,11 @@ export function useStepGate(step, user) {
     if (!step) return;
 
     if (step.gate === "auto" || !step.gate) {
+      setState({ isComplete: true, loading: false, pendingLabel: "" });
+      return;
+    }
+    // D2 — Stage-aware: if the step should be skipped for this user, it's auto-complete
+    if (shouldSkipStep(step, user)) {
       setState({ isComplete: true, loading: false, pendingLabel: "" });
       return;
     }

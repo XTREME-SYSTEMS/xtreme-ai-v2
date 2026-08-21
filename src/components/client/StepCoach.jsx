@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { ArrowRight, Lightbulb, CheckCircle2, Lock, Loader2 } from "lucide-react";
-import { getStepByPath } from "@/lib/clientSteps";
+import { getStepByPath, shouldSkipStep, getVisibleSteps } from "@/lib/clientSteps";
 import { useClientUser } from "@/hooks/useClientUser";
+import { useClientTrack } from "@/hooks/useClientTrack";
 import { useStepGate } from "@/hooks/useStepGate";
 
 // Forced, two-phase gated walkthrough:
@@ -20,6 +21,8 @@ export default function StepCoach() {
   const navigate = useNavigate();
   const step = getStepByPath(location.pathname);
   const { user } = useClientUser();
+  const { track } = useClientTrack(user);
+  const visibleSteps = getVisibleSteps(track?.key || "default", user);
   const [phase, setPhase] = useState("intro"); // "intro" | "gate" | "done"
 
   const introKey = step ? `coach:intro:${step.to}` : null;
@@ -37,9 +40,11 @@ export default function StepCoach() {
   }, [step?.to, introKey, doneKey]);
 
   const { isComplete, loading, pendingLabel } = useStepGate(step, user);
-  const isLast = !step?.nextTo;
+  const currentIdx = visibleSteps.findIndex((s) => s.to === step?.to);
+  const isLast = currentIdx === -1 || currentIdx === visibleSteps.length - 1;
 
-  if (!step || phase === "done") return null;
+  // D2 — Don't show coach for steps that are skipped for this user's stage
+  if (!step || phase === "done" || shouldSkipStep(step, user)) return null;
 
   const start = () => {
     try { localStorage.setItem(introKey, "1"); } catch {}
@@ -49,7 +54,13 @@ export default function StepCoach() {
   const finish = () => {
     try { localStorage.setItem(doneKey, "1"); } catch {}
     setPhase("done");
-    if (step.nextTo) navigate(step.nextTo);
+    // G3 — Navigate to the next VISIBLE step (skips filtered-out steps)
+    const currentIdx = visibleSteps.findIndex((s) => s.to === step?.to);
+    if (currentIdx >= 0 && currentIdx < visibleSteps.length - 1) {
+      navigate(visibleSteps[currentIdx + 1].to);
+    } else if (step?.nextTo) {
+      navigate(step.nextTo);
+    }
   };
 
   // Phase 1 — intro modal
@@ -111,7 +122,7 @@ export default function StepCoach() {
           disabled={!isComplete}
           className="inline-flex shrink-0 items-center gap-1.5 rounded-lg bg-lime-400 px-4 py-2.5 text-sm font-semibold text-black transition-colors hover:bg-lime-300 disabled:cursor-not-allowed disabled:bg-white/10 disabled:text-white/40"
         >
-          {isLast ? <>Finish <CheckCircle2 className="h-4 w-4" /></> : <>{step.nextLabel} <ArrowRight className="h-4 w-4" /></>}
+          {isLast ? <>Finish <CheckCircle2 className="h-4 w-4" /></> : <>{(visibleSteps[currentIdx + 1]?.label || step.nextLabel || "Continue").replace("Go to ", "")} <ArrowRight className="h-4 w-4" /></>}
         </button>
       </div>
     </div>

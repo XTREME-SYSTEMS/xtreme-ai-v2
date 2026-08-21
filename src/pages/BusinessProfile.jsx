@@ -8,7 +8,10 @@ import {
 import BackButton from "@/components/client/BackButton";
 import { useClientUser } from "@/hooks/useClientUser";
 import { useClientUpdate } from "@/hooks/useClientUpdate";
+import { useClientProject } from "@/hooks/useClientProject";
 import { notifyStepComplete } from "@/lib/pipelineNotify";
+
+const DRAFT_KEY = "draft:business-profile";
 import {
   BUSINESS_STAGES, BUSINESS_TYPES, INDUSTRIES, RADIUS_OPTIONS, YEARS_OPTIONS,
 } from "@/lib/industryData";
@@ -31,6 +34,7 @@ export default function BusinessProfile() {
   const navigate = useNavigate();
   const { user } = useClientUser();
   const { update } = useClientUpdate();
+  const { saveProject } = useClientProject(user);
 
   const [step, setStep] = useState(0);
   const [form, setForm] = useState({
@@ -63,6 +67,32 @@ export default function BusinessProfile() {
   const [error, setError] = useState("");
 
   useEffect(() => { document.title = "Business Profile · Lead Gen Near You"; }, []);
+
+  // Restore draft from localStorage (D5 — draft saving)
+  useEffect(() => {
+    try {
+      const draft = localStorage.getItem(DRAFT_KEY);
+      if (draft) {
+        const parsed = JSON.parse(draft);
+        if (parsed.form) setForm((f) => ({ ...f, ...parsed.form }));
+        if (parsed.industryAnswers) setIndustryAnswers(parsed.industryAnswers);
+        if (parsed.step !== undefined) setStep(parsed.step);
+        if (parsed.financialIntel) setFinancialIntel(parsed.financialIntel);
+      }
+    } catch {}
+  }, []);
+
+  // Auto-save draft to localStorage on every change (D5 — draft saving)
+  useEffect(() => {
+    const t = setTimeout(() => {
+      try {
+        localStorage.setItem(DRAFT_KEY, JSON.stringify({
+          form, industryAnswers, step, financialIntel,
+        }));
+      } catch {}
+    }, 500);
+    return () => clearTimeout(t);
+  }, [form, industryAnswers, step, financialIntel]);
 
   // Pre-fill from existing profile
   useEffect(() => {
@@ -216,6 +246,21 @@ export default function BusinessProfile() {
       };
 
       await update({ epoxyProfile: profile, epoxyProfileSubmitted: true, financialIntelligence: financialIntel, industryAnswers });
+      // D1 — also create/update ClientProject to offload creative work from User
+      try {
+        await saveProject({
+          client_email: user?.email || "",
+          business_name: form.businessName,
+          industry: form.industry,
+          sub_industry: effectiveSubIndustry,
+          business_type: form.businessType,
+          business_stage: form.businessStage,
+          profile,
+          status: "onboarding",
+        });
+      } catch {}
+      // D5 — clear draft since profile is saved
+      try { localStorage.removeItem(DRAFT_KEY); } catch {}
       setLogoUrl(finalLogo);
       setGalleryUrls(finalGallery);
       setLogo(null);

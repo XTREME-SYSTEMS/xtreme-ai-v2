@@ -1,0 +1,120 @@
+{
+  "name": "RevisionThread",
+  "type": "object",
+  "description": "Two-way messaging thread between client and admin for revision requests. Each message has a sender role (client/admin), body, and timestamp. Threads are linked to a step or approval.",
+  "properties": {
+    "client_email": {
+      "type": "string",
+      "description": "Email of the client who owns this thread. Used for row-level isolation."
+    },
+    "step_key": {
+      "type": "string",
+      "description": "Pipeline step this revision thread is about (e.g. 'logo', 'content', 'website')"
+    },
+    "step_label": {
+      "type": "string"
+    },
+    "subject": {
+      "type": "string",
+      "description": "Short subject line for the thread"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "open",
+        "resolved",
+        "closed"
+      ],
+      "default": "open"
+    },
+    "messages": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "sender": {
+            "type": "string",
+            "enum": [
+              "client",
+              "admin"
+            ]
+          },
+          "sender_email": {
+            "type": "string"
+          },
+          "sender_name": {
+            "type": "string"
+          },
+          "body": {
+            "type": "string"
+          },
+          "sent_at": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      }
+    },
+    "last_message_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "client_unread_count": {
+      "type": "number",
+      "default": 0,
+      "description": "Messages from admin that the client hasn't seen"
+    },
+    "admin_unread_count": {
+      "type": "number",
+      "default": 0,
+      "description": "Messages from client that admins haven't seen"
+    }
+  },
+  "required": [
+    "client_email",
+    "step_key"
+  ],
+  "rls": {
+    "read": {
+      "$or": [
+        {
+          "data.client_email": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "create": {
+      "$or": [
+        {
+          "data.client_email": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "update": {
+      "$or": [
+        {
+          "data.client_email": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

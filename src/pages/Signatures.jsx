@@ -49,7 +49,30 @@ export default function Signatures() {
       (d.signers || []).some((s) => s.email && s.email.toLowerCase() === (email || "").toLowerCase())
     );
     setDocs(mine);
+    return mine;
   };
+
+  // D7 — Auto-generate contract when client reaches signatures step with no docs
+  const [autoGenerating, setAutoGenerating] = useState(false);
+  const [autoGenAttempted, setAutoGenAttempted] = useState(false);
+  useEffect(() => {
+    if (!effectiveEmail || loading || autoGenerating || autoGenAttempted) return;
+    if (docs.length === 0 && !isPreviewing) {
+      setAutoGenerating(true);
+      setAutoGenAttempted(true);
+      (async () => {
+        try {
+          await base44.functions.invoke("autoGenerateClientContract", {});
+          await load(effectiveEmail);
+        } catch (e) {
+          // best effort
+        } finally {
+          setAutoGenerating(false);
+        }
+      })();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [effectiveEmail, docs.length, loading, isPreviewing, autoGenAttempted]);
 
   useEffect(() => {
     if (!effectiveEmail) return;
