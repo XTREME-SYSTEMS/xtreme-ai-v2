@@ -39,6 +39,22 @@ export default function StepCoach() {
   }, [step?.to, introKey, doneKey]);
 
   const { isComplete, loading, pendingLabel } = useStepGate(step, user);
+  const isLast = !step?.nextTo;
+  const isActionStep = !!step?.gate && step.gate !== "auto";
+
+  // Auto-advance: for action steps (signatures/approvals), once the activity is
+  // actually complete, automatically move to the next step's intro pop-up so
+  // the user doesn't have to click. Review/auto steps and the final step keep a
+  // manual button (reviewing is passive — there's nothing to detect).
+  useEffect(() => {
+    if (!step || phase !== "gate" || !isComplete || !isActionStep || isLast) return;
+    const t = setTimeout(() => {
+      try { localStorage.setItem(doneKey, "1"); } catch {}
+      setPhase("done");
+      navigate(step.nextTo);
+    }, 1200);
+    return () => clearTimeout(t);
+  }, [phase, isComplete, isActionStep, isLast, step?.to, doneKey, navigate]);
 
   if (!step || phase === "done") return null;
 
@@ -52,8 +68,6 @@ export default function StepCoach() {
     setPhase("done");
     if (step.nextTo) navigate(step.nextTo);
   };
-
-  const isLast = !step.nextTo;
 
   // Phase 1 — intro modal
   if (phase === "intro") {
@@ -100,7 +114,14 @@ export default function StepCoach() {
           {loading ? (
             <p className="text-sm text-white/60">Checking activity status…</p>
           ) : isComplete ? (
-            <p className="text-sm font-semibold text-white">Activity complete — you're ready to continue.</p>
+            isActionStep && !isLast ? (
+              <p className="flex items-center gap-2 text-sm font-semibold text-white">
+                <Loader2 className="h-4 w-4 animate-spin text-lime-400" />
+                Activity complete — taking you to {step.nextLabel?.replace(/^Go to /, "")}…
+              </p>
+            ) : (
+              <p className="text-sm font-semibold text-white">Activity complete — you're ready to {isLast ? "finish" : "continue"}.</p>
+            )
           ) : (
             <p className="truncate text-sm text-white/80">
               <span className="font-semibold text-white">{step.activityLabel || step.label}</span>
@@ -109,13 +130,15 @@ export default function StepCoach() {
             </p>
           )}
         </div>
-        <button
-          onClick={finish}
-          disabled={!isComplete}
-          className="inline-flex shrink-0 items-center gap-1.5 rounded-lg bg-lime-400 px-4 py-2.5 text-sm font-semibold text-black transition-colors hover:bg-lime-300 disabled:cursor-not-allowed disabled:bg-white/10 disabled:text-white/40"
-        >
-          {isLast ? <>Finish <CheckCircle2 className="h-4 w-4" /></> : <>{step.nextLabel} <ArrowRight className="h-4 w-4" /></>}
-        </button>
+        {!(isComplete && isActionStep && !isLast) && (
+          <button
+            onClick={finish}
+            disabled={!isComplete}
+            className="inline-flex shrink-0 items-center gap-1.5 rounded-lg bg-lime-400 px-4 py-2.5 text-sm font-semibold text-black transition-colors hover:bg-lime-300 disabled:cursor-not-allowed disabled:bg-white/10 disabled:text-white/40"
+          >
+            {isLast ? <>Finish <CheckCircle2 className="h-4 w-4" /></> : <>{step.nextLabel} <ArrowRight className="h-4 w-4" /></>}
+          </button>
+        )}
       </div>
     </div>
   );

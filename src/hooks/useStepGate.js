@@ -71,7 +71,19 @@ export function useStepGate(step, user) {
       unsub = base44.entities.Approval.subscribe(() => check());
     }
 
-    return () => { cancelled = true; if (unsub) unsub(); };
+    // Polling fallback: re-check every few seconds in case the realtime
+    // subscription doesn't fire (e.g. service-role updates from backend
+    // functions). Stops naturally when the step changes / component unmounts.
+    const interval = setInterval(check, 4000);
+    const onFocus = () => check();
+    window.addEventListener("focus", onFocus);
+
+    return () => {
+      cancelled = true;
+      if (unsub) unsub();
+      clearInterval(interval);
+      window.removeEventListener("focus", onFocus);
+    };
   }, [step?.to, step?.gate, effectiveEmail]);
 
   return state;
