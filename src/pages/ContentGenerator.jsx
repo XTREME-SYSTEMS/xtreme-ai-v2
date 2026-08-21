@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { base44 } from "@/api/base44Client";
-import { MessageSquareText, Loader2, Check, RefreshCw, ArrowRight, AlertCircle, ThumbsUp, Eye, X, Send, MessageSquare } from "lucide-react";
+import { MessageSquareText, Loader2, Check, RefreshCw, ArrowRight, AlertCircle, ThumbsUp, Eye, X, Send, MessageSquare, Flame, TrendingUp, RotateCcw, SkipForward } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { logReceipt } from "@/lib/pipelineUtils";
 import BackButton from "@/components/client/BackButton";
@@ -64,6 +64,29 @@ export default function ContentGenerator() {
       try { await update({ contentTemplates: d }); } catch {}
     } catch (e) { setGenError("Couldn't generate content templates. Try again."); }
     finally { setGenerating(false); }
+  };
+
+  // Restart: clears all step state so the user can re-run generation from scratch.
+  const restart = () => {
+    setData(null);
+    setSelectedId("");
+    setGenError("");
+    setSaved(false);
+    try {
+      localStorage.removeItem("coach:done:/content-generator");
+      localStorage.removeItem("coach:intro:/content-generator");
+    } catch {}
+    setTimeout(() => generate(), 100);
+  };
+
+  // Skip: escape hatch for when the system is jammed — marks the step done and
+  // moves to the next step so the user is never trapped.
+  const skip = () => {
+    try {
+      localStorage.setItem("coach:done:/content-generator", "1");
+      localStorage.setItem("coach:intro:/content-generator", "1");
+    } catch {}
+    navigate("/logo-generator");
   };
 
   useEffect(() => {
@@ -136,14 +159,24 @@ export default function ContentGenerator() {
           <div className="mt-6 flex flex-col items-center justify-center rounded-xl border border-white/10 bg-zinc-950 py-16 text-center">
             <Loader2 className="h-8 w-8 animate-spin text-lime-400" />
             <p className="mt-3 text-sm text-white/60">Researching your market &amp; writing 10 tones…</p>
-            <p className="text-xs text-white/40">Pulling real local data — about 30 seconds.</p>
+            <p className="text-xs text-white/40">Pulling real local data — this can take up to 90 seconds. Please don't close this page.</p>
           </div>
         )}
 
         {genError && !generating && (
-          <div className="mt-4 flex items-center gap-2 rounded-lg border border-red-400/30 bg-red-400/10 px-3 py-2.5 text-sm text-red-300">
-            <AlertCircle className="h-4 w-4" /> {genError}
-            <button onClick={generate} className="ml-auto rounded-md border border-red-400/40 px-2 py-1 text-xs hover:bg-red-400/10">Retry</button>
+          <div className="mt-4 space-y-3">
+            <div className="flex items-center gap-2 rounded-lg border border-red-400/30 bg-red-400/10 px-3 py-2.5 text-sm text-red-300">
+              <AlertCircle className="h-4 w-4" /> {genError}
+              <button onClick={generate} className="ml-auto rounded-md border border-red-400/40 px-2 py-1 text-xs hover:bg-red-400/10">Retry</button>
+            </div>
+            <div className="flex flex-wrap gap-2">
+              <button type="button" onClick={restart} className="inline-flex items-center gap-1.5 rounded-lg border border-lime-400/40 bg-lime-400/10 px-3 py-2 text-xs font-semibold text-lime-300 hover:bg-lime-400/20">
+                <RotateCcw className="h-3.5 w-3.5" /> Restart Step
+              </button>
+              <button type="button" onClick={skip} className="inline-flex items-center gap-1.5 rounded-lg border border-white/15 px-3 py-2 text-xs font-medium text-white/70 hover:border-white/30">
+                <SkipForward className="h-3.5 w-3.5" /> Skip &amp; Continue
+              </button>
+            </div>
           </div>
         )}
 
@@ -152,13 +185,25 @@ export default function ContentGenerator() {
             {/* Recommendation banner */}
             {recIdx >= 0 && (
               <div className="mt-4 flex items-start gap-3 rounded-lg border border-lime-400/40 bg-lime-400/10 p-3">
-                <ThumbsUp className="mt-0.5 h-5 w-5 shrink-0 text-lime-400" />
+                <Flame className="mt-0.5 h-5 w-5 shrink-0 text-lime-400" />
                 <div>
-                  <p className="text-sm font-semibold text-lime-300">Recommended: {templates[recIdx]?.name}</p>
+                  <p className="text-sm font-semibold text-lime-300">Most likely to go viral: {templates[recIdx]?.name}</p>
                   <p className="mt-0.5 text-xs text-white/70">{data?.recommendationReason}</p>
-                  {templates[recIdx]?.estimatedOutcome && (
-                    <p className="mt-1 text-xs text-lime-300/80">📈 {templates[recIdx].estimatedOutcome}</p>
-                  )}
+                  <div className="mt-1.5 flex flex-wrap gap-2">
+                    {templates[recIdx]?.viralScore != null && (
+                      <span className="inline-flex items-center gap-1 rounded-full bg-lime-400/15 px-2 py-0.5 text-[10px] font-bold text-lime-300">
+                        <Flame className="h-3 w-3" /> Viral {templates[recIdx].viralScore}/100
+                      </span>
+                    )}
+                    {templates[recIdx]?.conversionScore != null && (
+                      <span className="inline-flex items-center gap-1 rounded-full bg-lime-400/15 px-2 py-0.5 text-[10px] font-bold text-lime-300">
+                        <TrendingUp className="h-3 w-3" /> Convert {templates[recIdx].conversionScore}/100
+                      </span>
+                    )}
+                    {templates[recIdx]?.estimatedOutcome && (
+                      <span className="text-xs text-lime-300/80">📈 {templates[recIdx].estimatedOutcome}</span>
+                    )}
+                  </div>
                 </div>
               </div>
             )}
@@ -179,6 +224,20 @@ export default function ContentGenerator() {
                       <h3 className="mt-1.5 text-sm font-bold text-white">{t.name}</h3>
                       <p className="mt-1.5 text-sm font-semibold text-white/90">{t.heroHeadline}</p>
                       <p className="mt-1 text-xs text-white/50 line-clamp-2">{t.heroSubhead}</p>
+                      {(t.viralScore != null || t.conversionScore != null) && (
+                        <div className="mt-2 flex flex-wrap gap-1.5">
+                          {t.viralScore != null && (
+                            <span className="inline-flex items-center gap-0.5 rounded bg-white/5 px-1.5 py-0.5 text-[9px] font-bold text-white/60">
+                              <Flame className="h-2.5 w-2.5 text-orange-400" /> {t.viralScore}
+                            </span>
+                          )}
+                          {t.conversionScore != null && (
+                            <span className="inline-flex items-center gap-0.5 rounded bg-white/5 px-1.5 py-0.5 text-[9px] font-bold text-white/60">
+                              <TrendingUp className="h-2.5 w-2.5 text-lime-400" /> {t.conversionScore}
+                            </span>
+                          )}
+                        </div>
+                      )}
                     </button>
                     <div className="flex items-center gap-2 p-2.5">
                       <button type="button" onClick={() => setSelectedId(t.id)} className={cn("inline-flex flex-1 items-center justify-center gap-1.5 rounded-md px-3 py-2 text-xs font-semibold transition-colors", on ? "bg-lime-400 text-black" : "border border-white/15 text-white/70 hover:border-lime-400/50 hover:text-lime-300")}>
