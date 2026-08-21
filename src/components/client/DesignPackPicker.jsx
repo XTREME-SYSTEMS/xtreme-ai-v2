@@ -9,7 +9,7 @@ import DesignPackPreview from "@/components/client/DesignPackPreview";
 
 // 10 curated epoxy-contractor logo & web design packs, each a distinct color
 // palette + style. Generated with the platform's best image model. The client
-// picks up to 3; the selection is saved as a "design DNA" profile that tells
+// picks exactly 1; the selection is saved as a "design DNA" profile that tells
 // the build team exactly what the client's eye gravitates toward.
 export const DESIGN_PACKS = [
   { id: "industrial", name: "Bold Industrial", colors: ["#1a1a1a", "#ff6b1a", "#9a9a9a"], styles: ["bold", "industrial", "geometric"], img: "https://media.base44.com/images/public/6a79444e821211169a147eee/5d8787bc7_generated_image.png" },
@@ -24,7 +24,7 @@ export const DESIGN_PACKS = [
   { id: "heritage", name: "Heritage Craft", colors: ["#1f4d3a", "#b08d57", "#f5f1e8"], styles: ["heritage", "classic", "artisanal"], img: "https://media.base44.com/images/public/6a79444e821211169a147eee/dcbb6f260_generated_image.png" },
 ];
 
-const MAX = 3;
+const MAX = 1;
 
 export default function DesignPackPicker() {
   const navigate = useNavigate();
@@ -48,16 +48,12 @@ export default function DesignPackPicker() {
 
   const toggle = (id) => {
     setError("");
-    setSelected((prev) => {
-      if (prev.includes(id)) return prev.filter((x) => x !== id);
-      if (prev.length >= MAX) return prev;
-      return [...prev, id];
-    });
+    setSelected((prev) => (prev.includes(id) ? [] : [id]));
   };
 
   const save = async () => {
     if (selected.length === 0) {
-      setError("Pick at least one design pack.");
+      setError("Pick one design pack.");
       return;
     }
     setSaving(true);
@@ -107,10 +103,10 @@ export default function DesignPackPicker() {
             {selected.length} of {MAX} selected
           </span>
         </div>
-        <h1 className="mt-2 text-xl font-semibold text-white sm:text-2xl">Pick the looks you love</h1>
+        <h1 className="mt-2 text-xl font-semibold text-white sm:text-2xl">Pick the look you love</h1>
         <p className="mt-1 text-sm text-white/60">
-          These are 10 logo &amp; web design packs in different colors and styles. Tap up to {MAX} that feel
-          right for your epoxy business — your choices tell our team exactly what you like.
+          These are 10 logo &amp; web design packs in different colors and styles. Tap the one that feels
+          right for your epoxy business — your choice tells our team exactly what you like.
         </p>
 
         {saved && (

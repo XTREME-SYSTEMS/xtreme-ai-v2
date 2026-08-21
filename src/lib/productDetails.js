@@ -15,7 +15,7 @@ export const PRODUCT_DETAILS = {
     features: [
       "Onboarding & business profile intake (digital form)",
       "Logo Generator — 10 custom digital logo concepts, you pick 1 (PNG + SVG files)",
-      "Brand Generator — 10 digital brand mockups, you pick up to 3 (all digital design files):",
+      "Brand Generator — 10 digital brand mockups, you pick 1 (all digital design files):",
       "  · Digital business card design (front & back, print-ready file)",
       "  · Digital tri-fold brochure design (print-ready file)",
       "  · Digital marketing flyer design (print-ready file)",
@@ -26,7 +26,7 @@ export const PRODUCT_DETAILS = {
       "  · Digital storefront signage design mockup (print-ready file)",
       "  · Digital social media kit (profile + post templates)",
       "  · Digital work uniform design mockup (print-ready file)",
-      "Website Design — 10 digital web design packs with desktop & mobile preview + color toggle, you pick up to 3",
+      "Website Design — 10 digital web design packs with desktop & mobile preview + color toggle, you pick 1",
       "Website Build — custom digital design from your chosen direction",
       "Hero, About, Services & FAQ copy written for your epoxy business (digital content)",
       "AI-generated digital project imagery (web-optimized image files)",

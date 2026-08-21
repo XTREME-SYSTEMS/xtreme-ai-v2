@@ -10,9 +10,9 @@ import BrandPackPreview from "@/components/client/BrandPackPreview";
 
 // Step: Brand Generator. Uses the client's chosen logo to generate 10 brand
 // mockups (business card, brochure, t-shirt, hat, app, vehicle wrap, …). The
-// client picks up to 3 favorites. Each mockup can be expanded into a full
+// client picks exactly 1 favorite. Each mockup can be expanded into a full
 // preview with a light/dark color toggle.
-const MAX = 3;
+const MAX = 1;
 
 export default function BrandGenerator() {
   const navigate = useNavigate();
@@ -75,16 +75,12 @@ export default function BrandGenerator() {
 
   const toggle = (url) => {
     setError("");
-    setSelected((prev) => {
-      if (prev.includes(url)) return prev.filter((x) => x !== url);
-      if (prev.length >= MAX) return prev;
-      return [...prev, url];
-    });
+    setSelected((prev) => (prev.includes(url) ? [] : [url]));
   };
 
   const save = async () => {
     if (selected.length === 0) {
-      setError("Pick at least one brand mockup.");
+      setError("Pick one brand mockup.");
       return;
     }
     setSaving(true);
@@ -118,7 +114,7 @@ export default function BrandGenerator() {
         <h1 className="mt-2 text-xl font-semibold text-white sm:text-2xl">See your brand come to life</h1>
         <p className="mt-1 text-sm text-white/60">
           We applied your logo to 10 real-world mockups — business cards, brochures, apparel, an app, a van wrap and more.
-          Tap up to {MAX} you love. Use <Eye className="inline h-3 w-3" /> Preview to zoom in and toggle colors.
+          Tap the one you love. Use <Eye className="inline h-3 w-3" /> Preview to zoom in and toggle colors.
         </p>
 
         {saved && (
