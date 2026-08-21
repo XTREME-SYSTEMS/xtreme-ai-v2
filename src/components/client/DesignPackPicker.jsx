@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { base44 } from "@/api/base44Client";
 import { Image } from "@/components/ui/image";
 import { Check, Loader2, Sparkles } from "lucide-react";
@@ -25,6 +26,7 @@ export const DESIGN_PACKS = [
 const MAX = 3;
 
 export default function DesignPackPicker() {
+  const navigate = useNavigate();
   const [selected, setSelected] = useState([]);
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
@@ -81,6 +83,8 @@ export default function DesignPackPicker() {
         /* best effort */
       }
       setSaved(true);
+      try { localStorage.setItem("coach:done:/design-direction", "1"); } catch {}
+      setTimeout(() => navigate("/signatures"), 1000);
     } catch (e) {
       setError("Couldn't save your selection. Please try again.");
     } finally {

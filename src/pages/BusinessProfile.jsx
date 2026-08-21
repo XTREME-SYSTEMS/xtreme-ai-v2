@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { base44 } from "@/api/base44Client";
 import { Building2, Upload, Loader2, CheckCircle2, X, MapPin, Star, Shield } from "lucide-react";
 
@@ -52,6 +53,7 @@ const DIFFERENTIATOR_OPTIONS = [
 ];
 
 export default function BusinessProfile() {
+  const navigate = useNavigate();
   const [form, setForm] = useState({
     businessName: "",
     phone: "",
@@ -147,6 +149,8 @@ export default function BusinessProfile() {
       setLogo(null);
       setGallery([]);
       setSaved(true);
+      try { localStorage.setItem("coach:done:/business-profile", "1"); } catch {}
+      setTimeout(() => navigate("/design-direction"), 1000);
     } catch (err) {
       setError("Something went wrong saving your profile. Please try again.");
     } finally {
