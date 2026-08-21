@@ -66,6 +66,9 @@
           "data.appUserId": "{{user.id}}"
         },
         {
+          "data.buyerEmail": "{{user.email}}"
+        },
+        {
           "created_by_id": "{{user.id}}"
         },
         {
