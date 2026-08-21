@@ -1,9 +1,15 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.40';
+import { getAdminEmails } from '../../shared/pipelineNotifications.ts';
 
 // Auto-generates a service agreement (EsignDocument) for a client when they
 // reach the signatures step and don't have one yet. Uses the client's
 // business profile data to personalize the contract. Idempotent — if a
 // draft contract already exists for the client, it returns that instead.
+//
+// G6 — The contract is created with status "draft" so an admin can review
+// and edit it before it becomes visible to the client. Admins are notified
+// by email. The admin changes the status to "sent" from the E-Sign Documents
+// page, which makes it appear on the client's Signatures page.
 export default async function(req) {
   try {
     const base44 = createClientFromRequest(req);
@@ -25,6 +31,11 @@ export default async function(req) {
     if (mine.length > 0) {
       return Response.json({ ok: true, documentId: mine[0].id, alreadyExisted: true });
     }
+
+    const appUrl =
+      req.headers.get("x-base44-app-url") ||
+      Deno.env.get("WIX_CHECKOUT_APP_URL") ||
+      `https://${req.headers.get("host") || ""}`;
 
     // Build contract from the user's profile data
     const profile = user.epoxyProfile || {};
@@ -76,13 +87,13 @@ Make it professional, enforceable, and easy to read. Use clear headings and bull
       response_json_schema: { type: "object", properties: { body: { type: "string" } } },
     });
 
-    // Create the EsignDocument
+    // G6 — Create as "draft" so admins can review before sending to client
     const doc = await base44.asServiceRole.entities.EsignDocument.create({
       title: `Service Agreement — ${businessName}`,
       body: res.body,
       account_name: businessName,
       deal_name: businessStage === "rebrand" ? "Brand Refresh" : businessStage === "scale" ? "Growth Package" : "Launch Package",
-      status: "sent",
+      status: "draft",
       signers: [{
         name: user.full_name || businessName,
         email: clientEmail,
@@ -92,6 +103,25 @@ Make it professional, enforceable, and easy to read. Use clear headings and bull
       expires_at: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
       owner_name: "Lead Gen Near You",
     });
+
+    // G6 — Notify admins that a contract needs review
+    try {
+      const adminEmails = await getAdminEmails(base44);
+      for (const adminEmail of adminEmails) {
+        try {
+          await base44.integrations.Core.SendEmail({
+            to: adminEmail,
+            subject: `Contract needs review: ${businessName}`,
+            body:
+              `A service agreement was auto-generated for ${businessName} (${clientEmail}).\n\n` +
+              `It's in "draft" status — please review and click "Send" to make it visible to the client.\n\n` +
+              `Review: ${appUrl}/esign/documents`,
+          });
+        } catch (e) {
+          console.error("autoGenerateClientContract: admin email failed", adminEmail, e?.message || e);
+        }
+      }
+    } catch {}
 
     return Response.json({ ok: true, documentId: doc.id, alreadyExisted: false });
   } catch (error) {

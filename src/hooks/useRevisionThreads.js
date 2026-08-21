@@ -82,9 +82,19 @@ export function useRevisionThreads(user) {
       };
       await base44.entities.RevisionThread.update(threadId, {
         messages: [...(thread.messages || []), newMsg],
-        last_message_at: new Date.sent_at,
+        last_message_at: newMsg.sent_at,
         admin_unread_count: (thread.admin_unread_count || 0) + 1,
       });
+      // G4 — Notify admins about the new message
+      try {
+        await base44.functions.invoke("notifyThreadMessage", {
+          message: body.trim(),
+          sender: "client",
+          clientEmail: effectiveEmail,
+          stepLabel: thread.step_label || thread.step_key,
+          threadId,
+        });
+      } catch {}
       await load();
     } catch (e) {
       // best effort

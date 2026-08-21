@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { base44 } from "@/api/base44Client";
 import {
-  Sparkles, Check, Loader2, ArrowRight, Zap, FileText, MapPin, Star, Phone, Calendar, Plus, Minus,
+  Sparkles, Check, Loader2, ArrowRight, Zap, FileText, MapPin, Star, Phone, Calendar, Plus, Minus, CreditCard,
 } from "lucide-react";
 import BackButton from "@/components/client/BackButton";
 import { notifyStepComplete } from "@/lib/pipelineNotify";
@@ -23,6 +23,7 @@ export default function Enhancements() {
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
   const [error, setError] = useState("");
+  const [paying, setPaying] = useState(false);
 
   // D8 — Dynamic industry-aware enhancements
   const industry = user?.epoxyProfile?.industry || "";
@@ -80,6 +81,25 @@ export default function Enhancements() {
       setError("Couldn't save. Please try again.");
     } finally {
       setSaving(false);
+    }
+  };
+
+  // G8 — Pay for selected enhancements via Base44 Payments checkout
+  const payForEnhancements = async () => {
+    if (total < 0.5) return;
+    setPaying(true);
+    setError("");
+    try {
+      const res = await base44.functions.invoke("create-checkout", { productId: "enhancements" });
+      if (res?.data?.redirectUrl) {
+        window.location.href = res.data.redirectUrl;
+      } else {
+        setError("Couldn't start checkout. Please try again.");
+      }
+    } catch (e) {
+      setError("Couldn't start checkout. Please try again.");
+    } finally {
+      setPaying(false);
     }
   };
 
@@ -173,6 +193,22 @@ export default function Enhancements() {
             <>Continue to Sign Agreement <ArrowRight className="h-4 w-4" /></>
           )}
         </button>
+
+        {/* G8 — Pay for enhancements via checkout (only if total > 0) */}
+        {total > 0 && (
+          <button
+            type="button"
+            onClick={payForEnhancements}
+            disabled={paying}
+            className="mt-2 inline-flex w-full items-center justify-center gap-2 rounded-lg border border-lime-400/40 bg-lime-400/10 px-4 py-3 text-sm font-semibold text-lime-300 transition-colors hover:bg-lime-400/20 disabled:opacity-50"
+          >
+            {paying ? (
+              <><Loader2 className="h-4 w-4 animate-spin" /> Starting checkout…</>
+            ) : (
+              <><CreditCard className="h-4 w-4" /> Pay ${total} for Enhancements</>
+            )}
+          </button>
+        )}
       </div>
     </div>
   );

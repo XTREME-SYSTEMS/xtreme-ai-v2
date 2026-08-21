@@ -46,6 +46,16 @@ export default function AdminRevisionThreads() {
         last_message_at: new Date().toISOString(),
         client_unread_count: (activeThread.client_unread_count || 0) + 1,
       });
+      // G4 — Notify the client about the new reply
+      try {
+        await base44.functions.invoke("notifyThreadMessage", {
+          message: reply.trim(),
+          sender: "admin",
+          clientEmail: activeThread.client_email,
+          stepLabel: activeThread.step_label || activeThread.step_key,
+          threadId: activeThread.id,
+        });
+      } catch {}
       setReply("");
       await load();
       // Refresh active thread

@@ -119,16 +119,26 @@ export default function YourDesigns() {
   const uncheckedSections = Object.entries(checks).filter(([, v]) => !v).map(([k]) => k);
   const sectionLabels = { content: "Content Tone", logo: "Logo", brand: "Brand Mockups", website: "Website Design", social: "Social Media", video: "Videos" };
 
-  // D4 — Asset download: triggers a browser download for a single URL
-  const downloadAsset = (url, filename) => {
+  // D4/G5 — Asset download: fetches the image as a blob to bypass cross-origin
+  // download restrictions, then triggers a browser download with the correct
+  // filename. Falls back to opening in a new tab if the fetch fails.
+  const downloadAsset = async (url, filename) => {
     if (!url) return;
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = filename || "asset";
-    a.target = "_blank";
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
+    try {
+      const res = await fetch(url);
+      const blob = await res.blob();
+      const blobUrl = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = blobUrl;
+      a.download = filename || "asset.png";
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      setTimeout(() => URL.revokeObjectURL(blobUrl), 1000);
+    } catch {
+      // Fallback: open in a new tab
+      window.open(url, "_blank");
+    }
   };
 
   // D4 — Download all brand mockups (opens each in sequence)

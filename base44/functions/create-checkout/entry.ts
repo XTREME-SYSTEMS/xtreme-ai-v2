@@ -92,14 +92,36 @@ Deno.serve(async (req: Request) => {
       "web-pack":      { name: "Web Pack",             price: "299.00" },
       "app-pack":      { name: "App Pack",             price: "499.00" },
       "deposit":       { name: "Done-For-You Service Deposit", price: "500.00" },
+      "enhancements":  { name: "Package Enhancements", price: "0" },
     };
     const product = PRODUCTS[productId];
     if (!product) {
       return new Response(JSON.stringify({ error: "Unknown product" }), { status: 400 });
     }
-    const productName = product.name;
-    const price = product.price;
+    let productName = product.name;
+    let price = product.price;
     const currency = "USD";
+
+    // G8 — For enhancements, resolve the price server-side from the buyer's saved
+    // selections (never trust a client-sent price). The buyer must be signed in
+    // since enhancements are selected in the client portal.
+    if (productId === "enhancements") {
+      if (!appUser?.email) {
+        return new Response(JSON.stringify({ error: "Sign in to purchase enhancements" }), { status: 400 });
+      }
+      try {
+        const users = await base44.asServiceRole.entities.User.filter({ email: appUser.email });
+        const userRecord = users?.[0];
+        const enhancementsTotal = Number(userRecord?.enhancementsTotal || 0);
+        if (enhancementsTotal < 0.5) {
+          return new Response(JSON.stringify({ error: "No enhancements to pay for (minimum $0.50)" }), { status: 400 });
+        }
+        price = enhancementsTotal.toFixed(2);
+      } catch (e) {
+        console.error("create-checkout: enhancements price resolve failed", e?.message || e);
+        return new Response(JSON.stringify({ error: "Could not resolve enhancement total" }), { status: 500 });
+      }
+    }
     // For a SUBSCRIPTION set this to Wix's subscriptionInfo; leave null for a one-time payment.
     const subscriptionInfo = product.subscription
       ? { subscriptionSettings: { frequency: product.subscription.frequency }, title: product.name, description: product.name }

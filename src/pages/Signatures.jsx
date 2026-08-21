@@ -46,6 +46,8 @@ export default function Signatures() {
   const load = async (email) => {
     const all = await base44.entities.EsignDocument.list("-created_date", 200);
     const mine = (all || []).filter((d) =>
+      // G6 — Only show docs that have been sent (not "draft" — those need admin review)
+      d.status !== "draft" &&
       (d.signers || []).some((s) => s.email && s.email.toLowerCase() === (email || "").toLowerCase())
     );
     setDocs(mine);
@@ -218,8 +220,17 @@ export default function Signatures() {
       ) : docs.length === 0 ? (
         <div className="rounded-xl border border-white/10 bg-zinc-950 p-10 text-center">
           <FileSignature className="mx-auto mb-3 h-10 w-10 text-white/30" />
-          <h2 className="text-sm font-semibold text-white">No contracts to sign</h2>
-          <p className="mx-auto mt-1 max-w-xs text-xs text-white/50">When a contract is sent to you, it'll appear here for signing on any device.</p>
+          {autoGenAttempted ? (
+            <>
+              <h2 className="text-sm font-semibold text-white">Your contract is being prepared</h2>
+              <p className="mx-auto mt-1 max-w-xs text-xs text-white/50">Our team is reviewing your service agreement. You'll receive an email when it's ready to sign.</p>
+            </>
+          ) : (
+            <>
+              <h2 className="text-sm font-semibold text-white">No contracts to sign</h2>
+              <p className="mx-auto mt-1 max-w-xs text-xs text-white/50">When a contract is sent to you, it'll appear here for signing on any device.</p>
+            </>
+          )}
         </div>
       ) : (
         <div className="space-y-7">

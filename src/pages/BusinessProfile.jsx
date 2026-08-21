@@ -65,22 +65,40 @@ export default function BusinessProfile() {
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
   const [error, setError] = useState("");
+  const [showDraftPrompt, setShowDraftPrompt] = useState(false);
+  const [draftData, setDraftData] = useState(null);
 
   useEffect(() => { document.title = "Business Profile · Lead Gen Near You"; }, []);
 
-  // Restore draft from localStorage (D5 — draft saving)
+  // G7 — Draft restore prompt: instead of silently auto-restoring, ask the
+  // user if they want to restore their previous draft or start fresh.
   useEffect(() => {
     try {
       const draft = localStorage.getItem(DRAFT_KEY);
       if (draft) {
         const parsed = JSON.parse(draft);
-        if (parsed.form) setForm((f) => ({ ...f, ...parsed.form }));
-        if (parsed.industryAnswers) setIndustryAnswers(parsed.industryAnswers);
-        if (parsed.step !== undefined) setStep(parsed.step);
-        if (parsed.financialIntel) setFinancialIntel(parsed.financialIntel);
+        if (parsed.form && parsed.form.businessName) {
+          setDraftData(parsed);
+          setShowDraftPrompt(true);
+        }
       }
     } catch {}
   }, []);
+
+  const restoreDraft = () => {
+    if (!draftData) return;
+    if (draftData.form) setForm((f) => ({ ...f, ...draftData.form }));
+    if (draftData.industryAnswers) setIndustryAnswers(draftData.industryAnswers);
+    if (draftData.step !== undefined) setStep(draftData.step);
+    if (draftData.financialIntel) setFinancialIntel(draftData.financialIntel);
+    setShowDraftPrompt(false);
+  };
+
+  const discardDraft = () => {
+    try { localStorage.removeItem(DRAFT_KEY); } catch {}
+    setDraftData(null);
+    setShowDraftPrompt(false);
+  };
 
   // Auto-save draft to localStorage on every change (D5 — draft saving)
   useEffect(() => {
@@ -295,6 +313,35 @@ export default function BusinessProfile() {
         {saved && (
           <div className="mt-4 flex items-center gap-2 rounded-lg border border-lime-400/50 bg-lime-400/10 px-3 py-2.5 text-sm text-lime-300">
             <CheckCircle2 className="h-4 w-4" /> Profile saved — taking you to the next step…
+          </div>
+        )}
+
+        {/* G7 — Draft restore prompt */}
+        {showDraftPrompt && (
+          <div className="mt-4 rounded-lg border border-amber-400/40 bg-amber-400/10 p-4">
+            <div className="flex items-center gap-2 text-sm font-semibold text-amber-300">
+              <RefreshCw className="h-4 w-4" /> Restore previous draft?
+            </div>
+            <p className="mt-1 text-xs text-white/60">
+              We found an unsaved draft from <span className="font-semibold text-white">{draftData?.form?.businessName}</span>.
+              Would you like to continue where you left off, or start fresh?
+            </p>
+            <div className="mt-3 flex gap-2">
+              <button
+                type="button"
+                onClick={restoreDraft}
+                className="inline-flex items-center gap-1.5 rounded-lg bg-lime-400 px-3 py-2 text-xs font-semibold text-black hover:bg-lime-300"
+              >
+                <RefreshCw className="h-3.5 w-3.5" /> Restore draft
+              </button>
+              <button
+                type="button"
+                onClick={discardDraft}
+                className="inline-flex items-center gap-1.5 rounded-lg border border-white/15 px-3 py-2 text-xs font-medium text-white/70 hover:border-white/30"
+              >
+                Start fresh
+              </button>
+            </div>
           </div>
         )}
 
