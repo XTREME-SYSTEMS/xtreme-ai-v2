@@ -50,7 +50,12 @@ For EACH name, use your web search to:
 2. Search for "[name] business registration [state]" to check state business registries
 3. Check if the .com domain is likely available
 
-Score each name's viral potential (0-100) based on: memorability, brandability, emotional resonance, uniqueness, and shareability.
+Score each name on THREE 0-100 scales:
+- viral_score: memorability, brandability, emotional resonance, uniqueness, shareability
+- local_seo_score: how well the name+domain supports ranking for "[industry] near [location]" / "[industry] [location]" — exact/partial keyword match, location hint, EMD potential, local intent clarity
+- searchability_score: how easily a potential customer searching Google or speaking to an AI assistant would find and recall this business — clarity, spellability, distinctiveness from competitors, map-pack friendliness
+
+Also write customer_findability_notes: 1-2 sentences on how easy it will be for local customers to discover this name in search and AI answers.
 
 Return JSON with this structure:
 {
@@ -60,6 +65,9 @@ Return JSON with this structure:
       "domain": "businessname.com",
       "tagline": "short catchy tagline",
       "viral_score": 85,
+      "local_seo_score": 80,
+      "searchability_score": 78,
+      "customer_findability_notes": "how easily local customers will find this name",
       "state_registry_status": "likely_available",
       "google_search_status": "unique",
       "state_registry_notes": "what you found when searching state registries",
@@ -97,6 +105,9 @@ Guidelines for highly successful names:
                 domain: { type: "string" },
                 tagline: { type: "string" },
                 viral_score: { type: "number" },
+                local_seo_score: { type: "number" },
+                searchability_score: { type: "number" },
+                customer_findability_notes: { type: "string" },
                 state_registry_status: { type: "string" },
                 google_search_status: { type: "string" },
                 state_registry_notes: { type: "string" },

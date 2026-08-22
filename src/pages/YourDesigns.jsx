@@ -6,6 +6,7 @@ import { LayoutTemplate, PenTool, Shirt, Globe, ArrowRight, Eye, Sparkles, Messa
 import { cn } from "@/lib/utils";
 import BackButton from "@/components/client/BackButton";
 import DemoPaywallBanner from "@/components/client/DemoPaywallBanner";
+import WebsiteQualityPanel from "@/components/client/WebsiteQualityPanel";
 import { notifyStepComplete } from "@/lib/pipelineNotify";
 import { useClientUser } from "@/hooks/useClientUser";
 import { useClientUpdate } from "@/hooks/useClientUpdate";
@@ -288,6 +289,15 @@ export default function YourDesigns() {
                 <span className="text-xs font-semibold text-white">{chosenLayout.name}</span>
                 <span className="text-[10px] text-white/40">{chosenPalette.name}</span>
               </div>
+              <WebsiteQualityPanel
+                content={webContent}
+                profile={profile}
+                onEnhanced={async (fixedContent) => {
+                  const updatedUser = { ...user, websiteContent: fixedContent };
+                  setUser(updatedUser);
+                  try { await update({ websiteContent: fixedContent }); } catch {}
+                }}
+              />
             </div>
           )}
         </DesignSection>
