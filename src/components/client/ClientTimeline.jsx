@@ -1,6 +1,5 @@
 import { useEffect, useRef } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { Check } from "lucide-react";
 import { getStepByPath } from "@/lib/clientSteps";
 import { useClientUser } from "@/hooks/useClientUser";
 import { usePortalPipeline } from "@/hooks/usePortalPipeline";
@@ -49,7 +48,6 @@ export default function ClientTimeline() {
         {visibleSteps.map((step, i) => {
           const Icon = step.icon;
           const isCurrent = i === currentIdx;
-          const isDone = states[i]?.completed || false;
           return (
             <div key={step.to} className="flex items-center" data-step-idx={i}>
               <button
@@ -60,17 +58,17 @@ export default function ClientTimeline() {
                 <span
                   className={cn(
                     "flex h-8 w-8 items-center justify-center rounded-full border-2 text-xs font-bold transition-all sm:h-9 sm:w-9",
-                    isDone && "border-lime-400 bg-lime-400 text-black",
-                    isCurrent && !isDone && "border-lime-400 bg-lime-400/15 text-lime-400 ring-2 ring-lime-400/30",
-                    !isDone && !isCurrent && "border-white/15 bg-zinc-900 text-white/40 hover:border-lime-400/40 hover:text-lime-300"
+                    isCurrent
+                      ? "border-lime-400 bg-lime-400 text-black"
+                      : "border-white/15 bg-zinc-900 text-white/40 hover:border-lime-400/40 hover:text-lime-300"
                   )}
                 >
-                  {isDone ? <Check className="h-4 w-4" /> : <Icon className="h-4 w-4" />}
+                  <Icon className="h-4 w-4" />
                 </span>
                 <span
                   className={cn(
                     "hidden whitespace-nowrap text-[11px] font-medium sm:block",
-                    isCurrent ? "text-lime-400" : isDone ? "text-white/60" : "text-white/30"
+                    isCurrent ? "text-lime-400" : "text-white/30"
                   )}
                 >
                   {step.label}
@@ -80,7 +78,7 @@ export default function ClientTimeline() {
                 <div
                   className={cn(
                     "mx-0.5 h-0.5 w-3 shrink-0 rounded-full sm:mx-1 sm:w-5",
-                    isDone ? "bg-lime-400" : "bg-white/10"
+                    i < currentIdx ? "bg-lime-400" : "bg-white/10"
                   )}
                 />
               )}
