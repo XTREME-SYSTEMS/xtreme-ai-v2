@@ -26,10 +26,10 @@ Date: 2026-08-22 · Auditor: Base44 autonomous audit · Scope: full stack
 - **What:** `User.list()` returns every user in the app; the code then filters for admins in JS. For a growing user base this pulls unnecessary data on every step-completion + revision email.
 - **Fix:** `User.filter({ role: "admin" })` — server-side filter. ✅ Applied.
 
-### H3 — `cloneAndLaunch` uses user-context integrations in an autonomous pipeline
-- **Where:** `base44/functions/cloneAndLaunch/entry.ts` (all `base44.integrations.Core.InvokeLLM` / `GenerateImage` calls)
-- **What:** The clone pipeline is designed to run from a scheduled workflow (no user token). `base44.integrations` (user context) will 401 when invoked from a workflow; `base44.asServiceRole.integrations` is required. Mixed with `base44.asServiceRole.entities` (correct). This is why the scheduled clone pipeline stalls on LLM phases.
-- **Fix:** (Deferred — broad change across 11 phases; needs targeted pass.)
+### H3 — Backend functions used user-context integrations (autonomous pipelines 401 from workflows)
+- **Where:** 35 backend functions — every `base44.integrations.Core.*` call (72 occurrences), including the autonomous clone/rank/SEO/citation pipelines (`cloneAndLaunch`, `autoCloneSerpCompetitors`, `autoOptimizeSites`, `runRankEngine`, `prospectBacklinks`, `monitorAiVisibility`, `extractRankingBlueprint`, `provisionApprovedClone`, etc.).
+- **What:** `base44.integrations` runs as the authenticated user. Autonomous pipelines triggered from scheduled workflows have no user token, so every LLM/image/email call 401'd and the pipeline stalled silently. Client-facing generators happened to work only because a user was logged in.
+- **Fix:** Converted all 72 `base44.integrations.*` → `base44.asServiceRole.integrations.*` across 35 functions. `asServiceRole.integrations` works with or without a user (matches `payments-webhook` and `generation.ts`), so every backend function now runs correctly from both the UI and workflows. ✅ Applied.
 
 ## MEDIUM
 
@@ -75,10 +75,10 @@ Date: 2026-08-22 · Auditor: Base44 autonomous audit · Scope: full stack
 - ✅ C2: Removed host-header fallback in pipeline email links (no more open-redirect in client/admin emails)
 - ✅ H1: Atomic promo-code increment (no oversell under concurrency)
 - ✅ H2: Server-side admin filter (no full-user scan on every pipeline email)
+- ✅ H3: All 72 user-context integration calls → asServiceRole across 35 backend functions (autonomous pipelines no longer 401 from workflows)
 - ✅ Webhook re-registered with ORDER_APPROVED + SUBSCRIPTION_CANCELED + SUBSCRIPTION_ENDED (cancellations now revoke access)
 
 ## Deferred (next round)
-- H3: asServiceRole integrations in cloneAndLaunch (11 phases)
-- M1: pushAllToMax chunking
-- M2: deterministic enqueue idempotency
-- M3: server-persisted "visited steps"
+- M1: pushAllToMax chunking (524 timeout on large portfolios)
+- M2: deterministic enqueue idempotency (duplicate jobs on heartbeat retry)
+- M3: server-persisted "visited steps" (per-device localStorage completion)
