@@ -69,6 +69,8 @@ export default function VideoGenerator() {
         services: profile.services || [], contentTone, logoUrl,
         industry: profile.industry || "", subIndustry: profile.subIndustry || "",
         businessType: profile.businessType || "",
+        industryAnswers: profile.industryAnswers || profile.industry_answers || {},
+        differentiators: profile.differentiators || [],
       });
       const d = res?.data?.data;
       if (!d?.concepts?.length) throw new Error("no data");

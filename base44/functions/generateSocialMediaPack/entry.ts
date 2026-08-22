@@ -1,4 +1,5 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.40';
+import { compileBrief, briefText, photoStyleSuffix } from "../../shared/generatorBrief.ts";
 
 // Social Media Generator: generates 10 social media brand template images
 // using the client's chosen logo as a reference, PLUS a 30-day content
@@ -20,6 +21,13 @@ export default async function(req) {
     const svc = (services || []).join(", ") || "professional services";
     const ref = logoUrl ? [logoUrl] : undefined;
 
+    // Compile the full onboarding brief so every template image + caption
+    // reflects the client's visual style, signature work, differentiators,
+    // and customer pain points — not just their logo.
+    const brief = compileBrief(body);
+    const briefBlock = briefText(brief);
+    const photo = photoStyleSuffix(brief);
+
     const TEMPLATES = [
       { id: "profile", label: "Profile Avatar", prompt: `A professional social media profile avatar for ${ind} "${biz}". Clean circular logo on a solid brand-colored background, centered, minimal, high quality.` },
       { id: "cover", label: "Cover / Header", prompt: `A wide social media cover banner for ${ind} "${biz}". Show a professional ${ind} work setting with the business name overlaid, modern layout, professional.` },
@@ -37,7 +45,7 @@ export default async function(req) {
     const imgResults = await Promise.allSettled(
       TEMPLATES.map(async (t) => {
         const r = await base44.integrations.Core.GenerateImage({
-          prompt: t.prompt + (loc ? ` Located in ${loc}.` : ""),
+          prompt: `${t.prompt}${loc ? ` Located in ${loc}.` : ""} ${photo}`,
           existing_image_urls: ref,
         });
         return { id: t.id, label: t.label, url: r.url };
@@ -47,7 +55,12 @@ export default async function(req) {
 
     // Generate a 30-day content calendar using the best AI model.
     const calRes = await base44.integrations.Core.InvokeLLM({
-      prompt: `Create a 30-day social media content calendar for ${ind} "${biz}"${subInd ? ` (${subInd})` : ""} in ${loc}. Services: ${svc}. Mix post types: before/after, tips, testimonials, behind-the-scenes, promotions, educational. Make all content specific to the ${ind} industry. Return exactly 30 posts, one per day, each with a day number (1-30), platform (Instagram, Facebook, or Google Business), a caption (2-3 sentences with hashtags), and a post type category.`,
+      prompt: `Create a 30-day social media content calendar for ${ind} "${biz}"${subInd ? ` (${subInd})` : ""} in ${loc}.
+
+CLIENT BRIEF:
+${briefBlock}
+
+Services: ${svc}. Mix post types: before/after, tips, testimonials, behind-the-scenes, promotions, educational. Make every caption specific to the ${ind} industry and weave in the client's DIFFERENTIATORS, SIGNATURE WORK, and BRAND PERSONALITY. Address the CUSTOMER PAIN POINTS in educational/tips posts. Return exactly 30 posts, one per day, each with a day number (1-30), platform (Instagram, Facebook, or Google Business), a caption (2-3 sentences with hashtags), and a post type category.`,
       model: "claude_opus_4_8",
       response_json_schema: {
         type: "object",

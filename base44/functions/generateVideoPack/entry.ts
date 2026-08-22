@@ -1,4 +1,5 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.40';
+import { compileBrief, briefText, photoStyleSuffix } from "../../shared/generatorBrief.ts";
 
 // Video Generator: generates 10 video concept cards — each with a thumbnail
 // image, a title, a short description, and a production script. Industry-aware:
@@ -21,6 +22,12 @@ export default async function(req) {
     const tone = contentTone || "professional and trustworthy";
     const ref = logoUrl ? [logoUrl] : undefined;
 
+    // Compile the full onboarding brief so thumbnails + scripts reflect the
+    // client's visual style, signature work, differentiators, and pain points.
+    const brief = compileBrief(body);
+    const briefBlock = briefText(brief);
+    const photo = photoStyleSuffix(brief);
+
     const CONCEPTS = [
       { id: "hero", title: "Brand Hero Video", desc: `A cinematic hero showing your best ${ind} work with your logo.`, prompt: `Cinematic hero video thumbnail for ${ind} "${biz}". Slow pan over professional work, dramatic lighting, professional, high-end.` },
       { id: "before-after", title: "Before & After", desc: `A satisfying before-and-after ${ind} transformation.`, prompt: `Before and after ${ind} transformation, split screen, professional photo, dramatic improvement.` },
@@ -38,7 +45,7 @@ export default async function(req) {
     const imgResults = await Promise.allSettled(
       CONCEPTS.map(async (c) => {
         const r = await base44.integrations.Core.GenerateImage({
-          prompt: c.prompt + (loc ? ` Located in ${loc}.` : ""),
+          prompt: `${c.prompt}${loc ? ` Located in ${loc}.` : ""} ${photo}`,
           existing_image_urls: ref,
         });
         return { id: c.id, title: c.title, description: c.desc, thumbnailUrl: r.url };
@@ -48,7 +55,14 @@ export default async function(req) {
 
     // Generate scripts using the best AI model.
     const scriptRes = await base44.integrations.Core.InvokeLLM({
-      prompt: `Write a compelling video script for each of these 10 video concepts for ${ind} "${biz}"${subInd ? ` (${subInd})` : ""} in ${loc}. Services: ${svc}. Tone: ${tone}. Make scripts specific to the ${ind} industry. Return one script per concept id.\n\nConcepts: ${JSON.stringify(concepts.map((c) => ({ id: c.id, title: c.title, description: c.description })))}`,
+      prompt: `Write a compelling video script for each of these 10 video concepts for ${ind} "${biz}"${subInd ? ` (${subInd})` : ""} in ${loc}.
+
+CLIENT BRIEF:
+${briefBlock}
+
+Services: ${svc}. Tone: ${tone}. Make every script specific to the ${ind} industry. Weave in the client's DIFFERENTIATORS and SIGNATURE WORK. Speak directly to the CUSTOMER PAIN POINTS. Match the BRAND PERSONALITY. Each script should be punchy, 15-30 seconds spoken, with a clear hook in the first 3 seconds and a strong call-to-action at the end. Return one script per concept id.
+
+Concepts: ${JSON.stringify(concepts.map((c) => ({ id: c.id, title: c.title, description: c.description })))}`,
       model: "claude_opus_4_8",
       response_json_schema: {
         type: "object",

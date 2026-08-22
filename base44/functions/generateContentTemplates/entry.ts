@@ -1,4 +1,5 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.40';
+import { compileBrief, briefText } from "../../shared/generatorBrief.ts";
 
 // Content Generator: scrapes the client's market (location, industry,
 // competitors, pricing, existing website, social presence) via web search and
@@ -39,22 +40,17 @@ export default async function(req) {
       if (parts.length) finContext = `\n\nFINANCIAL INTELLIGENCE:\n${parts.join("\n")}`;
     }
 
-    // Build industry answers context if available
-    let answersContext = "";
-    if (industryAnswers && typeof industryAnswers === "object" && Object.keys(industryAnswers).length > 0) {
-      answersContext = `\n\nCLIENT-SPECIFIC ANSWERS:\n${Object.entries(industryAnswers).map(([k, v]) => `- ${k}: ${v}`).join("\n")}`;
-    }
+    // Compile the full structured brief from onboarding answers so the
+    // copy reflects the client's visual style, brand personality, signature
+    // work, and customer pain points — not just services + location.
+    const brief = compileBrief(body);
+    const briefBlock = briefText(brief);
 
     const prompt = `You are a senior brand strategist and viral-marketing copywriter for local service businesses. A client needs website messaging for their ${ind} business.
 
-BUSINESS: ${biz}
-INDUSTRY: ${ind}${subInd ? ` (${subInd})` : ""}
-BUSINESS TYPE: ${bizType}
-LOCATION: ${loc}
-SERVICES: ${svc}
-YEARS IN BUSINESS: ${years}
-DIFFERENTIATORS: ${diff}
-EXISTING WEBSITE: ${site || "none"}${finContext}${answersContext}
+CLIENT BRIEF:
+${briefBlock}
+EXISTING WEBSITE: ${site || "none"}${finContext}
 
 STEP 1 — Research the market. Use real web data about ${loc}: the local ${ind} competition, typical pricing, what customers there care about, and what messaging the top competitors use. Note 3-5 key findings.
 

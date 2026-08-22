@@ -1,4 +1,5 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.40';
+import { compileBrief, briefText } from "../../shared/generatorBrief.ts";
 
 // Generates rich, location-aware website copy for a client's site using
 // real web context about their area. Industry-aware: uses the client's actual
@@ -40,24 +41,22 @@ export default async function(req) {
       if (parts.length) finContext = `\n\nFINANCIAL INTELLIGENCE:\n${parts.join("\n")}`;
     }
 
-    // Build industry answers context
-    let answersContext = "";
-    if (industryAnswers && typeof industryAnswers === "object" && Object.keys(industryAnswers).length > 0) {
-      answersContext = `\n\nCLIENT-SPECIFIC ANSWERS:\n${Object.entries(industryAnswers).map(([k, v]) => `- ${k}: ${v}`).join("\n")}`;
-    }
+    // Compile the full structured brief so the copy weaves in the client's
+    // signature work, brand personality, visual style, and the specific pain
+    // points their customers worry about — not just services + location.
+    const brief = compileBrief(body);
+    const briefBlock = briefText(brief);
 
     const prompt = `You are writing the website copy for a local ${ind} business. Make it specific, high-converting, and locally relevant — no generic filler.
 
-Business name: ${biz}
-Industry: ${ind}${subInd ? ` (${subInd})` : ""}
-Business type: ${bizType}
-Primary location: ${loc}
-Service area: ${area}
-Services offered: ${svc}
-Years in business: ${yearsInBusiness || "n/a"}
-Differentiators: ${diff || "n/a"}
-Phone: ${phone || "n/a"}
-Email: ${email || "n/a"}${finContext}${answersContext}
+CLIENT BRIEF:
+${briefBlock}${finContext}
+
+INSTRUCTIONS:
+- Weave the client's DIFFERENTIATORS and SIGNATURE WORK into the hero and about sections — don't just list them.
+- Address the CUSTOMER PAIN POINTS directly in the FAQ and service descriptions.
+- Match the BRAND PERSONALITY in every line of copy.
+- Reference the real ${loc} area (surrounding communities, local landmarks, climate, common local needs) so it feels native.
 
 Using real, current information about ${loc} (the real surrounding cities/communities, local landmarks, climate, and common needs there), write website copy that feels native to ${loc}. Reference the actual area and local trust signals where natural. Make all copy specific to the ${ind} industry — use industry-appropriate terminology, pain points, and benefits.
 
