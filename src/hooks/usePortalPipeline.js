@@ -58,13 +58,14 @@ export function usePortalPipeline(user) {
     const gate = step.gate;
 
     if (gate === "auto" || !gate) {
-      // "auto" steps (review/view) are complete only when the user has gone
-      // through the StepCoach for that page — tracked by localStorage
-      // coach:done:<path>. Without this, every "auto" step shows a checkmark
-      // even before the user has visited it.
+      // "auto" steps are complete when the user has visited them. Server-
+      // persisted in ClientProject.visited_steps (cross-device); localStorage
+      // coach:done:<path> is a local cache for instant UI feedback.
+      const visitedSteps = project?.visited_steps || [];
       try {
-        completed = localStorage.getItem(`coach:done:${step.to}`) === "1";
-      } catch { completed = false; }
+        completed = visitedSteps.includes(step.to) ||
+          localStorage.getItem(`coach:done:${step.to}`) === "1";
+      } catch { completed = visitedSteps.includes(step.to); }
     } else if (gate === "profile") {
       completed = !!(user?.epoxyProfileSubmitted);
     } else if (gate === "logo") {
@@ -101,6 +102,24 @@ export function usePortalPipeline(user) {
 
     return { step, completed, pendingApproval, locked: false, isCurrent: false };
   });
+
+  // M3 — Promote per-device localStorage step completions to the server
+  // (ClientProject.visited_steps) so they survive device switches. Best-effort,
+  // non-blocking: runs after project loads; converges on next reload.
+  useEffect(() => {
+    if (!project?.id || !visibleSteps.length) return;
+    const visited = project.visited_steps || [];
+    const toSync = [];
+    for (const s of visibleSteps) {
+      if ((s.gate === "auto" || !s.gate) && !visited.includes(s.to)) {
+        try { if (localStorage.getItem(`coach:done:${s.to}`) === "1") toSync.push(s.to); } catch {}
+      }
+    }
+    if (toSync.length === 0) return;
+    base44.entities.ClientProject.update(project.id, {
+      visited_steps: [...visited, ...toSync],
+    }).catch(() => {});
+  }, [project?.id, project?.visited_steps]);
 
   // Compute locked + current (sequential: first incomplete step is current,
   // steps after it are locked until prerequisites are done)

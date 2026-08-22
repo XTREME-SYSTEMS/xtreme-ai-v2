@@ -16,14 +16,26 @@ async function llm(base44, prompt, schema) {
 }
 
 async function enqueue(base44, job_type, build_id, generator_id, input) {
-  await base44.asServiceRole.entities.GenerationJob.create({
+  const sr = base44.asServiceRole;
+  // Deterministic key: same job_type + build_id + generator_id + input signature
+  // → same key. Prevents duplicate jobs when a runner retries or re-enqueues.
+  const inputSig = JSON.stringify(input || {}).slice(0, 200);
+  const idempotency_key = `${job_type}:${build_id || "auto"}:${generator_id || ""}:${inputSig}`;
+  // Skip if an active job with this key already exists (queued or running).
+  const existing = await sr.entities.GenerationJob.filter(
+    { idempotency_key }, "-created_date", 5
+  ).catch(() => []);
+  const active = (existing || []).find(j => j.status === "queued" || j.status === "running");
+  if (active) return active.id;
+  const job = await sr.entities.GenerationJob.create({
     build_id: build_id || "auto",
     generator_id,
     job_type,
-    idempotency_key: `${job_type}-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+    idempotency_key,
     status: "queued",
     input_ref: JSON.stringify(input),
   });
+  return job.id;
 }
 
 async function receipt(base44, action, entity_type, entity_id, status, inputs, outputs) {

@@ -1,20 +1,27 @@
 {
   "name": "GenerationJob",
   "type": "object",
+  "description": "Queue entry for the autonomous generation engine (heartbeat dispatcher) and the market-asset generator. Tracks job type, status, retries, idempotency, and results.",
   "properties": {
     "market_id": {
-      "type": "string"
+      "type": "string",
+      "description": "Linked Market (used by generateMarketAssets). Optional for growth-engine jobs."
+    },
+    "build_id": {
+      "type": "string",
+      "description": "Linked BuildProject (used by the growth-engine pipeline). Optional."
+    },
+    "generator_id": {
+      "type": "string",
+      "description": "Generator/agent that owns this job (e.g. presence_auditor, concept_inventor)."
     },
     "job_type": {
       "type": "string",
-      "enum": [
-        "seo",
-        "pricing",
-        "competitors",
-        "images",
-        "full"
-      ],
-      "default": "full"
+      "description": "Job type \u2014 growth-engine phases (discover, audit, opportunity, concept, brand, website, marketing, build, qa, proposal) or market-asset types (seo, pricing, competitors, images, full)."
+    },
+    "idempotency_key": {
+      "type": "string",
+      "description": "Deterministic key to prevent duplicate enqueue. Jobs with the same key are not re-created."
     },
     "status": {
       "type": "string",
@@ -22,12 +29,31 @@
         "queued",
         "running",
         "done",
-        "failed"
+        "complete",
+        "failed",
+        "dead_letter"
       ],
       "default": "queued"
     },
+    "input_ref": {
+      "type": "string",
+      "description": "JSON-stringified input payload for the job."
+    },
+    "output_ref": {
+      "type": "string",
+      "description": "JSON-stringified output summary (trimmed)."
+    },
     "result_summary": {
       "type": "string"
+    },
+    "next_attempt_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When to retry after a failure (exponential backoff)."
+    },
+    "attempt_count": {
+      "type": "number",
+      "default": 0
     },
     "started_at": {
       "type": "string",
@@ -42,7 +68,6 @@
     }
   },
   "required": [
-    "market_id",
     "job_type"
   ]
 }

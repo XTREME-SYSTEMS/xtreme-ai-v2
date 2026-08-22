@@ -163,6 +163,14 @@
     },
     "current_step": {
       "type": "string"
+    },
+    "visited_steps": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "default": [],
+      "description": "Portal step paths the client has visited/completed (server-persisted, replaces per-device localStorage coach:done keys)."
     }
   },
   "required": [

@@ -15,6 +15,18 @@ export default async function(req) {
     const now = new Date();
     const nowIso = now.toISOString();
 
+    // Reclaim orphaned "running" jobs (crashed mid-execution) older than 10
+    // minutes — reset them to "queued" so the heartbeat retries them instead
+    // of leaving them stuck forever.
+    const staleCutoff = new Date(Date.now() - 10 * 60 * 1000);
+    const stuck = await sr.entities.GenerationJob.filter({ status: "running" }, "-created_date", 20).catch(() => []);
+    for (const j of stuck || []) {
+      const touched = j.updated_date ? new Date(j.updated_date) : null;
+      if (!touched || touched < staleCutoff) {
+        await sr.entities.GenerationJob.update(j.id, { status: "queued", error: "reclaimed from stuck running" }).catch(() => {});
+      }
+    }
+
     // Find queued jobs that are due (next_attempt_at is null or in the past)
     const queuedJobs = await sr.entities.GenerationJob.filter({ status: "queued" }, "-created_date", 50);
 

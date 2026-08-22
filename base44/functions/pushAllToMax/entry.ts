@@ -8,10 +8,23 @@ export default async function(req) {
     const base44 = createClientFromRequest(req);
     const svc = base44.asServiceRole;
 
+    const body = await req.json().catch(() => ({}));
+    const limit = Math.min(Math.max(Number(body.limit) || 8, 1), 20);
+
     const domains = await svc.entities.DomainPortfolio.list('-created_date', 200);
+    // Only process domains that still have work to do — skip fully-pushed and
+    // failed. Capping the batch prevents gateway 524 timeouts on large
+    // portfolios; the nightly workflow re-invokes until has_more is false.
+    const needsWork = domains.filter(d =>
+      d.status !== 'failed' &&
+      ((d.keywords_count || 0) === 0 || (d.pages_count || 0) === 0 ||
+       (d.citations_count || 0) === 0 || (d.backlinks_count || 0) === 0)
+    );
+    const batch = needsWork.slice(0, limit);
+    const hasMore = needsWork.length > batch.length;
     const results = [];
 
-    for (const d of domains) {
+    for (const d of batch) {
       const r = { domain: d.domain, stages_pushed: [] };
 
       // Skip failed domains
@@ -129,6 +142,8 @@ export default async function(req) {
       pushed: results.filter(r => r.stages_pushed.length > 0).length,
       skipped: results.filter(r => r.skipped).length,
       failed: results.filter(r => r.error).length,
+      has_more: hasMore,
+      remaining: needsWork.length - batch.length,
     };
 
     return Response.json({ ok: true, summary, results });
