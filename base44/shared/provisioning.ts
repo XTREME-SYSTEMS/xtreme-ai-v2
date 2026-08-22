@@ -172,8 +172,8 @@ export async function provisionDrive(base44, market) {
 
 // ---- Supabase ---------------------------------------------------------------
 export async function provisionSupabase(market) {
-  const token = process.env.SUPABASE_ACCESS_TOKEN;
-  const org = process.env.SUPABASE_ORG_ID;
+  const token = Deno.env.get("SUPABASE_ACCESS_TOKEN");
+  const org = Deno.env.get("SUPABASE_ORG_ID");
   if (!token || !org) throw new Error("Supabase secrets missing (SUPABASE_ACCESS_TOKEN / SUPABASE_ORG_ID)");
   const name = (market.slug || slugify(market.state + "-" + market.city)).replace(/[^a-z0-9]/g, "-").slice(0, 20);
   const dbPass = `Pass_${Math.random().toString(36).slice(2, 14)}!A1`;
@@ -189,8 +189,8 @@ export async function provisionSupabase(market) {
 
 // ---- Vercel -----------------------------------------------------------------
 export async function provisionVercel(market, repoFullName, files) {
-  const token = process.env.VERCEL_TOKEN;
-  const team = process.env.VERCEL_TEAM_ID;
+  const token = Deno.env.get("VERCEL_TOKEN");
+  const team = Deno.env.get("VERCEL_TEAM_ID");
   if (!token) throw new Error("Vercel token missing (VERCEL_TOKEN)");
   const qs = team ? `?teamId=${team}` : "";
   const name = (market.slug || slugify(market.state + "-" + market.city)).replace(/[^a-z0-9-]/g, "-").slice(0, 40);

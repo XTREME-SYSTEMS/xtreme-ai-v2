@@ -193,10 +193,12 @@ Deno.serve(async (req: Request) => {
         if (discount > parseFloat(price)) discount = parseFloat(price);
         price = (parseFloat(price) - discount).toFixed(2);
         appliedPromoCode = promo.code;
-        // Increment the usage counter atomically.
-        await base44.asServiceRole.entities.PromoCode.update(promo.id, {
-          usedCount: (promo.usedCount || 0) + 1,
-        });
+        // Increment the usage counter atomically (avoids overselling under
+        // concurrent checkouts — read-then-write would race two buyers past maxUses).
+        await base44.asServiceRole.entities.PromoCode.updateMany(
+          { code: requestedPromoCode },
+          { $inc: { usedCount: 1 } }
+        );
         console.log("create-checkout: promo code applied", { code: promo.code, discount: discount.toFixed(2) });
       } catch (e) {
         console.error("create-checkout: promo code validation failed", e?.message || e);

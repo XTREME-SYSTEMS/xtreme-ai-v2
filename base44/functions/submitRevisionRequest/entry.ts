@@ -31,7 +31,7 @@ export default async function(req) {
     const appUrl =
       secrets.get("WIX_CHECKOUT_APP_URL") ||
       req.headers.get("x-base44-app-url") ||
-      `https://${req.headers.get("host") || ""}`;
+      "";
 
     // 1) Persist the revision request as a pending Approval so it shows up in
     //    the admin's Approvals dashboard immediately.

@@ -44,8 +44,8 @@ export const STEP_RESET_FIELDS: Record<string, string[]> = {
 
 export async function getAdminEmails(base44: any): Promise<string[]> {
   try {
-    const users = await base44.asServiceRole.entities.User.list();
-    return (users || []).filter((u: any) => u.role === "admin" && u.email).map((u: any) => u.email);
+    const users = await base44.asServiceRole.entities.User.filter({ role: "admin" });
+    return (users || []).filter((u: any) => u.email).map((u: any) => u.email);
   } catch {
     return [];
   }
