@@ -42,7 +42,7 @@ export default async function(req) {
 
     const results = await Promise.all(
       adminEmails.map((email) =>
-        base44.integrations.Core.SendEmail({ to: email, subject, body: body_text })
+        base44.asServiceRole.integrations.Core.SendEmail({ to: email, subject, body: body_text })
           .then(() => ({ email, ok: true }))
           .catch((e) => ({ email, ok: false, error: e.message }))
       )

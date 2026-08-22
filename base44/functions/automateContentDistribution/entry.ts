@@ -40,7 +40,7 @@ export default async function(req) {
       const niche = p.niche || 'general';
 
       // Use InvokeLLM to generate multi-platform content
-      const result = await base44.integrations.Core.InvokeLLM({
+      const result = await base44.asServiceRole.integrations.Core.InvokeLLM({
         prompt: `Generate social media content for ${p.domain} (${niche} services).
 
 Recent published content:

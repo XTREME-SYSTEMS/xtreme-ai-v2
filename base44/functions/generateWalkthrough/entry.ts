@@ -21,7 +21,7 @@ export default async function (req: Request) {
 
   try {
     // Use AI with vision to analyze the uploaded images and create a walkthrough plan
-    const result = await base44.integrations.Core.InvokeLLM({
+    const result = await base44.asServiceRole.integrations.Core.InvokeLLM({
       prompt: `You are a professional 3D walkthrough designer. Analyze these ${images.length} uploaded images of a space and create an immersive walkthrough plan.
 
 For each image:

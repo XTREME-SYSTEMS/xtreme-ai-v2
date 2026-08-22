@@ -44,7 +44,7 @@ export default async function(req) {
     // Generate 10 thumbnails in parallel.
     const imgResults = await Promise.allSettled(
       CONCEPTS.map(async (c) => {
-        const r = await base44.integrations.Core.GenerateImage({
+        const r = await base44.asServiceRole.integrations.Core.GenerateImage({
           prompt: `${c.prompt}${loc ? ` Located in ${loc}.` : ""} ${photo}`,
           existing_image_urls: ref,
         });
@@ -54,7 +54,7 @@ export default async function(req) {
     const concepts = imgResults.map((r) => r.value).filter(Boolean);
 
     // Generate scripts using the best AI model.
-    const scriptRes = await base44.integrations.Core.InvokeLLM({
+    const scriptRes = await base44.asServiceRole.integrations.Core.InvokeLLM({
       prompt: `Write a compelling video script for each of these 10 video concepts for ${ind} "${biz}"${subInd ? ` (${subInd})` : ""} in ${loc}.
 
 CLIENT BRIEF:

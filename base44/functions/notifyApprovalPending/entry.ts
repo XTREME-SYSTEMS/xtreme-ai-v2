@@ -27,7 +27,7 @@ export default async function(req) {
     const step = approval.pipeline_step ? ` (${approval.pipeline_step})` : "";
 
     try {
-      await base44.integrations.Core.SendEmail({
+      await base44.asServiceRole.integrations.Core.SendEmail({
         to: approval.client_email,
         subject: `Action needed: ${approval.requested_action || "New approval"}${step}`,
         body: `Hello,\n\nA new step in your build needs your approval:\n\n${approval.requested_action || ""}\n\nReview and approve it here:\n${link}\n\nThank you,\nLead Gen Near You`,

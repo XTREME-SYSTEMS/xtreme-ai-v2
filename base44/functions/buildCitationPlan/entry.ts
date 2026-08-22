@@ -43,7 +43,7 @@ export default async function(req) {
     log('Generating NAP (Name, Address, Phone) data...');
     let nap = null;
     try {
-      const napRes = await base44.integrations.Core.InvokeLLM({
+      const napRes = await base44.asServiceRole.integrations.Core.InvokeLLM({
         prompt: `Generate realistic NAP (Name, Address, Phone) data for a local ${niche} business whose website is ${domain}. Infer a plausible US city/region from the domain name if it contains a location hint, otherwise pick a major US metro. The business should sound like a real local ${niche} contractor. Return JSON with: business_name, phone (US format like 555-123-4567), address (street number + name), city, state (2-letter code), zip (5-digit), short_description (one sentence about the ${niche} service they offer).`,
         response_json_schema: {
           type: 'object',

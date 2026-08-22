@@ -36,7 +36,7 @@ export default async function(req) {
       return Response.json({ error: "unsupported section" }, { status: 400 });
     }
 
-    const res = await base44.integrations.Core.InvokeLLM({ prompt, response_json_schema: schema, model: "claude_sonnet_4_6" });
+    const res = await base44.asServiceRole.integrations.Core.InvokeLLM({ prompt, response_json_schema: schema, model: "claude_sonnet_4_6" });
     return Response.json({ ok: true, section, updates: res });
   } catch (error) {
     console.error("regenerateWebsiteSection error", error?.message || error);

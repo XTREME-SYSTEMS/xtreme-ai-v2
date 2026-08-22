@@ -40,7 +40,7 @@ export default async function(req) {
     log('Searching web for niche-relevant link opportunities...');
     let opportunities = [];
     try {
-      const llmRes = await base44.integrations.Core.InvokeLLM({
+      const llmRes = await base44.asServiceRole.integrations.Core.InvokeLLM({
         prompt: `You are a professional link-building expert. Find ${limit} real, high-quality backlink opportunities for a ${niche} business website at ${domain}.
 
 Search the web for:
@@ -117,7 +117,7 @@ Only include REAL sites you found via web search — no fabricated domains. Retu
     log('Drafting compelling partnership outreach emails...');
     let outreachEmails = [];
     try {
-      const draftRes = await base44.integrations.Core.InvokeLLM({
+      const draftRes = await base44.asServiceRole.integrations.Core.InvokeLLM({
         prompt: `Write compelling, personalized partnership outreach emails for ${domain} — an AI-powered autonomous marketing engine that scales local lead generation by automating site deployment, Google Search Console indexing, citation building, backlink outreach, and persistent SEO/AEO/AI optimization across a portfolio of high-value "near me" service domains.
 
 Prospects to draft emails for:

@@ -95,7 +95,7 @@ Return JSON: an array of ${n} strings, each a complete image prompt.`;
 
     let prompts: string[] = [];
     try {
-      const res = await base44.integrations.Core.InvokeLLM({
+      const res = await base44.asServiceRole.integrations.Core.InvokeLLM({
         prompt,
         add_context_from_internet: true,
         model: "gemini_3_1_pro",
@@ -123,7 +123,7 @@ Return JSON: an array of ${n} strings, each a complete image prompt.`;
     const images: string[] = [];
     for (let i = 0; i < n && i < prompts.length; i++) {
       try {
-        const r = await base44.integrations.Core.GenerateImage({ prompt: prompts[i] });
+        const r = await base44.asServiceRole.integrations.Core.GenerateImage({ prompt: prompts[i] });
         if (r?.url) images.push(r.url);
       } catch (err) {
         console.error("image gen failed", err?.message || err);
@@ -163,7 +163,7 @@ async function generateStyleMatched(base44, refs, ctx) {
   let styleBrief = "";
   let prompts: string[] = [];
   try {
-    const analyzeRes = await base44.integrations.Core.InvokeLLM({
+    const analyzeRes = await base44.asServiceRole.integrations.Core.InvokeLLM({
       prompt: `You are a master commercial photographer and art director. Analyze the attached project photos from a real business and extract the visual principles that define them.
 
 Business context:
@@ -214,7 +214,7 @@ Return JSON: { "styleBrief": string, "prompts": string[${n}] }`,
   const images: string[] = [];
   for (let i = 0; i < n && i < prompts.length; i++) {
     try {
-      const r = await base44.integrations.Core.GenerateImage({
+      const r = await base44.asServiceRole.integrations.Core.GenerateImage({
         prompt: prompts[i],
         existing_image_urls: refs.slice(0, 4),
       });

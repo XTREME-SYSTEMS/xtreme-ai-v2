@@ -18,7 +18,7 @@ export default async function(req) {
     const ind = industry || "";
     const svc = (services || []).join(", ");
 
-    const res = await base44.integrations.Core.InvokeLLM({
+    const res = await base44.asServiceRole.integrations.Core.InvokeLLM({
       prompt: `You are an AEO (Answer Engine Optimization) and AI-search specialist. Optimize the page below so AI search engines (Google AI Overviews, ChatGPT, Perplexity) quote it directly and cite it as a source.
 
 BUSINESS: ${biz}

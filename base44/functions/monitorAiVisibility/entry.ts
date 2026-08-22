@@ -45,7 +45,7 @@ Then answer these questions about "${brandDomain}":
 Be specific and factual. Only say a brand is visible if it genuinely appears in your recommendations or you have specific knowledge of it.`;
 
       try {
-        const result = await base44.integrations.Core.InvokeLLM({
+        const result = await base44.asServiceRole.integrations.Core.InvokeLLM({
           prompt,
           add_context_from_internet: true,
           response_json_schema: {

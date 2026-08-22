@@ -69,7 +69,7 @@ For each keyword:
 Be accurate. Only report a position if you genuinely find the domain in the results. Do not guess.`;
 
         try {
-          const result = await base44.integrations.Core.InvokeLLM({
+          const result = await base44.asServiceRole.integrations.Core.InvokeLLM({
             prompt,
             add_context_from_internet: true,
             response_json_schema: {

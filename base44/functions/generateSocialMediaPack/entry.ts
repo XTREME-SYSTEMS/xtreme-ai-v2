@@ -44,7 +44,7 @@ export default async function(req) {
     // Generate 10 template images in parallel.
     const imgResults = await Promise.allSettled(
       TEMPLATES.map(async (t) => {
-        const r = await base44.integrations.Core.GenerateImage({
+        const r = await base44.asServiceRole.integrations.Core.GenerateImage({
           prompt: `${t.prompt}${loc ? ` Located in ${loc}.` : ""} ${photo}`,
           existing_image_urls: ref,
         });
@@ -54,7 +54,7 @@ export default async function(req) {
     const templates = imgResults.map((r) => r.value).filter(Boolean);
 
     // Generate a 30-day content calendar using the best AI model.
-    const calRes = await base44.integrations.Core.InvokeLLM({
+    const calRes = await base44.asServiceRole.integrations.Core.InvokeLLM({
       prompt: `Create a 30-day social media content calendar for ${ind} "${biz}"${subInd ? ` (${subInd})` : ""} in ${loc}.
 
 CLIENT BRIEF:

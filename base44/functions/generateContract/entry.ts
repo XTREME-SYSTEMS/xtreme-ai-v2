@@ -22,7 +22,7 @@ export default async function(req) {
     }
 
     const prompt = `Generate a professional service agreement (contract) as clean HTML article content (use <h2>, <p>, <ul>, <li> — no <html>/<body> wrapper). Title: "${title || "Service Agreement"}". Client/Business: ${account_name || "Client"}. Signer: ${party_name || ""} (${party_email || ""}). Deal/Project: ${deal_name || "Services"}. Scope of work: ${scope || "digital marketing and lead generation services"}. Price: ${price || "as quoted"}. Terms: ${terms || "net 30, standard"}. Include sections: Parties, Scope of Services, Term, Fees & Payment, Responsibilities, Confidentiality, Limitation of Liability, Governing Law, Signatures. Make it professional and enforceable.`;
-    const res = await base44.integrations.Core.InvokeLLM({
+    const res = await base44.asServiceRole.integrations.Core.InvokeLLM({
       prompt,
       response_json_schema: { type: "object", properties: { body: { type: "string" } } },
     });

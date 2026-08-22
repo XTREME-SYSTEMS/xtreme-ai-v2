@@ -97,7 +97,7 @@ RULES:
 
 Return a JSON object with a "questions" array.`;
 
-    const res = await base44.integrations.Core.InvokeLLM({
+    const res = await base44.asServiceRole.integrations.Core.InvokeLLM({
       prompt,
       add_context_from_internet: true,
       model: "gemini_3_flash",

@@ -18,7 +18,7 @@ export default async function(req) {
     // === CHAT: AI conversation with full project context ===
     if (action === "chat") {
       const ctx = buildProjectContext(project);
-      const result = await base44.integrations.Core.InvokeLLM({
+      const result = await base44.asServiceRole.integrations.Core.InvokeLLM({
         prompt: `You are XtremeClone AI, an autonomous rebranding assistant with full read/write/execute access to a clone project. You can analyze the cloned site, identify issues, suggest changes, and execute updates to the rebrand package.
 
 ${ctx}
@@ -57,7 +57,7 @@ Only include actions when the user explicitly asks for a change. Otherwise, just
 
     // === ANALYZE ELEMENT: Point-and-click element analysis ===
     if (action === "analyze_element") {
-      const result = await base44.integrations.Core.InvokeLLM({
+      const result = await base44.asServiceRole.integrations.Core.InvokeLLM({
         prompt: `Analyze this element from a cloned website that the user clicked on with their mouse.
 
 Project: ${project.selected_name || project.target_url}
@@ -96,7 +96,7 @@ Be concise and actionable.`,
 
     // === FORENSIC AUDIT: Deep audit with business owner summary ===
     if (action === "forensic_audit") {
-      const result = await base44.integrations.Core.InvokeLLM({
+      const result = await base44.asServiceRole.integrations.Core.InvokeLLM({
         prompt: `Perform a deep forensic audit of this cloned website project. Write the business owner summary in plain English with no jargon.
 
 PROJECT:
@@ -180,7 +180,7 @@ Create a comprehensive forensic audit. The business_owner_summary should tell th
 
     // === GENERATE NAMES: 20 fresh name+domain recommendations ===
     if (action === "generate_names") {
-      const result = await base44.integrations.Core.InvokeLLM({
+      const result = await base44.asServiceRole.integrations.Core.InvokeLLM({
         prompt: `Generate 20 creative, brandable business name + domain recommendations for a cloned ${project.industry || "service"} website.
 
 Original site: ${project.target_url}
@@ -356,7 +356,7 @@ For each, provide: name, domain, rationale (why this name works), available (tru
         if (item_key === "business_name") {
           let names = project.legal_scan?.name_recommendations || [];
           if (names.length === 0) {
-            const result = await base44.integrations.Core.InvokeLLM({
+            const result = await base44.asServiceRole.integrations.Core.InvokeLLM({
               prompt: `Generate 20 creative, brandable business name + domain recommendations for a ${industry} business replacing "${mc.business_name || ""}". Return JSON: { "names": [{ "name": string, "domain": string, "rationale": string, "available": boolean }] }`,
               add_context_from_internet: true, model: "gemini_3_flash",
               response_json_schema: { type: "object", properties: { names: { type: "array", items: { type: "object", properties: { name: { type: "string" }, domain: { type: "string" }, rationale: { type: "string" }, available: { type: "boolean" } } } } } }
@@ -378,7 +378,7 @@ For each, provide: name, domain, rationale (why this name works), available (tru
         else if (item_key === "domain") {
           let names = project.legal_scan?.name_recommendations || [];
           if (names.length === 0) {
-            const result = await base44.integrations.Core.InvokeLLM({
+            const result = await base44.asServiceRole.integrations.Core.InvokeLLM({
               prompt: `Generate 20 domain options for a ${industry} business named "${name}". Return JSON: { "domains": [{ "domain": string, "available": boolean, "rationale": string }] }`,
               add_context_from_internet: true, model: "gemini_3_flash",
               response_json_schema: { type: "object", properties: { domains: { type: "array", items: { type: "object", properties: { domain: { type: "string" }, available: { type: "boolean" }, rationale: { type: "string" } } } } } }
@@ -398,7 +398,7 @@ For each, provide: name, domain, rationale (why this name works), available (tru
           const colors = rp.new_brand?.colors || { primary: "#0a0a0a", accent: "#D4FF4D" };
           const styles = ["minimalist geometric", "bold emblem badge", "modern abstract monogram"];
           const prompts = styles.map(s => `Professional logo for "${name}", a ${industry} company. Style: ${s}. Colors: ${colors.primary} and ${colors.accent}. Clean, scalable, on white background. Brand name "${name}" integrated.`);
-          const results = await Promise.all(prompts.map(p => base44.integrations.Core.GenerateImage({ prompt: p }).catch(() => null)));
+          const results = await Promise.all(prompts.map(p => base44.asServiceRole.integrations.Core.GenerateImage({ prompt: p }).catch(() => null)));
           const logos = results.filter(Boolean).map((r, i) => ({ url: r.url, prompt: prompts[i], style: styles[i] }));
           rep = `${logos.length} logo options generated`;
           repData = { logos };
@@ -408,7 +408,7 @@ For each, provide: name, domain, rationale (why this name works), available (tru
         }
 
         else if (item_key === "tagline") {
-          const result = await base44.integrations.Core.InvokeLLM({
+          const result = await base44.asServiceRole.integrations.Core.InvokeLLM({
             prompt: `Create a new tagline for "${name}", a ${industry} business. The original tagline "${mc.tagline || ""}" must be replaced. Return JSON: { "tagline": string, "voice": string }`,
             model: "gemini_3_flash",
             response_json_schema: { type: "object", properties: { tagline: { type: "string" }, voice: { type: "string" } } }
@@ -429,7 +429,7 @@ For each, provide: name, domain, rationale (why this name works), available (tru
             rep = "No copyrighted content blocks identified — all content is safe to keep";
             aiNotes = "Legal scan found no content blocks that need replacement";
           } else {
-            const result = await base44.integrations.Core.InvokeLLM({
+            const result = await base44.asServiceRole.integrations.Core.InvokeLLM({
               prompt: `You are rebranding a ${industry} website from "${mc.business_name || ""}" to "${name}". For each content block, write a unique replacement that conveys the same information but in original words. Return JSON: { "replacements": [{ "section": string, "original_text": string, "new_text": string }] }
 
 Content blocks to replace:
@@ -456,7 +456,7 @@ Brand voice: ${rp.new_brand?.voice || "professional and trustworthy"}`,
             aiNotes = "Legal scan found no images that need replacement";
           } else {
             const results = await Promise.all(images.slice(0, 5).map(img =>
-              base44.integrations.Core.GenerateImage({ prompt: img.replacement_prompt || `Professional ${industry} image, high quality, no text` })
+              base44.asServiceRole.integrations.Core.GenerateImage({ prompt: img.replacement_prompt || `Professional ${industry} image, high quality, no text` })
                 .then(r => ({ original_url: img.url, new_url: r.url, description: img.description, prompt: img.replacement_prompt }))
                 .catch(() => null)
             ));
@@ -470,7 +470,7 @@ Brand voice: ${rp.new_brand?.voice || "professional and trustworthy"}`,
         }
 
         else if (item_key === "testimonials") {
-          const result = await base44.integrations.Core.InvokeLLM({
+          const result = await base44.asServiceRole.integrations.Core.InvokeLLM({
             prompt: `Generate 3 realistic, original testimonials for "${name}", a ${industry} business. These should be entirely original, not copied from any real business. Return JSON: { "testimonials": [{ "name": string, "location": string, "text": string, "rating": number }] }`,
             model: "gemini_3_flash",
             response_json_schema: { type: "object", properties: { testimonials: { type: "array", items: { type: "object", properties: { name: { type: "string" }, location: { type: "string" }, text: { type: "string" }, rating: { type: "number" } } } } } }
@@ -481,7 +481,7 @@ Brand voice: ${rp.new_brand?.voice || "professional and trustworthy"}`,
         }
 
         else if (item_key === "facts_claims") {
-          const result = await base44.integrations.Core.InvokeLLM({
+          const result = await base44.asServiceRole.integrations.Core.InvokeLLM({
             prompt: `Generate verified, accurate facts and claims for "${name}", a ${industry} business. These should be general industry facts, not copied from the original site. Return JSON: { "facts": [{ "claim": string, "verification": string }] }`,
             add_context_from_internet: true, model: "gemini_3_flash",
             response_json_schema: { type: "object", properties: { facts: { type: "array", items: { type: "object", properties: { claim: { type: "string" }, verification: { type: "string" } } } } } }
@@ -492,7 +492,7 @@ Brand voice: ${rp.new_brand?.voice || "professional and trustworthy"}`,
         }
 
         else if (item_key === "contact_info") {
-          const result = await base44.integrations.Core.InvokeLLM({
+          const result = await base44.asServiceRole.integrations.Core.InvokeLLM({
             prompt: `Generate plausible contact information for "${name}", a ${industry} business. Use the domain ${domain}. Return JSON: { "phone": string, "email": string, "address": string, "hours": string, "social_links": [string] }`,
             model: "gemini_3_flash",
             response_json_schema: { type: "object", properties: { phone: { type: "string" }, email: { type: "string" }, address: { type: "string" }, hours: { type: "string" }, social_links: { type: "array", items: { type: "string" } } } }
@@ -503,7 +503,7 @@ Brand voice: ${rp.new_brand?.voice || "professional and trustworthy"}`,
         }
 
         else if (item_key === "privacy_terms") {
-          const result = await base44.integrations.Core.InvokeLLM({
+          const result = await base44.asServiceRole.integrations.Core.InvokeLLM({
             prompt: `Generate privacy policy, terms of service, and cookie policy for "${name}", a ${industry} business at ${domain}. The site collects: contact form submissions, email newsletter signups, and uses cookies for analytics. Return JSON: { "privacy_policy": string, "terms_of_service": string, "cookie_policy": string }`,
             model: "gemini_3_flash",
             response_json_schema: { type: "object", properties: { privacy_policy: { type: "string" }, terms_of_service: { type: "string" }, cookie_policy: { type: "string" } } }
@@ -514,7 +514,7 @@ Brand voice: ${rp.new_brand?.voice || "professional and trustworthy"}`,
         }
 
         else if (item_key === "overall_branding") {
-          const result = await base44.integrations.Core.InvokeLLM({
+          const result = await base44.asServiceRole.integrations.Core.InvokeLLM({
             prompt: `Assess the overall brand distinctiveness of this rebrand. Could the finished property reasonably look like it comes from the original company?
 
 Original: ${mc.business_name || "N/A"} (${project.target_url})

@@ -22,7 +22,7 @@ export default async function(req) {
     const diff = (p.differentiators || []).join("; ");
 
     // ── Critique pass ───────────────────────────────────────────────
-    const critique = await base44.integrations.Core.InvokeLLM({
+    const critique = await base44.asServiceRole.integrations.Core.InvokeLLM({
       prompt: `You are a senior conversion copywriter, local SEO specialist, and brand director reviewing a generated website for a real local business. Score it against a strict rubric and give concrete fixes.
 
 BUSINESS:
@@ -73,7 +73,7 @@ Return JSON:
         .filter(([, v]) => v && typeof v.score === "number" && v.score < 75)
         .map(([k]) => k);
       if (weakSections.length > 0) {
-        const fixRes = await base44.integrations.Core.InvokeLLM({
+        const fixRes = await base44.asServiceRole.integrations.Core.InvokeLLM({
           prompt: `You are rewriting weak sections of a local business website to top-tier quality. Apply the fixes below and return ONLY the updated sections as JSON — preserve everything else.
 
 BUSINESS: ${biz} — ${ind}${subInd ? ` (${subInd})` : ""} — ${loc || "n/a"}

@@ -28,7 +28,7 @@ export default async function(req) {
       const adminEmails = await getAdminEmails(base44);
       for (const adminEmail of adminEmails) {
         try {
-          await base44.integrations.Core.SendEmail({
+          await base44.asServiceRole.integrations.Core.SendEmail({
             to: adminEmail,
             subject: `New revision message: ${label}`,
             body:
@@ -43,7 +43,7 @@ export default async function(req) {
     } else if (sender === "admin" && clientEmail) {
       // Admin sent a message — notify the client
       try {
-        await base44.integrations.Core.SendEmail({
+        await base44.asServiceRole.integrations.Core.SendEmail({
           to: clientEmail,
           subject: `New message from our team: ${label}`,
           body:

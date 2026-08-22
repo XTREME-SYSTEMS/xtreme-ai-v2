@@ -55,7 +55,7 @@ Return a structured financial intelligence report:
 
 All prices in USD. Be specific to ${industryContext} and the ${zip || "local"} area. If you can't find exact local data, use regional/national averages and note the source.`;
 
-    const res = await base44.integrations.Core.InvokeLLM({
+    const res = await base44.asServiceRole.integrations.Core.InvokeLLM({
       prompt,
       add_context_from_internet: true,
       model: "gemini_3_flash",

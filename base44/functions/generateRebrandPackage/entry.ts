@@ -58,7 +58,7 @@ export default async function(req) {
       `Professional logo for "${name}", a ${industry} company. Style: ${style}. Colors: ${brand.colors?.primary || '#0a0a0a'} and ${brand.colors?.accent || '#D4FF4D'}. Clean, scalable, on white background. Brand name "${name}" integrated into the logo design.`
     );
     const logoResults = await parallelSafe(logoPrompts.map(p => () =>
-      base44.integrations.Core.GenerateImage({ prompt: p })
+      base44.asServiceRole.integrations.Core.GenerateImage({ prompt: p })
     ));
     const logos = logoResults.filter(r => r.ok).map((r, i) => ({ url: r.result.url, prompt: logoPrompts[i], style: logoStyles[i] }));
     if (logos.length < logoResults.length) log(`${logoResults.length - logos.length} logo(s) failed`);
@@ -68,7 +68,7 @@ export default async function(req) {
     const imagesToReplace = mc.images_to_replace || [];
     log(`Generating ${imagesToReplace.length} replacement images...`);
     const imageResults = await parallelSafe(imagesToReplace.slice(0, 5).map(img => () =>
-      base44.integrations.Core.GenerateImage({ prompt: img.replacement_prompt || `Professional ${industry} image, high quality, no text` })
+      base44.asServiceRole.integrations.Core.GenerateImage({ prompt: img.replacement_prompt || `Professional ${industry} image, high quality, no text` })
         .then(r => ({ original_url: img.url, new_url: r.url, description: img.description, prompt: img.replacement_prompt }))
     ));
     const replacementImages = imageResults.filter(r => r.ok).map(r => r.result);

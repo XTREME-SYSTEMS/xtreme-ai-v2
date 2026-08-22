@@ -89,7 +89,7 @@ Guidelines for highly successful names:
 - Each name must be distinct from the others in the list`;
 
   try {
-    const result = await base44.integrations.Core.InvokeLLM({
+    const result = await base44.asServiceRole.integrations.Core.InvokeLLM({
       prompt,
       add_context_from_internet: true,
       model: "gemini_3_flash",

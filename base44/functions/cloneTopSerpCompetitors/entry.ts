@@ -37,7 +37,7 @@ Also identify:
 
 Be specific with real URLs from the actual search results.`;
 
-    const result = await base44.integrations.Core.InvokeLLM({
+    const result = await base44.asServiceRole.integrations.Core.InvokeLLM({
       prompt,
       add_context_from_internet: true,
       response_json_schema: {

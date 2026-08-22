@@ -49,7 +49,7 @@ export default async function(req) {
 
           for (const page of pages) {
             try {
-              const optRes = await base44.integrations.Core.InvokeLLM({
+              const optRes = await base44.asServiceRole.integrations.Core.InvokeLLM({
                 prompt: `You are an SEO metadata optimizer. Given the following page details, generate an optimized SEO title (max 60 chars) and meta description (max 155 chars) that maximize click-through rate and search ranking.
 
 Page title: "${page.title}"
@@ -106,7 +106,7 @@ Return JSON with optimized_title and optimized_meta_description.`,
 
           if (allPages.length >= 2) {
             // Use LLM to identify internal linking opportunities
-            const linkRes = await base44.integrations.Core.InvokeLLM({
+            const linkRes = await base44.asServiceRole.integrations.Core.InvokeLLM({
               prompt: `You are an internal linking strategist. Given these pages on the same site, suggest 3 high-value internal links to add. For each, specify which page should link to which, and what anchor text to use.
 
 Pages:

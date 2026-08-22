@@ -468,7 +468,7 @@ async function identifyAndFillSeoAeoGaps(base44, project, files, domain) {
 
 Mark gaps as "filled": true if the fix is already in the generated site. Only list gaps that still need manual attention.`;
 
-  const result = await base44.integrations.Core.InvokeLLM({
+  const result = await base44.asServiceRole.integrations.Core.InvokeLLM({
     prompt, model: 'gemini_3_flash',
     response_json_schema: {
       type: 'object',

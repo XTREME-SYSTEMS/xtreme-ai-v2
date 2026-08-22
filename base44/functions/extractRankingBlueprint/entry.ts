@@ -63,7 +63,7 @@ Visit the page and extract a detailed SEO ranking blueprint:
 
 Return a comprehensive JSON blueprint.`;
 
-    const result = await base44.integrations.Core.InvokeLLM({
+    const result = await base44.asServiceRole.integrations.Core.InvokeLLM({
       prompt,
       add_context_from_internet: true,
       response_json_schema: {

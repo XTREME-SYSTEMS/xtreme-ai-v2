@@ -18,7 +18,7 @@ export default async function(req) {
     const biz = businessName || "this business";
 
     // 1) Build matched prompts — same room/angle, two states.
-    const planRes = await base44.integrations.Core.InvokeLLM({
+    const planRes = await base44.asServiceRole.integrations.Core.InvokeLLM({
       prompt: `You are a commercial photographer art-directing a before/after pair for a local service business website slider. Both photos must show the SAME exact space from the SAME angle — only the state changes.
 
 BUSINESS: ${biz}
@@ -52,7 +52,7 @@ Return JSON: { "afterPrompt": string, "beforePrompt": string, "caption": string 
     // 2) Generate the "after" first — it's the hero result.
     let afterUrl = "";
     try {
-      const r = await base44.integrations.Core.GenerateImage({ prompt: afterPrompt });
+      const r = await base44.asServiceRole.integrations.Core.GenerateImage({ prompt: afterPrompt });
       if (r?.url) afterUrl = r.url;
     } catch (err) {
       console.error("after image gen failed", err?.message || err);
@@ -62,7 +62,7 @@ Return JSON: { "afterPrompt": string, "beforePrompt": string, "caption": string 
     // the angle/framing matches for a clean slider.
     let beforeUrl = "";
     try {
-      const r = await base44.integrations.Core.GenerateImage({
+      const r = await base44.asServiceRole.integrations.Core.GenerateImage({
         prompt: beforePrompt,
         existing_image_urls: afterUrl ? [afterUrl] : undefined,
       });

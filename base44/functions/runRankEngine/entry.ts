@@ -40,7 +40,7 @@ export default async function(req) {
       }
       // LLM: detect services + suggest cities from scraped content
       try {
-        const detectRes = await base44.integrations.Core.InvokeLLM({
+        const detectRes = await base44.asServiceRole.integrations.Core.InvokeLLM({
           prompt: `Analyze this website content and return JSON. Business name: "${siteName}". Niche: "${niche}". Title: "${scrape?.title||''}". Meta: "${scrape?.meta_description||''}". Headings: ${JSON.stringify((scrape?.headings||[]).slice(0,10))}. Return: { "services": [3-6 service keywords this business offers], "cities": [3-5 cities/areas they serve, or [] if not local], "business_name": [cleaner version of the business name if detectable, else the provided name] }`,
           model: 'gemini_3_flash',
           response_json_schema: {
@@ -99,7 +99,7 @@ export default async function(req) {
 1) The 15 highest-value local-intent keywords for a brand-new site to reach page one fast (low-difficulty, high-commercial-intent long-tail).
 2) The 12 highest-impact citation/backlink sources a new local business should acquire (directories, social, industry, press).
 Return JSON: { "keywords": [ { "keyword": string, "city": string, "search_intent": "transactional|commercial|informational", "monthly_volume": number, "difficulty": 0-100 } ], "citations": [ { "source_name": string, "source_url": string, "category": "directory|social|industry|blog_outreach|press", "domain_authority": number, "notes": string } ] }`;
-    const discoveryRes = await base44.integrations.Core.InvokeLLM({
+    const discoveryRes = await base44.asServiceRole.integrations.Core.InvokeLLM({
       prompt: discoveryPrompt,
       add_context_from_internet: true,
       model: 'gemini_3_flash',
@@ -151,7 +151,7 @@ Return JSON: { "keywords": [ { "keyword": string, "city": string, "search_intent
     let pagesCreated = 0;
     if (topKw.length) {
       const pagePrompt = `You are an elite SEO content writer and auditor. For "${engine.site_name}" (${engine.niche}), generate unique, indexable, E-E-A-T landing-page content for each target keyword (600+ words each, keyword-rich, with H1, body sections, 4 FAQ Q&As). Also audit the overall SEO readiness of this campaign (it has ${keywords.length} keywords, ${topKw.length} pages with JSON-LD + FAQ, and ${citations.length} citation targets). Return JSON: { "pages": [ { "keyword": string, "title": string, "meta_description": string, "headline": string, "body_content": string (HTML), "faq": [ { "question": string, "answer": string } ] } ], "audit": { "technical_seo_score": 0-100, "content_score": 0-100, "authority_score": 0-100, "gaps": [string], "summary": string } }. One page per keyword, same order: ${JSON.stringify(topKw.map(k => k.keyword))}`;
-      const pageRes = await base44.integrations.Core.InvokeLLM({
+      const pageRes = await base44.asServiceRole.integrations.Core.InvokeLLM({
         prompt: pagePrompt,
         model: 'gemini_3_flash',
         response_json_schema: {

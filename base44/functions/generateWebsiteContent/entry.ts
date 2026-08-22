@@ -72,7 +72,7 @@ Return JSON with exactly these fields:
 - metaTitle: <=60 chars
 - metaDescription: <=160 chars`;
 
-    const res = await base44.integrations.Core.InvokeLLM({
+    const res = await base44.asServiceRole.integrations.Core.InvokeLLM({
       prompt,
       add_context_from_internet: true,
       model: "gemini_3_1_pro",

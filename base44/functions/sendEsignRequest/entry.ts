@@ -19,7 +19,7 @@ export default async function(req) {
     for (const s of signers) {
       if (!s.email) continue;
       try {
-        await base44.integrations.Core.SendEmail({
+        await base44.asServiceRole.integrations.Core.SendEmail({
           to: s.email,
           subject: `Document for signature: ${doc.title}`,
           body: `Hello ${s.name || ""},\n\nYou have a document ready to sign: ${doc.title}.\n\nOpen and sign it here:\n${link}\n\nThank you.`,

@@ -133,7 +133,7 @@ Include these sections:
 
 Make it professional, enforceable, and easy to read. Use clear headings and bullet points where appropriate.`;
 
-    const res = await base44.integrations.Core.InvokeLLM({
+    const res = await base44.asServiceRole.integrations.Core.InvokeLLM({
       prompt,
       model: "claude_opus_4_8",
       response_json_schema: { type: "object", properties: { body: { type: "string" } } },
@@ -161,7 +161,7 @@ Make it professional, enforceable, and easy to read. Use clear headings and bull
       const adminEmails = await getAdminEmails(base44);
       for (const adminEmail of adminEmails) {
         try {
-          await base44.integrations.Core.SendEmail({
+          await base44.asServiceRole.integrations.Core.SendEmail({
             to: adminEmail,
             subject: `Contract sent to client: ${businessName}`,
             body:
