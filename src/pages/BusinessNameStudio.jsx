@@ -26,6 +26,9 @@ export default function BusinessNameStudio() {
   const [suggestions, setSuggestions] = useState([]);
   const [saving, setSaving] = useState(null);
   const [savedId, setSavedId] = useState(null);
+  const [purchasing, setPurchasing] = useState(null);
+  const [purchased, setPurchased] = useState(null);
+  const [purchaseError, setPurchaseError] = useState({});
 
   const generate = async () => {
     if (!industry.trim()) {
@@ -63,7 +66,7 @@ export default function BusinessNameStudio() {
         business_name: s.name,
         tagline: s.tagline || "",
         industry: industry.trim(),
-        status: "requested",
+        status: s.domain_available ? "purchasing" : "requested",
         viral_score: s.viral_score || 0,
         domain_available: s.domain_available || false,
         domain_status: s.domain_status || "UNKNOWN",
@@ -72,6 +75,22 @@ export default function BusinessNameStudio() {
         rationale: s.rationale || "",
       });
       setSavedId(s.domain);
+      // Available domains are purchased automatically via Vercel in the
+      // background — the client never fills out a form. Unavailable domains
+      // fall back to a manual request for our team.
+      if (s.domain_available && created?.id) {
+        setPurchasing(s.domain);
+        try {
+          const res = await base44.functions.invoke("purchaseDomainViaVercel", { clientDomainId: created.id });
+          const d = res?.data || res;
+          if (d?.ok) setPurchased(s.domain);
+          else setPurchaseError((prev) => ({ ...prev, [s.domain]: d?.error || "Couldn't purchase right now." }));
+        } catch (e) {
+          setPurchaseError((prev) => ({ ...prev, [s.domain]: e?.message || "Couldn't purchase right now." }));
+        } finally {
+          setPurchasing(null);
+        }
+      }
     } catch (e) {
       setError(e?.message || "Could not save your request.");
     } finally {
@@ -165,6 +184,10 @@ export default function BusinessNameStudio() {
               rank={i + 1}
               saving={saving === s.domain}
               saved={savedId === s.domain}
+              purchasing={purchasing === s.domain}
+              purchased={purchased === s.domain}
+              purchaseError={purchaseError[s.domain]}
+              onRetry={() => requestDomain(s)}
               onRequest={() => requestDomain(s)}
             />
           ))}
@@ -174,7 +197,7 @@ export default function BusinessNameStudio() {
   );
 }
 
-function NameCard({ suggestion: s, rank, saving, saved, onRequest }) {
+function NameCard({ suggestion: s, rank, saving, saved, purchasing, purchased, purchaseError, onRetry, onRequest }) {
   const score = s.viral_score || 0;
   const scoreColor = score >= 80 ? "text-lime-400" : score >= 60 ? "text-amber-400" : "text-white/60";
   const scoreBg = score >= 80 ? "bg-lime-400" : score >= 60 ? "bg-amber-400" : "bg-white/30";
@@ -252,7 +275,24 @@ function NameCard({ suggestion: s, rank, saving, saved, onRequest }) {
 
           {/* Action */}
           <div className="mt-3">
-            {saved ? (
+            {purchased ? (
+              <div className="flex items-center gap-2 rounded-lg border border-lime-400/40 bg-lime-400/10 px-3 py-2 text-xs text-lime-300">
+                <CheckCircle2 className="h-4 w-4" /> Purchased! We're securing <span className="font-mono">{s.domain}</span> for you now.
+              </div>
+            ) : purchasing ? (
+              <div className="flex items-center gap-2 rounded-lg border border-lime-400/30 bg-lime-400/5 px-3 py-2 text-xs text-lime-300">
+                <Loader2 className="h-4 w-4 animate-spin" /> Purchasing your domain…
+              </div>
+            ) : saved && s.domain_available && purchaseError ? (
+              <div className="space-y-2">
+                <div className="flex items-center gap-2 rounded-lg border border-amber-400/40 bg-amber-400/10 px-3 py-2 text-xs text-amber-300">
+                  <AlertCircle className="h-4 w-4" /> {purchaseError}
+                </div>
+                <button onClick={onRetry} className="inline-flex items-center gap-1.5 rounded-lg bg-lime-400 px-4 py-2 text-xs font-semibold text-black hover:bg-lime-300">
+                  <ArrowRight className="h-3.5 w-3.5" /> Try again
+                </button>
+              </div>
+            ) : saved ? (
               <div className="flex items-center gap-2 rounded-lg border border-lime-400/40 bg-lime-400/10 px-3 py-2 text-xs text-lime-300">
                 <CheckCircle2 className="h-4 w-4" /> Request sent! Our team will secure this domain for you.
               </div>
@@ -263,7 +303,7 @@ function NameCard({ suggestion: s, rank, saving, saved, onRequest }) {
                 className="inline-flex items-center gap-1.5 rounded-lg bg-lime-400 px-4 py-2 text-xs font-semibold text-black transition-colors hover:bg-lime-300 disabled:opacity-50"
               >
                 {saving ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <ArrowRight className="h-3.5 w-3.5" />}
-                {saving ? "Sending…" : "Request This Domain"}
+                {saving ? "Working…" : s.domain_available ? "Buy This Domain" : "Request This Domain"}
               </button>
             )}
           </div>
