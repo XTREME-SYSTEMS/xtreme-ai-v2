@@ -11,6 +11,7 @@ import { useClientUser } from "@/hooks/useClientUser";
 import { useClientUpdate } from "@/hooks/useClientUpdate";
 import { useClientProject } from "@/hooks/useClientProject";
 import { notifyStepComplete } from "@/lib/pipelineNotify";
+import { useAutoBuild } from "@/lib/AutoBuildContext";
 
 const DRAFT_KEY = "draft:business-profile";
 import {
@@ -36,6 +37,7 @@ export default function BusinessProfile() {
   const { user } = useClientUser();
   const { update } = useClientUpdate();
   const { saveProject } = useClientProject(user);
+  const autoBuild = useAutoBuild();
 
   const [step, setStep] = useState(0);
   const [form, setForm] = useState({
@@ -316,7 +318,13 @@ export default function BusinessProfile() {
       setSaved(true);
       try { localStorage.setItem("coach:done:/business-profile", "1"); } catch {}
       await notifyStepComplete("profile", { businessName: form.businessName || "" });
-      setTimeout(() => navigate("/content-generator"), 1000);
+      // System builds (web_app / ecommerce / platform) go to the architecture
+      // step next; marketing builds go to the content generator.
+      const sysTypes = ["web_app", "ecommerce", "platform"];
+      const nextRoute = (autoBuild.isActive && sysTypes.includes(autoBuild.build?.product_type))
+        ? "/system-architecture"
+        : "/content-generator";
+      setTimeout(() => navigate(nextRoute), 1000);
     } catch (err) {
       setError("Something went wrong saving your profile. Please try again.");
     } finally {
