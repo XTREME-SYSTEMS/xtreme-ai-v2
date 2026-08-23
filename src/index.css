@@ -150,3 +150,26 @@
 :root:not(.dark) .bg-white\/10 { background-color: hsl(var(--muted)); }
 :root:not(.dark) .hover\:bg-white\/5:hover,
 :root:not(.dark) .hover\:bg-white\/10:hover { background-color: hsl(var(--muted)); }
+
+/* ============================================================
+   Neon green hover outline — system-wide
+   Every rounded, bordered container in the client portal and
+   admin dashboard gets a thin lime-green border + subtle glow
+   on hover. This is the universal hover affordance.
+   ============================================================ */
+.rounded-lg[class*="border-"],
+.rounded-xl[class*="border-"],
+.rounded-md[class*="border-"],
+.rounded-2xl[class*="border-"],
+.rounded-sm[class*="border-"] {
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.rounded-lg[class*="border-"]:hover,
+.rounded-xl[class*="border-"]:hover,
+.rounded-md[class*="border-"]:hover,
+.rounded-2xl[class*="border-"]:hover,
+.rounded-sm[class*="border-"]:hover {
+  border-color: hsl(var(--primary));
+  box-shadow: 0 0 0 1px hsl(var(--primary) / 0.3), 0 0 14px -3px hsl(var(--primary) / 0.45);
+}
