@@ -1,22 +1,33 @@
 {
   "name": "AutoBuild",
   "type": "object",
-  "description": "Admin-driven Auto Builder queue \u2014 mirrors the client portal pipeline (profile \u2192 names \u2192 content \u2192 logo \u2192 brand \u2192 website \u2192 social \u2192 video \u2192 review) with queue semantics and an auto-advance toggle for autonomous execution. Admin uses this to run the full build pipeline themselves, improve on it, and eventually make it autonomous.",
+  "description": "Admin-driven Auto Builder queue \u2014 supports multiple product types (marketing site, web app, e-commerce, platform). Each product type has its own dedicated pipeline of steps. The admin creates a build, picks a product type, then walks through the exact same client portal experience (timeline, StepCoach, generators) against that build. All client portal hooks transparently read/write the AutoBuild record via AutoBuildContext.",
   "properties": {
     "business_name": {
       "type": "string",
-      "description": "Business name for this build"
+      "description": "Business name or product name for this build"
     },
     "industry": {
       "type": "string",
-      "description": "Industry / niche (e.g. epoxy, hvac, roofing)"
+      "description": "Industry / niche (e.g. epoxy, hvac, roofing, fintech, healthcare)"
     },
     "sub_industry": {
       "type": "string"
     },
+    "product_type": {
+      "type": "string",
+      "enum": [
+        "marketing_site",
+        "web_app",
+        "ecommerce",
+        "platform"
+      ],
+      "default": "marketing_site",
+      "description": "What kind of digital product this build produces. Each type has its own pipeline (see buildProductTypes.js). marketing_site = premium marketing website; web_app = SaaS/app with auth + database; ecommerce = online store; platform = multi-sided marketplace."
+    },
     "profile": {
       "type": "object",
-      "description": "Business profile data \u2014 the input that feeds all downstream generators",
+      "description": "Business/product profile data \u2014 the input that feeds all downstream generators",
       "properties": {
         "phone": {
           "type": "string"
@@ -53,6 +64,19 @@
         },
         "business_stage": {
           "type": "string"
+        },
+        "product_description": {
+          "type": "string",
+          "description": "For non-marketing builds: what the app/platform/store does"
+        },
+        "target_audience": {
+          "type": "string"
+        },
+        "key_features": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
         }
       }
     },
@@ -68,10 +92,16 @@
         "social",
         "video",
         "review",
+        "architecture",
+        "data_model",
+        "ui_system",
+        "codegen",
+        "deploy",
+        "system_review",
         "complete"
       ],
       "default": "profile",
-      "description": "Which pipeline step this build is on (mirrors client portal)"
+      "description": "Which pipeline step this build is on. Marketing builds use profile\u2192names\u2192content\u2192...\u2192review. System builds (web_app/ecommerce/platform) use profile\u2192architecture\u2192data_model\u2192ui_system\u2192codegen\u2192deploy\u2192system_review."
     },
     "status": {
       "type": "string",
@@ -90,12 +120,107 @@
       "default": false,
       "description": "When true, the queue processor automatically advances to the next step after each step completes \u2014 the autonomy toggle"
     },
+    "architecture": {
+      "type": "object",
+      "description": "Generated system architecture spec (for web_app/ecommerce/platform builds) \u2014 the full blueprint: tech stack, pages, data models, features, integrations, user flows. Produced by generateSystemArchitecture.",
+      "properties": {
+        "concept": {
+          "type": "string"
+        },
+        "summary": {
+          "type": "string"
+        },
+        "tech_stack": {
+          "type": "object"
+        },
+        "pages": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        },
+        "data_models": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        },
+        "features": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        },
+        "integrations": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        },
+        "user_flows": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "tech_decisions": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "estimated_effort": {
+          "type": "string"
+        }
+      }
+    },
+    "code_manifest": {
+      "type": "object",
+      "description": "Generated codebase manifest (future codegen step) \u2014 the list of files, their paths, and content references that make up the deployable codebase.",
+      "properties": {
+        "repo_url": {
+          "type": "string"
+        },
+        "files": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        },
+        "framework": {
+          "type": "string"
+        },
+        "generated_at": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
+    "deployment": {
+      "type": "object",
+      "description": "Deployment record (future deploy step) \u2014 where the codebase is hosted, the live URL, and deployment status.",
+      "properties": {
+        "platform": {
+          "type": "string"
+        },
+        "live_url": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string"
+        },
+        "deployed_at": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
     "content_templates": {
       "type": "array",
       "items": {
         "type": "object"
       },
-      "description": "Generated content tone templates (10 variations)"
+      "description": "Generated content tone templates (10 variations) \u2014 marketing builds"
     },
     "chosen_content_template": {
       "type": "string"
@@ -105,7 +230,7 @@
       "items": {
         "type": "object"
       },
-      "description": "Generated logo concepts with URLs"
+      "description": "Generated logo concepts with URLs \u2014 marketing builds"
     },
     "chosen_logo_url": {
       "type": "string"
@@ -115,7 +240,7 @@
       "items": {
         "type": "object"
       },
-      "description": "Generated brand mockup images"
+      "description": "Generated brand mockup images \u2014 marketing builds"
     },
     "chosen_brand_images": {
       "type": "array",
@@ -125,14 +250,14 @@
     },
     "website_content": {
       "type": "object",
-      "description": "Generated website copy (hero, about, services, faq)"
+      "description": "Generated website copy (hero, about, services, faq) \u2014 marketing builds"
     },
     "website_images": {
       "type": "array",
       "items": {
         "type": "object"
       },
-      "description": "Generated website project imagery"
+      "description": "Generated website project imagery \u2014 marketing builds"
     },
     "chosen_website_layout": {
       "type": "string"
@@ -142,18 +267,18 @@
     },
     "social_media_pack": {
       "type": "object",
-      "description": "Generated social templates + 30-day content calendar"
+      "description": "Generated social templates + 30-day content calendar \u2014 marketing builds"
     },
     "video_pack": {
       "type": "object",
-      "description": "Generated video concepts"
+      "description": "Generated video concepts \u2014 marketing builds"
     },
     "name_options": {
       "type": "array",
       "items": {
         "type": "object"
       },
-      "description": "AI-generated business name ideas with domain suggestions"
+      "description": "AI-generated business name ideas with domain suggestions \u2014 marketing builds"
     },
     "visited_steps": {
       "type": "array",
@@ -161,7 +286,7 @@
         "type": "string"
       },
       "default": [],
-      "description": "Steps that have been completed"
+      "description": "Steps that have been completed (server-persisted step paths)"
     },
     "error": {
       "type": "string"
