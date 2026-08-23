@@ -69,7 +69,7 @@ export default function SystemReview() {
 
   return (
     <div className="mx-auto max-w-3xl space-y-5">
-      <BackButton to="/system-architecture" />
+      <BackButton to="/deploy" />
 
       <div className="rounded-xl border border-lime-400/30 bg-gradient-to-br from-lime-400/5 to-transparent p-5">
         <h1 className="text-xl font-semibold text-white">System Review</h1>

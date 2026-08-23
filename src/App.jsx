@@ -111,6 +111,8 @@ import AutoBuilder from '@/pages/AutoBuilder';
 import SystemArchitecture from '@/pages/SystemArchitecture';
 import DataModel from '@/pages/DataModel';
 import UiSystem from '@/pages/UiSystem';
+import Codegen from '@/pages/Codegen';
+import Deploy from '@/pages/Deploy';
 import SystemReview from '@/pages/SystemReview';
 
 const AuthenticatedApp = () => {
@@ -240,6 +242,8 @@ const AuthenticatedApp = () => {
           <Route path="/system-architecture" element={<SystemArchitecture />} />
           <Route path="/data-model" element={<DataModel />} />
           <Route path="/ui-system" element={<UiSystem />} />
+          <Route path="/codegen" element={<Codegen />} />
+          <Route path="/deploy" element={<Deploy />} />
           <Route path="/system-review" element={<SystemReview />} />
         </Route>
       </Route>

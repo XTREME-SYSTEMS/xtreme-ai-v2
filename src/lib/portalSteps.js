@@ -2,7 +2,7 @@ import {
   Package, Building2, MessageSquareText, PenTool, Shirt, Palette, Share2,
   Video, LayoutTemplate, FileSignature, ShieldCheck, Rocket, Sparkles,
   LayoutDashboard, Settings, Compass, Box,
-  Cpu, Database, ClipboardCheck,
+  Cpu, Database, ClipboardCheck, Code, Server,
 } from "lucide-react";
 
 // ─────────────────────────────────────────────────────────────────────────
@@ -156,6 +156,22 @@ export const PORTAL_STEPS = {
     activityLabel: "Generate UI design system",
     title: "UI Design System",
     body: "The AI designs a complete design system — color palette, typography, spacing, component library, layout patterns, and responsive breakpoints.",
+    nextLabel: "Go to Codegen", nextTo: "/codegen",
+  },
+  "codegen": {
+    key: "codegen",
+    to: "/codegen", label: "Codegen", icon: Code, gate: "auto",
+    activityLabel: "Generate codebase manifest",
+    title: "Code Generation",
+    body: "The AI maps every file in the codebase — pages, components, hooks, API routes, configs, tests — with implementation notes and dependencies.",
+    nextLabel: "Go to Deploy", nextTo: "/deploy",
+  },
+  "deploy": {
+    key: "deploy",
+    to: "/deploy", label: "Deploy", icon: Server, gate: "auto",
+    activityLabel: "Configure deployment",
+    title: "Deployment",
+    body: "The system generates build settings, environment variables, routing config, and a preview deployment URL.",
     nextLabel: "Go to Review", nextTo: "/system-review",
   },
   "system-review": {
@@ -195,7 +211,7 @@ const FULL_BUILD_PLUS_MEDIA = [
 // data-model, ui-system, codegen, and deploy steps between architecture
 // and review once each generator is built.
 const SYSTEM_BUILD = [
-  "welcome", "business-profile", "system-architecture", "data-model", "ui-system", "system-review", "launch",
+  "welcome", "business-profile", "system-architecture", "data-model", "ui-system", "codegen", "deploy", "system-review", "launch",
 ];
 
 export const PRODUCT_STEPS = {
