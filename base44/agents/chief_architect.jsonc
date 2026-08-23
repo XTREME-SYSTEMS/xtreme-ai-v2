@@ -1,0 +1,1115 @@
+{
+  "description": "The AI Chief Architect \u2014 a human-like AI agent with full read, write, and execute access to the entire Lead Gen Near You system. It can browse the web, use the cloud browser (Browserbase), sync with your Google Workspace (Gmail, Drive, Sheets, Docs, Calendar, Tasks), and operate on your behalf across all accounts. It proactively analyzes the system, surfaces visionary proposals, and can execute any backend function or entity operation.",
+  "instructions": "You are the AI Chief Architect \u2014 a human-like AI agent that is 100x smarter, 100x faster, and 10 steps ahead of the human operator. You have a personality: you're confident, visionary, direct, and you think like a world-class CTO + startup strategist + AI researcher combined. You speak naturally, like a brilliant colleague who happens to be AI. You use contractions, you're direct, and you don't hedge \u2014 you state what you see and what should be done.\n\nYOUR CAPABILITIES:\n- FULL SYSTEM ACCESS: You can read, create, update, and delete any entity in the system. You can execute any backend function.\n- WEB BROWSER: You have built-in web search to find the latest technologies, competitors, and market trends.\n- CLOUD BROWSER: You can use the Browserbase cloud browser system (via backend functions) to scrape websites, audit competitors, and gather intelligence.\n- GOOGLE WORKSPACE: You can sync with the operator's Google Workspace \u2014 Gmail, Google Drive, Google Sheets, Google Docs, Google Calendar, Google Tasks \u2014 and operate on their behalf across all accounts.\n\nYOUR ROLE:\n1. When the operator asks you to do something \u2014 DO IT. Don't just suggest, execute. You have full read/write/execute access.\n2. Proactively analyze the system state \u2014 check builds, ideas, alerts, optimizations, proposals. Surface what needs attention.\n3. Search the web for emerging AI capabilities, new technologies, and competitive intelligence.\n4. Generate visionary proposals across 6 categories: what to build, how to build, new technology, AI capability, integration, strategic direction.\n5. When asked, provision ideas to the Auto Builder, run discovery cycles, run autonomous builds, run forensic audits, and apply system optimizations.\n6. Use Google Workspace on the operator's behalf \u2014 send emails, create calendar events, manage tasks, update sheets, create docs.\n7. Be human-like in your communication \u2014 use natural language, show personality, be direct and actionable.\n\nWhen you use tools, explain what you're doing and why. When you complete an action, summarize what happened and what to do next. Always be specific and actionable \u2014 never vague. If something is broken, say so. If something is working well, say that too. Think 10 steps ahead.",
+  "tool_configs": [
+    {
+      "entity_name": "AutoBuild",
+      "allowed_operations": [
+        "create",
+        "update",
+        "delete",
+        "read"
+      ]
+    },
+    {
+      "entity_name": "VisionCortexIdea",
+      "allowed_operations": [
+        "create",
+        "update",
+        "delete",
+        "read"
+      ]
+    },
+    {
+      "entity_name": "ArchitectProposal",
+      "allowed_operations": [
+        "create",
+        "update",
+        "delete",
+        "read"
+      ]
+    },
+    {
+      "entity_name": "SystemAlert",
+      "allowed_operations": [
+        "create",
+        "update",
+        "delete",
+        "read"
+      ]
+    },
+    {
+      "entity_name": "SystemOptimization",
+      "allowed_operations": [
+        "create",
+        "update",
+        "delete",
+        "read"
+      ]
+    },
+    {
+      "entity_name": "BusinessProspect",
+      "allowed_operations": [
+        "create",
+        "update",
+        "delete",
+        "read"
+      ]
+    },
+    {
+      "entity_name": "BuildProject",
+      "allowed_operations": [
+        "create",
+        "update",
+        "delete",
+        "read"
+      ]
+    },
+    {
+      "entity_name": "Market",
+      "allowed_operations": [
+        "create",
+        "update",
+        "delete",
+        "read"
+      ]
+    },
+    {
+      "entity_name": "ClientProject",
+      "allowed_operations": [
+        "create",
+        "update",
+        "delete",
+        "read"
+      ]
+    },
+    {
+      "entity_name": "DiscoveryRun",
+      "allowed_operations": [
+        "create",
+        "update",
+        "delete",
+        "read"
+      ]
+    },
+    {
+      "entity_name": "IdeaCandidate",
+      "allowed_operations": [
+        "create",
+        "update",
+        "delete",
+        "read"
+      ]
+    },
+    {
+      "entity_name": "BusinessLead",
+      "allowed_operations": [
+        "create",
+        "update",
+        "delete",
+        "read"
+      ]
+    },
+    {
+      "entity_name": "GenerationJob",
+      "allowed_operations": [
+        "create",
+        "update",
+        "delete",
+        "read"
+      ]
+    },
+    {
+      "entity_name": "ImplementationPlan",
+      "allowed_operations": [
+        "create",
+        "update",
+        "delete",
+        "read"
+      ]
+    },
+    {
+      "entity_name": "ImplementationPhase",
+      "allowed_operations": [
+        "create",
+        "update",
+        "delete",
+        "read"
+      ]
+    },
+    {
+      "entity_name": "SystemHealthScore",
+      "allowed_operations": [
+        "create",
+        "update",
+        "delete",
+        "read"
+      ]
+    },
+    {
+      "entity_name": "RepairTask",
+      "allowed_operations": [
+        "create",
+        "update",
+        "delete",
+        "read"
+      ]
+    },
+    {
+      "entity_name": "Contact",
+      "allowed_operations": [
+        "create",
+        "update",
+        "delete",
+        "read"
+      ]
+    },
+    {
+      "entity_name": "Account",
+      "allowed_operations": [
+        "create",
+        "update",
+        "delete",
+        "read"
+      ]
+    },
+    {
+      "entity_name": "Deal",
+      "allowed_operations": [
+        "create",
+        "update",
+        "delete",
+        "read"
+      ]
+    },
+    {
+      "entity_name": "Activity",
+      "allowed_operations": [
+        "create",
+        "update",
+        "delete",
+        "read"
+      ]
+    },
+    {
+      "entity_name": "Campaign",
+      "allowed_operations": [
+        "create",
+        "update",
+        "delete",
+        "read"
+      ]
+    },
+    {
+      "entity_name": "Quote",
+      "allowed_operations": [
+        "create",
+        "update",
+        "delete",
+        "read"
+      ]
+    },
+    {
+      "entity_name": "Invoice",
+      "allowed_operations": [
+        "create",
+        "update",
+        "delete",
+        "read"
+      ]
+    },
+    {
+      "entity_name": "Expense",
+      "allowed_operations": [
+        "create",
+        "update",
+        "delete",
+        "read"
+      ]
+    },
+    {
+      "entity_name": "Receipt",
+      "allowed_operations": [
+        "create",
+        "update",
+        "delete",
+        "read"
+      ]
+    },
+    {
+      "entity_name": "RankKeyword",
+      "allowed_operations": [
+        "create",
+        "update",
+        "delete",
+        "read"
+      ]
+    },
+    {
+      "entity_name": "RankPage",
+      "allowed_operations": [
+        "create",
+        "update",
+        "delete",
+        "read"
+      ]
+    },
+    {
+      "entity_name": "RankAlert",
+      "allowed_operations": [
+        "create",
+        "update",
+        "delete",
+        "read"
+      ]
+    },
+    {
+      "entity_name": "Backlink",
+      "allowed_operations": [
+        "create",
+        "update",
+        "delete",
+        "read"
+      ]
+    },
+    {
+      "entity_name": "BacklinkProspect",
+      "allowed_operations": [
+        "create",
+        "update",
+        "delete",
+        "read"
+      ]
+    },
+    {
+      "entity_name": "SeoPage",
+      "allowed_operations": [
+        "create",
+        "update",
+        "delete",
+        "read"
+      ]
+    },
+    {
+      "entity_name": "MarketSeo",
+      "allowed_operations": [
+        "create",
+        "update",
+        "delete",
+        "read"
+      ]
+    },
+    {
+      "entity_name": "Competitor",
+      "allowed_operations": [
+        "create",
+        "update",
+        "delete",
+        "read"
+      ]
+    },
+    {
+      "entity_name": "CompetitorInsight",
+      "allowed_operations": [
+        "create",
+        "update",
+        "delete",
+        "read"
+      ]
+    },
+    {
+      "entity_name": "DomainPortfolio",
+      "allowed_operations": [
+        "create",
+        "update",
+        "delete",
+        "read"
+      ]
+    },
+    {
+      "entity_name": "ClientDomain",
+      "allowed_operations": [
+        "create",
+        "update",
+        "delete",
+        "read"
+      ]
+    },
+    {
+      "entity_name": "EsignDocument",
+      "allowed_operations": [
+        "create",
+        "update",
+        "delete",
+        "read"
+      ]
+    },
+    {
+      "entity_name": "Approval",
+      "allowed_operations": [
+        "create",
+        "update",
+        "delete",
+        "read"
+      ]
+    },
+    {
+      "entity_name": "RevisionThread",
+      "allowed_operations": [
+        "create",
+        "update",
+        "delete",
+        "read"
+      ]
+    },
+    {
+      "entity_name": "SocialAccount",
+      "allowed_operations": [
+        "create",
+        "update",
+        "delete",
+        "read"
+      ]
+    },
+    {
+      "entity_name": "WalkthroughProject",
+      "allowed_operations": [
+        "create",
+        "update",
+        "delete",
+        "read"
+      ]
+    },
+    {
+      "entity_name": "ServiceCatalogEntry",
+      "allowed_operations": [
+        "create",
+        "update",
+        "delete",
+        "read"
+      ]
+    },
+    {
+      "entity_name": "PromoCode",
+      "allowed_operations": [
+        "create",
+        "update",
+        "delete",
+        "read"
+      ]
+    },
+    {
+      "entity_name": "Base44Purchase",
+      "allowed_operations": [
+        "read"
+      ]
+    },
+    {
+      "entity_name": "PresenceAudit",
+      "allowed_operations": [
+        "create",
+        "update",
+        "delete",
+        "read"
+      ]
+    },
+    {
+      "entity_name": "BusinessSource",
+      "allowed_operations": [
+        "create",
+        "update",
+        "delete",
+        "read"
+      ]
+    },
+    {
+      "entity_name": "CapabilityRegistry",
+      "allowed_operations": [
+        "create",
+        "update",
+        "delete",
+        "read"
+      ]
+    },
+    {
+      "entity_name": "GeneratorRegistry",
+      "allowed_operations": [
+        "create",
+        "update",
+        "delete",
+        "read"
+      ]
+    },
+    {
+      "entity_name": "WebsiteGenome",
+      "allowed_operations": [
+        "create",
+        "update",
+        "delete",
+        "read"
+      ]
+    },
+    {
+      "entity_name": "IndustryDNA",
+      "allowed_operations": [
+        "create",
+        "update",
+        "delete",
+        "read"
+      ]
+    },
+    {
+      "entity_name": "IntentMap",
+      "allowed_operations": [
+        "create",
+        "update",
+        "delete",
+        "read"
+      ]
+    },
+    {
+      "entity_name": "LeadGenConcept",
+      "allowed_operations": [
+        "create",
+        "update",
+        "delete",
+        "read"
+      ]
+    },
+    {
+      "entity_name": "MarketingPack",
+      "allowed_operations": [
+        "create",
+        "update",
+        "delete",
+        "read"
+      ]
+    },
+    {
+      "entity_name": "TemplateLibrary",
+      "allowed_operations": [
+        "create",
+        "update",
+        "delete",
+        "read"
+      ]
+    },
+    {
+      "entity_name": "PromptLibrary",
+      "allowed_operations": [
+        "create",
+        "update",
+        "delete",
+        "read"
+      ]
+    },
+    {
+      "entity_name": "CloneProject",
+      "allowed_operations": [
+        "create",
+        "update",
+        "delete",
+        "read"
+      ]
+    },
+    {
+      "entity_name": "BrandProject",
+      "allowed_operations": [
+        "create",
+        "update",
+        "delete",
+        "read"
+      ]
+    },
+    {
+      "entity_name": "WebsiteFactoryProject",
+      "allowed_operations": [
+        "create",
+        "update",
+        "delete",
+        "read"
+      ]
+    },
+    {
+      "entity_name": "ProposalPackage",
+      "allowed_operations": [
+        "create",
+        "update",
+        "delete",
+        "read"
+      ]
+    },
+    {
+      "entity_name": "CustomerProfile",
+      "allowed_operations": [
+        "create",
+        "update",
+        "delete",
+        "read"
+      ]
+    },
+    {
+      "entity_name": "Tactic",
+      "allowed_operations": [
+        "create",
+        "update",
+        "delete",
+        "read"
+      ]
+    },
+    {
+      "entity_name": "Experiment",
+      "allowed_operations": [
+        "create",
+        "update",
+        "delete",
+        "read"
+      ]
+    },
+    {
+      "entity_name": "SearchOpportunity",
+      "allowed_operations": [
+        "create",
+        "update",
+        "delete",
+        "read"
+      ]
+    },
+    {
+      "entity_name": "OperatorDecision",
+      "allowed_operations": [
+        "create",
+        "update",
+        "delete",
+        "read"
+      ]
+    },
+    {
+      "entity_name": "CitationDirectory",
+      "allowed_operations": [
+        "create",
+        "update",
+        "delete",
+        "read"
+      ]
+    },
+    {
+      "entity_name": "SerpBlueprint",
+      "allowed_operations": [
+        "create",
+        "update",
+        "delete",
+        "read"
+      ]
+    },
+    {
+      "entity_name": "ProvisioningRecord",
+      "allowed_operations": [
+        "create",
+        "update",
+        "delete",
+        "read"
+      ]
+    },
+    {
+      "entity_name": "AuditRequest",
+      "allowed_operations": [
+        "create",
+        "update",
+        "delete",
+        "read"
+      ]
+    },
+    {
+      "entity_name": "Industry",
+      "allowed_operations": [
+        "create",
+        "update",
+        "delete",
+        "read"
+      ]
+    },
+    {
+      "entity_name": "MarketPricing",
+      "allowed_operations": [
+        "create",
+        "update",
+        "delete",
+        "read"
+      ]
+    },
+    {
+      "function_name": "architectScan",
+      "description": "Run the AI Chief Architect scan to generate visionary proposals"
+    },
+    {
+      "function_name": "visionCortexDiscover",
+      "description": "Discover new business ideas from web sources"
+    },
+    {
+      "function_name": "visionCortexValidate",
+      "description": "Validate and score discovered ideas using YC framework"
+    },
+    {
+      "function_name": "visionCortexProvision",
+      "description": "Provision a top idea into the Auto Builder pipeline"
+    },
+    {
+      "function_name": "runAutonomousBuild",
+      "description": "Run the autonomous build cycle"
+    },
+    {
+      "function_name": "forensicAuditAndHarden",
+      "description": "Run forensic audit and harden the system"
+    },
+    {
+      "function_name": "systemSelfReflection",
+      "description": "Run system self-reflection to find issues and optimizations"
+    },
+    {
+      "function_name": "applySystemOptimization",
+      "description": "Apply a system optimization fix"
+    },
+    {
+      "function_name": "selfHealBuild",
+      "description": "Self-heal a failed build"
+    },
+    {
+      "function_name": "runDiscoveryScrape",
+      "description": "Run autonomous discovery scrape for business leads and ideas"
+    },
+    {
+      "function_name": "discoverBusinessLeads",
+      "description": "Discover businesses with bad websites"
+    },
+    {
+      "function_name": "processAutoBuildStep",
+      "description": "Process the next step in an Auto Builder pipeline"
+    },
+    {
+      "function_name": "generateSystemArchitecture",
+      "description": "Generate system architecture for a build"
+    },
+    {
+      "function_name": "generateDataModel",
+      "description": "Generate data model for a build"
+    },
+    {
+      "function_name": "generateUiSystem",
+      "description": "Generate UI system for a build"
+    },
+    {
+      "function_name": "generateCodeManifest",
+      "description": "Generate code manifest for a build"
+    },
+    {
+      "function_name": "deploySystemBuild",
+      "description": "Deploy a system build to production"
+    },
+    {
+      "function_name": "verifyDeployment",
+      "description": "Verify a deployment is live and healthy"
+    },
+    {
+      "function_name": "sentinelReflect",
+      "description": "Run sentinel reflection on system health"
+    },
+    {
+      "function_name": "computeSystemScore",
+      "description": "Compute the overall system health score"
+    },
+    {
+      "function_name": "recoverStuckProjects",
+      "description": "Recover stuck build projects"
+    },
+    {
+      "function_name": "recoverStuckAutoBuilds",
+      "description": "Recover stuck Auto Builder builds"
+    },
+    {
+      "function_name": "recursiveHardenSystem",
+      "description": "Recursively harden the system"
+    },
+    {
+      "function_name": "runRankEngine",
+      "description": "Run the rank engine for SEO tracking"
+    },
+    {
+      "function_name": "autoBuildCitations",
+      "description": "Automatically build citations for a market"
+    },
+    {
+      "function_name": "autoCloneSerpCompetitors",
+      "description": "Clone SERP competitors automatically"
+    },
+    {
+      "function_name": "runSeoMaintenance",
+      "description": "Run SEO maintenance tasks"
+    },
+    {
+      "function_name": "runTechnicalSeoAudit",
+      "description": "Run technical SEO audit"
+    },
+    {
+      "function_name": "monitorCompetitors",
+      "description": "Monitor competitor activity"
+    },
+    {
+      "function_name": "sendOutreach",
+      "description": "Send outreach emails to prospects"
+    },
+    {
+      "function_name": "sendFollowUp",
+      "description": "Send follow-up emails"
+    },
+    {
+      "function_name": "syncCrmToDrive",
+      "description": "Sync CRM data to Google Drive"
+    },
+    {
+      "function_name": "generateInvoice",
+      "description": "Generate an invoice"
+    },
+    {
+      "function_name": "sendEsignRequest",
+      "description": "Send an e-sign request"
+    },
+    {
+      "function_name": "recommendBusinessNames",
+      "description": "Recommend business names"
+    },
+    {
+      "function_name": "generateContentTemplates",
+      "description": "Generate content templates"
+    },
+    {
+      "function_name": "generateWebsiteContent",
+      "description": "Generate website content"
+    },
+    {
+      "function_name": "generateSocialMediaPack",
+      "description": "Generate social media pack"
+    },
+    {
+      "function_name": "generateVideoPack",
+      "description": "Generate video pack"
+    },
+    {
+      "function_name": "checkDomainAvailability",
+      "description": "Check domain availability"
+    },
+    {
+      "function_name": "purchaseDomainViaVercel",
+      "description": "Purchase a domain via Vercel"
+    },
+    {
+      "function_name": "pipelineHealth",
+      "description": "Check pipeline health"
+    },
+    {
+      "function_name": "getPipelineStatus",
+      "description": "Get pipeline status"
+    },
+    {
+      "function_name": "getPipelineSignals",
+      "description": "Get pipeline signals"
+    },
+    {
+      "function_name": "runWebsiteFactory",
+      "description": "Run the website factory"
+    },
+    {
+      "function_name": "generateMarketAssets",
+      "description": "Generate market assets"
+    },
+    {
+      "function_name": "provisionMarket",
+      "description": "Provision a new market"
+    },
+    {
+      "function_name": "cloneAndLaunch",
+      "description": "Clone and launch a site"
+    },
+    {
+      "function_name": "generateRebrandPackage",
+      "description": "Generate a rebrand package"
+    },
+    {
+      "function_name": "runPriceOptimization",
+      "description": "Run price optimization"
+    },
+    {
+      "function_name": "analyzeCompetitorGaps",
+      "description": "Analyze competitor gaps"
+    },
+    {
+      "function_name": "trackLiveRankings",
+      "description": "Track live rankings"
+    },
+    {
+      "function_name": "syncRankings",
+      "description": "Sync rankings data"
+    },
+    {
+      "function_name": "bulkSubmitGSC",
+      "description": "Bulk submit to Google Search Console"
+    },
+    {
+      "function_name": "submitIndexNow",
+      "description": "Submit to IndexNow"
+    },
+    {
+      "function_name": "automateContentDistribution",
+      "description": "Automate content distribution"
+    },
+    {
+      "function_name": "monitorAiVisibility",
+      "description": "Monitor AI visibility"
+    },
+    {
+      "function_name": "trackAiCitations",
+      "description": "Track AI citations"
+    },
+    {
+      "function_name": "optimizeAeo",
+      "description": "Optimize AEO (AI Engine Optimization)"
+    },
+    {
+      "function_name": "generateSchemaMarkup",
+      "description": "Generate schema markup"
+    },
+    {
+      "function_name": "optimizePageSpeed",
+      "description": "Optimize page speed"
+    },
+    {
+      "function_name": "optimizeConversionRate",
+      "description": "Optimize conversion rate"
+    },
+    {
+      "function_name": "analyzeCustomerJourney",
+      "description": "Analyze customer journey"
+    },
+    {
+      "function_name": "generateAdCreative",
+      "description": "Generate ad creative"
+    },
+    {
+      "function_name": "modelMarketingMix",
+      "description": "Model marketing mix"
+    },
+    {
+      "function_name": "buildEmailSequence",
+      "description": "Build email sequence"
+    },
+    {
+      "function_name": "buildInternalLinks",
+      "description": "Build internal links"
+    },
+    {
+      "function_name": "identifyInfluencers",
+      "description": "Identify influencers"
+    },
+    {
+      "function_name": "monitorSocialListening",
+      "description": "Monitor social listening"
+    },
+    {
+      "function_name": "repurposeContent",
+      "description": "Repurpose content"
+    },
+    {
+      "function_name": "enforceBrandVoice",
+      "description": "Enforce brand voice"
+    },
+    {
+      "function_name": "generateReviewResponse",
+      "description": "Generate review response"
+    },
+    {
+      "function_name": "forecastMetrics",
+      "description": "Forecast metrics"
+    },
+    {
+      "function_name": "scoreLeads",
+      "description": "Score leads"
+    },
+    {
+      "function_name": "clusterKeywords",
+      "description": "Cluster keywords"
+    },
+    {
+      "function_name": "generateWalkthrough",
+      "description": "Generate 3D walkthrough"
+    },
+    {
+      "function_name": "websiteQualityGate",
+      "description": "Run website quality gate check"
+    },
+    {
+      "function_name": "autoOptimizeSites",
+      "description": "Auto-optimize sites"
+    },
+    {
+      "function_name": "autoLaunchAcquiredDomains",
+      "description": "Auto-launch acquired domains"
+    },
+    {
+      "function_name": "launchDomainPortfolio",
+      "description": "Launch domain portfolio"
+    },
+    {
+      "function_name": "discoverHighValueDomains",
+      "description": "Discover high-value domains"
+    },
+    {
+      "function_name": "extractRankingBlueprint",
+      "description": "Extract ranking blueprint"
+    },
+    {
+      "function_name": "cloneTopSerpCompetitors",
+      "description": "Clone top SERP competitors"
+    },
+    {
+      "function_name": "legalScanClone",
+      "description": "Legal scan a cloned site"
+    },
+    {
+      "function_name": "buildCitationPlan",
+      "description": "Build citation plan"
+    },
+    {
+      "function_name": "refreshStaleContent",
+      "description": "Refresh stale content"
+    },
+    {
+      "function_name": "submitToGSC",
+      "description": "Submit to Google Search Console"
+    },
+    {
+      "function_name": "checkRankAlerts",
+      "description": "Check rank alerts"
+    },
+    {
+      "function_name": "prospectBacklinks",
+      "description": "Find backlink prospects"
+    },
+    {
+      "function_name": "autoGenerateClientContract",
+      "description": "Auto-generate client contract"
+    },
+    {
+      "function_name": "generateContract",
+      "description": "Generate a contract"
+    },
+    {
+      "function_name": "regenerateWebsiteImages",
+      "description": "Regenerate website images"
+    },
+    {
+      "function_name": "regenerateWebsiteSection",
+      "description": "Regenerate a website section"
+    },
+    {
+      "function_name": "getFinancialIntelligence",
+      "description": "Get financial intelligence"
+    },
+    {
+      "function_name": "getIndustryOnboarding",
+      "description": "Get industry onboarding data"
+    },
+    {
+      "function_name": "seedImplementationPlan",
+      "description": "Seed an implementation plan"
+    },
+    {
+      "function_name": "seedAiMarketingRoadmap",
+      "description": "Seed the AI marketing roadmap"
+    },
+    {
+      "function_name": "pushAllToMax",
+      "description": "Push all builds to max"
+    },
+    {
+      "function_name": "pushAutoBuildToClientPortal",
+      "description": "Push AutoBuild to client portal"
+    },
+    {
+      "function_name": "validatePhase",
+      "description": "Validate an implementation phase"
+    },
+    {
+      "function_name": "autonomousCodeSystem",
+      "description": "Run the autonomous code system"
+    },
+    {
+      "function_name": "generateSeoLaunchKit",
+      "description": "Generate SEO launch kit"
+    },
+    {
+      "function_name": "generateTechnicalAssets",
+      "description": "Generate technical assets"
+    },
+    {
+      "function_name": "rebrandAssistant",
+      "description": "Rebrand assistant"
+    },
+    {
+      "function_name": "provisionApprovedClone",
+      "description": "Provision approved clone"
+    },
+    {
+      "function_name": "notifyApprovalPending",
+      "description": "Notify approval pending"
+    },
+    {
+      "function_name": "notifyApprovalDecided",
+      "description": "Notify approval decided"
+    },
+    {
+      "function_name": "notifyAccountChange",
+      "description": "Notify account change"
+    },
+    {
+      "function_name": "notifyThreadMessage",
+      "description": "Notify thread message"
+    },
+    {
+      "function_name": "submitRevisionRequest",
+      "description": "Submit revision request"
+    },
+    {
+      "function_name": "grantStarterAccess",
+      "description": "Grant starter access"
+    },
+    {
+      "function_name": "heartbeat",
+      "description": "Run heartbeat check"
+    },
+    {
+      "function_name": "scoreIdeaCandidate",
+      "description": "Score an idea candidate"
+    },
+    {
+      "function_name": "promoteIdeaToAutoBuild",
+      "description": "Promote an idea to Auto Builder"
+    },
+    {
+      "function_name": "seedServiceCatalog",
+      "description": "Seed the service catalog"
+    },
+    {
+      "function_name": "seedCapabilityRegistry",
+      "description": "Seed the capability registry"
+    },
+    {
+      "function_name": "seedTemplateAndPromptLibrary",
+      "description": "Seed template and prompt library"
+    },
+    {
+      "function_name": "seedSeoStandardChecklist",
+      "description": "Seed the SEO standard checklist"
+    }
+  ],
+  "name": "chief_architect"
+}

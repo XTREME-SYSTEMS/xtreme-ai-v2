@@ -2,6 +2,7 @@ import { useEffect, useState, useCallback } from "react";
 import { base44 } from "@/api/base44Client";
 import { PageHeader, Panel, LoadingButton, EmptyState } from "@/components/ui";
 import ArchitectProposalRow from "@/components/architect/ArchitectProposalRow";
+import ArchitectChat from "@/components/architect/ArchitectChat";
 import { Brain, RefreshCw, Zap, Filter } from "lucide-react";
 
 const TYPE_LABELS = {
@@ -88,6 +89,11 @@ export default function Architect() {
           <RefreshCw className="h-4 w-4" /> Refresh
         </LoadingButton>
       </PageHeader>
+
+      {/* AI Chief Architect Chat Agent — full system access, human-like, operates on your behalf */}
+      <div className="mb-6">
+        <ArchitectChat />
+      </div>
 
       {/* Stats */}
       <div className="mb-6 grid grid-cols-2 gap-3 sm:grid-cols-4">

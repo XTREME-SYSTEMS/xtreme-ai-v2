@@ -1,9 +1,10 @@
-import { CheckCircle, ChevronRight, AlertTriangle, DollarSign, Target, Bot } from "lucide-react";
+import { CheckCircle, ChevronRight, AlertTriangle, DollarSign, Target, Bot, Rocket, Loader2 } from "lucide-react";
 
 // VisionCortexIdeaRow — compact clickable row for an idea in the Vision Cortex list.
 // Shows the problem it solves, estimated profit margin, and success probability
 // at a glance. Clicking opens the full summary modal.
-export default function VisionCortexIdeaRow({ idea, onClick }) {
+// The Deploy button provisions the idea to the Auto Builder pipeline.
+export default function VisionCortexIdeaRow({ idea, onClick, onDeploy, deploying }) {
   const scores = idea.yc_scores || {};
   const overallScore = scores.overall || 0;
   const scoreColor = overallScore >= 80 ? "text-lime-400" : overallScore >= 60 ? "text-yellow-400" : "text-orange-400";
@@ -101,6 +102,23 @@ export default function VisionCortexIdeaRow({ idea, onClick }) {
         <div className={`text-lg font-bold ${scoreColor}`}>{overallScore}</div>
         <div className="text-[9px] uppercase tracking-wider text-white/40">YC Score</div>
       </div>
+
+      {/* Deploy button — provisions to Auto Builder */}
+      {onDeploy && !isProvisioned && (
+        <button
+          onClick={(e) => { e.stopPropagation(); onDeploy(idea.id); }}
+          disabled={deploying}
+          className="flex shrink-0 items-center gap-1 rounded-lg bg-lime-400/15 border border-lime-400/30 px-2.5 py-1.5 text-[11px] font-medium text-lime-300 hover:bg-lime-400/25 disabled:opacity-50"
+        >
+          {deploying ? <Loader2 className="h-3 w-3 animate-spin" /> : <Rocket className="h-3 w-3" />}
+          {deploying ? "Deploying" : "Deploy"}
+        </button>
+      )}
+      {isProvisioned && (
+        <span className="flex shrink-0 items-center gap-1 rounded-lg bg-lime-400/10 px-2.5 py-1.5 text-[11px] font-medium text-lime-400">
+          <CheckCircle className="h-3 w-3" /> Deployed
+        </span>
+      )}
 
       <ChevronRight className="h-4 w-4 shrink-0 text-white/30 group-hover:text-lime-400" />
     </button>

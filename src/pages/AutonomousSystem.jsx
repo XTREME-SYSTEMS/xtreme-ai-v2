@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback } from "react";
 import { base44 } from "@/api/base44Client";
 import { PageHeader, Panel, LoadingButton, EmptyState } from "@/components/ui";
 import StatusBadge from "@/components/StatusBadge";
-import { Bot, ShieldCheck, RefreshCw, Play, Rocket, Activity, AlertTriangle, CheckCircle2, Cpu } from "lucide-react";
+import { Bot, ShieldCheck, RefreshCw, Play, Rocket, Activity, AlertTriangle, CheckCircle2, Cpu, Radar, Database } from "lucide-react";
 
 export default function AutonomousSystem() {
   const [plans, setPlans] = useState([]);
@@ -16,6 +16,8 @@ export default function AutonomousSystem() {
   const [seedingRoadmap, setSeedingRoadmap] = useState(false);
   const [running, setRunning] = useState(false);
   const [auditing, setAuditing] = useState(false);
+  const [discovering, setDiscovering] = useState(false);
+  const [discoveryRuns, setDiscoveryRuns] = useState([]);
 
   const loadPlan = useCallback(async (p) => {
     if (!p) { setPhases([]); setHealth(null); setRepairs([]); return; }
@@ -31,17 +33,19 @@ export default function AutonomousSystem() {
 
   const loadSystemFailures = useCallback(async () => {
     try {
-      const [openAlerts, escalatedAlerts, failedBuilds, failedJobs] = await Promise.all([
+      const [openAlerts, escalatedAlerts, failedBuilds, failedJobs, recentRuns] = await Promise.all([
         base44.entities.SystemAlert.filter({ status: "open" }, "-created_date", 20).catch(() => []),
         base44.entities.SystemAlert.filter({ status: "escalated" }, "-created_date", 20).catch(() => []),
         base44.entities.AutoBuild.filter({ status: "failed" }, "-created_date", 20).catch(() => []),
         base44.entities.GenerationJob.filter({ status: "failed" }, "-created_date", 20).catch(() => []),
+        base44.entities.DiscoveryRun.list("-created_date", 5).catch(() => []),
       ]);
       setSystemFailures({
         alerts: [...(openAlerts || []), ...(escalatedAlerts || [])],
         failedBuilds: failedBuilds || [],
         failedJobs: failedJobs || [],
       });
+      setDiscoveryRuns(recentRuns || []);
     } catch (e) {
       console.error("Failed to load system failures", e);
     }
@@ -119,6 +123,18 @@ export default function AutonomousSystem() {
     }
   };
 
+  const runDiscovery = async () => {
+    try {
+      setDiscovering(true);
+      await base44.functions.invoke("runDiscoveryScrape", { triggered_by: "manual" });
+      await load();
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setDiscovering(false);
+    }
+  };
+
   const scoreColor = (s) => s >= 100 ? "text-lime-400" : s >= 70 ? "text-yellow-400" : s >= 40 ? "text-orange-400" : "text-red-400";
 
   if (loading) return <div className="flex items-center justify-center py-20"><RefreshCw className="h-6 w-6 animate-spin text-lime-400" /></div>;
@@ -151,9 +167,42 @@ export default function AutonomousSystem() {
         )}
         <LoadingButton loading={seedingRoadmap} onClick={seedRoadmap} variant="ghost"><Bot className="h-4 w-4" /> Seed AI Roadmap</LoadingButton>
         <LoadingButton loading={running} onClick={runCycle}><Play className="h-4 w-4" /> Run Cycle</LoadingButton>
+        <LoadingButton loading={discovering} onClick={runDiscovery} variant="ghost"><Radar className="h-4 w-4" /> Run Discovery</LoadingButton>
         <LoadingButton loading={auditing} onClick={runAudit} variant="ghost"><ShieldCheck className="h-4 w-4" /> Forensic Audit</LoadingButton>
         <LoadingButton onClick={load} variant="ghost"><RefreshCw className="h-4 w-4" /> Refresh</LoadingButton>
       </PageHeader>
+
+      {/* Autonomous Discovery — integrated into the system */}
+      <Panel title="Autonomous Discovery Engine" className="mb-6">
+        <div className="flex items-start gap-3">
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-lime-400/15">
+            <Radar className="h-5 w-5 text-lime-400" />
+          </div>
+          <div className="flex-1 min-w-0">
+            <p className="text-sm text-white/60">
+              Scrapes the web for business leads with bad websites and new app/website ideas. Runs on a schedule or manually.
+            </p>
+            {discoveryRuns.length > 0 && (
+              <div className="mt-3 space-y-1.5">
+                {discoveryRuns.map((r) => (
+                  <div key={r.id} className="flex items-center gap-2 rounded-lg border border-white/10 bg-black/40 px-3 py-2 text-xs">
+                    <Database className="h-3.5 w-3.5 shrink-0 text-white/40" />
+                    <span className="text-white/60 capitalize">{r.run_type?.replace(/_/g, " ") || "discovery"}</span>
+                    <span className="text-white/30">·</span>
+                    <span className="text-white/50">{r.items_found || 0} found</span>
+                    <span className="text-white/30">·</span>
+                    <span className={`capitalize ${r.status === "complete" ? "text-emerald-400" : r.status === "failed" ? "text-red-400" : "text-yellow-400"}`}>{r.status}</span>
+                    <span className="ml-auto text-white/30">{new Date(r.created_date).toLocaleDateString()}</span>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+          <LoadingButton loading={discovering} onClick={runDiscovery}>
+            <Radar className="h-4 w-4" /> Run Now
+          </LoadingButton>
+        </div>
+      </Panel>
 
       {/* Health Score */}
       {health && (
