@@ -76,6 +76,20 @@ export default function SystemAlerts() {
     }
   };
 
+  const resolveAlert = async (alert) => {
+    try {
+      await base44.entities.SystemAlert.update(alert.id, {
+        status: "resolved",
+        resolved_at: new Date().toISOString(),
+        resolution: "Marked resolved by operator",
+      });
+      await loadAlerts();
+    } catch (e) {
+      console.error("Resolve failed", e);
+      setHealError(e?.message || "Failed to resolve alert");
+    }
+  };
+
   const filtered = filter === "all" ? alerts : alerts.filter((a) => a.status === filter);
 
   const stats = {
@@ -204,7 +218,15 @@ export default function SystemAlerts() {
                       Heal
                     </button>
                   )}
-                  {alert.status !== "resolved" && (
+                  {(alert.status === "open" || alert.status === "healing" || alert.status === "escalated") && (
+                    <button
+                      onClick={() => resolveAlert(alert)}
+                      className="inline-flex items-center gap-1 rounded-lg border border-lime-400/40 px-2.5 py-1 text-[11px] font-medium text-lime-300 hover:bg-lime-400/10"
+                    >
+                      <CheckCircle className="h-3 w-3" /> Resolve
+                    </button>
+                  )}
+                  {alert.status !== "resolved" && alert.status !== "dismissed" && (
                     <button
                       onClick={() => dismissAlert(alert)}
                       className="inline-flex items-center gap-1 rounded-lg border border-white/15 px-2.5 py-1 text-[11px] text-white/50 hover:text-white"
