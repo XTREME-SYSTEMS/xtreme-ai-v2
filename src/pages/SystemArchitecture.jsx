@@ -66,7 +66,7 @@ export default function SystemArchitecture() {
       visited_steps: visited,
       logs: [...(build.logs || []), `[${new Date().toISOString()}] Architecture approved`],
     });
-    navigate("/system-review");
+    navigate("/data-model");
   };
 
   if (autoBuild.loading) {

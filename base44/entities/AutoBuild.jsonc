@@ -174,6 +174,33 @@
         }
       }
     },
+    "data_model": {
+      "type": "object",
+      "description": "Generated detailed data model spec (for web_app/ecommerce/platform builds) \u2014 refined entity schemas with field-level validation, indexes, relationships, seed data, and API endpoints. Produced by generateDataModel from the architecture spec.",
+      "properties": {
+        "entities": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        },
+        "relationships": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        },
+        "seed_data": {
+          "type": "object"
+        },
+        "api_endpoints": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        }
+      }
+    },
     "code_manifest": {
       "type": "object",
       "description": "Generated codebase manifest (future codegen step) \u2014 the list of files, their paths, and content references that make up the deployable codebase.",

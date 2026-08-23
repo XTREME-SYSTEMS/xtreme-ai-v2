@@ -2,6 +2,7 @@ import {
   Package, Building2, MessageSquareText, PenTool, Shirt, Palette, Share2,
   Video, LayoutTemplate, FileSignature, ShieldCheck, Rocket, Sparkles,
   LayoutDashboard, Settings, Compass, Box,
+  Cpu, Database, ClipboardCheck,
 } from "lucide-react";
 
 // ─────────────────────────────────────────────────────────────────────────
@@ -132,6 +133,31 @@ export const PORTAL_STEPS = {
     body: "Every action your team takes to build and launch your website is logged here for full transparency.",
     nextLabel: null, nextTo: null,
   },
+  // ── System build steps (web_app / ecommerce / platform) ──
+  "system-architecture": {
+    key: "system-architecture",
+    to: "/system-architecture", label: "Architecture", icon: Cpu, gate: "auto",
+    activityLabel: "Generate system architecture",
+    title: "System Architecture",
+    body: "The AI designs a complete blueprint — tech stack, pages, data models, features, and integrations — for your product.",
+    nextLabel: "Go to Data Model", nextTo: "/data-model",
+  },
+  "data-model": {
+    key: "data-model",
+    to: "/data-model", label: "Data Model", icon: Database, gate: "auto",
+    activityLabel: "Generate data model",
+    title: "Data Model",
+    body: "The AI refines the architecture into detailed entity schemas with validation rules, indexes, relationships, seed data, and API endpoints.",
+    nextLabel: "Go to Review", nextTo: "/system-review",
+  },
+  "system-review": {
+    key: "system-review",
+    to: "/system-review", label: "Review", icon: ClipboardCheck, gate: "auto",
+    activityLabel: "Review the system build",
+    title: "System Review",
+    body: "Review the complete system blueprint and finalize the build.",
+    nextLabel: "Go to Launch", nextTo: "/receipts",
+  },
 };
 
 // ─────────────────────────────────────────────────────────────────────────
@@ -161,7 +187,7 @@ const FULL_BUILD_PLUS_MEDIA = [
 // data-model, ui-system, codegen, and deploy steps between architecture
 // and review once each generator is built.
 const SYSTEM_BUILD = [
-  "welcome", "business-profile", "system-architecture", "system-review", "launch",
+  "welcome", "business-profile", "system-architecture", "data-model", "system-review", "launch",
 ];
 
 export const PRODUCT_STEPS = {
