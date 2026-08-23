@@ -4,7 +4,17 @@ import { createClientFromRequest } from 'npm:@base44/sdk@0.8.43';
 // finding. Calls the finding's action_endpoint with the action_payload, then
 // updates the finding status based on the result.
 //
+// Retry-with-backoff: retries up to MAX_ATTEMPTS times before marking failed.
+// Only marks as "failed" after all retries are exhausted. A failed finding
+// can still be retried manually (the button stays available).
+//
 // Supports all action types: fix, heal, harden, optimize, enhance.
+
+const MAX_ATTEMPTS = 3;
+const BASE_DELAY_SEC = 3;
+
+const sleep = (sec: number) => new Promise((r) => setTimeout(r, sec * 1000));
+
 export default async function(req) {
   try {
     const base44 = createClientFromRequest(req);
@@ -23,37 +33,50 @@ export default async function(req) {
     // Mark as fixing
     await base44.asServiceRole.entities.SystemOptimization.update(optimizationId, {
       status: 'fixing',
-      logs: [...(finding.logs || []), `[${new Date().toISOString()}] Applying ${finding.recommended_action} via ${finding.action_endpoint}`],
+      logs: [...(finding.logs || []), `[${new Date().toISOString()}] Applying ${finding.recommended_action} via ${finding.action_endpoint} (up to ${MAX_ATTEMPTS} attempts)`],
     });
 
-    let result: any;
-    try {
-      const payload = finding.action_payload ? JSON.parse(finding.action_payload) : {};
-      const res = await base44.asServiceRole.functions.invoke(finding.action_endpoint, payload);
-      result = res?.data || res;
-    } catch (applyErr: any) {
-      // Fix failed — mark as failed but keep it re-tryable
-      await base44.asServiceRole.entities.SystemOptimization.update(optimizationId, {
-        status: 'failed',
-        logs: [...(finding.logs || []), `[${new Date().toISOString()}] Fix FAILED: ${applyErr?.message || 'unknown'}`],
-      });
-      return Response.json({
-        ok: false,
-        optimizationId,
-        error: applyErr?.message || 'Fix application failed',
-      }, { status: 500 });
+    const payload = finding.action_payload ? JSON.parse(finding.action_payload) : {};
+
+    // ── Retry loop: try up to MAX_ATTEMPTS times with exponential backoff ──
+    let result: any = null;
+    let lastError: string | null = null;
+    let success = false;
+    const attemptLogs: string[] = [];
+
+    for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt++) {
+      if (attempt > 1) await sleep(BASE_DELAY_SEC * Math.pow(2, attempt - 2));
+
+      try {
+        const res = await base44.asServiceRole.functions.invoke(finding.action_endpoint, payload);
+        result = res?.data || res;
+
+        // Check if the fix succeeded — be lenient: only treat as failed if explicitly failed
+        const attemptSuccess = result?.ok !== false && result?.healed !== false && !result?.error;
+
+        if (attemptSuccess) {
+          success = true;
+          attemptLogs.push(`[${new Date().toISOString()}] Attempt ${attempt}/${MAX_ATTEMPTS}: SUCCESS`);
+          break;
+        } else {
+          // Endpoint returned a failure result — retry
+          lastError = result?.message || result?.error || 'endpoint returned failure';
+          attemptLogs.push(`[${new Date().toISOString()}] Attempt ${attempt}/${MAX_ATTEMPTS}: FAILED — ${lastError}`);
+        }
+      } catch (applyErr: any) {
+        lastError = applyErr?.message || 'unknown';
+        attemptLogs.push(`[${new Date().toISOString()}] Attempt ${attempt}/${MAX_ATTEMPTS}: ERROR — ${lastError}`);
+      }
     }
 
-    // Check if the fix succeeded — be lenient: only mark failed if explicitly failed
-    const success = result?.ok !== false && result?.healed !== false && !result?.error;
-
+    // Update the finding with final status
     await base44.asServiceRole.entities.SystemOptimization.update(optimizationId, {
       status: success ? 'resolved' : 'failed',
       resolved_at: success ? new Date().toISOString() : undefined,
       resolution: success
-        ? `Fixed via ${finding.action_endpoint}`
-        : `Fix attempted but issue persists — retry available`,
-      logs: [...(finding.logs || []), `[${new Date().toISOString()}] Fix ${success ? 'SUCCEEDED' : 'FAILED'}: ${JSON.stringify(result).slice(0, 500)}`],
+        ? `Fixed via ${finding.action_endpoint} (after up to ${MAX_ATTEMPTS} attempts)`
+        : `Fix failed after ${MAX_ATTEMPTS} attempts — retry available`,
+      logs: [...(finding.logs || []), ...attemptLogs],
     });
 
     // Record a Receipt
@@ -63,10 +86,10 @@ export default async function(req) {
         action: finding.recommended_action,
         entity_type: 'SystemOptimization',
         entity_id: optimizationId,
-        inputs: JSON.stringify({ optimizationId, endpoint: finding.action_endpoint }).slice(0, 4000),
-        outputs: JSON.stringify(result).slice(0, 4000),
+        inputs: JSON.stringify({ optimizationId, endpoint: finding.action_endpoint, attempts: MAX_ATTEMPTS }).slice(0, 4000),
+        outputs: JSON.stringify({ success, result, lastError }).slice(0, 4000),
         status: success ? 'success' : 'failed',
-        evidence: `Applied ${finding.recommended_action} for: ${finding.title}`,
+        evidence: `Applied ${finding.recommended_action} for: ${finding.title} — ${success ? 'SUCCESS' : `FAILED after ${MAX_ATTEMPTS} attempts`}`,
       });
     } catch {}
 
@@ -75,6 +98,8 @@ export default async function(req) {
       optimizationId,
       action: finding.recommended_action,
       result,
+      attempts: MAX_ATTEMPTS,
+      message: success ? undefined : `Failed after ${MAX_ATTEMPTS} attempts: ${lastError}`,
     });
   } catch (error) {
     console.error('applySystemOptimization error', error?.message || error);

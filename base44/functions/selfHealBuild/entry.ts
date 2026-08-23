@@ -1,15 +1,27 @@
-import { createClientFromRequest } from 'npm:@base44/sdk@0.8.40';
-import { classifyError, CircuitBreaker } from '../../shared/errorClassifier.ts';
+import { createClientFromRequest } from 'npm:@base44/sdk@0.8.43';
+import { classifyError } from '../../shared/errorClassifier.ts';
 
-// selfHealBuild — Phase 3: Autonomous self-healing loop.
+// selfHealBuild — Autonomous self-healing loop with retry-with-backoff.
 // Examines a failed/stuck AutoBuild, classifies the error, and attempts
-// recovery (retry, regenerate with context, or escalate). Creates a
-// SystemAlert when it can't self-heal.
+// recovery multiple times before escalating. Only escalates after all
+// retries are exhausted within this invocation AND the alert's total
+// retry_count exceeds MAX_TOTAL_RETRIES.
+//
+// Key design: every heal attempt retries up to MAX_HEAL_ATTEMPTS times
+// with exponential backoff WITHIN a single invocation, so a single
+// button press always tries its hardest before giving up.
 //
 // Called by:
 // - The "Autonomous Build Loop" workflow on a schedule
 // - The "Auto Heal Loop" workflow on entity update (status=failed)
-// - Manually from the admin UI
+// - Manually from the admin UI (SystemAlerts / SystemOptimization)
+
+const MAX_HEAL_ATTEMPTS = 3;       // retries per invocation
+const BASE_DELAY_SEC = 3;          // base backoff delay
+const MAX_TOTAL_RETRIES = 15;      // cross-invocation cap before forced escalation
+
+const sleep = (sec: number) => new Promise((r) => setTimeout(r, sec * 1000));
+
 export default async function(req) {
   try {
     const base44 = createClientFromRequest(req);
@@ -38,7 +50,7 @@ export default async function(req) {
       } catch {}
     }
 
-    // Post-deploy check failures need re-verification, not step retry
+    // ── Post-deploy check failures: retry verification up to MAX_HEAL_ATTEMPTS ──
     if (alertType === 'post_deploy_check_failure') {
       const liveUrl = alert?.live_url || build?.deployment?.live_url;
       if (!liveUrl) {
@@ -49,35 +61,43 @@ export default async function(req) {
         }, { status: 400 });
       }
 
-      let verifyResult: any = null;
-      try {
-        const res = await base44.asServiceRole.functions.invoke('verifyDeployment', {
-          liveUrl,
-          buildId,
-        });
-        verifyResult = res?.data || res;
-      } catch (verifyErr: any) {
-        return Response.json({
-          ok: false,
-          action: 'escalate',
-          message: `Re-verification failed: ${verifyErr?.message || 'unknown'}`,
-        }, { status: 500 });
+      let lastVerifyResult: any = null;
+      let lastError: string | null = null;
+      let allPassed = false;
+
+      for (let attempt = 1; attempt <= MAX_HEAL_ATTEMPTS; attempt++) {
+        if (attempt > 1) await sleep(BASE_DELAY_SEC * Math.pow(2, attempt - 2));
+
+        try {
+          const res = await base44.asServiceRole.functions.invoke('verifyDeployment', {
+            liveUrl,
+            buildId,
+          });
+          lastVerifyResult = res?.data || res;
+          const checks = lastVerifyResult?.checks || [];
+          allPassed = checks.length > 0 && checks.every((c: any) => c.passed);
+          if (allPassed) break; // success — stop retrying
+        } catch (verifyErr: any) {
+          lastError = verifyErr?.message || 'unknown';
+        }
       }
 
-      const score = verifyResult?.score ?? 0;
-      const checks = verifyResult?.checks || [];
-      const allPassed = checks.length > 0 && checks.every((c: any) => c.passed);
+      const score = lastVerifyResult?.score ?? 0;
+      const checks = lastVerifyResult?.checks || [];
+      const totalRetries = (alert?.retry_count || 0) + MAX_HEAL_ATTEMPTS;
 
       // Update the alert
       if (alertId) {
         try {
           await base44.asServiceRole.entities.SystemAlert.update(alertId, {
-            status: allPassed ? 'resolved' : 'escalated',
-            resolved_at: new Date().toISOString(),
-            resolution: allPassed ? 'Self-healed: post-deploy verification passed on retry' : 'Re-verification still failing — needs operator',
-            retry_count: (alert?.retry_count || 0) + 1,
-            context: `Re-verified at ${score}% — ${checks.filter((c: any) => c.passed).length}/${checks.length} checks passed`,
-            logs: [...(alert?.logs || []), `[${new Date().toISOString()}] self-heal: re-verified deployment → ${score}% (${checks.filter((c: any) => c.passed).length}/${checks.length} passed)`],
+            status: allPassed ? 'resolved' : (totalRetries >= MAX_TOTAL_RETRIES ? 'escalated' : 'open'),
+            resolved_at: allPassed ? new Date().toISOString() : undefined,
+            resolution: allPassed
+              ? 'Self-healed: post-deploy verification passed on retry'
+              : (totalRetries >= MAX_TOTAL_RETRIES ? 'Re-verification still failing after max retries — needs operator' : undefined),
+            retry_count: totalRetries,
+            context: `Re-verified at ${score}% — ${checks.filter((c: any) => c.passed).length}/${checks.length} checks passed (tried ${MAX_HEAL_ATTEMPTS}x this round, ${totalRetries}x total)`,
+            logs: [...(alert?.logs || []), `[${new Date().toISOString()}] self-heal: re-verified deployment → ${score}% (${checks.filter((c: any) => c.passed).length}/${checks.length} passed) — ${allPassed ? 'HEALED' : 'still failing'} after ${MAX_HEAL_ATTEMPTS} attempts`],
           });
         } catch {}
       }
@@ -88,27 +108,27 @@ export default async function(req) {
           action: 'self_heal_post_deploy',
           entity_type: 'AutoBuild',
           entity_id: buildId,
-          inputs: JSON.stringify({ buildId, alertType, liveUrl }).slice(0, 4000),
-          outputs: JSON.stringify({ score, passed: allPassed }).slice(0, 4000),
+          inputs: JSON.stringify({ buildId, alertType, liveUrl, attempts: MAX_HEAL_ATTEMPTS }).slice(0, 4000),
+          outputs: JSON.stringify({ score, passed: allPassed, totalRetries }).slice(0, 4000),
           status: allPassed ? 'success' : 'escalated',
-          evidence: `Post-deploy re-verification: ${score}% — ${allPassed ? 'PASS' : 'STILL FAILING'}`,
+          evidence: `Post-deploy re-verification after ${MAX_HEAL_ATTEMPTS} attempts: ${score}% — ${allPassed ? 'PASS' : 'STILL FAILING'}`,
         });
       } catch {}
 
       return Response.json({
         ok: allPassed,
-        action: allPassed ? 'resolved' : 'escalate',
+        action: allPassed ? 'resolved' : (totalRetries >= MAX_TOTAL_RETRIES ? 'escalate' : 'retry'),
         healed: allPassed,
         message: allPassed
           ? `Post-deploy verification passed on retry (${score}%)`
-          : `Re-verification still failing at ${score}% — escalated`,
+          : `Re-verification still failing at ${score}% after ${MAX_HEAL_ATTEMPTS} attempts — ${totalRetries >= MAX_TOTAL_RETRIES ? 'escalated' : 'retry available'}`,
         buildId,
         score,
         checks,
       });
     }
 
-    // For non-post-deploy alerts, we need a valid build to retry/regenerate
+    // ── Non-post-deploy: need a valid build to retry/regenerate ──
     if (!build) {
       return Response.json({
         ok: false,
@@ -117,12 +137,13 @@ export default async function(req) {
       }, { status: 404 });
     }
 
-    const breaker = new CircuitBreaker(5);
     const stepKey = build.current_step || 'unknown';
-    const errorKey = `${buildId}:${stepKey}`;
+    const errorMsg = build.error || `Build stuck at step ${stepKey}`;
+    const classified = classifyError(errorMsg);
+    const totalRetries = (alert?.retry_count || 0) + MAX_HEAL_ATTEMPTS;
 
-    // If circuit breaker is already tripped, escalate
-    if (breaker.isOpen(errorKey)) {
+    // If we've exhausted all cross-invocation retries, escalate
+    if (totalRetries >= MAX_TOTAL_RETRIES) {
       try {
         await base44.asServiceRole.entities.SystemAlert.create({
           alert_type: 'circuit_breaker_tripped',
@@ -130,97 +151,103 @@ export default async function(req) {
           build_id: buildId,
           build_name: build.business_name,
           step: stepKey,
-          message: `Circuit breaker tripped for ${build.business_name} at step ${stepKey} — repeated failures`,
-          error_class: 'structural',
+          message: `Max retries (${MAX_TOTAL_RETRIES}) exhausted for ${build.business_name} at step ${stepKey}`,
+          error_class: classified.class,
           recommended_action: 'escalate',
-          context: `Build has failed ${breaker['failureCounts']?.get(errorKey) || 5} times at step ${stepKey}`,
+          context: `Build has failed ${totalRetries} total times at step ${stepKey}. Last error: ${errorMsg}`,
           status: 'escalated',
         });
       } catch {}
 
       return Response.json({
         ok: false,
-        action: 'escalated',
-        message: 'Circuit breaker tripped — escalating to operator',
+        action: 'escalate',
+        message: `Max retries (${MAX_TOTAL_RETRIES}) exhausted — escalating to operator`,
         buildId,
         step: stepKey,
       });
     }
 
-    // Classify the error
-    const errorMsg = build.error || `Build stuck at step ${stepKey}`;
-    const classified = classifyError(errorMsg);
+    // ── Retry loop: try up to MAX_HEAL_ATTEMPTS times with backoff ──
+    let healed = false;
+    let lastError: string | null = null;
+    const attemptLogs: string[] = [];
 
-    // Record the failure
-    const tripped = breaker.recordFailure(errorKey);
+    for (let attempt = 1; attempt <= MAX_HEAL_ATTEMPTS; attempt++) {
+      if (attempt > 1) await sleep(BASE_DELAY_SEC * Math.pow(2, attempt - 2));
 
-    // Log the healing attempt
-    const logs = [...(build.logs || []), `[${new Date().toISOString()}] self-heal: ${classified.class} → ${classified.recommendedAction} (attempt ${(build.logs || []).filter((l: string) => l.includes('self-heal')).length + 1})`];
+      const attemptLabel = `attempt ${attempt}/${MAX_HEAL_ATTEMPTS}`;
+      attemptLogs.push(`[${new Date().toISOString()}] self-heal ${attemptLabel}: ${classified.class} → ${classified.recommendedAction}`);
 
-    let result: any = { action: classified.recommendedAction, classified };
-
-    if (classified.recommendedAction === 'retry') {
-      // Transient error — wait and retry the step
-      await new Promise((r) => setTimeout(r, classified.retryDelay * 1000));
-
-      // Re-invoke the step processor
       try {
-        await base44.asServiceRole.functions.invoke('processAutoBuildStep', {
-          buildId,
-          step: stepKey,
-          action: 'execute',
-        });
-        breaker.recordSuccess(errorKey);
-        result.healed = true;
-        result.message = `Retried step ${stepKey} after ${classified.class} error`;
+        if (classified.recommendedAction === 'retry' || classified.recommendedAction === 'regenerate') {
+          const invokePayload: any = {
+            buildId,
+            step: stepKey,
+            action: 'execute',
+          };
+          if (classified.recommendedAction === 'regenerate') {
+            invokePayload.previousErrors = [classified.context];
+          }
+
+          await base44.asServiceRole.functions.invoke('processAutoBuildStep', invokePayload);
+          healed = true;
+          attemptLogs.push(`[${new Date().toISOString()}] self-heal ${attemptLabel}: SUCCESS`);
+          break; // success — stop retrying
+        } else {
+          // escalate-class error — don't retry
+          lastError = `${classified.class} error requires operator intervention`;
+          break;
+        }
       } catch (retryErr: any) {
-        result.healed = false;
-        result.message = `Retry failed: ${retryErr?.message || 'unknown'}`;
+        lastError = retryErr?.message || 'unknown';
+        attemptLogs.push(`[${new Date().toISOString()}] self-heal ${attemptLabel}: FAILED — ${lastError}`);
+        // Re-classify the new error for the next attempt
       }
-    } else if (classified.recommendedAction === 'regenerate') {
-      // Structural/schema error — regenerate with error context injected
-      try {
-        await base44.asServiceRole.functions.invoke('processAutoBuildStep', {
-          buildId,
-          step: stepKey,
-          action: 'execute',
-          previousErrors: [classified.context],
-        });
-        breaker.recordSuccess(errorKey);
-        result.healed = true;
-        result.message = `Regenerated step ${stepKey} with error context`;
-      } catch (regenErr: any) {
-        result.healed = false;
-        result.message = `Regeneration failed: ${regenErr?.message || 'unknown'}`;
-      }
-    } else {
-      // Escalate
-      try {
-        await base44.asServiceRole.entities.SystemAlert.create({
-          alert_type: 'build_failure',
-          severity: 'critical',
-          build_id: buildId,
-          build_name: build.business_name,
-          step: stepKey,
-          message: `Build ${build.business_name} failed at ${stepKey}: ${errorMsg}`,
-          error_class: classified.class,
-          recommended_action: 'escalate',
-          context: classified.context,
-          status: 'escalated',
-        });
-      } catch {}
-
-      result.healed = false;
-      result.message = `Escalated: ${classified.class} error requires operator intervention`;
     }
 
     // Update the build with logs
     try {
       await base44.asServiceRole.entities.AutoBuild.update(buildId, {
-        logs,
-        error: result.healed ? '' : build.error,
+        logs: [...(build.logs || []), ...attemptLogs],
+        error: healed ? '' : (lastError || build.error),
       });
     } catch {}
+
+    // Update the alert if we have one
+    if (alertId) {
+      try {
+        await base44.asServiceRole.entities.SystemAlert.update(alertId, {
+          status: healed ? 'resolved' : (totalRetries >= MAX_TOTAL_RETRIES ? 'escalated' : 'open'),
+          resolved_at: healed ? new Date().toISOString() : undefined,
+          resolution: healed
+            ? `Self-healed: step ${stepKey} recovered after retry`
+            : (totalRetries >= MAX_TOTAL_RETRIES ? `Failed after ${MAX_HEAL_ATTEMPTS} attempts — escalated` : undefined),
+          retry_count: totalRetries,
+          context: healed ? undefined : `Last error: ${lastError} (tried ${MAX_HEAL_ATTEMPTS}x this round, ${totalRetries}x total)`,
+          logs: [...(alert?.logs || []), ...attemptLogs],
+        });
+      } catch {}
+    }
+
+    // If not healed and not yet at max retries, create/update an alert for visibility
+    if (!healed && !alertId && totalRetries < MAX_TOTAL_RETRIES) {
+      try {
+        await base44.asServiceRole.entities.SystemAlert.create({
+          alert_type: 'build_failure',
+          severity: 'warning',
+          build_id: buildId,
+          build_name: build.business_name,
+          step: stepKey,
+          message: `Build ${build.business_name} failed at ${stepKey}: ${errorMsg}`,
+          error_class: classified.class,
+          recommended_action: classified.recommendedAction === 'escalate' ? 'escalate' : 'retry',
+          context: `Last error: ${lastError} (tried ${MAX_HEAL_ATTEMPTS}x this round, ${totalRetries}x total)`,
+          status: 'open',
+          retry_count: totalRetries,
+        });
+      } catch {}
+    }
 
     // Record a Receipt
     try {
@@ -229,18 +256,25 @@ export default async function(req) {
         action: 'self_heal_attempt',
         entity_type: 'AutoBuild',
         entity_id: buildId,
-        inputs: JSON.stringify({ buildId, step: stepKey, errorClass: classified.class }).slice(0, 4000),
-        outputs: JSON.stringify({ action: result.action, healed: result.healed }).slice(0, 4000),
-        status: result.healed ? 'success' : 'escalated',
-        evidence: result.message,
+        inputs: JSON.stringify({ buildId, step: stepKey, errorClass: classified.class, attempts: MAX_HEAL_ATTEMPTS }).slice(0, 4000),
+        outputs: JSON.stringify({ healed, totalRetries, lastError }).slice(0, 4000),
+        status: healed ? 'success' : 'escalated',
+        evidence: healed
+          ? `Healed step ${stepKey} after retry`
+          : `Failed to heal after ${MAX_HEAL_ATTEMPTS} attempts (${totalRetries} total) — ${lastError}`,
       });
     } catch {}
 
     return Response.json({
-      ok: true,
-      ...result,
+      ok: healed,
+      action: healed ? 'resolved' : (totalRetries >= MAX_TOTAL_RETRIES ? 'escalate' : 'retry'),
+      healed,
+      message: healed
+        ? `Step ${stepKey} healed after retry`
+        : `Failed after ${MAX_HEAL_ATTEMPTS} attempts — ${totalRetries >= MAX_TOTAL_RETRIES ? 'escalated' : 'retry available'} (${lastError})`,
       buildId,
       step: stepKey,
+      totalRetries,
     });
   } catch (error) {
     console.error('selfHealBuild error', error?.message || error);
