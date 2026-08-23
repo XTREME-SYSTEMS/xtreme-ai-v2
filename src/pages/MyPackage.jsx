@@ -13,6 +13,7 @@ import { getVisibleSteps } from "@/lib/clientSteps";
 import { useClientTrack } from "@/hooks/useClientTrack";
 import { notifyStepComplete } from "@/lib/pipelineNotify";
 import BrandedButton from "@/components/client/BrandedButton";
+import ExpandableLineItems from "@/components/client/ExpandableLineItems";
 import { useRevisionThreads } from "@/hooks/useRevisionThreads";
 import RevisionThreadPanel from "@/components/client/RevisionThreadPanel";
 
@@ -181,36 +182,7 @@ export default function MyPackage() {
                     <div className="mt-4 grid gap-4 lg:grid-cols-2">
                       {/* Line items included — numbered */}
                       {detail.features.length > 0 && (
-                        <div className="rounded-lg border border-white/10 bg-black/20 p-4">
-                          <h4 className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-lime-400">
-                            <span className="h-1 w-4 rounded-full bg-lime-400" /> Line items included
-                          </h4>
-                          <ol className="mt-3 space-y-2">
-                            {(() => {
-                              let n = 0;
-                              return detail.features.map((f, i) => {
-                                const isSub = f.startsWith("  ·");
-                                if (isSub) {
-                                  return (
-                                    <li key={i} className="flex items-start gap-2 pl-7 text-xs text-white/50">
-                                      <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-white/30" />
-                                      <span>{f.replace(/^  ·\s*/, "")}</span>
-                                    </li>
-                                  );
-                                }
-                                n++;
-                                return (
-                                  <li key={i} className="flex items-start gap-2.5 text-sm text-white/80">
-                                    <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full border border-lime-400/30 bg-lime-400/10 text-[10px] font-bold text-lime-400">
-                                      {n}
-                                    </span>
-                                    <span className="pt-0.5">{f}</span>
-                                  </li>
-                                );
-                              });
-                            })()}
-                          </ol>
-                        </div>
+                        <ExpandableLineItems features={detail.features} />
                       )}
 
                       {/* Deliverables — numbered */}
