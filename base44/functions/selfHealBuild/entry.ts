@@ -20,15 +20,27 @@ export default async function(req) {
     const body = await req.json().catch(() => ({}));
     const { buildId, action, alertType, alertId } = body;
 
-    if (!buildId) return Response.json({ error: 'buildId is required' }, { status: 400 });
+    if (!buildId && !alertType) return Response.json({ error: 'buildId is required' }, { status: 400 });
 
-    // Fetch the build
-    const build = await base44.asServiceRole.entities.AutoBuild.get(buildId);
-    if (!build) return Response.json({ error: 'Build not found' }, { status: 404 });
+    // Fetch the alert if we have an alertId (to get live_url for post-deploy alerts)
+    let alert: any = null;
+    if (alertId) {
+      try {
+        alert = await base44.asServiceRole.entities.SystemAlert.get(alertId);
+      } catch {}
+    }
+
+    // Fetch the build (graceful — post-deploy alerts may not have a real build)
+    let build: any = null;
+    if (buildId) {
+      try {
+        build = await base44.asServiceRole.entities.AutoBuild.get(buildId);
+      } catch {}
+    }
 
     // Post-deploy check failures need re-verification, not step retry
     if (alertType === 'post_deploy_check_failure') {
-      const liveUrl = build.deployment?.live_url;
+      const liveUrl = alert?.live_url || build?.deployment?.live_url;
       if (!liveUrl) {
         return Response.json({
           ok: false,
@@ -63,9 +75,9 @@ export default async function(req) {
             status: allPassed ? 'resolved' : 'escalated',
             resolved_at: new Date().toISOString(),
             resolution: allPassed ? 'Self-healed: post-deploy verification passed on retry' : 'Re-verification still failing — needs operator',
-            retry_count: (verifyResult?.retry_count || 0) + 1,
+            retry_count: (alert?.retry_count || 0) + 1,
             context: `Re-verified at ${score}% — ${checks.filter((c: any) => c.passed).length}/${checks.length} checks passed`,
-            logs: [`[${new Date().toISOString()}] self-heal: re-verified deployment → ${score}% (${checks.filter((c: any) => c.passed).length}/${checks.length} passed)`],
+            logs: [...(alert?.logs || []), `[${new Date().toISOString()}] self-heal: re-verified deployment → ${score}% (${checks.filter((c: any) => c.passed).length}/${checks.length} passed)`],
           });
         } catch {}
       }

@@ -141,6 +141,7 @@ export default async function(req) {
           alert_type: 'post_deploy_check_failure',
           severity: failedChecks.length > 2 ? 'critical' : 'warning',
           build_id: buildId,
+          live_url: url,
           step: 'post_deploy',
           message: `Post-deploy verification failed: ${failedChecks.map((c) => c.name).join(', ')}`,
           recommended_action: failedChecks.length > 2 ? 'escalate' : 'retry',

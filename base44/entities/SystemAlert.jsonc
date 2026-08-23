@@ -33,6 +33,10 @@
     "build_name": {
       "type": "string"
     },
+    "live_url": {
+      "type": "string",
+      "description": "Live URL being verified (for post_deploy_check_failure alerts) \u2014 stored so self-heal can re-verify even if the build record is missing"
+    },
     "step": {
       "type": "string",
       "description": "Pipeline step where the alert was raised (architecture, data_model, ui_system, codegen, deploy, post_deploy)"
