@@ -1,0 +1,211 @@
+{
+  "name": "ServiceCatalogEntry",
+  "type": "object",
+  "description": "Backend catalog of every product and service with full descriptions, line-item details, SEO metadata, AEO metadata, and organizational data. Seeded by the seedServiceCatalog function and read by the client portal to display rich line-item information.",
+  "properties": {
+    "product_id": {
+      "type": "string",
+      "description": "Unique product identifier matching the checkout catalog (e.g. elite-monthly, pro-monthly, monthly-seo-rank)"
+    },
+    "name": {
+      "type": "string",
+      "description": "Display name of the product or service"
+    },
+    "category": {
+      "type": "string",
+      "enum": [
+        "package",
+        "monthly-service",
+        "free",
+        "web-pack",
+        "app-pack",
+        "ai-tool",
+        "service"
+      ],
+      "description": "Product category for organizational grouping"
+    },
+    "tagline": {
+      "type": "string",
+      "description": "Short marketing tagline"
+    },
+    "description": {
+      "type": "string",
+      "description": "Full product description shown to clients"
+    },
+    "price": {
+      "type": "number",
+      "description": "Price in USD (0 for free products)"
+    },
+    "price_label": {
+      "type": "string",
+      "description": "Formatted price label (e.g. $2,999 one-time, $149/mo)"
+    },
+    "delivery_time": {
+      "type": "string",
+      "description": "Expected delivery time (e.g. 7 days, Ongoing, Instant)"
+    },
+    "features": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "text": {
+            "type": "string",
+            "description": "The line item text as shown to the client"
+          },
+          "detail": {
+            "type": "string",
+            "description": "Full description of this specific line item"
+          },
+          "what_you_get": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Bullet list of what the client receives for this item"
+          },
+          "how_it_works": {
+            "type": "string",
+            "description": "Step-by-step explanation of how this item works"
+          },
+          "seo_value": {
+            "type": "string",
+            "description": "SEO value of this line item"
+          },
+          "aeo_value": {
+            "type": "string",
+            "description": "AEO (AI search) value of this line item"
+          },
+          "category": {
+            "type": "string",
+            "description": "Line item category (onboarding, branding, website, seo, aeo, content, social, video, app, reporting, free)"
+          }
+        }
+      },
+      "description": "Array of line items with full per-item details"
+    },
+    "deliverables": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "List of final deliverables the client receives"
+    },
+    "seo_metadata": {
+      "type": "object",
+      "description": "SEO metadata for this product \u2014 used for SEO landing pages and structured data",
+      "properties": {
+        "meta_title": {
+          "type": "string"
+        },
+        "meta_description": {
+          "type": "string"
+        },
+        "keywords": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "schema_type": {
+          "type": "string",
+          "description": "Schema.org type for this product (Service, Product, Subscription)"
+        }
+      }
+    },
+    "aeo_metadata": {
+      "type": "object",
+      "description": "AEO (AI Search Engine Optimization) metadata \u2014 answer blocks, entity types, and topic clusters for AI search visibility",
+      "properties": {
+        "answer_blocks": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Pre-written answer blocks (40-60 words) that AI engines can extract and cite"
+        },
+        "entity_types": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Schema.org entity types for AI knowledge graph construction"
+        },
+        "topic_clusters": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Topic clusters this product covers \u2014 used for topical authority modeling"
+        },
+        "llm_summary": {
+          "type": "string",
+          "description": "Concise summary optimized for LLM extraction \u2014 clear, factual, citable"
+        }
+      }
+    },
+    "organizational_metadata": {
+      "type": "object",
+      "description": "Organizational data for catalog management, automation routing, and pipeline integration",
+      "properties": {
+        "tier": {
+          "type": "string",
+          "enum": [
+            "free",
+            "starter",
+            "pro",
+            "elite"
+          ],
+          "description": "Service tier level"
+        },
+        "tags": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Organizational tags for filtering and grouping"
+        },
+        "related_services": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Product IDs of related services (upsell/cross-sell)"
+        },
+        "automation_function": {
+          "type": "string",
+          "description": "Backend function that automates this service (if any)"
+        },
+        "pipeline_stage": {
+          "type": "string",
+          "description": "Client portal pipeline stage this product maps to (e.g. brand-kit, website, seo)"
+        }
+      }
+    },
+    "statistics": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "label": {
+            "type": "string"
+          },
+          "value": {
+            "type": "string"
+          }
+        }
+      },
+      "description": "Key statistics shown on pricing cards"
+    },
+    "active": {
+      "type": "boolean",
+      "default": true,
+      "description": "Whether this product is active and purchasable"
+    }
+  },
+  "required": [
+    "product_id",
+    "name",
+    "category"
+  ]
+}

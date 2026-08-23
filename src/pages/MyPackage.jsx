@@ -182,7 +182,7 @@ export default function MyPackage() {
                     <div className="mt-4 grid gap-4 lg:grid-cols-2">
                       {/* Line items included — numbered */}
                       {detail.features.length > 0 && (
-                        <ExpandableLineItems features={detail.features} />
+                        <ExpandableLineItems features={detail.features} productId={p.productId} />
                       )}
 
                       {/* Deliverables — numbered */}
