@@ -1,0 +1,151 @@
+{
+  "name": "ArchitectProposal",
+  "type": "object",
+  "description": "A proactive proposal from the AI Chief Architect \u2014 an AI system designed to be 100x smarter and 10 steps ahead of the operator. It analyzes the current system state + scans the web for emerging tech, then surfaces ideas for what to build, how to build it, new technologies to adopt, AI capabilities to integrate, and strategic directions. Each proposal is classified by type and priority for the operator to review and act on.",
+  "properties": {
+    "title": {
+      "type": "string",
+      "description": "Short title for the proposal"
+    },
+    "description": {
+      "type": "string",
+      "description": "Full description of the proposal \u2014 what it is and why it matters"
+    },
+    "proposal_type": {
+      "type": "string",
+      "enum": [
+        "what_to_build",
+        "how_to_build",
+        "new_technology",
+        "ai_capability",
+        "integration",
+        "strategic_direction"
+      ],
+      "description": "What kind of proposal: what_to_build = new product/feature, how_to_build = better approach, new_technology = emerging tech to adopt, ai_capability = AI tool/model to integrate, integration = third-party service/API, strategic_direction = long-term vision"
+    },
+    "rationale": {
+      "type": "string",
+      "description": "Why this matters \u2014 the reasoning behind the proposal"
+    },
+    "current_gap": {
+      "type": "string",
+      "description": "What's missing or suboptimal in the current system"
+    },
+    "proposed_solution": {
+      "type": "string",
+      "description": "The concrete action to take"
+    },
+    "impact_score": {
+      "type": "number",
+      "description": "0-100: How much impact this would have on the system/business"
+    },
+    "effort_score": {
+      "type": "number",
+      "description": "0-100: How much effort to implement (inverse \u2014 lower = easier, higher = harder)"
+    },
+    "priority": {
+      "type": "string",
+      "enum": [
+        "critical",
+        "high",
+        "medium",
+        "low"
+      ],
+      "default": "medium",
+      "description": "How urgent this is: critical = do now, high = this week, medium = this month, low = backlog"
+    },
+    "time_horizon": {
+      "type": "string",
+      "enum": [
+        "immediate",
+        "short_term",
+        "medium_term",
+        "long_term"
+      ],
+      "default": "medium_term",
+      "description": "When this should be acted on: immediate = days, short_term = weeks, medium_term = months, long_term = quarters"
+    },
+    "technology_references": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "url": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          }
+        }
+      },
+      "description": "Specific technologies, tools, or references mentioned in the proposal"
+    },
+    "implementation_steps": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Step-by-step actions to implement this proposal"
+    },
+    "estimated_impact": {
+      "type": "string",
+      "description": "What the expected outcome/impact is if implemented"
+    },
+    "competitive_advantage": {
+      "type": "string",
+      "description": "How this creates a moat or competitive advantage"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "pending",
+        "reviewing",
+        "approved",
+        "dismissed",
+        "implemented"
+      ],
+      "default": "pending",
+      "description": "Review status: pending = new, reviewing = operator looking at it, approved = accepted for implementation, dismissed = rejected, implemented = done"
+    },
+    "scan_id": {
+      "type": "string",
+      "description": "Groups proposals by scan run"
+    },
+    "logs": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    }
+  },
+  "required": [
+    "title",
+    "proposal_type",
+    "description"
+  ],
+  "rls": {
+    "read": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "create": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

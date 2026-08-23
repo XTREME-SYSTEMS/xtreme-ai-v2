@@ -9,6 +9,7 @@ import PipelineHealthWidget from "@/components/PipelineHealthWidget";
 import SystemAccessGrid from "@/components/SystemAccessGrid";
 import ClientPipelineOps from "@/components/admin/ClientPipelineOps";
 import VisionCortexWidget from "@/components/visioncortex/VisionCortexWidget";
+import ArchitectWidget from "@/components/architect/ArchitectWidget";
 
 export default function CommandCenter() {
   const [stats, setStats] = useState({ prospects: 0, opportunities: 0, builds: 0, receipts: 0, clones: 0, recent: [], gscImpressions: 0, gscClicks: 0, topKeywords: [] });
@@ -57,6 +58,11 @@ export default function CommandCenter() {
       {/* Vision Cortex — the main AI-assisted idea engine, at the top */}
       <div className="mb-6">
         <VisionCortexWidget />
+      </div>
+
+      {/* AI Chief Architect — proactively surfaces what to build, new tech, AI capabilities */}
+      <div className="mb-6">
+        <ArchitectWidget />
       </div>
 
       <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">

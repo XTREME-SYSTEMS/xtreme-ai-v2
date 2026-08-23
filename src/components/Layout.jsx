@@ -85,6 +85,7 @@ const NAV = [
   { to: "/seo-launch-pad", label: "SEO Launch Pad", icon: Rocket },
   { section: "Autonomous" },
   { to: "/vision-cortex", label: "Vision Cortex", icon: Brain, end: true },
+  { to: "/architect", label: "AI Chief Architect", icon: Brain, end: true },
   { to: "/auto-builder", label: "Auto Builder", icon: Hammer, end: true },
   { to: "/autonomous-system", label: "Autonomous Engine", icon: Bot, end: true },
   { section: "Lab" },

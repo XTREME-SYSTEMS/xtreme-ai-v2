@@ -1,0 +1,48 @@
+{
+  "definition": {
+    "document": {
+      "dsl": "1.0.0",
+      "name": "architect_daily_scan",
+      "version": "1.0",
+      "namespace": "base44"
+    },
+    "do": [
+      {
+        "scan": {
+          "call": "invoke_backend_function",
+          "with": {
+            "function_name": "architectScan",
+            "args": {
+              "triggered_by": "workflow",
+              "max_proposals": 15
+            }
+          },
+          "then": "end",
+          "x-base44": {
+            "title": "AI Chief Architect Scan",
+            "description": "Analyze system state + scan web for emerging tech \u2192 generate 15 visionary proposals"
+          }
+        }
+      }
+    ]
+  },
+  "name": "Architect Daily Scan",
+  "description": "Runs the AI Chief Architect once every 24 hours (4:00 AM ET, after Vision Cortex). Analyzes the current system state, searches the web for emerging AI capabilities and new technologies, and generates 15 visionary proposals across 6 categories: what to build, how to build, new technology, AI capability, integration, and strategic direction.",
+  "trigger": {
+    "condition": null,
+    "config": {
+      "trigger_type": "scheduled",
+      "events": [],
+      "schedule_mode": "recurring",
+      "cron_expression": "0 4 * * *",
+      "one_time_date": null,
+      "timezone": "America/New_York",
+      "interval_value": null,
+      "interval_unit": null,
+      "interval_anchor": null,
+      "ends_type": "never",
+      "ends_on_date": null,
+      "ends_after_count": null
+    }
+  }
+}

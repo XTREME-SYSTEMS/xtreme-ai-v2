@@ -118,6 +118,7 @@ import IdeaDiscovery from '@/pages/IdeaDiscovery';
 import SystemAlerts from '@/pages/SystemAlerts';
 import SystemOptimization from '@/pages/SystemOptimization';
 import VisionCortex from '@/pages/VisionCortex';
+import Architect from '@/pages/Architect';
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin, isAuthenticated } = useAuth();
@@ -253,6 +254,7 @@ const AuthenticatedApp = () => {
           <Route path="/system-alerts" element={<SystemAlerts />} />
           <Route path="/system-optimization" element={<SystemOptimization />} />
           <Route path="/vision-cortex" element={<VisionCortex />} />
+      <Route path="/architect" element={<Architect />} />
         </Route>
       </Route>
       <Route path="*" element={<PageNotFound />} />
