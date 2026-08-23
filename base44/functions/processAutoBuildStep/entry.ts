@@ -1,21 +1,36 @@
 // Auto Builder step processor — executes a single pipeline step for an
-// AutoBuild record using the EXACT same generation logic as the client
-// portal (imported from autoBuildGenerators.ts — one source of truth).
+// AutoBuild record. Supports BOTH marketing and system-build pipelines.
 //
-// Steps mirror the client portal: profile → names → content → logo → brand →
-// website → social → video → review.
+// Marketing:  profile → names → content → logo → brand → website → social → video → review
+// System:     profile → architecture → data_model → ui_system → codegen → deploy → system_review
 //
 // Called manually from the admin UI ("Run Step") and by the autonomous
 // queue processor. Each step generates assets, saves results to the
 // AutoBuild entity, and advances current_step if auto_advance is on.
 
-import { createClientFromRequest } from "npm:@base44/sdk@0.8.31";
+import { createClientFromRequest } from "npm:@base44/sdk@0.8.40";
 import {
   generateNames, generateContent, generateLogos, generateBrandPacks,
   generateWebsite, generateSocial, generateVideo,
 } from "../../shared/autoBuildGenerators.ts";
+import {
+  generateArchitectureSpec, generateDataModelSpec, generateUiSystemSpec,
+  generateCodeManifestSpec, generateDeploymentSpec,
+} from "../../shared/systemBuildGenerators.ts";
+import {
+  validateArchitectureSpec, validateDataModelSpec, validateUiSystemSpec,
+  validateCodeManifestSpec, validateDeploymentSpec,
+} from "../../shared/systemBuildValidation.ts";
 
-const STEP_KEYS = ["profile", "names", "content", "logo", "brand", "website", "social", "video", "review", "complete"];
+// ── Step sequences ──────────────────────────────────────────────────────
+
+const MARKETING_STEPS = ["profile", "names", "content", "logo", "brand", "website", "social", "video", "review", "complete"];
+const SYSTEM_STEPS = ["profile", "architecture", "data_model", "ui_system", "codegen", "deploy", "system_review", "complete"];
+const SYSTEM_PRODUCT_TYPES = ["web_app", "ecommerce", "platform"];
+
+function getStepSequence(productType: string): string[] {
+  return SYSTEM_PRODUCT_TYPES.includes(productType) ? SYSTEM_STEPS : MARKETING_STEPS;
+}
 
 function log(build: any, msg: string): string[] {
   const ts = new Date().toISOString();
@@ -23,10 +38,11 @@ function log(build: any, msg: string): string[] {
   return [...(build.logs || []), entry].slice(-100);
 }
 
-function nextStep(current: string): string {
-  const idx = STEP_KEYS.indexOf(current);
-  if (idx < 0 || idx >= STEP_KEYS.length - 1) return "complete";
-  return STEP_KEYS[idx + 1];
+function nextStep(current: string, productType: string): string {
+  const steps = getStepSequence(productType);
+  const idx = steps.indexOf(current);
+  if (idx < 0 || idx >= steps.length - 1) return "complete";
+  return steps[idx + 1];
 }
 
 // Map AutoBuild record fields → generator params (same shape the client
@@ -53,7 +69,7 @@ function buildParams(build: any): Record<string, any> {
   };
 }
 
-// ── Step executors ──────────────────────────────────────────────────────
+// ── Marketing step executors ────────────────────────────────────────────
 
 async function runNames(base44: any, build: any) {
   const suggestions = await generateNames(base44, buildParams(build));
@@ -78,9 +94,6 @@ async function runBrand(base44: any, build: any) {
 async function runWebsite(base44: any, build: any) {
   const params = buildParams(build);
   const content = await generateWebsite(base44, params);
-  // Generate 3 project images (client portal generates these separately;
-  // no dedicated backend function, so we generate inline matching the
-  // same photo style the portal uses).
   const { photoStyleSuffix, compileBrief } = await import("../../shared/generatorBrief.ts");
   const photo = photoStyleSuffix(compileBrief(params));
   const ind = params.industry || "local service business";
@@ -107,7 +120,75 @@ async function runVideo(base44: any, build: any) {
   return { video_pack: { concepts } };
 }
 
+// ── System-build step executors ─────────────────────────────────────────
+
+async function runArchitecture(base44: any, build: any) {
+  const spec = await generateArchitectureSpec(base44, {
+    productType: build.product_type,
+    businessName: build.business_name,
+    industry: build.industry,
+    profile: build.profile,
+  });
+  const v = validateArchitectureSpec(spec);
+  if (!v.valid) throw new Error(`Architecture validation failed: ${v.errors.join("; ")}`);
+  return { architecture: spec };
+}
+
+async function runDataModel(base44: any, build: any) {
+  if (!build.architecture) throw new Error("Architecture spec is required before generating the data model");
+  const spec = await generateDataModelSpec(base44, {
+    architecture: build.architecture,
+    productType: build.product_type,
+    businessName: build.business_name,
+  });
+  const v = validateDataModelSpec(spec);
+  if (!v.valid) throw new Error(`Data model validation failed: ${v.errors.join("; ")}`);
+  return { data_model: spec };
+}
+
+async function runUiSystem(base44: any, build: any) {
+  if (!build.architecture) throw new Error("Architecture spec is required before generating the UI system");
+  const spec = await generateUiSystemSpec(base44, {
+    architecture: build.architecture,
+    productType: build.product_type,
+    businessName: build.business_name,
+  });
+  const v = validateUiSystemSpec(spec);
+  if (!v.valid) throw new Error(`UI system validation failed: ${v.errors.join("; ")}`);
+  return { ui_system: spec };
+}
+
+async function runCodegen(base44: any, build: any) {
+  if (!build.architecture) throw new Error("Architecture spec is required before generating the code manifest");
+  const spec = await generateCodeManifestSpec(base44, {
+    architecture: build.architecture,
+    dataModel: build.data_model,
+    uiSystem: build.ui_system,
+    productType: build.product_type,
+    businessName: build.business_name,
+  });
+  const v = validateCodeManifestSpec(spec);
+  if (!v.valid) throw new Error(`Code manifest validation failed: ${v.errors.join("; ")}`);
+  return { code_manifest: spec };
+}
+
+async function runDeploy(base44: any, build: any) {
+  if (!build.code_manifest) throw new Error("Code manifest is required before configuring deployment");
+  const spec = generateDeploymentSpec({
+    codeManifest: build.code_manifest,
+    architecture: build.architecture,
+    productType: build.product_type,
+    businessName: build.business_name,
+  });
+  const v = validateDeploymentSpec(spec);
+  if (!v.valid) throw new Error(`Deployment validation failed: ${v.errors.join("; ")}`);
+  return { deployment: spec };
+}
+
+// ── Executor registry ───────────────────────────────────────────────────
+
 const STEP_EXECUTORS: Record<string, (base44: any, build: any) => Promise<Record<string, any>>> = {
+  // Marketing
   profile: async () => ({}),
   names: runNames,
   content: runContent,
@@ -117,6 +198,13 @@ const STEP_EXECUTORS: Record<string, (base44: any, build: any) => Promise<Record
   social: runSocial,
   video: runVideo,
   review: async () => ({}),
+  // System-build
+  architecture: runArchitecture,
+  data_model: runDataModel,
+  ui_system: runUiSystem,
+  codegen: runCodegen,
+  deploy: runDeploy,
+  system_review: async () => ({}),
 };
 
 // ── Main handler ────────────────────────────────────────────────────────
@@ -175,8 +263,8 @@ Deno.serve(async (req: Request) => {
         status: "paused",
       };
 
-      if (advance && step !== "review") {
-        const ns = nextStep(step);
+      if (advance && step !== "review" && step !== "system_review") {
+        const ns = nextStep(step, build.product_type);
         updateData.current_step = ns;
         logs = log({ logs } as any, `Advanced to step: ${ns}`);
         updateData.logs = logs;

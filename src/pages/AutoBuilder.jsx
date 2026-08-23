@@ -75,7 +75,28 @@ export default function AutoBuilder() {
 
   const enterBuild = (build) => {
     autoBuild.setActiveBuildId(build.id);
-    navigate("/my-package");
+    // Navigate to the current step's route if mid-pipeline, otherwise
+    // start at the welcome page. System-build steps use their own routes.
+    const stepRoutes = {
+      profile: "/business-profile",
+      names: "/business-name-studio",
+      content: "/content-generator",
+      logo: "/logo-generator",
+      brand: "/brand-generator",
+      website: "/design-direction",
+      social: "/social-media",
+      video: "/video-generator",
+      review: "/your-designs",
+      architecture: "/system-architecture",
+      data_model: "/data-model",
+      ui_system: "/ui-system",
+      codegen: "/codegen",
+      deploy: "/deploy",
+      system_review: "/system-review",
+      complete: "/receipts",
+    };
+    const route = stepRoutes[build.current_step] || "/my-package";
+    navigate(route);
   };
 
   const deleteBuild = async (id, e) => {

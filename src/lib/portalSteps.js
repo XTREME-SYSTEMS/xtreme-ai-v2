@@ -136,7 +136,7 @@ export const PORTAL_STEPS = {
   // ── System build steps (web_app / ecommerce / platform) ──
   "system-architecture": {
     key: "system-architecture",
-    to: "/system-architecture", label: "Architecture", icon: Cpu, gate: "auto",
+    to: "/system-architecture", label: "Architecture", icon: Cpu, gate: "architecture",
     activityLabel: "Generate system architecture",
     title: "System Architecture",
     body: "The AI designs a complete blueprint — tech stack, pages, data models, features, and integrations — for your product.",
@@ -144,7 +144,7 @@ export const PORTAL_STEPS = {
   },
   "data-model": {
     key: "data-model",
-    to: "/data-model", label: "Data Model", icon: Database, gate: "auto",
+    to: "/data-model", label: "Data Model", icon: Database, gate: "data_model",
     activityLabel: "Generate data model",
     title: "Data Model",
     body: "The AI refines the architecture into detailed entity schemas with validation rules, indexes, relationships, seed data, and API endpoints.",
@@ -152,7 +152,7 @@ export const PORTAL_STEPS = {
   },
   "ui-system": {
     key: "ui-system",
-    to: "/ui-system", label: "UI System", icon: Palette, gate: "auto",
+    to: "/ui-system", label: "UI System", icon: Palette, gate: "ui_system",
     activityLabel: "Generate UI design system",
     title: "UI Design System",
     body: "The AI designs a complete design system — color palette, typography, spacing, component library, layout patterns, and responsive breakpoints.",
@@ -160,7 +160,7 @@ export const PORTAL_STEPS = {
   },
   "codegen": {
     key: "codegen",
-    to: "/codegen", label: "Codegen", icon: Code, gate: "auto",
+    to: "/codegen", label: "Codegen", icon: Code, gate: "codegen",
     activityLabel: "Generate codebase manifest",
     title: "Code Generation",
     body: "The AI maps every file in the codebase — pages, components, hooks, API routes, configs, tests — with implementation notes and dependencies.",
@@ -168,7 +168,7 @@ export const PORTAL_STEPS = {
   },
   "deploy": {
     key: "deploy",
-    to: "/deploy", label: "Deploy", icon: Server, gate: "auto",
+    to: "/deploy", label: "Deploy", icon: Server, gate: "deploy",
     activityLabel: "Configure deployment",
     title: "Deployment",
     body: "The system generates build settings, environment variables, routing config, and a preview deployment URL.",

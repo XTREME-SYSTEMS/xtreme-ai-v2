@@ -77,6 +77,21 @@ export function useStepGate(step, user) {
           const done = !!(user && user.epoxyProfileSubmitted);
           if (!cancelled)
             setState({ isComplete: done, loading: false, pendingLabel: done ? "" : "Business profile needed" });
+        } else if (step.gate === "architecture") {
+          const done = !!(autoBuild.isActive && autoBuild.build?.architecture);
+          if (!cancelled) setState({ isComplete: done, loading: false, pendingLabel: done ? "" : "Generate architecture spec" });
+        } else if (step.gate === "data_model") {
+          const done = !!(autoBuild.isActive && autoBuild.build?.data_model);
+          if (!cancelled) setState({ isComplete: done, loading: false, pendingLabel: done ? "" : "Generate data model" });
+        } else if (step.gate === "ui_system") {
+          const done = !!(autoBuild.isActive && autoBuild.build?.ui_system);
+          if (!cancelled) setState({ isComplete: done, loading: false, pendingLabel: done ? "" : "Generate UI system" });
+        } else if (step.gate === "codegen") {
+          const done = !!(autoBuild.isActive && autoBuild.build?.code_manifest);
+          if (!cancelled) setState({ isComplete: done, loading: false, pendingLabel: done ? "" : "Generate code manifest" });
+        } else if (step.gate === "deploy") {
+          const done = !!(autoBuild.isActive && autoBuild.build?.deployment);
+          if (!cancelled) setState({ isComplete: done, loading: false, pendingLabel: done ? "" : "Configure deployment" });
         } else if (step.gate === "logo") {
           const done = !!(user && user.chosenLogoUrl);
           if (!cancelled)
@@ -132,7 +147,10 @@ export function useStepGate(step, user) {
       clearInterval(interval);
       window.removeEventListener("focus", onFocus);
     };
-  }, [step?.to, step?.gate, effectiveEmail, user, autoBuild.isActive]);
+  }, [step?.to, step?.gate, effectiveEmail, user, autoBuild.isActive,
+    autoBuild.build?.architecture, autoBuild.build?.data_model,
+    autoBuild.build?.ui_system, autoBuild.build?.code_manifest,
+    autoBuild.build?.deployment]);
 
   return state;
 }

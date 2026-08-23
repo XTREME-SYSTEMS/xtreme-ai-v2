@@ -76,6 +76,14 @@ export function usePortalPipeline(user) {
       }
     } else if (gate === "architecture") {
       completed = !!(autoBuild.isActive ? autoBuild.build?.architecture : project?.architecture);
+    } else if (gate === "data_model") {
+      completed = !!(autoBuild.isActive ? autoBuild.build?.data_model : project?.data_model);
+    } else if (gate === "ui_system") {
+      completed = !!(autoBuild.isActive ? autoBuild.build?.ui_system : project?.ui_system);
+    } else if (gate === "codegen") {
+      completed = !!(autoBuild.isActive ? autoBuild.build?.code_manifest : project?.code_manifest);
+    } else if (gate === "deploy") {
+      completed = !!(autoBuild.isActive ? autoBuild.build?.deployment : project?.deployment);
     } else if (gate === "logo") {
       completed = !!(project?.chosen_logo_url || user?.chosenLogoUrl);
     } else if (gate === "brand") {

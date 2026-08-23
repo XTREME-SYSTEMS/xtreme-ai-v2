@@ -1,9 +1,9 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { base44 } from "@/api/base44Client";
 import { useAutoBuild } from "@/lib/AutoBuildContext";
 import { getProductType } from "@/lib/buildProductTypes";
 import BackButton from "@/components/client/BackButton";
+import { useSystemBuildStep } from "@/hooks/useSystemBuildStep";
 import {
   Loader2, Rocket, RefreshCw, CheckCircle, ArrowRight, Zap,
   Globe, Settings, KeyRound, Route, ExternalLink, Server,
@@ -17,9 +17,7 @@ import {
 export default function Deploy() {
   const autoBuild = useAutoBuild();
   const navigate = useNavigate();
-  const [generating, setGenerating] = useState(false);
-  const [error, setError] = useState("");
-  const [approved, setApproved] = useState(false);
+  const { generating, error, approved, validationErrors, warnings, attempt, generate: runGenerate, approve: runApprove } = useSystemBuildStep("deploySystemBuild", "deployment", "deploy");
 
   const build = autoBuild.build;
   const deployment = build?.deployment;
@@ -32,42 +30,14 @@ export default function Deploy() {
     document.title = "Deploy · Auto Builder";
   }, []);
 
-  const generate = async () => {
-    if (!build) return;
-    setGenerating(true);
-    setError("");
-    try {
-      const res = await base44.functions.invoke("deploySystemBuild", {
-        codeManifest,
-        architecture,
-        productType: build.product_type,
-        businessName: build.business_name,
-      });
-      const spec = res?.data?.data || res?.data;
-      if (!spec) throw new Error("No deployment config returned");
-      await autoBuild.saveBuild({
-        deployment: spec,
-        current_step: "deploy",
-        logs: [...(build.logs || []), `[${new Date().toISOString()}] Deployment configured — preview URL: ${spec.live_url}`],
-      });
-    } catch (e) {
-      setError(e?.message || "Couldn't generate deployment config. Try again.");
-    } finally {
-      setGenerating(false);
-    }
-  };
+  const generate = () => runGenerate({
+    codeManifest,
+    architecture,
+    productType: build.product_type,
+    businessName: build.business_name,
+  });
 
-  const approve = async () => {
-    if (!build) return;
-    setApproved(true);
-    const visited = build.visited_steps || [];
-    if (!visited.includes("/deploy")) visited.push("/deploy");
-    await autoBuild.saveBuild({
-      visited_steps: visited,
-      logs: [...(build.logs || []), `[${new Date().toISOString()}] Deployment config approved`],
-    });
-    navigate("/system-review");
-  };
+  const approve = () => runApprove("/deploy", "/system-review", navigate);
 
   if (autoBuild.loading) {
     return (
@@ -129,12 +99,30 @@ export default function Deploy() {
         <div className="flex flex-col items-center justify-center gap-3 rounded-xl border border-white/10 bg-zinc-950 py-16">
           <Loader2 className="h-8 w-8 animate-spin text-lime-400" />
           <p className="text-sm text-white/60">Configuring deployment…</p>
-          <p className="text-xs text-white/30">Setting up build config, environment variables, and routes.</p>
+          <p className="text-xs text-white/30">Setting up build config, environment variables, and routes.{attempt > 1 ? ` (retry ${attempt}/3)` : ""}</p>
         </div>
       )}
 
       {error && !generating && (
         <div className="rounded-xl border border-red-400/30 bg-red-400/5 p-4 text-sm text-red-300">{error}</div>
+      )}
+
+      {validationErrors.length > 0 && !generating && (
+        <div className="rounded-xl border border-amber-400/30 bg-amber-400/5 p-4">
+          <p className="mb-1 text-sm font-semibold text-amber-300">Spec Validation Issues:</p>
+          <ul className="space-y-0.5 text-xs text-amber-200/80">
+            {validationErrors.map((err, i) => <li key={i}>• {err}</li>)}
+          </ul>
+        </div>
+      )}
+
+      {warnings.length > 0 && !generating && (
+        <div className="rounded-xl border border-blue-400/20 bg-blue-400/5 p-3">
+          <p className="mb-1 text-xs font-semibold text-blue-300">Warnings:</p>
+          <ul className="space-y-0.5 text-[11px] text-blue-200/70">
+            {warnings.map((w, i) => <li key={i}>• {w}</li>)}
+          </ul>
+        </div>
       )}
 
       {/* Generate button */}

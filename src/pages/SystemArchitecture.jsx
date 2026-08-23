@@ -1,9 +1,9 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { base44 } from "@/api/base44Client";
 import { useAutoBuild } from "@/lib/AutoBuildContext";
 import { getProductType } from "@/lib/buildProductTypes";
 import BackButton from "@/components/client/BackButton";
+import { useSystemBuildStep } from "@/hooks/useSystemBuildStep";
 import {
   Loader2, Cpu, RefreshCw, CheckCircle, ArrowRight, Layers,
   Database, Layout, Plug, Route, Zap, FileText, Clock,
@@ -17,9 +17,7 @@ import {
 export default function SystemArchitecture() {
   const autoBuild = useAutoBuild();
   const navigate = useNavigate();
-  const [generating, setGenerating] = useState(false);
-  const [error, setError] = useState("");
-  const [approved, setApproved] = useState(false);
+  const { generating, error, approved, validationErrors, warnings, attempt, generate: runGenerate, approve: runApprove } = useSystemBuildStep("generateSystemArchitecture", "architecture", "architecture");
 
   const build = autoBuild.build;
   const architecture = build?.architecture;
@@ -30,44 +28,14 @@ export default function SystemArchitecture() {
     document.title = "System Architecture · Auto Builder";
   }, []);
 
-  const generate = async () => {
-    if (!build) return;
-    setGenerating(true);
-    setError("");
-    try {
-      const res = await base44.functions.invoke("generateSystemArchitecture", {
-        productType: build.product_type,
-        businessName: build.business_name,
-        industry: build.industry,
-        profile: build.profile,
-      });
-      const spec = res?.data?.data || res?.data;
-      if (!spec) throw new Error("No architecture returned");
-      await autoBuild.saveBuild({
-        architecture: spec,
-        current_step: "architecture",
-        logs: [...(build.logs || []), `[${new Date().toISOString()}] Architecture generated`],
-      });
-    } catch (e) {
-      setError(e?.message || "Couldn't generate architecture. Try again.");
-    } finally {
-      setGenerating(false);
-    }
-  };
+  const generate = () => runGenerate({
+    productType: build.product_type,
+    businessName: build.business_name,
+    industry: build.industry,
+    profile: build.profile,
+  });
 
-  const approve = async () => {
-    if (!build) return;
-    setApproved(true);
-    const visited = build.visited_steps || [];
-    if (!visited.includes("/system-architecture")) {
-      visited.push("/system-architecture");
-    }
-    await autoBuild.saveBuild({
-      visited_steps: visited,
-      logs: [...(build.logs || []), `[${new Date().toISOString()}] Architecture approved`],
-    });
-    navigate("/data-model");
-  };
+  const approve = () => runApprove("/system-architecture", "/data-model", navigate);
 
   if (autoBuild.loading) {
     return (
@@ -118,13 +86,31 @@ export default function SystemArchitecture() {
         <div className="flex flex-col items-center justify-center gap-3 rounded-xl border border-white/10 bg-zinc-950 py-16">
           <Loader2 className="h-8 w-8 animate-spin text-lime-400" />
           <p className="text-sm text-white/60">Designing your {productType.label.toLowerCase()} architecture…</p>
-          <p className="text-xs text-white/30">This takes 15-30 seconds. The AI is planning pages, data models, features, and integrations.</p>
+          <p className="text-xs text-white/30">This takes 15-30 seconds. The AI is planning pages, data models, features, and integrations.{attempt > 1 ? ` (retry ${attempt}/3)` : ""}</p>
         </div>
       )}
 
       {error && !generating && (
         <div className="rounded-xl border border-red-400/30 bg-red-400/5 p-4 text-sm text-red-300">
           {error}
+        </div>
+      )}
+
+      {validationErrors.length > 0 && !generating && (
+        <div className="rounded-xl border border-amber-400/30 bg-amber-400/5 p-4">
+          <p className="mb-1 text-sm font-semibold text-amber-300">Spec Validation Issues:</p>
+          <ul className="space-y-0.5 text-xs text-amber-200/80">
+            {validationErrors.map((err, i) => <li key={i}>• {err}</li>)}
+          </ul>
+        </div>
+      )}
+
+      {warnings.length > 0 && !generating && (
+        <div className="rounded-xl border border-blue-400/20 bg-blue-400/5 p-3">
+          <p className="mb-1 text-xs font-semibold text-blue-300">Warnings:</p>
+          <ul className="space-y-0.5 text-[11px] text-blue-200/70">
+            {warnings.map((w, i) => <li key={i}>• {w}</li>)}
+          </ul>
         </div>
       )}
 

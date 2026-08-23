@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { base44 } from "@/api/base44Client";
 import { useAutoBuild } from "@/lib/AutoBuildContext";
 import { getProductType } from "@/lib/buildProductTypes";
 import BackButton from "@/components/client/BackButton";
+import { useSystemBuildStep } from "@/hooks/useSystemBuildStep";
 import {
   Loader2, Database, RefreshCw, CheckCircle, ArrowRight, Zap,
   Key, Link2, GitBranch, ChevronDown, ChevronRight, Code2,
@@ -17,9 +17,7 @@ import {
 export default function DataModel() {
   const autoBuild = useAutoBuild();
   const navigate = useNavigate();
-  const [generating, setGenerating] = useState(false);
-  const [error, setError] = useState("");
-  const [approved, setApproved] = useState(false);
+  const { generating, error, approved, validationErrors, warnings, attempt, generate: runGenerate, approve: runApprove } = useSystemBuildStep("generateDataModel", "data_model", "data_model");
   const [expanded, setExpanded] = useState({});
 
   const build = autoBuild.build;
@@ -32,41 +30,13 @@ export default function DataModel() {
     document.title = "Data Model · Auto Builder";
   }, []);
 
-  const generate = async () => {
-    if (!build) return;
-    setGenerating(true);
-    setError("");
-    try {
-      const res = await base44.functions.invoke("generateDataModel", {
-        architecture,
-        productType: build.product_type,
-        businessName: build.business_name,
-      });
-      const spec = res?.data?.data || res?.data;
-      if (!spec) throw new Error("No data model returned");
-      await autoBuild.saveBuild({
-        data_model: spec,
-        current_step: "data_model",
-        logs: [...(build.logs || []), `[${new Date().toISOString()}] Data model generated`],
-      });
-    } catch (e) {
-      setError(e?.message || "Couldn't generate data model. Try again.");
-    } finally {
-      setGenerating(false);
-    }
-  };
+  const generate = () => runGenerate({
+    architecture,
+    productType: build.product_type,
+    businessName: build.business_name,
+  });
 
-  const approve = async () => {
-    if (!build) return;
-    setApproved(true);
-    const visited = build.visited_steps || [];
-    if (!visited.includes("/data-model")) visited.push("/data-model");
-    await autoBuild.saveBuild({
-      visited_steps: visited,
-      logs: [...(build.logs || []), `[${new Date().toISOString()}] Data model approved`],
-    });
-    navigate("/ui-system");
-  };
+  const approve = () => runApprove("/data-model", "/ui-system", navigate);
 
   const toggle = (name) => setExpanded((p) => ({ ...p, [name]: !p[name] }));
 
@@ -130,13 +100,31 @@ export default function DataModel() {
         <div className="flex flex-col items-center justify-center gap-3 rounded-xl border border-white/10 bg-zinc-950 py-16">
           <Loader2 className="h-8 w-8 animate-spin text-lime-400" />
           <p className="text-sm text-white/60">Refining entity schemas, validation rules, and API endpoints…</p>
-          <p className="text-xs text-white/30">This takes 15-30 seconds. The AI is designing detailed data models from your architecture.</p>
+          <p className="text-xs text-white/30">This takes 15-30 seconds. The AI is designing detailed data models from your architecture.{attempt > 1 ? ` (retry ${attempt}/3)` : ""}</p>
         </div>
       )}
 
       {error && !generating && (
         <div className="rounded-xl border border-red-400/30 bg-red-400/5 p-4 text-sm text-red-300">
           {error}
+        </div>
+      )}
+
+      {validationErrors.length > 0 && !generating && (
+        <div className="rounded-xl border border-amber-400/30 bg-amber-400/5 p-4">
+          <p className="mb-1 text-sm font-semibold text-amber-300">Spec Validation Issues:</p>
+          <ul className="space-y-0.5 text-xs text-amber-200/80">
+            {validationErrors.map((err, i) => <li key={i}>• {err}</li>)}
+          </ul>
+        </div>
+      )}
+
+      {warnings.length > 0 && !generating && (
+        <div className="rounded-xl border border-blue-400/20 bg-blue-400/5 p-3">
+          <p className="mb-1 text-xs font-semibold text-blue-300">Warnings:</p>
+          <ul className="space-y-0.5 text-[11px] text-blue-200/70">
+            {warnings.map((w, i) => <li key={i}>• {w}</li>)}
+          </ul>
         </div>
       )}
 

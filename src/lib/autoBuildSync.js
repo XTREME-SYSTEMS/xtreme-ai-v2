@@ -5,9 +5,22 @@
 // (snake_case) into that shape on read, and convert update payloads back to
 // AutoBuild snake_case on write.
 
-const STEP_ORDER = [
+// Marketing pipeline steps
+const MARKETING_STEPS = [
   "profile", "names", "content", "logo", "brand", "website", "social", "video", "review", "complete",
 ];
+
+// System-build pipeline steps (web_app / ecommerce / platform)
+const SYSTEM_STEPS = [
+  "profile", "architecture", "data_model", "ui_system", "codegen", "deploy", "system_review", "complete",
+];
+
+// Combined — used to compute current_step from visited_steps. We check both
+// pipelines since the build's product_type determines which applies.
+const STEP_ORDER = [...new Set([...MARKETING_STEPS, ...SYSTEM_STEPS])];
+
+// System-build product types — their pipeline uses SYSTEM_STEPS, not MARKETING_STEPS
+const SYSTEM_PRODUCT_TYPES = ["web_app", "ecommerce", "platform"];
 
 // ── READ: AutoBuild → User-like ──────────────────────────────────────────
 export function buildToUser(build) {
@@ -62,6 +75,12 @@ export function buildToUser(build) {
     // Video
     videoPack: build.video_pack,
     videoChosen: visited.includes("video"),
+    // System-build fields (web_app / ecommerce / platform)
+    architecture: build.architecture,
+    dataModel: build.data_model,
+    uiSystem: build.ui_system,
+    codeManifest: build.code_manifest,
+    deployment: build.deployment,
   };
 }
 
@@ -138,15 +157,19 @@ export function userToBuildFields(data, currentBuild) {
       if (!visited.has(stepKey)) { visited.add(stepKey); changed = true; }
     }
   }
-  // Also mark "names" as visited when profile is submitted (names step is
-  // handled by the BusinessNameStudio page, which creates ClientDomain
-  // records — for AutoBuild we just mark it visited)
-  if (data.epoxyProfileSubmitted && !visited.has("names")) { visited.add("names"); changed = true; }
+  // Also mark "names" as visited when profile is submitted — but ONLY for
+  // marketing builds (system builds don't have a "names" step)
+  if (data.epoxyProfileSubmitted && !visited.has("names") && !SYSTEM_PRODUCT_TYPES.includes(currentBuild?.product_type)) {
+    visited.add("names"); changed = true;
+  }
   if (changed) mapped.visited_steps = Array.from(visited);
 
-  // Update current_step to the next unvisited step
+  // Update current_step to the next unvisited step — use the correct pipeline
+  // (SYSTEM_STEPS for system builds, MARKETING_STEPS for marketing builds)
   if (changed || "current_step" in data) {
-    const nextStep = STEP_ORDER.find((s) => !visited.has(s) && s !== "complete") || "complete";
+    const productType = currentBuild?.product_type;
+    const pipeline = SYSTEM_PRODUCT_TYPES.includes(productType) ? SYSTEM_STEPS : MARKETING_STEPS;
+    const nextStep = pipeline.find((s) => !visited.has(s) && s !== "complete") || "complete";
     mapped.current_step = nextStep;
   }
 

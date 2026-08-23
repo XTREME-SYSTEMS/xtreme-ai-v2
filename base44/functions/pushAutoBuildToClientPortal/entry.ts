@@ -7,7 +7,7 @@
 // generated (non-empty) are pushed — so partial builds only push what's
 // ready.
 
-import { createClientFromRequest } from "npm:@base44/sdk@0.8.31";
+import { createClientFromRequest } from "npm:@base44/sdk@0.8.40";
 
 Deno.serve(async (req: Request) => {
   try {
@@ -104,6 +104,13 @@ Deno.serve(async (req: Request) => {
       updateData.video_pack = build.video_pack;
       updateData.video_chosen = true;
     }
+
+    // System-build fields (web_app / ecommerce / platform)
+    if (build.architecture) updateData.architecture = build.architecture;
+    if (build.data_model) updateData.data_model = build.data_model;
+    if (build.ui_system) updateData.ui_system = build.ui_system;
+    if (build.code_manifest) updateData.code_manifest = build.code_manifest;
+    if (build.deployment) updateData.deployment = build.deployment;
 
     // Merge visited steps
     const mergedVisited = [...new Set([
