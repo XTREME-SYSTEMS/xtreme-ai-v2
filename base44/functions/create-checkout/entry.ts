@@ -83,12 +83,30 @@ Deno.serve(async (req: Request) => {
       return new Response(JSON.stringify({ error: "Invalid quantity" }), { status: 400 });
     }
     // Server-side product catalog — authoritative prices, never trust client-sent price.
+    // Growth packages are ONE-TIME; monthly services are subscriptions.
     const PRODUCTS: Record<string, { name: string; price: string; subscription?: { frequency: string } }> = {
-      // ── Subscriptions ──
-      "pro-monthly":   { name: "Pro Plan (Monthly)",   price: "499.00",   subscription: { frequency: "MONTH" } },
-      "pro-annual":    { name: "Pro Plan (Annual)",    price: "4990.00",  subscription: { frequency: "YEAR" } },
-      "elite-monthly": { name: "Elite Plan (Monthly)", price: "1499.00",  subscription: { frequency: "MONTH" } },
-      "elite-annual":  { name: "Elite Plan (Annual)",  price: "14990.00", subscription: { frequency: "YEAR" } },
+      // ── Growth Packages (ONE-TIME) ──
+      "elite-monthly": { name: "Elite Growth Package",  price: "2999.00" },
+      "pro-monthly":   { name: "Pro Growth Package",    price: "999.00" },
+      // ── Monthly Services (subscriptions) ──
+      "monthly-seo-rank":           { name: "SEO Rank & Report",            price: "149.00", subscription: { frequency: "MONTH" } },
+      "monthly-citations":          { name: "Citation Building",            price: "99.00",  subscription: { frequency: "MONTH" } },
+      "monthly-backlinks":          { name: "Backlink Outreach",            price: "149.00", subscription: { frequency: "MONTH" } },
+      "monthly-content":            { name: "Content Generation",          price: "99.00",  subscription: { frequency: "MONTH" } },
+      "monthly-social":             { name: "Social Media Management",     price: "149.00", subscription: { frequency: "MONTH" } },
+      "monthly-gsc":                { name: "GSC Monitoring & Indexing",   price: "99.00",  subscription: { frequency: "MONTH" } },
+      "monthly-reviews":            { name: "Review Management",           price: "79.00",  subscription: { frequency: "MONTH" } },
+      "monthly-chatbot":           { name: "AI Chatbot Management",       price: "99.00",  subscription: { frequency: "MONTH" } },
+      "monthly-tech-seo":          { name: "Technical SEO Audits",         price: "129.00", subscription: { frequency: "MONTH" } },
+      "monthly-competitor-intel":  { name: "Competitor Intelligence",     price: "129.00", subscription: { frequency: "MONTH" } },
+      "monthly-aeo":               { name: "AEO / AI Search Optimization", price: "149.00", subscription: { frequency: "MONTH" } },
+      "monthly-call-tracking":     { name: "Call Tracking & Analytics",   price: "79.00",  subscription: { frequency: "MONTH" } },
+      "monthly-gbp":               { name: "Google Business Profile Mgmt", price: "99.00",  subscription: { frequency: "MONTH" } },
+      "monthly-site-maintenance":  { name: "Website Maintenance",         price: "99.00",  subscription: { frequency: "MONTH" } },
+      "monthly-lead-gen":          { name: "Lead Generation Pipeline",    price: "199.00", subscription: { frequency: "MONTH" } },
+      "monthly-backlink-followup": { name: "Backlink Follow-up Sequence", price: "79.00",  subscription: { frequency: "MONTH" } },
+      "monthly-rank-alerts":       { name: "Rank Alert Monitoring",       price: "69.00",  subscription: { frequency: "MONTH" } },
+      "monthly-content-distribution": { name: "Content Distribution",     price: "99.00",  subscription: { frequency: "MONTH" } },
       // ── Web Packs (one-time, downloadable) ──
       "web-pack-starter":   { name: "Starter Web Pack",      price: "299.00" },
       "web-pack-pro":       { name: "Pro Web Pack",          price: "599.00" },

@@ -4,11 +4,31 @@ import {
 } from "lucide-react";
 
 // Maps a purchased productId (from create-checkout catalog) to an onboarding track.
+// Growth packages are one-time; monthly services grant the matching track.
 export const PRODUCT_TO_TRACK = {
-  "pro-monthly": "pro",
-  "pro-annual": "pro",
+  // Growth Packages (one-time)
   "elite-monthly": "elite",
-  "elite-annual": "elite",
+  "pro-monthly": "pro",
+  // Monthly Services — grant the pro track (tool access)
+  "monthly-seo-rank": "pro",
+  "monthly-citations": "pro",
+  "monthly-backlinks": "pro",
+  "monthly-content": "pro",
+  "monthly-social": "pro",
+  "monthly-gsc": "pro",
+  "monthly-reviews": "pro",
+  "monthly-chatbot": "pro",
+  "monthly-tech-seo": "pro",
+  "monthly-competitor-intel": "pro",
+  "monthly-aeo": "pro",
+  "monthly-call-tracking": "pro",
+  "monthly-gbp": "pro",
+  "monthly-site-maintenance": "pro",
+  "monthly-lead-gen": "elite",
+  "monthly-backlink-followup": "pro",
+  "monthly-rank-alerts": "pro",
+  "monthly-content-distribution": "pro",
+  // Other packages
   deposit: "deposit",
   "web-pack": "web-pack",
   "app-pack": "app-pack",
@@ -17,7 +37,7 @@ export const PRODUCT_TO_TRACK = {
 };
 
 // Highest-priority track wins when a user owns multiple products.
-// Demo is lowest priority — any paid plan overrides it.
+// Elite > Pro > other packages. Demo is lowest priority.
 export const PRIORITY = ["elite", "pro", "deposit", "web-pack", "app-pack", "ai-tool", "demo"];
 
 export const TRACKS = {
