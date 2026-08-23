@@ -8,6 +8,7 @@ import AnnouncementBar from "@/components/marketing/AnnouncementBar";
 const LINKS = [
   { to: "/#features", label: "Features" },
   { to: "/#pricing", label: "Pricing" },
+  { to: "/free-tools", label: "Free Tools" },
   { to: "/#solutions", label: "Solutions" },
   { to: "/#about", label: "About" },
 ];

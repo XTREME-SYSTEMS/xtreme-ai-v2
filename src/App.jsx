@@ -105,6 +105,7 @@ import AdminPackages from '@/pages/AdminPackages';
 import AdminPromoCodes from '@/pages/AdminPromoCodes';
 import AdminDomainPurchase from '@/pages/AdminDomainPurchase';
 import ClientSetup from '@/pages/ClientSetup';
+import FreeTools from '@/pages/FreeTools';
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin, isAuthenticated } = useAuth();
@@ -138,6 +139,7 @@ const AuthenticatedApp = () => {
       <Route path="/seo/:slug" element={<SeoLanding />} />
       <Route path="/coupon" element={<CouponPage />} />
       <Route path="/free-audit" element={<FreeAuditPage />} />
+      <Route path="/free-tools" element={<FreeTools />} />
       <Route path="/sign/:token" element={<SignPortal />} />
       <Route path="/walkthrough/:token" element={<WalkthroughView />} />
       <Route path="/login" element={<Login />} />
