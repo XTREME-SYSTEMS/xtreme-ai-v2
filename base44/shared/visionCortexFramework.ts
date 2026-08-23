@@ -93,6 +93,13 @@ export const VISION_SOURCES: VisionSource[] = [
     category: 'idea_site',
     scrape_prompt: 'Find indie startup ideas, problems indie founders are solving, and gaps in the market they discuss.',
   },
+  {
+    id: 'autonomous_systems_hn',
+    label: 'HN: AI & Autonomous SaaS',
+    url: 'https://hn.algolia.com/?q=AI+automated+saas+recurring+revenue',
+    category: 'elite',
+    scrape_prompt: 'Find ideas for FULLY AUTONOMOUS digital systems — software that runs itself with AI, requires minimal human operation, targets high-paying customers ($500+/mo), and can reach profitability within weeks. Focus on: AI-powered SaaS, automated platforms, AI agents, self-service tools with recurring revenue, no-code/low-code automation, digital products with near-zero marginal cost.',
+  },
 ];
 
 // ============================================================
@@ -121,12 +128,18 @@ export const YC_SCORING_SCHEMA = {
     scalability: { type: 'number', description: '(0-100): How easily does this scale without proportional cost increase?' },
     technical_feasibility: { type: 'number', description: '(0-100): How feasible is it to build with current technology (React, Tailwind, AI APIs, cloud infrastructure)?' },
     autonomous_build_potential: { type: 'number', description: '(0-100): Can the Auto Builder system build and launch this autonomously — generate architecture, data model, UI, code, and deploy without human intervention?' },
+    automation_level: { type: 'number', description: '(0-100): How fully can this system be built AND operated autonomously via AI and digital capabilities AFTER launch? 100 = zero human operation needed, the system runs itself. 50 = some manual monitoring/intervention. 0 = requires constant human labor.' },
+    speed_to_profit: { type: 'number', description: '(0-100): How fast can this reach profitability from launch? 100 = profitable within weeks (near-zero CAC, self-serve). 50 = within 3-6 months. 0 = years or never (high CAC, long sales cycles).' },
+    end_user_value: { type: 'number', description: '(0-100): How much will the end user pay? 100 = high-ticket ($500+/mo or $5k+ one-time, enterprise/B2B). 50 = mid-tier ($50-500/mo, prosumer). 0 = free/freemium only, low willingness to pay.' },
+    manual_work_required: { type: 'number', description: '(0-100): How much manual human work is needed to launch AND maintain this system? 100 = heavy manual labor (physical ops, manual fulfillment, human-in-loop). 0 = fully automated, no human touch after deployment.' },
+    autonomous_overall: { type: 'number', description: 'Weighted composite for the autonomous systems category (0-100): automation_level 35%, speed_to_profit 25%, end_user_value 25%, (100 - manual_work_required) 15%. Higher = better fit as a fully autonomous, fast-to-profit, high-value system.' },
+    system_category: { type: 'string', description: '"fully_autonomous" if automation_level >= 70 AND speed_to_profit >= 60 AND end_user_value >= 60 AND manual_work_required <= 30. Otherwise "general".' },
     overall: { type: 'number', description: 'Weighted composite (0-100). Weights: problem_acuity 20%, market_size 15%, autonomous_build_potential 15%, scalability 10%, competition_insight 10%, recently_possible 10%, technical_feasibility 10%, founder_market_fit 5%, personal_demand 3%, proxy_validation 2%' },
     score_breakdown: { type: 'string', description: '3-5 sentence explanation of why each dimension was scored this way, referencing the YC framework' },
     is_tarpit: { type: 'boolean', description: 'Is this a tarpit idea — looks attractive but has hidden structural reasons it has never succeeded?' },
     tarpit_warning: { type: 'string', description: 'If is_tarpit is true, explain the structural barrier. If false, empty string.' },
   },
-  required: ['founder_market_fit', 'market_size', 'problem_acuity', 'competition_insight', 'personal_demand', 'recently_possible', 'proxy_validation', 'scalability', 'technical_feasibility', 'autonomous_build_potential', 'overall', 'score_breakdown', 'is_tarpit'],
+  required: ['founder_market_fit', 'market_size', 'problem_acuity', 'competition_insight', 'personal_demand', 'recently_possible', 'proxy_validation', 'scalability', 'technical_feasibility', 'autonomous_build_potential', 'automation_level', 'speed_to_profit', 'end_user_value', 'manual_work_required', 'autonomous_overall', 'system_category', 'overall', 'score_breakdown', 'is_tarpit'],
 };
 
 // ============================================================
@@ -245,6 +258,14 @@ Scalability: How easily does this scale without proportional cost increase?
 Technical Feasibility: How feasible to build with current tech (React, Tailwind, AI APIs, cloud)?
 Autonomous Build Potential: Can the Auto Builder system build and launch this autonomously — generate architecture, data model, UI, code, deploy, verify — without human intervention?
 
+FULLY AUTONOMOUS SYSTEMS CATEGORY — Score these additional dimensions (0-100):
+- Automation Level: How fully can this system be built AND operated autonomously via AI and digital capabilities AFTER launch? 100 = zero human operation needed, the system runs itself. 0 = requires constant human labor.
+- Speed to Profit: How fast can this reach profitability from launch? 100 = profitable within weeks (near-zero CAC, self-serve). 50 = within 3-6 months. 0 = years or never.
+- End User Value: How much will the end user pay? 100 = high-ticket ($500+/mo or $5k+ one-time, enterprise/B2B). 50 = mid-tier ($50-500/mo). 0 = free/freemium only.
+- Manual Work Required: How much manual human work is needed to launch AND maintain? 100 = heavy manual labor. 0 = fully automated, no human touch.
+- Autonomous Overall = automation_level 35%, speed_to_profit 25%, end_user_value 25%, (100 - manual_work_required) 15%
+- System Category: Set to "fully_autonomous" if automation_level >= 70 AND speed_to_profit >= 60 AND end_user_value >= 60 AND manual_work_required <= 30. Otherwise "general".
+
 ALSO: Determine if this is a TAR PIT IDEA — a concept that looks attractive but has hidden structural reasons it has never succeeded (e.g. friend meetup planners). If it is a tarpit, set is_tarpit=true and explain the structural barrier in tarpit_warning.
 
 Overall = weighted composite: problem_acuity 20%, market_size 15%, autonomous_build_potential 15%, scalability 10%, competition_insight 10%, recently_possible 10%, technical_feasibility 10%, founder_market_fit 5%, personal_demand 3%, proxy_validation 2%
@@ -272,8 +293,14 @@ Search the web for market data, competitor info, and trend validation.`;
       scalability: clampScore(data.scalability),
       technical_feasibility: clampScore(data.technical_feasibility),
       autonomous_build_potential: clampScore(data.autonomous_build_potential),
+      automation_level: clampScore(data.automation_level),
+      speed_to_profit: clampScore(data.speed_to_profit),
+      end_user_value: clampScore(data.end_user_value),
+      manual_work_required: clampScore(data.manual_work_required),
+      autonomous_overall: clampScore(data.autonomous_overall),
       overall: clampScore(data.overall),
     },
+    system_category: data.system_category === 'fully_autonomous' ? 'fully_autonomous' : 'general',
     score_breakdown: data.score_breakdown || '',
     is_tarpit: Boolean(data.is_tarpit),
     tarpit_warning: data.tarpit_warning || '',

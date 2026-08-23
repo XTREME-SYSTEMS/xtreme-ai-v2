@@ -1,4 +1,4 @@
-import { CheckCircle, ChevronRight, AlertTriangle, DollarSign, Target } from "lucide-react";
+import { CheckCircle, ChevronRight, AlertTriangle, DollarSign, Target, Bot } from "lucide-react";
 
 // VisionCortexIdeaRow — compact clickable row for an idea in the Vision Cortex list.
 // Shows the problem it solves, estimated profit margin, and success probability
@@ -37,6 +37,11 @@ export default function VisionCortexIdeaRow({ idea, onClick }) {
       <div className="min-w-0 flex-1">
         <div className="flex items-center gap-2">
           <h3 className="truncate text-sm font-semibold text-white group-hover:text-lime-300">{idea.title}</h3>
+          {idea.system_category === "fully_autonomous" && (
+            <span className="flex items-center gap-1 rounded-full bg-cyan-400/10 px-1.5 py-0.5 text-[9px] font-medium text-cyan-300 shrink-0">
+              <Bot className="h-2.5 w-2.5" /> Autonomous
+            </span>
+          )}
           {isProvisioned && (
             <span className="flex items-center gap-1 rounded-full bg-lime-400/10 px-1.5 py-0.5 text-[9px] font-medium text-lime-400 shrink-0">
               <CheckCircle className="h-2.5 w-2.5" /> Provisioned
@@ -71,6 +76,14 @@ export default function VisionCortexIdeaRow({ idea, onClick }) {
             <Target className="h-3 w-3 shrink-0 text-lime-400/70" />
             <span className={scoreColor}>{overallScore}% success</span>
           </span>
+
+          {/* Autonomous score — only show for fully autonomous ideas */}
+          {idea.system_category === "fully_autonomous" && idea.autonomous_scores && (
+            <span className="flex items-center gap-1 shrink-0">
+              <Bot className="h-3 w-3 shrink-0 text-cyan-400/70" />
+              <span className="text-cyan-300">{idea.autonomous_scores.autonomous_overall || 0}% auto</span>
+            </span>
+          )}
         </div>
 
         {/* Source tags */}

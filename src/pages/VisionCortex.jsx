@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback } from "react";
 import { base44 } from "@/api/base44Client";
 import VisionCortexIdeaRow from "@/components/visioncortex/VisionCortexIdeaRow";
 import VisionCortexIdeaModal from "@/components/visioncortex/VisionCortexIdeaModal";
-import { Brain, RefreshCw, Rocket, Filter, Activity, Database, CheckCircle, Clock } from "lucide-react";
+import { Brain, RefreshCw, Rocket, Filter, Activity, Database, CheckCircle, Clock, Bot } from "lucide-react";
 
 // VisionCortex — the full Vision Cortex dashboard page.
 // Shows all top 10 ideas with exhaustive summaries, plus controls to
@@ -16,7 +16,7 @@ export default function VisionCortex() {
   const [error, setError] = useState(null);
   const [filter, setFilter] = useState("top_10");
   const [lastRun, setLastRun] = useState(null);
-  const [stats, setStats] = useState({ discovered: 0, validated: 0, top10: 0, provisioned: 0 });
+  const [stats, setStats] = useState({ discovered: 0, validated: 0, top10: 0, autonomous: 0, provisioned: 0 });
   const [selectedIdea, setSelectedIdea] = useState(null);
 
   const load = useCallback(async () => {
@@ -37,6 +37,7 @@ export default function VisionCortex() {
         discovered: allList.filter((i) => i.status === "discovered").length,
         validated: allList.filter((i) => i.status === "validated").length,
         top10: allList.filter((i) => i.is_top_10).length,
+        autonomous: allList.filter((i) => i.system_category === "fully_autonomous").length,
         provisioned: allList.filter((i) => i.status === "provisioned").length,
       });
     } catch (e) {
@@ -112,6 +113,8 @@ export default function VisionCortex() {
     ? topIdeas
     : filter === "provisioned"
     ? allIdeas.filter((i) => i.status === "provisioned")
+    : filter === "autonomous"
+    ? allIdeas.filter((i) => i.system_category === "fully_autonomous")
     : filter === "all"
     ? allIdeas
     : topIdeas;
@@ -165,12 +168,12 @@ export default function VisionCortex() {
       <div>
         <div className="mb-2 flex items-center justify-between">
           <h2 className="text-sm font-semibold text-white">
-            {filter === "top_10" ? "Top 10 Ideas" : filter === "provisioned" ? "Provisioned Ideas" : "All Ideas"}
+            {filter === "top_10" ? "Top 10 Ideas" : filter === "autonomous" ? "Fully Autonomous Systems" : filter === "provisioned" ? "Provisioned Ideas" : "All Ideas"}
             <span className="ml-2 text-xs font-normal text-white/40">({filteredIdeas.length})</span>
           </h2>
           <div className="flex items-center gap-2">
             <Filter className="h-3.5 w-3.5 text-white/40" />
-            {["top_10", "provisioned", "all"].map((f) => (
+            {["top_10", "autonomous", "provisioned", "all"].map((f) => (
               <button
                 key={f}
                 onClick={() => setFilter(f)}
@@ -178,7 +181,7 @@ export default function VisionCortex() {
                   filter === f ? "bg-lime-400/15 text-lime-300 border border-lime-400/30" : "border border-white/10 text-white/50 hover:text-white"
                 }`}
               >
-                {f === "top_10" ? "Top 10" : f}
+                {f === "top_10" ? "Top 10" : f === "autonomous" ? "Autonomous Systems" : f}
               </button>
             ))}
           </div>
@@ -227,11 +230,12 @@ export default function VisionCortex() {
       )}
 
       {/* Stats */}
-      <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-5">
         {[
           { label: "Discovered", value: stats.discovered, icon: Database, color: "text-blue-400" },
           { label: "Validated", value: stats.validated, icon: Activity, color: "text-yellow-400" },
           { label: "Top 10", value: stats.top10, icon: Brain, color: "text-lime-400" },
+          { label: "Autonomous", value: stats.autonomous, icon: Bot, color: "text-cyan-400" },
           { label: "Provisioned", value: stats.provisioned, icon: CheckCircle, color: "text-emerald-400" },
         ].map((s) => (
           <div key={s.label} className="rounded-xl border border-white/10 bg-zinc-950 p-4 text-center">

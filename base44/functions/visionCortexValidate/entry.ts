@@ -95,8 +95,16 @@ export default async function(req: Request): Promise<Response> {
         const updated = await base44.asServiceRole.entities.VisionCortexIdea.update(idea.id, {
           status: 'validated',
           yc_scores: scoring.yc_scores,
+          system_category: scoring.system_category || 'general',
+          autonomous_scores: {
+            automation_level: scoring.yc_scores.automation_level || 0,
+            speed_to_profit: scoring.yc_scores.speed_to_profit || 0,
+            end_user_value: scoring.yc_scores.end_user_value || 0,
+            manual_work_required: scoring.yc_scores.manual_work_required || 0,
+            autonomous_overall: scoring.yc_scores.autonomous_overall || 0,
+          },
           score_breakdown: scoring.score_breakdown,
-          logs: [...(idea.logs || []), `[${new Date().toISOString()}] Validated — YC overall score: ${scoring.yc_scores.overall}`],
+          logs: [...(idea.logs || []), `[${new Date().toISOString()}] Validated — YC overall: ${scoring.yc_scores.overall}, autonomous: ${scoring.yc_scores.autonomous_overall}, category: ${scoring.system_category || 'general'}`],
         });
 
         scoredIdeas.push({ ...updated, _yc_scores: scoring.yc_scores });

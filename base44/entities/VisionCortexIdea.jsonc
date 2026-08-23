@@ -58,6 +58,41 @@
       "default": "web_app",
       "description": "What type of product this idea maps to in the AutoBuilder"
     },
+    "system_category": {
+      "type": "string",
+      "enum": [
+        "general",
+        "fully_autonomous"
+      ],
+      "default": "general",
+      "description": "Classification: fully_autonomous = a digital system that can be built AND operated via AI/digital capabilities with minimal manual work, fastest to profit, and high-paying end user. Classified during YC scoring: automation_level>=70 AND speed_to_profit>=60 AND end_user_value>=60 AND manual_work_required<=30."
+    },
+    "autonomous_scores": {
+      "type": "object",
+      "description": "Scores for the fully-autonomous-systems category \u2014 how well this idea fits as a fully automated, fast-to-profit, high-value system with a high-paying end user",
+      "properties": {
+        "automation_level": {
+          "type": "number",
+          "description": "0-100: How fully can this system be built AND operated autonomously via AI and digital capabilities after launch? 100 = zero human operation needed, the system runs itself. 0 = requires constant human labor."
+        },
+        "speed_to_profit": {
+          "type": "number",
+          "description": "0-100: How fast can this reach profitability from launch? 100 = profitable within weeks (near-zero CAC, self-serve). 50 = within 3-6 months. 0 = years or never."
+        },
+        "end_user_value": {
+          "type": "number",
+          "description": "0-100: How much will the end user pay? 100 = high-ticket ($500+/mo or $5k+ one-time, enterprise/B2B). 50 = mid-tier ($50-500/mo). 0 = free/freemium only."
+        },
+        "manual_work_required": {
+          "type": "number",
+          "description": "0-100: How much manual human work is needed to launch AND maintain? 100 = heavy manual labor. 0 = fully automated, no human touch after deployment."
+        },
+        "autonomous_overall": {
+          "type": "number",
+          "description": "Weighted composite (0-100): automation_level 35%, speed_to_profit 25%, end_user_value 25%, (100 - manual_work_required) 15%. Higher = better fit as a fully autonomous, fast-to-profit, high-value system."
+        }
+      }
+    },
     "keywords": {
       "type": "array",
       "items": {
@@ -119,6 +154,26 @@
         "autonomous_build_potential": {
           "type": "number",
           "description": "Can this be built and launched autonomously by the Auto Builder? (0-100)"
+        },
+        "automation_level": {
+          "type": "number",
+          "description": "How fully can this be operated autonomously after launch? (0-100, 100 = zero human operation)"
+        },
+        "speed_to_profit": {
+          "type": "number",
+          "description": "How fast to profitability from launch? (0-100, 100 = weeks)"
+        },
+        "end_user_value": {
+          "type": "number",
+          "description": "How much will the end user pay? (0-100, 100 = high-ticket $500+/mo)"
+        },
+        "manual_work_required": {
+          "type": "number",
+          "description": "How much manual human work to launch and maintain? (0-100, 100 = heavy labor)"
+        },
+        "autonomous_overall": {
+          "type": "number",
+          "description": "Weighted composite for autonomous systems category (0-100)"
         },
         "overall": {
           "type": "number",
