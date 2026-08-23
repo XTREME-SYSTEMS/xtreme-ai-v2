@@ -9,6 +9,8 @@ import PreviewBanner from "@/components/client/PreviewBanner";
 import { usePreviewEmail } from "@/hooks/usePreviewEmail";
 import { useClientUser } from "@/hooks/useClientUser";
 import { useClientUpdate } from "@/hooks/useClientUpdate";
+import { getVisibleSteps } from "@/lib/clientSteps";
+import { useClientTrack } from "@/hooks/useClientTrack";
 import { notifyStepComplete } from "@/lib/pipelineNotify";
 import BrandedButton from "@/components/client/BrandedButton";
 import { useRevisionThreads } from "@/hooks/useRevisionThreads";
@@ -21,6 +23,8 @@ export default function MyPackage() {
   const [loading, setLoading] = useState(true);
   const [activePurchase, setActivePurchase] = useState(null);
   const { user } = useClientUser();
+  const { productId } = useClientTrack(user);
+  const visibleSteps = getVisibleSteps(productId, user);
   const { update } = useClientUpdate();
   const [revising, setRevising] = useState(false);
   const [reviseComment, setReviseComment] = useState("");
@@ -37,7 +41,9 @@ export default function MyPackage() {
     setActivePurchase(null);
     try { localStorage.setItem("coach:done:/my-package", "1"); } catch {}
     notifyStepComplete("welcome", { clientEmail: user?.email || "" });
-    navigate("/business-profile");
+    const idx = visibleSteps.findIndex((s) => s.to === "/my-package");
+    const next = idx >= 0 && idx < visibleSteps.length - 1 ? visibleSteps[idx + 1] : null;
+    navigate(next ? next.to : "/business-name-studio");
   };
 
   // Sends the client's revision note to the team: creates a pending Approval
