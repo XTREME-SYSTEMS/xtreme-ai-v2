@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { base44 } from "@/api/base44Client";
-import VisionCortexIdeaCard from "@/components/visioncortex/VisionCortexIdeaCard";
+import VisionCortexIdeaRow from "@/components/visioncortex/VisionCortexIdeaRow";
+import VisionCortexIdeaModal from "@/components/visioncortex/VisionCortexIdeaModal";
 import { Brain, RefreshCw, Rocket, Filter, Activity, Database, CheckCircle, Clock } from "lucide-react";
 
 // VisionCortex — the full Vision Cortex dashboard page.
@@ -16,6 +17,7 @@ export default function VisionCortex() {
   const [filter, setFilter] = useState("top_10");
   const [lastRun, setLastRun] = useState(null);
   const [stats, setStats] = useState({ discovered: 0, validated: 0, top10: 0, provisioned: 0 });
+  const [selectedIdea, setSelectedIdea] = useState(null);
 
   const load = useCallback(async () => {
     try {
@@ -144,22 +146,6 @@ export default function VisionCortex() {
         </button>
       </div>
 
-      {/* Stats */}
-      <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-        {[
-          { label: "Discovered", value: stats.discovered, icon: Database, color: "text-blue-400" },
-          { label: "Validated", value: stats.validated, icon: Activity, color: "text-yellow-400" },
-          { label: "Top 10", value: stats.top10, icon: Brain, color: "text-lime-400" },
-          { label: "Provisioned", value: stats.provisioned, icon: CheckCircle, color: "text-emerald-400" },
-        ].map((s) => (
-          <div key={s.label} className="rounded-xl border border-white/10 bg-zinc-950 p-4 text-center">
-            <s.icon className={`mx-auto h-5 w-5 ${s.color}`} />
-            <div className={`mt-1 text-2xl font-bold ${s.color}`}>{s.value}</div>
-            <div className="text-[10px] uppercase tracking-wider text-white/40">{s.label}</div>
-          </div>
-        ))}
-      </div>
-
       {/* Error banner */}
       {error && (
         <div className="rounded-xl border border-red-400/40 bg-red-400/5 p-3 text-sm text-red-300">
@@ -174,6 +160,53 @@ export default function VisionCortex() {
           <span>Scraping sources → Extracting 50 ideas → Scoring with YC framework → Selecting top 10 → Generating exhaustive summaries...</span>
         </div>
       )}
+
+      {/* Ideas list — at the top, immediately visible */}
+      <div>
+        <div className="mb-2 flex items-center justify-between">
+          <h2 className="text-sm font-semibold text-white">
+            {filter === "top_10" ? "Top 10 Ideas" : filter === "provisioned" ? "Provisioned Ideas" : "All Ideas"}
+            <span className="ml-2 text-xs font-normal text-white/40">({filteredIdeas.length})</span>
+          </h2>
+          <div className="flex items-center gap-2">
+            <Filter className="h-3.5 w-3.5 text-white/40" />
+            {["top_10", "provisioned", "all"].map((f) => (
+              <button
+                key={f}
+                onClick={() => setFilter(f)}
+                className={`rounded-lg px-2.5 py-1 text-[11px] font-medium capitalize transition-colors ${
+                  filter === f ? "bg-lime-400/15 text-lime-300 border border-lime-400/30" : "border border-white/10 text-white/50 hover:text-white"
+                }`}
+              >
+                {f === "top_10" ? "Top 10" : f}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {loading ? (
+          <div className="flex justify-center py-10">
+            <RefreshCw className="h-6 w-6 animate-spin text-lime-400" />
+          </div>
+        ) : filteredIdeas.length === 0 ? (
+          <div className="rounded-xl border border-white/10 bg-zinc-950 py-12 text-center">
+            <Brain className="mx-auto h-8 w-8 text-lime-400/50" />
+            <p className="mt-2 text-sm text-white/50">
+              No ideas yet. Run a cycle to discover, score, and rank the top 10 ideas.
+            </p>
+            <p className="mt-1 text-xs text-white/30">
+              The system will scrape Reddit, Product Hunt, Hacker News, AI directories, and more to find 50 ideas,
+              then score them against the YC 10-question framework and generate exhaustive build summaries for the top 10.
+            </p>
+          </div>
+        ) : (
+          <div className="space-y-2">
+            {filteredIdeas.map((idea) => (
+              <VisionCortexIdeaRow key={idea.id} idea={idea} onClick={setSelectedIdea} />
+            ))}
+          </div>
+        )}
+      </div>
 
       {/* Auto-provision top idea */}
       {topIdeas.length > 0 && topIdeas[0].status !== "provisioned" && !running && (
@@ -193,45 +226,21 @@ export default function VisionCortex() {
         </div>
       )}
 
-      {/* Filter */}
-      <div className="flex items-center gap-2">
-        <Filter className="h-4 w-4 text-white/40" />
-        {["top_10", "provisioned", "all"].map((f) => (
-          <button
-            key={f}
-            onClick={() => setFilter(f)}
-            className={`rounded-lg px-3 py-1.5 text-xs font-medium capitalize transition-colors ${
-              filter === f ? "bg-lime-400/15 text-lime-300 border border-lime-400/30" : "border border-white/10 text-white/50 hover:text-white"
-            }`}
-          >
-            {f === "top_10" ? "Top 10" : f}
-          </button>
+      {/* Stats */}
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+        {[
+          { label: "Discovered", value: stats.discovered, icon: Database, color: "text-blue-400" },
+          { label: "Validated", value: stats.validated, icon: Activity, color: "text-yellow-400" },
+          { label: "Top 10", value: stats.top10, icon: Brain, color: "text-lime-400" },
+          { label: "Provisioned", value: stats.provisioned, icon: CheckCircle, color: "text-emerald-400" },
+        ].map((s) => (
+          <div key={s.label} className="rounded-xl border border-white/10 bg-zinc-950 p-4 text-center">
+            <s.icon className={`mx-auto h-5 w-5 ${s.color}`} />
+            <div className={`mt-1 text-2xl font-bold ${s.color}`}>{s.value}</div>
+            <div className="text-[10px] uppercase tracking-wider text-white/40">{s.label}</div>
+          </div>
         ))}
       </div>
-
-      {/* Ideas list */}
-      {loading ? (
-        <div className="flex justify-center py-10">
-          <RefreshCw className="h-6 w-6 animate-spin text-lime-400" />
-        </div>
-      ) : filteredIdeas.length === 0 ? (
-        <div className="rounded-xl border border-white/10 bg-zinc-950 py-12 text-center">
-          <Brain className="mx-auto h-8 w-8 text-lime-400/50" />
-          <p className="mt-2 text-sm text-white/50">
-            No ideas yet. Run a cycle to discover, score, and rank the top 10 ideas.
-          </p>
-          <p className="mt-1 text-xs text-white/30">
-            The system will scrape Reddit, Product Hunt, Hacker News, AI directories, and more to find 50 ideas,
-            then score them against the YC 10-question framework and generate exhaustive build summaries for the top 10.
-          </p>
-        </div>
-      ) : (
-        <div className="space-y-4">
-          {filteredIdeas.map((idea) => (
-            <VisionCortexIdeaCard key={idea.id} idea={idea} onProvision={provisionIdea} />
-          ))}
-        </div>
-      )}
 
       {/* Info footer */}
       <div className="rounded-xl border border-white/10 bg-zinc-950 p-4">
@@ -243,6 +252,14 @@ export default function VisionCortex() {
           </span>
         </div>
       </div>
+
+      {/* Full summary modal */}
+      <VisionCortexIdeaModal
+        idea={selectedIdea}
+        open={!!selectedIdea}
+        onClose={() => setSelectedIdea(null)}
+        onProvision={provisionIdea}
+      />
     </div>
   );
 }
