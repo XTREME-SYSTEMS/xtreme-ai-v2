@@ -13,6 +13,7 @@ export default function SystemAlerts() {
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState("open");
   const [healing, setHealing] = useState(null);
+  const [healError, setHealError] = useState(null);
 
   const loadAlerts = useCallback(async () => {
     setLoading(true);
@@ -34,17 +35,39 @@ export default function SystemAlerts() {
 
   const healAlert = async (alert) => {
     setHealing(alert.id);
+    setHealError(null);
     try {
-      if (alert.build_id) {
-        await base44.functions.invoke("selfHealBuild", { buildId: alert.build_id });
+      if (!alert.build_id) {
+        setHealError("This alert has no linked build — can't auto-heal.");
+        return;
       }
-      await base44.entities.SystemAlert.update(alert.id, {
-        status: "healing",
-        logs: [...(alert.logs || []), `[${new Date().toISOString()}] Manual heal triggered`],
+      const res = await base44.functions.invoke("selfHealBuild", {
+        buildId: alert.build_id,
+        alertType: alert.alert_type,
+        alertId: alert.id,
       });
+      const body = res?.data || res;
+      if (body?.healed) {
+        await base44.entities.SystemAlert.update(alert.id, {
+          status: "resolved",
+          resolved_at: new Date().toISOString(),
+          resolution: body.message || "Self-healed",
+        });
+      } else if (body?.action === "escalate") {
+        await base44.entities.SystemAlert.update(alert.id, {
+          status: "escalated",
+          context: body.message,
+        });
+      } else {
+        await base44.entities.SystemAlert.update(alert.id, {
+          status: "healing",
+          logs: [...(alert.logs || []), `[${new Date().toISOString()}] Manual heal triggered`],
+        });
+      }
       await loadAlerts();
     } catch (e) {
       console.error("Heal failed", e);
+      setHealError(e?.message || "Heal failed — check the function logs");
     } finally {
       setHealing(null);
     }
@@ -126,6 +149,13 @@ export default function SystemAlerts() {
           </button>
         ))}
       </div>
+
+      {/* Heal error banner */}
+      {healError && (
+        <div className="rounded-xl border border-red-400/40 bg-red-400/5 p-3 text-sm text-red-300">
+          {healError}
+        </div>
+      )}
 
       {/* Alerts list */}
       {loading ? (

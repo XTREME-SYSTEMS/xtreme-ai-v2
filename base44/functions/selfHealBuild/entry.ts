@@ -18,13 +18,83 @@ export default async function(req) {
     if (user.role !== 'admin') return Response.json({ error: 'Forbidden — admin only' }, { status: 403 });
 
     const body = await req.json().catch(() => ({}));
-    const { buildId, action } = body;
+    const { buildId, action, alertType, alertId } = body;
 
     if (!buildId) return Response.json({ error: 'buildId is required' }, { status: 400 });
 
     // Fetch the build
     const build = await base44.asServiceRole.entities.AutoBuild.get(buildId);
     if (!build) return Response.json({ error: 'Build not found' }, { status: 404 });
+
+    // Post-deploy check failures need re-verification, not step retry
+    if (alertType === 'post_deploy_check_failure') {
+      const liveUrl = build.deployment?.live_url;
+      if (!liveUrl) {
+        return Response.json({
+          ok: false,
+          action: 'escalate',
+          message: 'No live URL to verify — cannot self-heal post-deploy check failure',
+        }, { status: 400 });
+      }
+
+      let verifyResult: any = null;
+      try {
+        const res = await base44.asServiceRole.functions.invoke('verifyDeployment', {
+          liveUrl,
+          buildId,
+        });
+        verifyResult = res?.data || res;
+      } catch (verifyErr: any) {
+        return Response.json({
+          ok: false,
+          action: 'escalate',
+          message: `Re-verification failed: ${verifyErr?.message || 'unknown'}`,
+        }, { status: 500 });
+      }
+
+      const score = verifyResult?.score ?? 0;
+      const checks = verifyResult?.checks || [];
+      const allPassed = checks.length > 0 && checks.every((c: any) => c.passed);
+
+      // Update the alert
+      if (alertId) {
+        try {
+          await base44.asServiceRole.entities.SystemAlert.update(alertId, {
+            status: allPassed ? 'resolved' : 'escalated',
+            resolved_at: new Date().toISOString(),
+            resolution: allPassed ? 'Self-healed: post-deploy verification passed on retry' : 'Re-verification still failing — needs operator',
+            retry_count: (verifyResult?.retry_count || 0) + 1,
+            context: `Re-verified at ${score}% — ${checks.filter((c: any) => c.passed).length}/${checks.length} checks passed`,
+            logs: [`[${new Date().toISOString()}] self-heal: re-verified deployment → ${score}% (${checks.filter((c: any) => c.passed).length}/${checks.length} passed)`],
+          });
+        } catch {}
+      }
+
+      try {
+        await base44.asServiceRole.entities.Receipt.create({
+          agent_or_workflow: 'selfHealBuild',
+          action: 'self_heal_post_deploy',
+          entity_type: 'AutoBuild',
+          entity_id: buildId,
+          inputs: JSON.stringify({ buildId, alertType, liveUrl }).slice(0, 4000),
+          outputs: JSON.stringify({ score, passed: allPassed }).slice(0, 4000),
+          status: allPassed ? 'success' : 'escalated',
+          evidence: `Post-deploy re-verification: ${score}% — ${allPassed ? 'PASS' : 'STILL FAILING'}`,
+        });
+      } catch {}
+
+      return Response.json({
+        ok: allPassed,
+        action: allPassed ? 'resolved' : 'escalate',
+        healed: allPassed,
+        message: allPassed
+          ? `Post-deploy verification passed on retry (${score}%)`
+          : `Re-verification still failing at ${score}% — escalated`,
+        buildId,
+        score,
+        checks,
+      });
+    }
 
     const breaker = new CircuitBreaker(5);
     const stepKey = build.current_step || 'unknown';
