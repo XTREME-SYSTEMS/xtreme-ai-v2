@@ -19,15 +19,24 @@ export default async function(req) {
     // Process each product
     for (const product of SERVICE_CATALOG_DATA) {
       try {
-        // Generate rich line-item details via LLM — one call per product
-        const featuresWithDetails = await generateFeatureDetails(base44, product);
-
         // Check if entry already exists
         const existing = await base44.asServiceRole.entities.ServiceCatalogEntry.filter(
           { product_id: product.product_id },
           "-updated_date",
           1
         );
+
+        // Skip LLM generation if features already have populated details
+        const existingFeatures = existing?.[0]?.features;
+        const hasPopulatedDetails = existingFeatures && existingFeatures.length > 0 &&
+          existingFeatures.some(f => f.detail && f.detail.length > 20);
+
+        let featuresWithDetails;
+        if (hasPopulatedDetails) {
+          featuresWithDetails = existingFeatures; // reuse existing details
+        } else {
+          featuresWithDetails = await generateFeatureDetails(base44, product);
+        }
 
         const record = {
           product_id: product.product_id,
