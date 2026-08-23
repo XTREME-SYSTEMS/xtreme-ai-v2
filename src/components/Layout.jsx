@@ -82,6 +82,7 @@ const NAV = [
   { to: "/markets/new", label: "New Market", icon: Plus },
   { to: "/seo-launch-pad", label: "SEO Launch Pad", icon: Rocket },
   { section: "Autonomous" },
+  { to: "/auto-builder", label: "Auto Builder", icon: Hammer, end: true },
   { to: "/autonomous-system", label: "Autonomous Engine", icon: Bot, end: true },
   { section: "Lab" },
   { to: "/test-lab", label: "Test Lab", icon: FlaskConical },

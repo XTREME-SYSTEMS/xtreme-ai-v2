@@ -1,0 +1,202 @@
+{
+  "name": "AutoBuild",
+  "type": "object",
+  "description": "Admin-driven Auto Builder queue \u2014 mirrors the client portal pipeline (profile \u2192 names \u2192 content \u2192 logo \u2192 brand \u2192 website \u2192 social \u2192 video \u2192 review) with queue semantics and an auto-advance toggle for autonomous execution. Admin uses this to run the full build pipeline themselves, improve on it, and eventually make it autonomous.",
+  "properties": {
+    "business_name": {
+      "type": "string",
+      "description": "Business name for this build"
+    },
+    "industry": {
+      "type": "string",
+      "description": "Industry / niche (e.g. epoxy, hvac, roofing)"
+    },
+    "sub_industry": {
+      "type": "string"
+    },
+    "profile": {
+      "type": "object",
+      "description": "Business profile data \u2014 the input that feeds all downstream generators",
+      "properties": {
+        "phone": {
+          "type": "string"
+        },
+        "email": {
+          "type": "string"
+        },
+        "website": {
+          "type": "string"
+        },
+        "primary_location": {
+          "type": "string"
+        },
+        "address": {
+          "type": "string"
+        },
+        "zip": {
+          "type": "string"
+        },
+        "radius": {
+          "type": "string"
+        },
+        "years_in_business": {
+          "type": "string"
+        },
+        "services": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "tagline": {
+          "type": "string"
+        },
+        "business_stage": {
+          "type": "string"
+        }
+      }
+    },
+    "current_step": {
+      "type": "string",
+      "enum": [
+        "profile",
+        "names",
+        "content",
+        "logo",
+        "brand",
+        "website",
+        "social",
+        "video",
+        "review",
+        "complete"
+      ],
+      "default": "profile",
+      "description": "Which pipeline step this build is on (mirrors client portal)"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "queued",
+        "running",
+        "paused",
+        "complete",
+        "failed"
+      ],
+      "default": "queued",
+      "description": "Queue status \u2014 queued = waiting, running = step in progress, paused = admin halted, complete = finished, failed = errored"
+    },
+    "auto_advance": {
+      "type": "boolean",
+      "default": false,
+      "description": "When true, the queue processor automatically advances to the next step after each step completes \u2014 the autonomy toggle"
+    },
+    "content_templates": {
+      "type": "array",
+      "items": {
+        "type": "object"
+      },
+      "description": "Generated content tone templates (10 variations)"
+    },
+    "chosen_content_template": {
+      "type": "string"
+    },
+    "logo_options": {
+      "type": "array",
+      "items": {
+        "type": "object"
+      },
+      "description": "Generated logo concepts with URLs"
+    },
+    "chosen_logo_url": {
+      "type": "string"
+    },
+    "brand_packs": {
+      "type": "array",
+      "items": {
+        "type": "object"
+      },
+      "description": "Generated brand mockup images"
+    },
+    "chosen_brand_images": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "website_content": {
+      "type": "object",
+      "description": "Generated website copy (hero, about, services, faq)"
+    },
+    "website_images": {
+      "type": "array",
+      "items": {
+        "type": "object"
+      },
+      "description": "Generated website project imagery"
+    },
+    "chosen_website_layout": {
+      "type": "string"
+    },
+    "chosen_palette": {
+      "type": "string"
+    },
+    "social_media_pack": {
+      "type": "object",
+      "description": "Generated social templates + 30-day content calendar"
+    },
+    "video_pack": {
+      "type": "object",
+      "description": "Generated video concepts"
+    },
+    "name_options": {
+      "type": "array",
+      "items": {
+        "type": "object"
+      },
+      "description": "AI-generated business name ideas with domain suggestions"
+    },
+    "visited_steps": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "default": [],
+      "description": "Steps that have been completed"
+    },
+    "error": {
+      "type": "string"
+    },
+    "logs": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Execution log entries for debugging and auditability"
+    }
+  },
+  "required": [
+    "business_name"
+  ],
+  "rls": {
+    "read": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "create": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}
