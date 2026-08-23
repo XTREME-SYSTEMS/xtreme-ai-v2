@@ -173,11 +173,10 @@ export default function AutoBuilder() {
         ) : (
           <div className="divide-y divide-white/5">
             {builds.map((b) => (
-              <button
+              <div
                 key={b.id}
-                type="button"
                 onClick={() => enterBuild(b)}
-                className="group flex w-full items-center gap-3 p-3 text-left transition-colors hover:bg-white/5"
+                className="group flex w-full cursor-pointer items-center gap-3 p-3 text-left transition-colors hover:bg-white/5"
               >
                 {statusIcon(b.status)}
                 <div className="min-w-0 flex-1">
@@ -190,6 +189,7 @@ export default function AutoBuilder() {
                   </div>
                 </div>
                 <button
+                  type="button"
                   onClick={(e) => toggleAutoAdvance(b, e)}
                   title={b.auto_advance ? "Auto-advance ON" : "Auto-advance OFF"}
                   className={cn(
@@ -200,13 +200,14 @@ export default function AutoBuilder() {
                   {b.auto_advance ? <Play className="h-3.5 w-3.5" /> : <Pause className="h-3.5 w-3.5" />}
                 </button>
                 <button
+                  type="button"
                   onClick={(e) => deleteBuild(b.id, e)}
                   className="shrink-0 rounded p-1.5 text-white/20 opacity-0 transition-opacity hover:text-red-400 group-hover:opacity-100"
                 >
                   <Trash2 className="h-3.5 w-3.5" />
                 </button>
                 <ArrowRight className="h-4 w-4 shrink-0 text-white/30 group-hover:text-lime-400" />
-              </button>
+              </div>
             ))}
           </div>
         )}
