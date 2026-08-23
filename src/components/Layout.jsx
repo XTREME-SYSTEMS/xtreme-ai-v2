@@ -23,6 +23,7 @@ import { useAutoBuild } from "@/lib/AutoBuildContext";
 const NAV = [
   { to: "/client-portal", label: "Command Center", icon: LayoutDashboard, end: true },
   { section: "Discovery" },
+  { to: "/idea-discovery", label: "Autonomous Discovery", icon: Radar },
   { to: "/discovery", label: "Business Discovery", icon: Search },
   { to: "/prospects", label: "Prospects", icon: Users },
   { to: "/audits", label: "Audits", icon: ClipboardCheck },

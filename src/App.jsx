@@ -114,6 +114,7 @@ import UiSystem from '@/pages/UiSystem';
 import Codegen from '@/pages/Codegen';
 import Deploy from '@/pages/Deploy';
 import SystemReview from '@/pages/SystemReview';
+import IdeaDiscovery from '@/pages/IdeaDiscovery';
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin, isAuthenticated } = useAuth();
@@ -245,6 +246,7 @@ const AuthenticatedApp = () => {
           <Route path="/codegen" element={<Codegen />} />
           <Route path="/deploy" element={<Deploy />} />
           <Route path="/system-review" element={<SystemReview />} />
+          <Route path="/idea-discovery" element={<IdeaDiscovery />} />
         </Route>
       </Route>
       <Route path="*" element={<PageNotFound />} />
