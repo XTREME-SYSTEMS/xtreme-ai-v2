@@ -126,3 +126,156 @@ export function validateDeploymentSpec(spec: any): ValidationResult {
   r.valid = r.errors.length === 0;
   return r;
 }
+
+// ============================================================
+// CROSS-STEP CONSISTENCY VALIDATORS
+// Check that downstream specs are consistent with upstream specs.
+// ============================================================
+
+// Data model entities must cover all architecture.data_models
+export function validateDataModelConsistency(dataModel: any, architecture: any): ValidationResult {
+  const r = base();
+  if (!dataModel?.entities || !architecture?.data_models) return r;
+
+  const archEntityNames = architecture.data_models.map((dm: any) => dm.name?.toLowerCase()).filter(Boolean);
+  const dataModelNames = dataModel.entities.map((e: any) => e.name?.toLowerCase()).filter(Boolean);
+
+  const missing = archEntityNames.filter((name: string) => !dataModelNames.includes(name));
+  if (missing.length > 0) {
+    r.warnings.push(`Data model is missing entities defined in architecture: ${missing.join(", ")}`);
+  }
+
+  // Check that referenced entities in relationships exist
+  if (Array.isArray(dataModel.relationships)) {
+    dataModel.relationships.forEach((rel: any, i: number) => {
+      if (rel.from && !dataModelNames.includes(rel.from.toLowerCase()))
+        r.warnings.push(`relationships[${i}].from '${rel.from}' does not match any entity name`);
+      if (rel.to && !dataModelNames.includes(rel.to.toLowerCase()))
+        r.warnings.push(`relationships[${i}].to '${rel.to}' does not match any entity name`);
+    });
+  }
+
+  r.valid = r.errors.length === 0;
+  return r;
+}
+
+// UI system components should cover all architecture pages
+export function validateUiSystemConsistency(uiSystem: any, architecture: any): ValidationResult {
+  const r = base();
+  if (!uiSystem?.components || !architecture?.pages) return r;
+
+  // Every page should have at least one component that references it
+  const componentNames = uiSystem.components.map((c: any) => c.name?.toLowerCase() || "");
+  const pages = architecture.pages;
+
+  // Check that the component library has at least a few navigation/layout components
+  const hasNav = componentNames.some((n: string) => n.includes("nav") || n.includes("header") || n.includes("sidebar"));
+  if (!hasNav && pages.length > 1)
+    r.warnings.push("UI system has no navigation/header/sidebar component despite multiple pages");
+
+  // Check color palette has enough contrast info
+  if (uiSystem.color_palette) {
+    if (!uiSystem.color_palette.text && !uiSystem.color_palette.text_muted)
+      r.warnings.push("UI system color_palette has no text color defined");
+  }
+
+  r.valid = r.errors.length === 0;
+  return r;
+}
+
+// Code manifest files should implement all architecture features
+export function validateCodeManifestConsistency(codeManifest: any, architecture: any): ValidationResult {
+  const r = base();
+  if (!codeManifest?.files || !architecture) return r;
+
+  const filePaths = codeManifest.files.map((f: any) => f.path || "").filter(Boolean);
+  const pageRoutes = (architecture.pages || []).map((p: any) => p.route || "").filter(Boolean);
+
+  // Every page route should have a corresponding file
+  for (const route of pageRoutes) {
+    const routeSlug = route.replace(/^\//, "").replace(/[^a-z0-9]/gi, "-").toLowerCase();
+    const hasFile = filePaths.some((p: string) =>
+      p.toLowerCase().includes(routeSlug) ||
+      p.toLowerCase().includes(route.replace(/^\//, "").toLowerCase())
+    );
+    if (!hasFile && route !== "/") {
+      r.warnings.push(`No file found for architecture page route '${route}'`);
+    }
+  }
+
+  // Every entity should have a corresponding file
+  const entityNames = (architecture.data_models || []).map((dm: any) => dm.name).filter(Boolean);
+  for (const entity of entityNames) {
+    const slug = entity.toLowerCase().replace(/[^a-z0-9]/g, "-");
+    const hasFile = filePaths.some((p: string) =>
+      p.toLowerCase().includes(slug) || p.toLowerCase().includes(entity.toLowerCase())
+    );
+    if (!hasFile)
+      r.warnings.push(`No file found for architecture entity '${entity}'`);
+  }
+
+  // Every feature should have at least one file referencing it
+  const features = (architecture.features || []).map((f: any) => f.name).filter(Boolean);
+  for (const feature of features) {
+    const featureSlug = feature.toLowerCase().replace(/[^a-z0-9]/g, "-");
+    const hasFile = filePaths.some((p: string) =>
+      p.toLowerCase().includes(featureSlug)
+    );
+    if (!hasFile)
+      r.warnings.push(`No file found for architecture feature '${feature}'`);
+  }
+
+  r.valid = r.errors.length === 0;
+  return r;
+}
+
+// Deployment routes should cover all architecture pages
+export function validateDeploymentConsistency(deployment: any, architecture: any): ValidationResult {
+  const r = base();
+  if (!deployment?.routes || !architecture?.pages) return r;
+
+  const deployRoutes = deployment.routes.map((r: any) => r.path || "").filter(Boolean);
+  const archRoutes = architecture.pages.map((p: any) => p.route || "").filter(Boolean);
+
+  const missing = archRoutes.filter((route: string) => !deployRoutes.includes(route));
+  if (missing.length > 0) {
+    r.warnings.push(`Deployment routes missing for architecture pages: ${missing.join(", ")}`);
+  }
+
+  r.valid = r.errors.length === 0;
+  return r;
+}
+
+// Combined consistency check for a full build
+export function validateFullBuildConsistency(build: any): ValidationResult {
+  const r = base();
+  const arch = build.architecture;
+  const dm = build.data_model;
+  const ui = build.ui_system;
+  const cm = build.code_manifest;
+  const dep = build.deployment;
+
+  if (arch && dm) {
+    const c = validateDataModelConsistency(dm, arch);
+    r.errors.push(...c.errors);
+    r.warnings.push(...c.warnings);
+  }
+  if (arch && ui) {
+    const c = validateUiSystemConsistency(ui, arch);
+    r.errors.push(...c.errors);
+    r.warnings.push(...c.warnings);
+  }
+  if (arch && cm) {
+    const c = validateCodeManifestConsistency(cm, arch);
+    r.errors.push(...c.errors);
+    r.warnings.push(...c.warnings);
+  }
+  if (arch && dep) {
+    const c = validateDeploymentConsistency(dep, arch);
+    r.errors.push(...c.errors);
+    r.warnings.push(...c.warnings);
+  }
+
+  r.valid = r.errors.length === 0;
+  return r;
+}

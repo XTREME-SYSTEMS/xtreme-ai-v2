@@ -4,7 +4,91 @@
 // codegen → deploy). Extracted from the individual backend
 // functions so both the HTTP handlers AND the processAutoBuildStep
 // queue processor use the EXACT same logic — one source of truth.
+//
+// PHASE 1 HARDENING: Each generator now accepts `previousErrors`
+// which gets injected into the LLM prompt for auto-regeneration.
+// The `generateWithValidation` wrapper handles the full loop:
+// generate → strict validate → LLM judge → if fail, regenerate
+// with errors → repeat up to 3x.
 // ============================================================
+
+import {
+  strictValidateArchitecture, strictValidateDataModel,
+  strictValidateUiSystem, strictValidateCodeManifest, strictValidateDeployment,
+} from "./systemBuildSchemas.ts";
+import { judgeSpec, judgePassed, type JudgeScore } from "./llmJudge.ts";
+
+// ── Auto-regeneration wrapper ────────────────────────────────────────────
+
+export interface GenerationResult {
+  data: any;
+  validation: { valid: boolean; errors: string[]; warnings: string[]; score: number };
+  judge: JudgeScore | null;
+  attempts: number;
+  regenerated: boolean;
+}
+
+export async function generateWithValidation(
+  base44: any,
+  generator: (base44: any, params: any) => Promise<any>,
+  validator: (spec: any) => { valid: boolean; errors: string[]; warnings: string[]; score: number },
+  params: any,
+  specType: string,
+  options?: { maxAttempts?: number; judgeThreshold?: number; context?: string }
+): Promise<GenerationResult> {
+  const maxAttempts = options?.maxAttempts ?? 3;
+  const threshold = options?.judgeThreshold ?? 70;
+  let lastErrors: string[] = [];
+  let lastJudge: JudgeScore | null = null;
+  let lastData: any = null;
+  let lastValidation: any = { valid: false, errors: [], warnings: [], score: 0 };
+
+  for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+    // Inject previous errors into params for regeneration
+    const genParams = attempt > 1 && lastErrors.length > 0
+      ? { ...params, previousErrors: lastErrors }
+      : params;
+
+    const data = await generator(base44, genParams);
+    lastData = data;
+
+    // Strict validation
+    const validation = validator(data);
+    lastValidation = validation;
+
+    if (!validation.valid) {
+      lastErrors = validation.errors;
+      continue; // regenerate with errors
+    }
+
+    // LLM judge (skip on first attempt if validation is clean and we want to save credits)
+    // Actually, always run the judge — it catches quality issues that schema validation misses
+    try {
+      const judge = await judgeSpec(base44, specType, data, options?.context);
+      lastJudge = judge;
+
+      if (!judgePassed(judge, threshold)) {
+        lastErrors = [judge.feedback];
+        continue; // regenerate with judge feedback
+      }
+
+      // Both validation and judge passed
+      return { data, validation, judge, attempts: attempt, regenerated: attempt > 1 };
+    } catch (judgeErr) {
+      // If judge fails, accept the spec if validation passed (judge is best-effort)
+      return { data, validation, judge: null, attempts: attempt, regenerated: attempt > 1 };
+    }
+  }
+
+  // All attempts exhausted — return last result with errors
+  return {
+    data: lastData,
+    validation: lastValidation,
+    judge: lastJudge,
+    attempts: maxAttempts,
+    regenerated: maxAttempts > 1,
+  };
+}
 
 // ── Architecture ───────────────────────────────────────────────────────
 
@@ -28,13 +112,17 @@ export async function generateArchitectureSpec(base44: any, params: {
     ? JSON.stringify(profile).slice(0, 3000)
     : 'No profile data provided yet.';
 
+  const errorContext = (params as any).previousErrors?.length
+    ? `\n\nPREVIOUS ATTEMPT FAILED VALIDATION. Fix these errors:\n${(params as any).previousErrors.join('\n')}\n`
+    : '';
+
   const prompt = `You are a senior software architect and product strategist with 15+ years of experience building production web applications. Design a complete, production-ready system architecture for a ${typeLabel}.
 
 BUSINESS / PRODUCT: ${businessName || 'Not yet named'}
 INDUSTRY / NICHE: ${industry || 'Not specified'}
 PRODUCT TYPE: ${productType}
 PROFILE DATA: ${profileStr}
-
+${errorContext}
 Produce a comprehensive architecture spec that a development team could execute immediately. Be specific and opinionated — recommend exact technologies, not vague categories. Consider scalability, security, developer experience, and time-to-market.
 
 For a ${typeLabel}, make sure your architecture includes everything needed for a real, deployable product:
@@ -152,6 +240,10 @@ export async function generateDataModelSpec(base44: any, params: {
     ? JSON.stringify(architecture.data_models).slice(0, 4000)
     : 'No data models in architecture spec — design appropriate entities from scratch.';
 
+  const errorContext = (params as any).previousErrors?.length
+    ? `\n\nPREVIOUS ATTEMPT FAILED VALIDATION. Fix these errors:\n${(params as any).previousErrors.join('\n')}\n`
+    : '';
+
   const prompt = `You are a senior database architect and backend engineer with 15+ years of experience designing production data models. You are given a high-level system architecture for a ${typeLabel} and must refine its data models into complete, production-ready entity schemas.
 
 PRODUCT: ${businessName || 'Not yet named'}
@@ -159,7 +251,7 @@ PRODUCT TYPE: ${productType}
 
 HIGH-LEVEL DATA MODELS FROM ARCHITECTURE:
 ${dataModelsStr}
-
+${errorContext}
 Refine these into detailed entity schemas. For each entity, define every field with its exact type, validation rules, default values, and indexes. Define all relationships between entities. Generate realistic seed data (2-3 sample records per entity). Define the CRUD + custom API endpoints for each entity.
 
 Be specific and exhaustive — a developer should be able to create the database tables and API routes directly from your output without any further design work.
@@ -269,6 +361,10 @@ export async function generateUiSystemSpec(base44: any, params: {
     ? architecture.features.map((f: any) => f.name).join(', ')
     : 'No features defined';
 
+  const errorContext = (params as any).previousErrors?.length
+    ? `\n\nPREVIOUS ATTEMPT FAILED VALIDATION. Fix these errors:\n${(params as any).previousErrors.join('\n')}\n`
+    : '';
+
   const prompt = `You are a senior UI/UX designer and design system architect with 15+ years of experience building production design systems for web applications. Design a complete, production-ready UI design system for a ${typeLabel}.
 
 PRODUCT: ${businessName || 'Not yet named'}
@@ -279,7 +375,7 @@ ${pagesStr}
 
 KEY FEATURES:
 ${featuresStr}
-
+${errorContext}
 Design a comprehensive design system that a frontend developer could implement immediately. Be specific and opinionated — recommend exact colors (hex values), font families, font sizes, spacing values, and component specs. The design should be modern, accessible (WCAG AA), and appropriate for the product type.
 
 ${productType === 'web_app' ? 'Include dashboard components, data tables, forms, modals, and navigation patterns.' : ''}
@@ -445,7 +541,11 @@ export async function generateCodeManifestSpec(base44: any, params: {
     ? Object.entries(architecture.tech_stack).map(([k, v]) => `${k}: ${v}`).join('\n')
     : 'Not specified';
 
-  const prompt = `You are a senior software architect and full-stack engineer with 15+ years of experience building production web applications. Generate a complete codebase manifest for a ${typeLabel}.
+  const errorContext = (params as any).previousErrors?.length
+    ? `\n\nPREVIOUS ATTEMPT FAILED VALIDATION. Fix these errors:\n${(params as any).previousErrors.join('\n')}\n`
+    : '';
+
+  const prompt = `You are a senior software architect and full-stack engineer with 15+ years of experience building production web applications. Generate a complete codebase with ACTUAL FILE CONTENTS for a ${typeLabel}.
 
 PRODUCT: ${businessName || 'Not yet named'}
 PRODUCT TYPE: ${productType}
@@ -464,18 +564,28 @@ ${entitiesStr}
 
 UI COMPONENTS:
 ${componentsStr}
+${errorContext}
+Generate the actual codebase files. For each file, provide:
+- path: the file path (e.g. src/pages/Dashboard.jsx, base44/entities/Task.jsonc)
+- category: config, page, component, hook, entity, function, style, route, test, doc, util, api, lib
+- language: jsx, ts, js, jsonc, css, json, md
+- purpose: what this file does
+- content: THE ACTUAL FILE CONTENT — real, compilable code. Not notes or descriptions. Write the full implementation.
 
-Generate a comprehensive file manifest that a development team could use to build this product. List every file that should exist in the repository — config files, pages, components, hooks, utilities, API routes, styles, tests, and docs. For each file, provide its path, category, a description of what it does, and key implementation notes (the critical code structure or logic that goes in it).
+CRITICAL: The 'content' field must contain ACTUAL CODE that a developer could copy into a file and run. For JSX files, write real React components. For JSONC files, write real JSON schemas. For config files, write real configurations. Do NOT write placeholders or descriptions — write the actual code.
 
-Be thorough and specific. Include:
-- Project config (package.json, tsconfig, vite/next config, tailwind config, env files)
-- All pages from the architecture spec
-- All UI components from the design system
-- API routes / backend functions for the data entities
-- Custom hooks for data fetching and business logic
-- Utility libraries (auth, validation, formatting)
-- Test files
-- Documentation (README, API docs)
+Include these essential files:
+- src/App.jsx (router with all routes registered)
+- Every page from the architecture spec as a real .jsx file
+- Key UI components (at least 5-8 real components)
+- Entity schemas as .jsonc files
+- Custom hooks for data fetching
+- Utility files
+- package.json with real dependencies
+- tailwind.config.js
+- src/index.css with the design system tokens
+
+Keep each file's content focused and production-quality. Prefer fewer files with complete implementations over many files with stubs.
 
 Return a detailed JSON codebase manifest.`;
 
@@ -491,12 +601,14 @@ Return a detailed JSON codebase manifest.`;
           type: "array",
           items: {
             type: "object",
-            required: ["path", "category", "description", "key_content"],
+            required: ["path", "category", "description", "content", "language"],
             properties: {
               path: { type: "string" },
               category: { type: "string" },
               description: { type: "string" },
-              key_content: { type: "string" },
+              content: { type: "string", description: "The actual file content — real, compilable code" },
+              language: { type: "string", description: "jsx, ts, js, jsonc, css, json, md" },
+              key_content: { type: "string", description: "Legacy field — use 'content' instead" },
             },
           },
         },

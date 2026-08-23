@@ -18,6 +18,10 @@ export function useSystemBuildStep(functionName, fieldName, stepKey) {
   const [warnings, setWarnings] = useState([]);
   const [approved, setApproved] = useState(false);
   const [attempt, setAttempt] = useState(0);
+  const [judge, setJudge] = useState(null);
+  const [regenerated, setRegenerated] = useState(false);
+  const [compileErrors, setCompileErrors] = useState([]);
+  const [compileValid, setCompileValid] = useState(null);
 
   const generate = useCallback(async (payload) => {
     const build = autoBuild.build;
@@ -26,6 +30,10 @@ export function useSystemBuildStep(functionName, fieldName, stepKey) {
     setError("");
     setValidationErrors([]);
     setWarnings([]);
+    setJudge(null);
+    setRegenerated(false);
+    setCompileErrors([]);
+    setCompileValid(null);
 
     const maxRetries = 3;
     for (let attemptNum = 1; attemptNum <= maxRetries; attemptNum++) {
@@ -39,6 +47,7 @@ export function useSystemBuildStep(functionName, fieldName, stepKey) {
           if (body.validationErrors) {
             setValidationErrors(body.validationErrors);
             setError(body.error);
+            if (body.judge) setJudge(body.judge);
             setGenerating(false);
             setAttempt(0);
             return null;
@@ -49,8 +58,12 @@ export function useSystemBuildStep(functionName, fieldName, stepKey) {
         if (!spec || (typeof spec === "object" && Object.keys(spec).length === 0)) {
           throw new Error(`No ${fieldName} returned from the AI`);
         }
-        // Capture warnings
+        // Capture warnings, judge scores, and retry info
         if (body.warnings?.length) setWarnings(body.warnings);
+        if (body.judge) setJudge(body.judge);
+        if (body.regenerated) setRegenerated(true);
+        if (body.compileErrors?.length) setCompileErrors(body.compileErrors);
+        if (body.compileValid !== undefined) setCompileValid(body.compileValid);
 
         await autoBuild.saveBuild({
           [fieldName]: spec,
@@ -128,6 +141,7 @@ export function useSystemBuildStep(functionName, fieldName, stepKey) {
 
   return {
     generating, error, validationErrors, warnings, approved, attempt,
+    judge, regenerated, compileErrors, compileValid,
     generate, approve, setApproved,
   };
 }

@@ -15,11 +15,15 @@ import {
 } from "../../shared/autoBuildGenerators.ts";
 import {
   generateArchitectureSpec, generateDataModelSpec, generateUiSystemSpec,
-  generateCodeManifestSpec, generateDeploymentSpec,
+  generateCodeManifestSpec, generateDeploymentSpec, generateWithValidation,
 } from "../../shared/systemBuildGenerators.ts";
 import {
-  validateArchitectureSpec, validateDataModelSpec, validateUiSystemSpec,
-  validateCodeManifestSpec, validateDeploymentSpec,
+  strictValidateArchitecture, strictValidateDataModel,
+  strictValidateUiSystem, strictValidateCodeManifest, strictValidateDeployment,
+} from "../../shared/systemBuildSchemas.ts";
+import {
+  validateDataModelConsistency, validateUiSystemConsistency,
+  validateCodeManifestConsistency, validateDeploymentConsistency,
 } from "../../shared/systemBuildValidation.ts";
 
 // ── Step sequences ──────────────────────────────────────────────────────
@@ -144,53 +148,50 @@ async function runVideo(base44: any, build: any) {
 // ── System-build step executors ─────────────────────────────────────────
 
 async function runArchitecture(base44: any, build: any) {
-  const spec = await generateArchitectureSpec(base44, {
-    productType: build.product_type,
-    businessName: build.business_name,
-    industry: build.industry,
-    profile: build.profile,
-  });
-  const v = validateArchitectureSpec(spec);
-  if (!v.valid) throw new Error(`Architecture validation failed: ${v.errors.join("; ")}`);
-  return { architecture: spec };
+  const result = await generateWithValidation(
+    base44, generateArchitectureSpec, strictValidateArchitecture,
+    { productType: build.product_type, businessName: build.business_name, industry: build.industry, profile: build.profile },
+    "system architecture", { maxAttempts: 3, judgeThreshold: 70 }
+  );
+  if (!result.validation.valid)
+    throw new Error(`Architecture validation failed after ${result.attempts} attempts: ${result.validation.errors.join("; ")}`);
+  return { architecture: result.data };
 }
 
 async function runDataModel(base44: any, build: any) {
   if (!build.architecture) throw new Error("Architecture spec is required before generating the data model");
-  const spec = await generateDataModelSpec(base44, {
-    architecture: build.architecture,
-    productType: build.product_type,
-    businessName: build.business_name,
-  });
-  const v = validateDataModelSpec(spec);
-  if (!v.valid) throw new Error(`Data model validation failed: ${v.errors.join("; ")}`);
-  return { data_model: spec };
+  const result = await generateWithValidation(
+    base44, generateDataModelSpec, strictValidateDataModel,
+    { architecture: build.architecture, productType: build.product_type, businessName: build.business_name },
+    "data model", { maxAttempts: 3, judgeThreshold: 70 }
+  );
+  if (!result.validation.valid)
+    throw new Error(`Data model validation failed after ${result.attempts} attempts: ${result.validation.errors.join("; ")}`);
+  return { data_model: result.data };
 }
 
 async function runUiSystem(base44: any, build: any) {
   if (!build.architecture) throw new Error("Architecture spec is required before generating the UI system");
-  const spec = await generateUiSystemSpec(base44, {
-    architecture: build.architecture,
-    productType: build.product_type,
-    businessName: build.business_name,
-  });
-  const v = validateUiSystemSpec(spec);
-  if (!v.valid) throw new Error(`UI system validation failed: ${v.errors.join("; ")}`);
-  return { ui_system: spec };
+  const result = await generateWithValidation(
+    base44, generateUiSystemSpec, strictValidateUiSystem,
+    { architecture: build.architecture, productType: build.product_type, businessName: build.business_name },
+    "UI design system", { maxAttempts: 3, judgeThreshold: 70 }
+  );
+  if (!result.validation.valid)
+    throw new Error(`UI system validation failed after ${result.attempts} attempts: ${result.validation.errors.join("; ")}`);
+  return { ui_system: result.data };
 }
 
 async function runCodegen(base44: any, build: any) {
   if (!build.architecture) throw new Error("Architecture spec is required before generating the code manifest");
-  const spec = await generateCodeManifestSpec(base44, {
-    architecture: build.architecture,
-    dataModel: build.data_model,
-    uiSystem: build.ui_system,
-    productType: build.product_type,
-    businessName: build.business_name,
-  });
-  const v = validateCodeManifestSpec(spec);
-  if (!v.valid) throw new Error(`Code manifest validation failed: ${v.errors.join("; ")}`);
-  return { code_manifest: spec };
+  const result = await generateWithValidation(
+    base44, generateCodeManifestSpec, strictValidateCodeManifest,
+    { architecture: build.architecture, dataModel: build.data_model, uiSystem: build.ui_system, productType: build.product_type, businessName: build.business_name },
+    "code manifest", { maxAttempts: 3, judgeThreshold: 70 }
+  );
+  if (!result.validation.valid)
+    throw new Error(`Code manifest validation failed after ${result.attempts} attempts: ${result.validation.errors.join("; ")}`);
+  return { code_manifest: result.data };
 }
 
 async function runDeploy(base44: any, build: any) {
@@ -201,7 +202,7 @@ async function runDeploy(base44: any, build: any) {
     productType: build.product_type,
     businessName: build.business_name,
   });
-  const v = validateDeploymentSpec(spec);
+  const v = strictValidateDeployment(spec);
   if (!v.valid) throw new Error(`Deployment validation failed: ${v.errors.join("; ")}`);
   return { deployment: spec };
 }
