@@ -64,7 +64,9 @@ export async function getProductLineItemDetails(productId) {
 export async function getLineItemDetailAsync(text, productId) {
   if (productId) {
     const productMap = await getProductLineItemDetails(productId);
-    if (productMap && productMap[text]) {
+    // Only use backend data if it has a non-empty description — otherwise
+    // fall back to the local keyword library which has full descriptions.
+    if (productMap && productMap[text] && productMap[text].description) {
       return productMap[text];
     }
   }

@@ -51,7 +51,7 @@ export default function ExpandableLineItems({ features, productId }) {
       <div className="mt-3 space-y-1">
         {groups.map((g, idx) => {
           const isOpen = !!expanded[idx];
-          const detail = detailMap[g.text] || getLineItemDetail(g.text);
+          const detail = (detailMap[g.text]?.description ? detailMap[g.text] : null) || getLineItemDetail(g.text);
           return (
             <div key={idx} className="overflow-hidden rounded-lg border border-white/5 transition-colors hover:border-lime-400/30">
               <button

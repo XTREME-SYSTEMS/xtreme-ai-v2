@@ -73,55 +73,61 @@ async function generateFeatureDetails(base44, product) {
 
   const prompt = `You are a product catalog expert. For each line item below, generate a rich, detailed description.
 
-Product: ${product.name}
-Category: ${product.category}
-Description: ${product.description}
+  Product: ${product.name}
+  Category: ${product.category}
+  Description: ${product.description}
 
-Line items:
-${featuresList}
+  Line items (in order):
+  ${featuresList}
 
-For EACH line item, provide:
-1. "description" — a full 2-3 sentence explanation of what this item is and what the client gets
-2. "what_you_get" — an array of 3-6 bullet points listing specific deliverables
-3. "how_it_works" — 1-2 sentences explaining the process
-4. "seo_value" — 1 sentence explaining the SEO value (or "N/A — [item type] item" if not SEO-related)
-5. "aeo_value" — 1 sentence explaining the AEO (AI Search Engine Optimization) value (or "N/A — [item type] item" if not AEO-related)
-6. "category" — one of: onboarding, branding, website, seo, aeo, content, social, video, app, reporting, free
+  For EACH line item IN ORDER, provide:
+  1. "description" — a full 2-3 sentence explanation of what this item is and what the client gets
+  2. "what_you_get" — an array of 3-6 bullet points listing specific deliverables
+  3. "how_it_works" — 1-2 sentences explaining the process
+  4. "seo_value" — 1 sentence explaining the SEO value (or "N/A — [item type] item" if not SEO-related)
+  5. "aeo_value" — 1 sentence explaining the AEO (AI Search Engine Optimization) value (or "N/A — [item type] item" if not AEO-related)
+  6. "category" — one of: onboarding, branding, website, seo, aeo, content, social, video, app, reporting, free
 
-Return a JSON object where keys are the line item text and values are objects with the fields above.`;
+  Return a JSON object with an "items" array — one entry per line item, IN THE SAME ORDER as listed above. Each entry is an object with the 6 fields.`;
 
   try {
-    const response = await base44.asServiceRole.integrations.Core.InvokeLLM({
-      prompt,
-      response_json_schema: {
-        type: "object",
-        additionalProperties: {
-          type: "object",
-          properties: {
-            description: { type: "string" },
-            what_you_get: { type: "array", items: { type: "string" } },
-            how_it_works: { type: "string" },
-            seo_value: { type: "string" },
-            aeo_value: { type: "string" },
-            category: { type: "string" }
+  const response = await base44.asServiceRole.integrations.Core.InvokeLLM({
+    prompt,
+    response_json_schema: {
+      type: "object",
+      properties: {
+        items: {
+          type: "array",
+          items: {
+            type: "object",
+            properties: {
+              description: { type: "string" },
+              what_you_get: { type: "array", items: { type: "string" } },
+              how_it_works: { type: "string" },
+              seo_value: { type: "string" },
+              aeo_value: { type: "string" },
+              category: { type: "string" }
+            }
           }
         }
       }
-    });
+    }
+  });
 
-    // Build the features array with details
-    return product.features.map((text) => {
-      const detail = response && response[text] ? response[text] : {};
-      return {
-        text,
-        detail: detail.description || "",
-        what_you_get: detail.what_you_get || [],
-        how_it_works: detail.how_it_works || "",
-        seo_value: detail.seo_value || "",
-        aeo_value: detail.aeo_value || "",
-        category: detail.category || "",
-      };
-    });
+  // Build the features array with details — match by index (order preserved)
+  const items = (response && response.items) || [];
+  return product.features.map((text, i) => {
+    const detail = items[i] || {};
+    return {
+      text,
+      detail: detail.description || "",
+      what_you_get: detail.what_you_get || [],
+      how_it_works: detail.how_it_works || "",
+      seo_value: detail.seo_value || "",
+      aeo_value: detail.aeo_value || "",
+      category: detail.category || "",
+    };
+  });
   } catch (e) {
     // If LLM fails, store features with text only — frontend will use local matching
     return product.features.map((text) => ({
