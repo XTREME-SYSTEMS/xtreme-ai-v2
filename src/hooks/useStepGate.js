@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { base44 } from "@/api/base44Client";
 import { usePreviewEmail } from "@/hooks/usePreviewEmail";
 import { shouldSkipStep } from "@/lib/clientSteps";
+import { useAutoBuild } from "@/lib/AutoBuildContext";
 
 // Checks whether the current step's gated activity is actually complete by
 // inspecting real data (not just a button click).
@@ -11,6 +12,7 @@ import { shouldSkipStep } from "@/lib/clientSteps";
 // Re-checks automatically via realtime subscriptions when the underlying data changes.
 export function useStepGate(step, user) {
   const { effectiveEmail } = usePreviewEmail(user);
+  const autoBuild = useAutoBuild();
   const [state, setState] = useState({ isComplete: true, loading: true, pendingLabel: "" });
 
   useEffect(() => {
@@ -22,6 +24,13 @@ export function useStepGate(step, user) {
     }
     // D2 — Stage-aware: if the step should be skipped for this user, it's auto-complete
     if (shouldSkipStep(step, user)) {
+      setState({ isComplete: true, loading: false, pendingLabel: "" });
+      return;
+    }
+    // AutoBuild mode: signatures & approvals are auto-complete (the admin
+    // doesn't sign their own agreement or approve their own design — those
+    // are client-facing gates that don't apply to an admin-driven build).
+    if (autoBuild.isActive && (step.gate === "signatures" || step.gate === "approvals")) {
       setState({ isComplete: true, loading: false, pendingLabel: "" });
       return;
     }
@@ -123,7 +132,7 @@ export function useStepGate(step, user) {
       clearInterval(interval);
       window.removeEventListener("focus", onFocus);
     };
-  }, [step?.to, step?.gate, effectiveEmail, user]);
+  }, [step?.to, step?.gate, effectiveEmail, user, autoBuild.isActive]);
 
   return state;
 }

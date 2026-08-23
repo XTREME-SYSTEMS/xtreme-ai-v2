@@ -3,13 +3,11 @@ import { base44 } from "@/api/base44Client";
 import { getTrack, TRACKS, PRODUCT_TO_TRACK, PRIORITY } from "@/lib/onboardingTracks";
 import { usePreviewEmail } from "@/hooks/usePreviewEmail";
 
-// L1 — Uses React Query for automatic deduplication: ClientTimeline and
-// StepCoach both call this hook, but the purchase fetch only runs once
-// per cache window (60s staleTime).
-// C2 — Filters purchases by the effective email (client or previewed client)
-// so admin preview resolves the correct product, not all purchases.
+// Resolves the active onboarding track + productId for the user.
+// In AutoBuild mode, returns the "demo" track (full build with social + video)
+// so the timeline shows every step — no purchase fetch needed.
 export function useClientTrack(user) {
-  const { effectiveEmail, isScoped } = usePreviewEmail(user);
+  const { effectiveEmail, isScoped, isAutoBuild } = usePreviewEmail(user);
   const email = effectiveEmail || user?.email;
 
   const query = useQuery({
@@ -20,7 +18,6 @@ export function useClientTrack(user) {
       const purchases = await base44.entities.Base44Purchase.filter(query, "-created_date", 20);
       const track = getTrack(purchases);
 
-      // Resolve the active productId from purchases (highest-priority track wins)
       const keys = (purchases || []).map((p) => PRODUCT_TO_TRACK[p.productId]).filter(Boolean);
       const topTrack = PRIORITY.find((k) => keys.includes(k));
       let productId = null;
@@ -37,9 +34,14 @@ export function useClientTrack(user) {
 
       return { track, productId };
     },
-    enabled: !!user,
+    enabled: !!user && !isAutoBuild,
     staleTime: 60000,
   });
+
+  // AutoBuild mode: return the demo track directly (full build with social + video)
+  if (isAutoBuild) {
+    return { track: TRACKS.demo, productId: "demo", loading: false };
+  }
 
   return {
     track: query.data?.track || TRACKS.default,

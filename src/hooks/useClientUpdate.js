@@ -1,28 +1,34 @@
 import { base44 } from "@/api/base44Client";
 import { usePreview } from "@/lib/PreviewContext";
-import { useState, useCallback } from "react";
+import { useAutoBuild } from "@/lib/AutoBuildContext";
+import { userToBuildFields, buildToUser } from "@/lib/autoBuildSync";
 import { mapUserToProject, hasProjectFields } from "@/lib/clientProjectSync";
+import { useState, useCallback } from "react";
 
-// Preview-safe write hook for client portal pages.
-// When an admin is previewing as a specific client, writes go to the CLIENT's
-// User record (via asServiceRole.entities.User.update). When not previewing,
-// writes go to the authenticated user (via auth.updateMe).
-// This fixes the critical bug where preview-mode interactions corrupted the
-// admin's own profile.
-//
-// G1 — Also dual-writes creative fields to the ClientProject entity so it
-// stays in sync with the User record (backward compat: reads still come from
-// User; ClientProject is the offload target for future migration).
+// Preview-safe + AutoBuild-aware write hook for client portal pages.
+// - When an AutoBuild is active, writes go to the AutoBuild record (mapped
+//   from camelCase to snake_case). No User or ClientProject writes.
+// - When an admin is previewing as a specific client, writes go to the
+//   CLIENT's User record (via asServiceRole.entities.User.update).
+// - Otherwise, writes go to the authenticated user (via auth.updateMe) +
+//   dual-writes creative fields to ClientProject.
 export function useClientUpdate() {
   const { previewAsClient, previewClientEmail } = usePreview();
+  const autoBuild = useAutoBuild();
   const [saving, setSaving] = useState(false);
 
   const update = useCallback(async (data) => {
     setSaving(true);
     try {
+      // AutoBuild mode: write to the AutoBuild record
+      if (autoBuild.isActive) {
+        const mapped = userToBuildFields(data, autoBuild.build);
+        const updated = await autoBuild.saveBuild(mapped);
+        return updated ? buildToUser(updated) : null;
+      }
+
       let email = previewClientEmail;
       if (previewAsClient && previewClientEmail) {
-        // Preview mode: write to the client's record via service role
         const users = await base44.entities.User.filter({ email: previewClientEmail });
         const clientUser = users?.[0];
         if (clientUser) {
@@ -31,34 +37,24 @@ export function useClientUpdate() {
         }
         throw new Error("Client not found for preview write");
       } else {
-        // Normal mode: write to self
         await base44.auth.updateMe(data);
-        // Get email for ClientProject dual-write
         try {
           const me = await base44.auth.me();
           email = me?.email || email;
         } catch {}
       }
 
-      // G1 — Dual-write to ClientProject (best effort, non-blocking)
-      // M4 — Log errors so divergence between User and ClientProject is
-      // diagnosable instead of silently swallowed.
       if (email && hasProjectFields(data)) {
         try {
           const projectData = mapUserToProject(data);
           if (Object.keys(projectData).length > 0) {
             const existing = await base44.entities.ClientProject.filter(
-              { client_email: email },
-              "-created_date",
-              1
+              { client_email: email }, "-created_date", 1
             );
             if (existing?.length > 0) {
               await base44.entities.ClientProject.update(existing[0].id, projectData);
             } else {
-              await base44.entities.ClientProject.create({
-                client_email: email,
-                ...projectData,
-              });
+              await base44.entities.ClientProject.create({ client_email: email, ...projectData });
             }
           }
         } catch (dualWriteErr) {
@@ -70,7 +66,7 @@ export function useClientUpdate() {
     } finally {
       setSaving(false);
     }
-  }, [previewAsClient, previewClientEmail]);
+  }, [previewAsClient, previewClientEmail, autoBuild.isActive, autoBuild.build]);
 
-  return { update, saving, isPreview: previewAsClient };
+  return { update, saving, isPreview: previewAsClient, isAutoBuild: autoBuild.isActive };
 }

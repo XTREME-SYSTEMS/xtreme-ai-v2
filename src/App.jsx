@@ -6,6 +6,7 @@ import PageNotFound from './lib/PageNotFound';
 import { AuthProvider, useAuth } from '@/lib/AuthContext';
 import UserNotRegisteredError from '@/components/UserNotRegisteredError';
 import ScrollToTop from './components/ScrollToTop';
+import { AutoBuildProvider } from '@/lib/AutoBuildContext';
 import ProtectedRoute from '@/components/ProtectedRoute';
 import { ThemeProvider } from '@/lib/ThemeContext';
 import { PreviewProvider } from '@/lib/PreviewContext';
@@ -246,13 +247,15 @@ function App() {
     <AuthProvider>
       <ThemeProvider>
         <PreviewProvider>
-          <QueryClientProvider client={queryClientInstance}>
-            <Router>
-            <ScrollToTop />
-            <AuthenticatedApp />
-          </Router>
-            <Toaster />
-          </QueryClientProvider>
+          <AutoBuildProvider>
+            <QueryClientProvider client={queryClientInstance}>
+              <Router>
+              <ScrollToTop />
+              <AuthenticatedApp />
+              </Router>
+              <Toaster />
+            </QueryClientProvider>
+          </AutoBuildProvider>
         </PreviewProvider>
       </ThemeProvider>
     </AuthProvider>

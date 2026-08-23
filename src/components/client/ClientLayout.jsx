@@ -1,10 +1,11 @@
 import { Outlet, useNavigate } from "react-router-dom";
 import { base44 } from "@/api/base44Client";
-import { LogOut, ArrowLeft } from "lucide-react";
+import { LogOut, ArrowLeft, Hammer } from "lucide-react";
 import { Image } from "@/components/ui/image";
 import { LOGO_ICON } from "@/lib/brandAssets";
 import ThemeToggle from "@/components/ThemeToggle";
 import { usePreview } from "@/lib/PreviewContext";
+import { useAutoBuild } from "@/lib/AutoBuildContext";
 import StepCoach from "@/components/client/StepCoach";
 import ClientTimeline from "@/components/client/ClientTimeline";
 import MobileBottomNav from "@/components/client/MobileBottomNav";
@@ -18,9 +19,11 @@ import ClientWelcomeModal from "@/components/client/ClientWelcomeModal";
 export default function ClientLayout({ user }) {
   const navigate = useNavigate();
   const { setPreview, clearPreview } = usePreview();
+  const autoBuild = useAutoBuild();
 
   const logout = async () => {
     clearPreview();
+    autoBuild.clearActiveBuild();
     await base44.auth.logout();
     navigate("/login");
   };
@@ -31,9 +34,19 @@ export default function ClientLayout({ user }) {
         <Image src={LOGO_ICON} alt="Lead Gen Near You" className="h-8 w-8" fittingType="fit" />
         <div className="leading-tight">
           <div className="text-sm font-semibold text-white">Lead Gen Near You</div>
-          <div className="text-[10px] uppercase tracking-wider text-lime-400">Client Portal</div>
+          <div className="text-[10px] uppercase tracking-wider text-lime-400">
+            {autoBuild.isActive ? "Auto Builder" : "Client Portal"}
+          </div>
         </div>
-        {user?.role === "admin" && (
+        {autoBuild.isActive && (
+          <button
+            onClick={() => { autoBuild.clearActiveBuild(); navigate("/auto-builder"); }}
+            className="ml-2 flex items-center gap-1.5 rounded-md border border-lime-400 px-2.5 py-1.5 text-xs font-semibold text-lime-400 hover:bg-lime-400/10"
+          >
+            <Hammer className="h-3.5 w-3.5" /> Back to Queue
+          </button>
+        )}
+        {user?.role === "admin" && !autoBuild.isActive && (
           <button
             onClick={() => { setPreview(false); navigate("/client-portal"); }}
             className="ml-2 flex items-center gap-1.5 rounded-md border border-lime-400 px-2.5 py-1.5 text-xs font-semibold text-lime-400 hover:bg-lime-400/10"

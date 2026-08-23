@@ -15,6 +15,7 @@ import { usePreview } from "@/lib/PreviewContext";
 import ClientLayout from "@/components/client/ClientLayout";
 import PreviewAsClientModal from "@/components/admin/PreviewAsClientModal";
 import ThemeToggle from "@/components/ThemeToggle";
+import { useAutoBuild } from "@/lib/AutoBuildContext";
 
 // Client portal navigation lives in ClientLayout; this admin NAV is the only
 // nav array used by the admin sidebar.
@@ -115,6 +116,7 @@ export default function Layout() {
   };
 
   const { previewAsClient, setPreview, clearPreview } = usePreview();
+  const autoBuild = useAutoBuild();
 
   if (user === null) {
     return (
@@ -124,6 +126,9 @@ export default function Layout() {
     );
   }
   const isAdmin = user?.role === "admin";
+  // AutoBuild mode: render the client portal shell so the admin walks the
+  // same guided timeline + StepCoach as a real client.
+  if (isAdmin && autoBuild.isActive) return <ClientLayout user={user} />;
   if (!isAdmin || previewAsClient) return <ClientLayout user={user} />;
 
   return (

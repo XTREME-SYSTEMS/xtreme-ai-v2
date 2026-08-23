@@ -6,6 +6,7 @@ import {
 import { LOGO_ICON } from "@/lib/brandAssets";
 import { base44 } from "@/api/base44Client";
 import SignaturePad from "@/components/client/SignaturePad";
+import { useAutoBuild } from "@/lib/AutoBuildContext";
 
 const STEPS = [
   { icon: Package, title: "Review Your Package", desc: "Confirm what's included in your plan, then approve it." },
@@ -60,6 +61,7 @@ export default function ClientWelcomeModal({ user }) {
   const [signature, setSignature] = useState(null);
   const [agreed, setAgreed] = useState(false);
   const [saving, setSaving] = useState(false);
+  const autoBuild = useAutoBuild();
   const storageKey = `lgny_client_welcome_${user?.id || "guest"}`;
 
   useEffect(() => {
@@ -70,6 +72,9 @@ export default function ClientWelcomeModal({ user }) {
       setOpen(true);
     }
   }, [user, storageKey]);
+
+  // Suppress the welcome modal in AutoBuild mode — the admin already knows the workflow.
+  if (autoBuild.isActive) return null;
 
   const canProceed = signature && agreed && !saving;
 

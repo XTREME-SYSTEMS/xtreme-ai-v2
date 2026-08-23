@@ -4,6 +4,7 @@ import { getVisibleSteps } from "@/lib/clientSteps";
 import { useClientTrack } from "@/hooks/useClientTrack";
 import { useClientProject } from "@/hooks/useClientProject";
 import { usePreviewEmail } from "@/hooks/usePreviewEmail";
+import { useAutoBuild } from "@/lib/AutoBuildContext";
 
 // H1 — Unified portal pipeline. The single source of truth for portal
 // progress. Replaces the old UNIVERSAL_PIPELINE system so the dashboard,
@@ -19,6 +20,7 @@ export function usePortalPipeline(user) {
   const { productId, loading: trackLoading } = useClientTrack(user);
   const { effectiveEmail } = usePreviewEmail(user);
   const { project } = useClientProject(user);
+  const autoBuild = useAutoBuild();
   const [approvals, setApprovals] = useState([]);
   const [esignDocs, setEsignDocs] = useState([]);
   const [dataLoading, setDataLoading] = useState(true);
@@ -82,30 +84,36 @@ export function usePortalPipeline(user) {
     } else if (gate === "video") {
       completed = !!(project?.video_chosen ?? user?.videoChosen);
     } else if (gate === "signatures") {
-      const mine = (esignDocs || []).filter((d) =>
-        (d.signers || []).some((s) => s.email?.toLowerCase() === effectiveEmail?.toLowerCase())
-      );
-      const pending = mine.filter((d) => {
-        const signer = (d.signers || []).find((s) => s.email?.toLowerCase() === effectiveEmail?.toLowerCase()) || {};
-        return !signer.signed && d.status !== "signed";
-      });
-      // Only complete when documents exist AND all are signed — not vacuously
-      // true when nothing has been sent yet.
-      completed = mine.length > 0 && pending.length === 0;
+      // AutoBuild mode: no esign needed for admin-driven builds
+      if (autoBuild.isActive) {
+        completed = true;
+      } else {
+        const mine = (esignDocs || []).filter((d) =>
+          (d.signers || []).some((s) => s.email?.toLowerCase() === effectiveEmail?.toLowerCase())
+        );
+        const pending = mine.filter((d) => {
+          const signer = (d.signers || []).find((s) => s.email?.toLowerCase() === effectiveEmail?.toLowerCase()) || {};
+          return !signer.signed && d.status !== "signed";
+        });
+        completed = mine.length > 0 && pending.length === 0;
+      }
     } else if (gate === "approvals") {
-      const pending = (approvals || []).filter((a) => a.status === "pending");
-      // Only complete when approvals exist AND all are decided — not vacuously
-      // true when none have been created yet.
-      completed = (approvals || []).length > 0 && pending.length === 0;
-      if (pending.length > 0) pendingApproval = pending[0];
+      // AutoBuild mode: no approval needed for admin-driven builds
+      if (autoBuild.isActive) {
+        completed = true;
+      } else {
+        const pending = (approvals || []).filter((a) => a.status === "pending");
+        completed = (approvals || []).length > 0 && pending.length === 0;
+        if (pending.length > 0) pendingApproval = pending[0];
+      }
     }
 
     return { step, completed, pendingApproval, locked: false, isCurrent: false };
   });
 
   // M3 — Promote per-device localStorage step completions to the server
-  // (ClientProject.visited_steps) so they survive device switches. Best-effort,
-  // non-blocking: runs after project loads; converges on next reload.
+  // (ClientProject.visited_steps or AutoBuild.visited_steps) so they survive
+  // device switches. Best-effort, non-blocking.
   useEffect(() => {
     if (!project?.id || !visibleSteps.length) return;
     const visited = project.visited_steps || [];
@@ -116,10 +124,11 @@ export function usePortalPipeline(user) {
       }
     }
     if (toSync.length === 0) return;
-    base44.entities.ClientProject.update(project.id, {
+    const entity = autoBuild.isActive ? base44.entities.AutoBuild : base44.entities.ClientProject;
+    entity.update(project.id, {
       visited_steps: [...visited, ...toSync],
     }).catch(() => {});
-  }, [project?.id, project?.visited_steps]);
+  }, [project?.id, project?.visited_steps, autoBuild.isActive]);
 
   // Compute locked + current (sequential: first incomplete step is current,
   // steps after it are locked until prerequisites are done)
