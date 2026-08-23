@@ -1,0 +1,151 @@
+{
+  "name": "BusinessLead",
+  "type": "object",
+  "description": "A business discovered by the autonomous engine that has a bad website, poor online presence, technical failures, or missing enhancements. Queued for outreach and potential conversion to a client project or AutoBuild.",
+  "properties": {
+    "business_name": {
+      "type": "string",
+      "description": "Name of the business"
+    },
+    "website_url": {
+      "type": "string",
+      "description": "Current website URL"
+    },
+    "industry": {
+      "type": "string",
+      "description": "Industry (e.g. roofing, hvac, plumbing, dental, legal)"
+    },
+    "sub_industry": {
+      "type": "string"
+    },
+    "location": {
+      "type": "string",
+      "description": "City, state or geographic area"
+    },
+    "phone": {
+      "type": "string"
+    },
+    "email": {
+      "type": "string"
+    },
+    "address": {
+      "type": "string"
+    },
+    "issues": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": [
+              "no_website",
+              "broken_website",
+              "slow_load",
+              "not_mobile_friendly",
+              "poor_seo",
+              "no_ssl",
+              "outdated_design",
+              "missing_schema",
+              "no_google_business",
+              "low_reviews",
+              "no_social_media",
+              "broken_links",
+              "poor_content",
+              "no_cta",
+              "security_issue"
+            ],
+            "description": "Type of issue detected"
+          },
+          "severity": {
+            "type": "string",
+            "enum": [
+              "critical",
+              "major",
+              "minor"
+            ]
+          },
+          "description": {
+            "type": "string"
+          }
+        }
+      },
+      "description": "List of detected issues with the business's online presence"
+    },
+    "website_score": {
+      "type": "number",
+      "default": 0,
+      "description": "0-100 score \u2014 lower = worse website = better lead opportunity"
+    },
+    "opportunity_score": {
+      "type": "number",
+      "default": 0,
+      "description": "0-100 score \u2014 how valuable this lead is (combines website score inverse + industry value + location)"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "new",
+        "queued",
+        "contacted",
+        "interested",
+        "converted",
+        "rejected"
+      ],
+      "default": "new"
+    },
+    "discovery_run_id": {
+      "type": "string"
+    },
+    "promoted_to_autobuild_id": {
+      "type": "string",
+      "description": "AutoBuild ID if this lead was promoted to the builder"
+    },
+    "promoted_to_prospect_id": {
+      "type": "string",
+      "description": "BusinessProspect ID if synced to the CRM"
+    },
+    "suggested_services": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "AI-suggested services this business needs (website redesign, SEO, branding, etc.)"
+    },
+    "competitor_analysis": {
+      "type": "string",
+      "description": "Brief analysis of how competitors' websites compare"
+    },
+    "logs": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    }
+  },
+  "required": [
+    "business_name"
+  ],
+  "rls": {
+    "read": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "create": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

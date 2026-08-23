@@ -1,0 +1,180 @@
+{
+  "name": "IdeaCandidate",
+  "type": "object",
+  "description": "An app, website, or business idea discovered by the autonomous scrape & discovery engine. Each idea is scored on profitability, scalability, niche strength, usability, competition, and trend momentum. High-scoring ideas can be promoted to the AutoBuilder pipeline.",
+  "properties": {
+    "title": {
+      "type": "string",
+      "description": "Short name/title for the idea"
+    },
+    "description": {
+      "type": "string",
+      "description": "Full description of the idea \u2014 what it does, who it serves"
+    },
+    "problem_statement": {
+      "type": "string",
+      "description": "The problem this idea solves"
+    },
+    "proposed_solution": {
+      "type": "string",
+      "description": "How the app/website/system solves the problem"
+    },
+    "target_audience": {
+      "type": "string",
+      "description": "Who would use this"
+    },
+    "source": {
+      "type": "string",
+      "enum": [
+        "reddit",
+        "producthunt",
+        "google_trends",
+        "hackernews",
+        "twitter",
+        "google_search",
+        "browserbase_scrape",
+        "manual",
+        "social_scan"
+      ],
+      "default": "google_search",
+      "description": "Where this idea was discovered"
+    },
+    "source_url": {
+      "type": "string",
+      "description": "URL of the source page where the idea was found"
+    },
+    "source_snippet": {
+      "type": "string",
+      "description": "Raw text snippet from the source that inspired the idea"
+    },
+    "industry": {
+      "type": "string",
+      "description": "Primary industry (e.g. healthcare, fintech, productivity)"
+    },
+    "sub_industry": {
+      "type": "string",
+      "description": "Sub-industry or niche"
+    },
+    "product_type": {
+      "type": "string",
+      "enum": [
+        "marketing_site",
+        "web_app",
+        "ecommerce",
+        "platform"
+      ],
+      "default": "web_app",
+      "description": "What type of product this idea maps to in the AutoBuilder"
+    },
+    "scores": {
+      "type": "object",
+      "description": "AI-generated scores (0-100) across key business viability dimensions",
+      "properties": {
+        "profitability": {
+          "type": "number",
+          "description": "Revenue potential \u2014 market size, willingness to pay, monetization clarity"
+        },
+        "scalability": {
+          "type": "number",
+          "description": "How easily the product scales without proportional cost increase"
+        },
+        "niche_strength": {
+          "type": "number",
+          "description": "How well-defined and underserved the niche is"
+        },
+        "usability": {
+          "type": "number",
+          "description": "How easy the product is to use / how clear the value prop is"
+        },
+        "competition": {
+          "type": "number",
+          "description": "Inverse competition \u2014 higher = less crowded market"
+        },
+        "trend_momentum": {
+          "type": "number",
+          "description": "Current trending strength / growing interest"
+        },
+        "technical_feasibility": {
+          "type": "number",
+          "description": "How feasible it is to build with current tech"
+        },
+        "overall": {
+          "type": "number",
+          "description": "Weighted composite score (0-100)"
+        }
+      }
+    },
+    "score_breakdown": {
+      "type": "string",
+      "description": "AI-generated explanation of the scores \u2014 why each dimension was rated that way"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "new",
+        "scored",
+        "promoted",
+        "archived",
+        "rejected"
+      ],
+      "default": "new"
+    },
+    "discovery_run_id": {
+      "type": "string",
+      "description": "Linked DiscoveryRun that found this idea"
+    },
+    "promoted_to_autobuild_id": {
+      "type": "string",
+      "description": "AutoBuild record ID if this idea was promoted to the builder pipeline"
+    },
+    "keywords": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Search keywords that describe this idea"
+    },
+    "competitors": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Known existing competitors or similar products"
+    },
+    "monetization_model": {
+      "type": "string",
+      "description": "Suggested monetization model (subscription, freemium, one-time, marketplace, etc.)"
+    },
+    "logs": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    }
+  },
+  "required": [
+    "title"
+  ],
+  "rls": {
+    "read": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "create": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

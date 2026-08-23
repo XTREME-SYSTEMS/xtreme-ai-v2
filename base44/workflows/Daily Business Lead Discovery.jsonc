@@ -1,0 +1,88 @@
+{
+  "description": "Autonomous daily search for businesses with bad websites, poor online presence, technical failures, or missing enhancements. Checks actual website health and saves high-opportunity leads as BusinessLead records.",
+  "definition": {
+    "document": {
+      "dsl": "1.0.0",
+      "name": "daily_business_lead_discovery",
+      "version": "1.0",
+      "namespace": "base44"
+    },
+    "do": [
+      {
+        "discover_home_services": {
+          "call": "invoke_backend_function",
+          "with": {
+            "function_name": "discoverBusinessLeads",
+            "args": {
+              "industry": "home services",
+              "max_results": 10,
+              "check_websites": true,
+              "triggered_by": "workflow"
+            }
+          },
+          "then": "discover_professional_services",
+          "x-base44": {
+            "title": "Scan home services",
+            "description": "Find contractors with bad websites"
+          }
+        }
+      },
+      {
+        "discover_professional_services": {
+          "call": "invoke_backend_function",
+          "with": {
+            "function_name": "discoverBusinessLeads",
+            "args": {
+              "industry": "professional services",
+              "max_results": 10,
+              "check_websites": true,
+              "triggered_by": "workflow"
+            }
+          },
+          "then": "discover_health_wellness",
+          "x-base44": {
+            "title": "Scan professional services",
+            "description": "Find lawyers, accountants, consultants"
+          }
+        }
+      },
+      {
+        "discover_health_wellness": {
+          "call": "invoke_backend_function",
+          "with": {
+            "function_name": "discoverBusinessLeads",
+            "args": {
+              "industry": "health and wellness",
+              "max_results": 10,
+              "check_websites": true,
+              "triggered_by": "workflow"
+            }
+          },
+          "then": "end",
+          "x-base44": {
+            "title": "Scan health & wellness",
+            "description": "Find clinics, gyms, spas with poor presence"
+          }
+        }
+      }
+    ]
+  },
+  "trigger": {
+    "condition": null,
+    "config": {
+      "trigger_type": "scheduled",
+      "events": [],
+      "schedule_mode": "recurring",
+      "cron_expression": "0 10 * * *",
+      "one_time_date": null,
+      "timezone": "America/New_York",
+      "interval_value": null,
+      "interval_unit": null,
+      "interval_anchor": null,
+      "ends_type": "never",
+      "ends_on_date": null,
+      "ends_after_count": null
+    }
+  },
+  "name": "Daily Business Lead Discovery"
+}

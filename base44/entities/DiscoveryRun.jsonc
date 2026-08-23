@@ -1,0 +1,119 @@
+{
+  "name": "DiscoveryRun",
+  "type": "object",
+  "description": "A single execution of the autonomous discovery engine \u2014 tracks what was searched, how many ideas/leads were found, and the outcome. Created by scheduled workflows or manual triggers.",
+  "properties": {
+    "run_type": {
+      "type": "string",
+      "enum": [
+        "idea_discovery",
+        "business_lead_discovery"
+      ],
+      "description": "Whether this run searched for app ideas or business leads with bad websites"
+    },
+    "source": {
+      "type": "string",
+      "description": "Discovery source used (google_search, reddit, producthunt, google_trends, browserbase_scrape, social_scan)"
+    },
+    "industry": {
+      "type": "string",
+      "description": "Industry filter for this run"
+    },
+    "sub_industry": {
+      "type": "string",
+      "description": "Sub-industry filter"
+    },
+    "search_criteria": {
+      "type": "object",
+      "description": "Full search criteria used for this run",
+      "properties": {
+        "keywords": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "location": {
+          "type": "string"
+        },
+        "max_results": {
+          "type": "number"
+        },
+        "min_score": {
+          "type": "number"
+        },
+        "exclude_sources": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "queued",
+        "running",
+        "complete",
+        "failed"
+      ],
+      "default": "queued"
+    },
+    "items_found": {
+      "type": "number",
+      "default": 0,
+      "description": "Number of ideas or leads found in this run"
+    },
+    "items_promoted": {
+      "type": "number",
+      "default": 0
+    },
+    "started_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "completed_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "error": {
+      "type": "string"
+    },
+    "triggered_by": {
+      "type": "string",
+      "description": "workflow, manual, or system"
+    },
+    "logs": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    }
+  },
+  "required": [
+    "run_type"
+  ],
+  "rls": {
+    "read": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "create": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

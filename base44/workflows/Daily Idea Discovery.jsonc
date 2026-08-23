@@ -1,0 +1,111 @@
+{
+  "description": "Autonomous daily scrape that searches the web for app/website ideas \u2014 problems needing solutions, trending topics, social media requests, and market gaps. Discovers, scores, and saves ideas as IdeaCandidate records.",
+  "definition": {
+    "document": {
+      "dsl": "1.0.0",
+      "name": "daily_idea_discovery",
+      "version": "1.0",
+      "namespace": "base44"
+    },
+    "do": [
+      {
+        "discover_problems": {
+          "call": "invoke_backend_function",
+          "with": {
+            "function_name": "runDiscoveryScrape",
+            "args": {
+              "search_type": "problems",
+              "max_results": 10,
+              "auto_score": true,
+              "min_score": 30,
+              "triggered_by": "workflow"
+            }
+          },
+          "then": "discover_trends",
+          "x-base44": {
+            "title": "Search for problems",
+            "description": "Find pain points needing apps"
+          }
+        }
+      },
+      {
+        "discover_trends": {
+          "call": "invoke_backend_function",
+          "with": {
+            "function_name": "runDiscoveryScrape",
+            "args": {
+              "search_type": "trends",
+              "max_results": 10,
+              "auto_score": true,
+              "min_score": 30,
+              "triggered_by": "workflow"
+            }
+          },
+          "then": "discover_social",
+          "x-base44": {
+            "title": "Search for trends",
+            "description": "Find trending topics and emerging tech"
+          }
+        }
+      },
+      {
+        "discover_social": {
+          "call": "invoke_backend_function",
+          "with": {
+            "function_name": "runDiscoveryScrape",
+            "args": {
+              "search_type": "social",
+              "max_results": 10,
+              "auto_score": true,
+              "min_score": 30,
+              "triggered_by": "workflow"
+            }
+          },
+          "then": "discover_gaps",
+          "x-base44": {
+            "title": "Scan social media",
+            "description": "Find what people are requesting"
+          }
+        }
+      },
+      {
+        "discover_gaps": {
+          "call": "invoke_backend_function",
+          "with": {
+            "function_name": "runDiscoveryScrape",
+            "args": {
+              "search_type": "gaps",
+              "max_results": 10,
+              "auto_score": true,
+              "min_score": 30,
+              "triggered_by": "workflow"
+            }
+          },
+          "then": "end",
+          "x-base44": {
+            "title": "Find market gaps",
+            "description": "Identify underserved niches"
+          }
+        }
+      }
+    ]
+  },
+  "trigger": {
+    "condition": null,
+    "config": {
+      "trigger_type": "scheduled",
+      "events": [],
+      "schedule_mode": "recurring",
+      "cron_expression": "0 9 * * *",
+      "one_time_date": null,
+      "timezone": "America/New_York",
+      "interval_value": null,
+      "interval_unit": null,
+      "interval_anchor": null,
+      "ends_type": "never",
+      "ends_on_date": null,
+      "ends_after_count": null
+    }
+  },
+  "name": "Daily Idea Discovery"
+}
