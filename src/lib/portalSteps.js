@@ -148,6 +148,14 @@ export const PORTAL_STEPS = {
     activityLabel: "Generate data model",
     title: "Data Model",
     body: "The AI refines the architecture into detailed entity schemas with validation rules, indexes, relationships, seed data, and API endpoints.",
+    nextLabel: "Go to UI System", nextTo: "/ui-system",
+  },
+  "ui-system": {
+    key: "ui-system",
+    to: "/ui-system", label: "UI System", icon: Palette, gate: "auto",
+    activityLabel: "Generate UI design system",
+    title: "UI Design System",
+    body: "The AI designs a complete design system — color palette, typography, spacing, component library, layout patterns, and responsive breakpoints.",
     nextLabel: "Go to Review", nextTo: "/system-review",
   },
   "system-review": {
@@ -187,7 +195,7 @@ const FULL_BUILD_PLUS_MEDIA = [
 // data-model, ui-system, codegen, and deploy steps between architecture
 // and review once each generator is built.
 const SYSTEM_BUILD = [
-  "welcome", "business-profile", "system-architecture", "data-model", "system-review", "launch",
+  "welcome", "business-profile", "system-architecture", "data-model", "ui-system", "system-review", "launch",
 ];
 
 export const PRODUCT_STEPS = {

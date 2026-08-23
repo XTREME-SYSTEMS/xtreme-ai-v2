@@ -65,7 +65,7 @@ export default function DataModel() {
       visited_steps: visited,
       logs: [...(build.logs || []), `[${new Date().toISOString()}] Data model approved`],
     });
-    navigate("/system-review");
+    navigate("/ui-system");
   };
 
   const toggle = (name) => setExpanded((p) => ({ ...p, [name]: !p[name] }));

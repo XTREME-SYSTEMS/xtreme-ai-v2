@@ -201,6 +201,45 @@
         }
       }
     },
+    "ui_system": {
+      "type": "object",
+      "description": "Generated UI design system spec (for web_app/ecommerce/platform builds) \u2014 color palette, typography scale, spacing system, component library, layout patterns, responsive breakpoints, and theme tokens. Produced by generateUiSystem from the architecture spec.",
+      "properties": {
+        "color_palette": {
+          "type": "object"
+        },
+        "typography": {
+          "type": "object"
+        },
+        "spacing": {
+          "type": "object"
+        },
+        "components": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        },
+        "layout_patterns": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        },
+        "responsive": {
+          "type": "object"
+        },
+        "theme_tokens": {
+          "type": "object"
+        },
+        "design_principles": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
     "code_manifest": {
       "type": "object",
       "description": "Generated codebase manifest (future codegen step) \u2014 the list of files, their paths, and content references that make up the deployable codebase.",

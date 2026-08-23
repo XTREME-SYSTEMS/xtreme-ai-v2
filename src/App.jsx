@@ -110,6 +110,7 @@ import FreeTools from '@/pages/FreeTools';
 import AutoBuilder from '@/pages/AutoBuilder';
 import SystemArchitecture from '@/pages/SystemArchitecture';
 import DataModel from '@/pages/DataModel';
+import UiSystem from '@/pages/UiSystem';
 import SystemReview from '@/pages/SystemReview';
 
 const AuthenticatedApp = () => {
@@ -238,6 +239,7 @@ const AuthenticatedApp = () => {
           <Route path="/auto-builder" element={<AutoBuilder />} />
           <Route path="/system-architecture" element={<SystemArchitecture />} />
           <Route path="/data-model" element={<DataModel />} />
+          <Route path="/ui-system" element={<UiSystem />} />
           <Route path="/system-review" element={<SystemReview />} />
         </Route>
       </Route>
