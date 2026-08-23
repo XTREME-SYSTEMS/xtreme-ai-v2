@@ -37,49 +37,43 @@ export default function SystemAlerts() {
     setHealing(alert.id);
     setHealError(null);
     try {
-      if (!alert.build_id) {
-        setHealError("This alert has no linked build — can't auto-heal.");
-        return;
-      }
+      // The backend selfHealBuild function already updates the alert's status,
+      // context, logs, and retry_count — so we just invoke it and reload.
       const res = await base44.functions.invoke("selfHealBuild", {
         buildId: alert.build_id,
         alertType: alert.alert_type,
         alertId: alert.id,
       });
       const body = res?.data || res;
-      if (body?.healed) {
-        await base44.entities.SystemAlert.update(alert.id, {
-          status: "resolved",
-          resolved_at: new Date().toISOString(),
-          resolution: body.message || "Self-healed",
-        });
+      if (body?.error) {
+        setHealError(body.error);
+      } else if (body?.healed) {
+        setHealError(null);
       } else if (body?.action === "escalate") {
-        await base44.entities.SystemAlert.update(alert.id, {
-          status: "escalated",
-          context: body.message,
-        });
-      } else {
-        await base44.entities.SystemAlert.update(alert.id, {
-          status: "healing",
-          logs: [...(alert.logs || []), `[${new Date().toISOString()}] Manual heal triggered`],
-        });
+        setHealError(body.message || "Re-verification still failing — alert escalated");
       }
       await loadAlerts();
     } catch (e) {
       console.error("Heal failed", e);
-      setHealError(e?.message || "Heal failed — check the function logs");
+      const msg = e?.response?.data?.error || e?.message || "Heal failed — check the function logs";
+      setHealError(msg);
     } finally {
       setHealing(null);
     }
   };
 
   const dismissAlert = async (alert) => {
-    await base44.entities.SystemAlert.update(alert.id, {
-      status: "dismissed",
-      resolved_at: new Date().toISOString(),
-      resolution: "Dismissed by operator",
-    });
-    await loadAlerts();
+    try {
+      await base44.entities.SystemAlert.update(alert.id, {
+        status: "dismissed",
+        resolved_at: new Date().toISOString(),
+        resolution: "Dismissed by operator",
+      });
+      await loadAlerts();
+    } catch (e) {
+      console.error("Dismiss failed", e);
+      setHealError(e?.message || "Failed to dismiss alert");
+    }
   };
 
   const filtered = filter === "all" ? alerts : alerts.filter((a) => a.status === filter);
@@ -200,7 +194,7 @@ export default function SystemAlerts() {
                   )}
                 </div>
                 <div className="flex flex-col gap-1.5">
-                  {alert.status === "open" && alert.build_id && (
+                  {(alert.status === "open" || alert.status === "healing" || alert.status === "escalated") && (
                     <button
                       onClick={() => healAlert(alert)}
                       disabled={healing === alert.id}

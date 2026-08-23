@@ -108,6 +108,15 @@ export default async function(req) {
       });
     }
 
+    // For non-post-deploy alerts, we need a valid build to retry/regenerate
+    if (!build) {
+      return Response.json({
+        ok: false,
+        action: 'escalate',
+        message: `Build ${buildId} not found — cannot self-heal without a build record`,
+      }, { status: 404 });
+    }
+
     const breaker = new CircuitBreaker(5);
     const stepKey = build.current_step || 'unknown';
     const errorKey = `${buildId}:${stepKey}`;
