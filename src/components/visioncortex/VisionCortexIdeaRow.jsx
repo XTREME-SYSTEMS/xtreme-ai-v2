@@ -1,13 +1,27 @@
-import { CheckCircle, ChevronRight } from "lucide-react";
+import { CheckCircle, ChevronRight, AlertTriangle, DollarSign, Target } from "lucide-react";
 
 // VisionCortexIdeaRow — compact clickable row for an idea in the Vision Cortex list.
-// Clicking opens the full summary modal.
+// Shows the problem it solves, estimated profit margin, and success probability
+// at a glance. Clicking opens the full summary modal.
 export default function VisionCortexIdeaRow({ idea, onClick }) {
   const scores = idea.yc_scores || {};
   const overallScore = scores.overall || 0;
   const scoreColor = overallScore >= 80 ? "text-lime-400" : overallScore >= 60 ? "text-yellow-400" : "text-orange-400";
   const hasSummary = idea.exhaustive_summary && Object.keys(idea.exhaustive_summary).length > 0;
   const isProvisioned = idea.status === "provisioned";
+
+  // Profit margin — extract a short snippet from the net income potential summary
+  const netIncome = idea.exhaustive_summary?.net_income_potential || "";
+  const profitSnippet = netIncome
+    ? netIncome.split(/[.\n]/)[0].slice(0, 45).trim()
+    : null;
+
+  // Problem — short snippet from problem_statement
+  const problemText = idea.problem_statement
+    ? idea.problem_statement.length > 60
+      ? idea.problem_statement.slice(0, 60).trim() + "…"
+      : idea.problem_statement
+    : null;
 
   return (
     <button
@@ -29,7 +43,37 @@ export default function VisionCortexIdeaRow({ idea, onClick }) {
             </span>
           )}
         </div>
-        <p className="truncate text-xs text-white/50">{idea.description || idea.problem_statement || "No description"}</p>
+
+        {/* Quick-glance stats: Problem, Profit, Success */}
+        <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-[10px]">
+          {/* Problem it solves */}
+          <span className="flex items-center gap-1 min-w-0">
+            <AlertTriangle className="h-3 w-3 shrink-0 text-red-400/70" />
+            <span className="truncate text-white/55 max-w-[180px]">
+              {problemText || "—"}
+            </span>
+          </span>
+
+          {/* Estimated profit margin */}
+          <span className="flex items-center gap-1 shrink-0">
+            <DollarSign className="h-3 w-3 shrink-0 text-emerald-400/70" />
+            <span className="text-white/55">
+              {profitSnippet ? (
+                <span className="text-emerald-300/80">{profitSnippet}</span>
+              ) : (
+                <span className="text-white/30">Profit: pending</span>
+              )}
+            </span>
+          </span>
+
+          {/* Success probability */}
+          <span className="flex items-center gap-1 shrink-0">
+            <Target className="h-3 w-3 shrink-0 text-lime-400/70" />
+            <span className={scoreColor}>{overallScore}% success</span>
+          </span>
+        </div>
+
+        {/* Source tags */}
         <div className="mt-1 flex flex-wrap items-center gap-1.5 text-[10px]">
           <span className="rounded-full bg-white/5 px-1.5 py-0.5 text-white/50">{idea.industry || "Unknown"}</span>
           <span className="rounded-full bg-white/5 px-1.5 py-0.5 text-white/50">{idea.source?.replace(/_/g, " ") || "manual"}</span>
