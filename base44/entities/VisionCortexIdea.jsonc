@@ -1,0 +1,260 @@
+{
+  "name": "VisionCortexIdea",
+  "type": "object",
+  "description": "An idea discovered, scored, and validated by the Vision Cortex engine \u2014 the AI-assisted idea generator that feeds the Auto Builder. Each idea is scraped from social media, Reddit, Product Hunt, AI websites, app directories, or any URL, then scored against the YC 10-question framework and visionary principles. Top 10 ideas get exhaustive build summaries (how it works, how to build, complications, financials, AI usage, autonomous build plan, architecture, data systems, brand). Top ideas can be provisioned directly into the AutoBuilder pipeline.",
+  "properties": {
+    "title": {
+      "type": "string",
+      "description": "Short name/title for the idea"
+    },
+    "description": {
+      "type": "string",
+      "description": "Full description of the idea \u2014 what it does, who it serves"
+    },
+    "problem_statement": {
+      "type": "string",
+      "description": "The specific problem this idea solves"
+    },
+    "proposed_solution": {
+      "type": "string",
+      "description": "How the app/website/system solves the problem"
+    },
+    "target_audience": {
+      "type": "string",
+      "description": "Who would use this"
+    },
+    "source": {
+      "type": "string",
+      "description": "Where this idea was discovered (reddit, producthunt, hackernews, ai_website, app_directory, social_media, google_search, browserbase_scrape, manual)"
+    },
+    "source_url": {
+      "type": "string",
+      "description": "URL of the source page where the idea was found"
+    },
+    "source_snippet": {
+      "type": "string",
+      "description": "Raw text snippet from the source that inspired the idea"
+    },
+    "scraped_content": {
+      "type": "string",
+      "description": "Full scraped content from the source page (for context)"
+    },
+    "industry": {
+      "type": "string",
+      "description": "Primary industry (e.g. healthcare, fintech, productivity, AI tools, developer tools)"
+    },
+    "sub_industry": {
+      "type": "string",
+      "description": "Sub-industry or niche"
+    },
+    "product_type": {
+      "type": "string",
+      "enum": [
+        "marketing_site",
+        "web_app",
+        "ecommerce",
+        "platform"
+      ],
+      "default": "web_app",
+      "description": "What type of product this idea maps to in the AutoBuilder"
+    },
+    "keywords": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Search keywords that describe this idea"
+    },
+    "competitors": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Known existing competitors or similar products"
+    },
+    "monetization_model": {
+      "type": "string",
+      "description": "Suggested monetization model (subscription, freemium, one-time, marketplace, ads, etc.)"
+    },
+    "yc_scores": {
+      "type": "object",
+      "description": "Scores (0-100) based on the YC 10-key-question framework and visionary principles",
+      "properties": {
+        "founder_market_fit": {
+          "type": "number",
+          "description": "KQ-01: Is this the right idea for an AI-driven autonomous build system? (0-100)"
+        },
+        "market_size": {
+          "type": "number",
+          "description": "KQ-02: How big is the market \u2014 large today or growing rapidly? (0-100)"
+        },
+        "problem_acuity": {
+          "type": "number",
+          "description": "KQ-03: How acute/painful is the problem \u2014 no good existing solution? (0-100)"
+        },
+        "competition_insight": {
+          "type": "number",
+          "description": "KQ-04: Is there a genuine insight competitors are missing? (0-100, higher = clearer differentiation)"
+        },
+        "personal_demand": {
+          "type": "number",
+          "description": "KQ-05: Do people actually want this? Evidence of real demand? (0-100)"
+        },
+        "recently_possible": {
+          "type": "number",
+          "description": "KQ-06: Did this only recently become possible/necessary? (0-100)"
+        },
+        "proxy_validation": {
+          "type": "number",
+          "description": "KQ-07: Is there a successful proxy company proving the model? (0-100)"
+        },
+        "scalability": {
+          "type": "number",
+          "description": "How easily it scales without proportional cost increase (0-100)"
+        },
+        "technical_feasibility": {
+          "type": "number",
+          "description": "How feasible to build autonomously with current AI/tech (0-100)"
+        },
+        "autonomous_build_potential": {
+          "type": "number",
+          "description": "Can this be built and launched autonomously by the Auto Builder? (0-100)"
+        },
+        "overall": {
+          "type": "number",
+          "description": "Weighted composite YC score (0-100)"
+        }
+      }
+    },
+    "score_breakdown": {
+      "type": "string",
+      "description": "AI-generated explanation of the YC scores \u2014 why each dimension was rated that way"
+    },
+    "is_top_10": {
+      "type": "boolean",
+      "default": false,
+      "description": "Whether this idea was selected as one of the top 10 best ideas"
+    },
+    "top_10_rank": {
+      "type": "number",
+      "description": "Rank within the top 10 (1 = best)"
+    },
+    "exhaustive_summary": {
+      "type": "object",
+      "description": "Exhaustive build summary generated for top 10 ideas \u2014 the full blueprint for how to build, launch, and monetize",
+      "properties": {
+        "how_it_works": {
+          "type": "string",
+          "description": "Detailed explanation of how the product works end-to-end"
+        },
+        "how_to_build": {
+          "type": "string",
+          "description": "Step-by-step build plan \u2014 tech stack, architecture, phases"
+        },
+        "possible_complications": {
+          "type": "string",
+          "description": "What could go wrong \u2014 technical, market, legal, operational"
+        },
+        "complication_prevention": {
+          "type": "string",
+          "description": "How to prevent or mitigate each complication"
+        },
+        "financial_cost": {
+          "type": "string",
+          "description": "Estimated cost to build and launch (infrastructure, AI, tools, labor)"
+        },
+        "gross_income_potential": {
+          "type": "string",
+          "description": "Estimated gross revenue potential (monthly/yearly, conservative and optimistic)"
+        },
+        "net_income_potential": {
+          "type": "string",
+          "description": "Estimated net profit after costs (monthly/yearly)"
+        },
+        "niche": {
+          "type": "string",
+          "description": "The specific niche this targets"
+        },
+        "problems_solved": {
+          "type": "string",
+          "description": "Exhaustive list of problems this solves"
+        },
+        "ai_usage_plan": {
+          "type": "string",
+          "description": "How AI is used to build and operate the product"
+        },
+        "autonomous_build_plan": {
+          "type": "string",
+          "description": "How the Auto Builder can build this autonomously \u2014 step by step"
+        },
+        "architecture_overview": {
+          "type": "string",
+          "description": "High-level system architecture \u2014 pages, data models, integrations"
+        },
+        "data_systems_needed": {
+          "type": "string",
+          "description": "What data systems, APIs, and integrations are needed"
+        },
+        "brand_strategy": {
+          "type": "string",
+          "description": "Brand name ideas, positioning, tone, visual direction"
+        },
+        "go_to_market": {
+          "type": "string",
+          "description": "How to launch and get first users \u2014 channels, tactics"
+        }
+      }
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "discovered",
+        "validated",
+        "top_10",
+        "provisioned",
+        "archived",
+        "rejected"
+      ],
+      "default": "discovered"
+    },
+    "discovery_run_id": {
+      "type": "string",
+      "description": "Linked Vision Cortex discovery run ID"
+    },
+    "provisioned_to_autobuild_id": {
+      "type": "string",
+      "description": "AutoBuild record ID if this idea was provisioned to the builder pipeline"
+    },
+    "logs": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    }
+  },
+  "required": [
+    "title"
+  ],
+  "rls": {
+    "read": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "create": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

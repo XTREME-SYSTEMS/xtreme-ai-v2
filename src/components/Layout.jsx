@@ -6,7 +6,7 @@ import {
   Lightbulb, Palette, Monitor, Megaphone, Boxes, Factory, Database, Eye,
   Hammer, ShieldCheck, FileText, TrendingUp, FlaskConical, Dna, Network, BarChart3,
   BookMarked, CheckCircle, ScrollText, Plug, Settings, LogOut, Menu, X,
-  MapPin, Plus, Rocket, Bot, LayoutTemplate, Copy, Wand2, Crosshair, Activity, Radar, Package, UserPlus, Tag, Box, ShieldAlert, Sparkles,
+  MapPin, Plus, Rocket, Bot, LayoutTemplate, Copy, Wand2, Crosshair, Activity, Radar, Package, UserPlus, Tag, Box, ShieldAlert, Sparkles, Brain,
 } from "lucide-react";
 import { Image } from "@/components/ui/image";
 import { cn } from "@/lib/utils";
@@ -84,6 +84,7 @@ const NAV = [
   { to: "/markets/new", label: "New Market", icon: Plus },
   { to: "/seo-launch-pad", label: "SEO Launch Pad", icon: Rocket },
   { section: "Autonomous" },
+  { to: "/vision-cortex", label: "Vision Cortex", icon: Brain, end: true },
   { to: "/auto-builder", label: "Auto Builder", icon: Hammer, end: true },
   { to: "/autonomous-system", label: "Autonomous Engine", icon: Bot, end: true },
   { section: "Lab" },

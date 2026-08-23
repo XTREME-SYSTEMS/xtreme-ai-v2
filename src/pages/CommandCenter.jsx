@@ -8,6 +8,7 @@ import { Users, Target, ShieldCheck, Hammer, ScrollText, Search, BookOpen, Arrow
 import PipelineHealthWidget from "@/components/PipelineHealthWidget";
 import SystemAccessGrid from "@/components/SystemAccessGrid";
 import ClientPipelineOps from "@/components/admin/ClientPipelineOps";
+import VisionCortexWidget from "@/components/visioncortex/VisionCortexWidget";
 
 export default function CommandCenter() {
   const [stats, setStats] = useState({ prospects: 0, opportunities: 0, builds: 0, receipts: 0, clones: 0, recent: [], gscImpressions: 0, gscClicks: 0, topKeywords: [] });
@@ -52,6 +53,11 @@ export default function CommandCenter() {
   return (
     <div>
       <PageHeader title="Command Center" subtitle="LEAD GEN NEAR YOU — Universal Growth Factory · THROW THE BOOK AT IT" />
+
+      {/* Vision Cortex — the main AI-assisted idea engine, at the top */}
+      <div className="mb-6">
+        <VisionCortexWidget />
+      </div>
 
       <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
         <StatCard label="Prospects" value={loading ? "—" : stats.prospects} icon={Users} />
