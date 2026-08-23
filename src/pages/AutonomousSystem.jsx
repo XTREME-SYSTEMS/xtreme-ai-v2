@@ -10,6 +10,7 @@ export default function AutonomousSystem() {
   const [phases, setPhases] = useState([]);
   const [health, setHealth] = useState(null);
   const [repairs, setRepairs] = useState([]);
+  const [systemFailures, setSystemFailures] = useState({ alerts: [], failedBuilds: [], failedJobs: [] });
   const [loading, setLoading] = useState(true);
   const [seeding, setSeeding] = useState(false);
   const [seedingRoadmap, setSeedingRoadmap] = useState(false);
@@ -28,6 +29,24 @@ export default function AutonomousSystem() {
     setRepairs(reps);
   }, []);
 
+  const loadSystemFailures = useCallback(async () => {
+    try {
+      const [openAlerts, escalatedAlerts, failedBuilds, failedJobs] = await Promise.all([
+        base44.entities.SystemAlert.filter({ status: "open" }, "-created_date", 20).catch(() => []),
+        base44.entities.SystemAlert.filter({ status: "escalated" }, "-created_date", 20).catch(() => []),
+        base44.entities.AutoBuild.filter({ status: "failed" }, "-created_date", 20).catch(() => []),
+        base44.entities.GenerationJob.filter({ status: "failed" }, "-created_date", 20).catch(() => []),
+      ]);
+      setSystemFailures({
+        alerts: [...(openAlerts || []), ...(escalatedAlerts || [])],
+        failedBuilds: failedBuilds || [],
+        failedJobs: failedJobs || [],
+      });
+    } catch (e) {
+      console.error("Failed to load system failures", e);
+    }
+  }, []);
+
   const load = useCallback(async () => {
     try {
       setLoading(true);
@@ -36,12 +55,13 @@ export default function AutonomousSystem() {
       const p = allPlans[0];
       setPlan(p);
       await loadPlan(p);
+      await loadSystemFailures();
     } catch (e) {
       console.error(e);
     } finally {
       setLoading(false);
     }
-  }, [loadPlan]);
+  }, [loadPlan, loadSystemFailures]);
 
   useEffect(() => { load(); }, [load]);
 
@@ -153,6 +173,44 @@ export default function AutonomousSystem() {
             </div>
           ))}
         </div>
+      )}
+
+      {/* System Failures */}
+      {(systemFailures.alerts.length > 0 || systemFailures.failedBuilds.length > 0 || systemFailures.failedJobs.length > 0) && (
+        <Panel title="System Failures" className="mb-6">
+          <div className="space-y-2">
+            {systemFailures.alerts.map((a) => (
+              <div key={a.id} className="flex items-start gap-2 rounded-lg border border-red-400/20 bg-red-400/5 p-3 text-sm">
+                <AlertTriangle className={`mt-0.5 h-4 w-4 shrink-0 ${a.severity === 'critical' ? 'text-red-400' : 'text-orange-400'}`} />
+                <div className="min-w-0 flex-1">
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs font-mono uppercase text-white/50">{(a.alert_type || '').replace(/_/g, ' ')}</span>
+                    {a.status === 'escalated' && <span className="rounded-full bg-red-400/10 px-1.5 py-0.5 text-[10px] text-red-300">escalated</span>}
+                  </div>
+                  <div className="mt-0.5 text-white/80">{a.message}</div>
+                </div>
+              </div>
+            ))}
+            {systemFailures.failedBuilds.map((b) => (
+              <div key={b.id} className="flex items-start gap-2 rounded-lg border border-red-400/20 bg-red-400/5 p-3 text-sm">
+                <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-red-400" />
+                <div className="min-w-0 flex-1">
+                  <div className="text-white/80">Failed build: {b.business_name}</div>
+                  <div className="mt-0.5 text-xs text-white/40">Step: {b.current_step} · {b.error?.slice(0, 100) || 'unknown error'}</div>
+                </div>
+              </div>
+            ))}
+            {systemFailures.failedJobs.map((j) => (
+              <div key={j.id} className="flex items-start gap-2 rounded-lg border border-yellow-400/20 bg-yellow-400/5 p-3 text-sm">
+                <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-yellow-400" />
+                <div className="min-w-0 flex-1">
+                  <div className="text-white/80">Failed job: {j.job_type}</div>
+                  <div className="mt-0.5 text-xs text-white/40">{j.error?.slice(0, 100) || 'unknown error'}</div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </Panel>
       )}
 
       {/* Progress bar */}

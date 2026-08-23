@@ -116,6 +116,7 @@ import Deploy from '@/pages/Deploy';
 import SystemReview from '@/pages/SystemReview';
 import IdeaDiscovery from '@/pages/IdeaDiscovery';
 import SystemAlerts from '@/pages/SystemAlerts';
+import SystemOptimization from '@/pages/SystemOptimization';
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin, isAuthenticated } = useAuth();
@@ -249,6 +250,7 @@ const AuthenticatedApp = () => {
           <Route path="/system-review" element={<SystemReview />} />
           <Route path="/idea-discovery" element={<IdeaDiscovery />} />
           <Route path="/system-alerts" element={<SystemAlerts />} />
+          <Route path="/system-optimization" element={<SystemOptimization />} />
         </Route>
       </Route>
       <Route path="*" element={<PageNotFound />} />

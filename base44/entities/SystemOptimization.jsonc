@@ -1,0 +1,121 @@
+{
+  "name": "SystemOptimization",
+  "type": "object",
+  "description": "Findings from the system self-reflection scan \u2014 failures, gaps, optimization opportunities, and enhancement areas. Each finding has a recommended action (fix, heal, harden, optimize, enhance) and an action endpoint to apply the fix. Manual trigger now; autonomous-ready for workflow scheduling later.",
+  "properties": {
+    "category": {
+      "type": "string",
+      "enum": [
+        "failure",
+        "gap",
+        "optimization",
+        "enhancement",
+        "hardening"
+      ],
+      "description": "What kind of finding this is"
+    },
+    "severity": {
+      "type": "string",
+      "enum": [
+        "critical",
+        "high",
+        "medium",
+        "low",
+        "info"
+      ],
+      "default": "medium"
+    },
+    "area": {
+      "type": "string",
+      "description": "Which part of the system (builds, workflows, alerts, entities, functions, seo, deploy, discovery, generation)"
+    },
+    "title": {
+      "type": "string",
+      "description": "Short title for the finding"
+    },
+    "description": {
+      "type": "string",
+      "description": "Full description of the finding"
+    },
+    "recommended_action": {
+      "type": "string",
+      "enum": [
+        "fix",
+        "heal",
+        "harden",
+        "optimize",
+        "enhance",
+        "dismiss"
+      ],
+      "description": "What action to take"
+    },
+    "action_endpoint": {
+      "type": "string",
+      "description": "Backend function to call to apply the fix"
+    },
+    "action_payload": {
+      "type": "string",
+      "description": "JSON-stringified payload to pass to the action endpoint"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "open",
+        "fixing",
+        "resolved",
+        "dismissed",
+        "failed"
+      ],
+      "default": "open"
+    },
+    "scan_id": {
+      "type": "string",
+      "description": "Groups findings by scan run"
+    },
+    "evidence": {
+      "type": "string",
+      "description": "Supporting evidence data (JSON stringified)"
+    },
+    "resolved_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "resolution": {
+      "type": "string",
+      "description": "How the finding was resolved"
+    },
+    "logs": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    }
+  },
+  "required": [
+    "category",
+    "title",
+    "recommended_action"
+  ],
+  "rls": {
+    "read": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "create": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}
