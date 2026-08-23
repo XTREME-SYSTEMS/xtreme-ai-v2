@@ -57,6 +57,19 @@ export function useSystemBuildStep(functionName, fieldName, stepKey) {
           current_step: stepKey,
           logs: [...(build.logs || []), `[${new Date().toISOString()}] ${stepKey} generated (attempt ${attemptNum})`],
         });
+        // Create Receipt for auditability
+        try {
+          await base44.entities.Receipt.create({
+            agent_or_workflow: "useSystemBuildStep",
+            action: `generate_${stepKey}`,
+            entity_type: "AutoBuild",
+            entity_id: build.id,
+            inputs: JSON.stringify({ function: functionName, attempt: attemptNum }).slice(0, 4000),
+            outputs: JSON.stringify({ field: fieldName }).slice(0, 4000),
+            status: "success",
+            evidence: `${stepKey} spec generated on attempt ${attemptNum}`,
+          });
+        } catch {}
         setGenerating(false);
         setAttempt(0);
         return spec;
@@ -97,6 +110,19 @@ export function useSystemBuildStep(functionName, fieldName, stepKey) {
       visited_steps: visited,
       logs: [...(build.logs || []), `[${new Date().toISOString()}] ${stepKey} approved`],
     });
+    // Create Receipt for the approval
+    try {
+      await base44.entities.Receipt.create({
+        agent_or_workflow: "useSystemBuildStep",
+        action: `approve_${stepKey}`,
+        entity_type: "AutoBuild",
+        entity_id: build.id,
+        inputs: JSON.stringify({ step_path: stepPath, next_route: nextRoute }).slice(0, 4000),
+        outputs: "",
+        status: "success",
+        evidence: `${stepKey} approved, advancing to ${nextRoute}`,
+      });
+    } catch {}
     navigate(nextRoute);
   }, [autoBuild, stepKey]);
 

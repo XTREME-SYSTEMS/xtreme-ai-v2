@@ -28,6 +28,27 @@ const MARKETING_STEPS = ["profile", "names", "content", "logo", "brand", "websit
 const SYSTEM_STEPS = ["profile", "architecture", "data_model", "ui_system", "codegen", "deploy", "system_review", "complete"];
 const SYSTEM_PRODUCT_TYPES = ["web_app", "ecommerce", "platform"];
 
+// Step key → UI route path. The UI pages add ROUTE PATHS to visited_steps
+// (e.g., "/system-architecture"), not step keys (e.g., "architecture").
+// The queue processor must use the same format so the timeline gates work.
+const STEP_PATHS: Record<string, string> = {
+  profile: "/business-profile",
+  names: "/business-name-studio",
+  content: "/content-generator",
+  logo: "/logo-generator",
+  brand: "/brand-generator",
+  website: "/design-direction",
+  social: "/social-media",
+  video: "/video-generator",
+  review: "/your-designs",
+  architecture: "/system-architecture",
+  data_model: "/data-model",
+  ui_system: "/ui-system",
+  codegen: "/codegen",
+  deploy: "/deploy",
+  system_review: "/system-review",
+};
+
 function getStepSequence(productType: string): string[] {
   return SYSTEM_PRODUCT_TYPES.includes(productType) ? SYSTEM_STEPS : MARKETING_STEPS;
 }
@@ -236,10 +257,19 @@ Deno.serve(async (req: Request) => {
     }
 
     // Load the build
-    const builds = await base44.asServiceRole.entities.AutoBuild.filter({ id: buildId }, "-created_date", 1);
-    const build = builds?.[0];
+    let builds = await base44.asServiceRole.entities.AutoBuild.filter({ id: buildId }, "-created_date", 1);
+    let build = builds?.[0];
     if (!build) {
       return new Response(JSON.stringify({ error: "Build not found" }), { status: 404 });
+    }
+
+    // Idempotency: don't start if already running (unless force=true)
+    if (build.status === "running" && !body.force) {
+      return new Response(JSON.stringify({
+        error: "Build is already running a step. Pass force=true to override.",
+        build_id: buildId,
+        current_step: build.current_step,
+      }), { status: 409 });
     }
 
     // Mark running
@@ -250,45 +280,94 @@ Deno.serve(async (req: Request) => {
       logs,
     });
 
-    try {
-      const executor = STEP_EXECUTORS[step];
-      const stepResult = await executor(base44, build);
+    // Retry with exponential backoff (3 attempts)
+    const maxRetries = 3;
+    let lastError = "";
+    let stepResult: Record<string, any> | null = null;
 
-      const visited = [...new Set([...(build.visited_steps || []), step])];
-      logs = log({ logs } as any, `Step ${step} completed successfully`);
-      const updateData: Record<string, unknown> = {
-        ...stepResult,
-        visited_steps: visited,
-        logs,
-        status: "paused",
-      };
-
-      if (advance && step !== "review" && step !== "system_review") {
-        const ns = nextStep(step, build.product_type);
-        updateData.current_step = ns;
-        logs = log({ logs } as any, `Advanced to step: ${ns}`);
-        updateData.logs = logs;
-        if (ns === "complete") updateData.status = "complete";
+    for (let attemptNum = 1; attemptNum <= maxRetries; attemptNum++) {
+      try {
+        const executor = STEP_EXECUTORS[step];
+        stepResult = await executor(base44, build);
+        break; // success
+      } catch (e) {
+        lastError = String((e as any)?.message || e);
+        logs = log({ logs } as any, `Step ${step} attempt ${attemptNum}/${maxRetries} failed: ${lastError}`);
+        await base44.asServiceRole.entities.AutoBuild.update(buildId, { logs });
+        if (attemptNum < maxRetries) {
+          // Exponential backoff: 2s, 4s
+          await new Promise((r) => setTimeout(r, 2000 * attemptNum));
+          // Reload build for fresh state on retry
+          const freshBuilds = await base44.asServiceRole.entities.AutoBuild.filter({ id: buildId }, "-created_date", 1);
+          if (freshBuilds?.[0]) build = freshBuilds[0] as any;
+        }
       }
+    }
 
-      const updated = await base44.asServiceRole.entities.AutoBuild.update(buildId, updateData);
-
-      return new Response(JSON.stringify({
-        success: true,
-        step,
-        build: updated,
-        advanced_to: updateData.current_step || build.current_step,
-      }), { status: 200 });
-    } catch (e) {
-      const errMsg = String((e as any)?.message || e);
-      logs = log({ logs } as any, `Step ${step} FAILED: ${errMsg}`);
+    if (!stepResult) {
+      // All retries exhausted — mark failed and create Receipt
+      logs = log({ logs } as any, `Step ${step} FAILED after ${maxRetries} attempts: ${lastError}`);
       await base44.asServiceRole.entities.AutoBuild.update(buildId, {
         status: "failed",
-        error: errMsg,
+        error: lastError,
         logs,
       });
-      return new Response(JSON.stringify({ success: false, error: errMsg, step }), { status: 500 });
+      try {
+        await base44.asServiceRole.entities.Receipt.create({
+          agent_or_workflow: "processAutoBuildStep",
+          action: `step_${step}`,
+          entity_type: "AutoBuild",
+          entity_id: buildId,
+          inputs: JSON.stringify({ step, build_id: buildId, attempts: maxRetries }).slice(0, 4000),
+          outputs: "",
+          status: "failed",
+          evidence: `Step ${step} failed after ${maxRetries} attempts: ${lastError}`,
+        });
+      } catch {}
+      return new Response(JSON.stringify({ success: false, error: lastError, step, attempts: maxRetries }), { status: 500 });
     }
+
+    // Success — save results, mark step path as visited, advance
+    const stepPath = STEP_PATHS[step] || `/${step}`;
+    const visited = [...new Set([...(build.visited_steps || []), stepPath])];
+    logs = log({ logs } as any, `Step ${step} completed successfully`);
+    const updateData: Record<string, unknown> = {
+      ...stepResult,
+      visited_steps: visited,
+      logs,
+      status: "paused",
+    };
+
+    if (advance && step !== "review" && step !== "system_review") {
+      const ns = nextStep(step, build.product_type);
+      updateData.current_step = ns;
+      logs = log({ logs } as any, `Advanced to step: ${ns}`);
+      updateData.logs = logs;
+      if (ns === "complete") updateData.status = "complete";
+    }
+
+    const updated = await base44.asServiceRole.entities.AutoBuild.update(buildId, updateData);
+
+    // Create Receipt for auditability
+    try {
+      await base44.asServiceRole.entities.Receipt.create({
+        agent_or_workflow: "processAutoBuildStep",
+        action: `step_${step}`,
+        entity_type: "AutoBuild",
+        entity_id: buildId,
+        inputs: JSON.stringify({ step, build_id: buildId, advance }).slice(0, 4000),
+        outputs: JSON.stringify({ fields: Object.keys(stepResult) }).slice(0, 4000),
+        status: "success",
+        evidence: `Step ${step} completed. Fields written: ${Object.keys(stepResult).join(", ")}`,
+      });
+    } catch {}
+
+    return new Response(JSON.stringify({
+      success: true,
+      step,
+      build: updated,
+      advanced_to: updateData.current_step || build.current_step,
+    }), { status: 200 });
   } catch (e) {
     console.error("processAutoBuildStep error:", e);
     return new Response(JSON.stringify({ error: String((e as any)?.message || e) }), { status: 500 });

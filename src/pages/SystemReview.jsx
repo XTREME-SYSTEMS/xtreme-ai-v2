@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAutoBuild } from "@/lib/AutoBuildContext";
+import { base44 } from "@/api/base44Client";
 import { getProductType } from "@/lib/buildProductTypes";
 import BackButton from "@/components/client/BackButton";
 import {
@@ -34,6 +35,19 @@ export default function SystemReview() {
       current_step: "complete",
       logs: [...(build.logs || []), `[${new Date().toISOString()}] Build finalized — all system steps complete`],
     });
+    // Create Receipt for the finalization
+    try {
+      await base44.entities.Receipt.create({
+        agent_or_workflow: "SystemReview",
+        action: "finalize_build",
+        entity_type: "AutoBuild",
+        entity_id: build.id,
+        inputs: JSON.stringify({ business_name: build.business_name, product_type: build.product_type }).slice(0, 4000),
+        outputs: JSON.stringify({ status: "complete" }).slice(0, 4000),
+        status: "success",
+        evidence: `Build finalized: ${build.business_name} (${build.product_type})`,
+      });
+    } catch {}
     navigate("/receipts");
   };
 

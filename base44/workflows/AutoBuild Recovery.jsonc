@@ -1,0 +1,44 @@
+{
+  "name": "AutoBuild Recovery",
+  "description": "Every 15 minutes, scans for stuck or failed AutoBuild records and automatically recovers them by re-running the current step via processAutoBuildStep. Makes the Auto Builder pipeline self-healing.",
+  "trigger": {
+    "condition": null,
+    "config": {
+      "trigger_type": "scheduled",
+      "events": [],
+      "schedule_mode": "recurring",
+      "cron_expression": "*/15 * * * *",
+      "one_time_date": null,
+      "timezone": "America/New_York",
+      "interval_value": null,
+      "interval_unit": null,
+      "interval_anchor": null,
+      "ends_type": "never",
+      "ends_on_date": null,
+      "ends_after_count": null
+    }
+  },
+  "definition": {
+    "document": {
+      "dsl": "1.0.0",
+      "name": "autobuild_recovery",
+      "version": "1.0",
+      "namespace": "base44"
+    },
+    "do": [
+      {
+        "recover": {
+          "call": "invoke_backend_function",
+          "with": {
+            "function_name": "recoverStuckAutoBuilds"
+          },
+          "then": "end",
+          "x-base44": {
+            "title": "Recover stuck AutoBuilds",
+            "description": "Scan + re-run failed/stuck build steps"
+          }
+        }
+      }
+    ]
+  }
+}
