@@ -108,6 +108,8 @@ import AdminDomainPurchase from '@/pages/AdminDomainPurchase';
 import ClientSetup from '@/pages/ClientSetup';
 import FreeTools from '@/pages/FreeTools';
 import AutoBuilder from '@/pages/AutoBuilder';
+import SystemArchitecture from '@/pages/SystemArchitecture';
+import SystemReview from '@/pages/SystemReview';
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin, isAuthenticated } = useAuth();
@@ -233,6 +235,8 @@ const AuthenticatedApp = () => {
           <Route path="/admin-domain-purchase" element={<AdminDomainPurchase />} />
           <Route path="/client-setup" element={<ClientSetup />} />
           <Route path="/auto-builder" element={<AutoBuilder />} />
+          <Route path="/system-architecture" element={<SystemArchitecture />} />
+          <Route path="/system-review" element={<SystemReview />} />
         </Route>
       </Route>
       <Route path="*" element={<PageNotFound />} />

@@ -69,7 +69,13 @@ export function usePortalPipeline(user) {
           localStorage.getItem(`coach:done:${step.to}`) === "1";
       } catch { completed = visitedSteps.includes(step.to); }
     } else if (gate === "profile") {
-      completed = !!(user?.epoxyProfileSubmitted);
+      if (autoBuild.isActive) {
+        completed = !!(autoBuild.build?.profile && Object.keys(autoBuild.build.profile).length > 0);
+      } else {
+        completed = !!(user?.epoxyProfileSubmitted);
+      }
+    } else if (gate === "architecture") {
+      completed = !!(autoBuild.isActive ? autoBuild.build?.architecture : project?.architecture);
     } else if (gate === "logo") {
       completed = !!(project?.chosen_logo_url || user?.chosenLogoUrl);
     } else if (gate === "brand") {

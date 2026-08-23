@@ -2,12 +2,14 @@ import { useQuery } from "@tanstack/react-query";
 import { base44 } from "@/api/base44Client";
 import { getTrack, TRACKS, PRODUCT_TO_TRACK, PRIORITY } from "@/lib/onboardingTracks";
 import { usePreviewEmail } from "@/hooks/usePreviewEmail";
+import { useAutoBuild } from "@/lib/AutoBuildContext";
 
 // Resolves the active onboarding track + productId for the user.
 // In AutoBuild mode, returns the "demo" track (full build with social + video)
 // so the timeline shows every step — no purchase fetch needed.
 export function useClientTrack(user) {
   const { effectiveEmail, isScoped, isAutoBuild } = usePreviewEmail(user);
+  const autoBuild = useAutoBuild();
   const email = effectiveEmail || user?.email;
 
   const query = useQuery({
@@ -40,7 +42,9 @@ export function useClientTrack(user) {
 
   // AutoBuild mode: return the demo track directly (full build with social + video)
   if (isAutoBuild) {
-    return { track: TRACKS.demo, productId: "demo", loading: false };
+    const productType = autoBuild.build?.product_type || "marketing_site";
+    const productId = productType === "marketing_site" ? "demo" : productType;
+    return { track: TRACKS.demo, productId, loading: false };
   }
 
   return {

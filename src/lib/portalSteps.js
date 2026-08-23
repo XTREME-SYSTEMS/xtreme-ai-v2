@@ -156,6 +156,14 @@ const FULL_BUILD_PLUS_MEDIA = [
   "approvals", "launch",
 ];
 
+// System build pipeline (web_app / ecommerce / platform). For now:
+// profile → architecture → review → launch. Subsequent turns add
+// data-model, ui-system, codegen, and deploy steps between architecture
+// and review once each generator is built.
+const SYSTEM_BUILD = [
+  "welcome", "business-profile", "system-architecture", "system-review", "launch",
+];
+
 export const PRODUCT_STEPS = {
   "elite-monthly": FULL_BUILD,
   "elite-annual": FULL_BUILD,
@@ -168,6 +176,10 @@ export const PRODUCT_STEPS = {
   // Demo mode — full build with social + video so users experience everything,
   // but paywalled at finalization (YourDesigns → pricing redirect).
   "demo": FULL_BUILD_PLUS_MEDIA,
+  // ── System build pipelines (web_app / ecommerce / platform) ──
+  "web_app": SYSTEM_BUILD,
+  "ecommerce": SYSTEM_BUILD,
+  "platform": SYSTEM_BUILD,
 };
 
 // Fallback for users with no purchase and no plan. grantStarterAccess now

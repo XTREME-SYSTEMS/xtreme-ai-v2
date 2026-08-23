@@ -7,6 +7,7 @@ import {
   Clock, ArrowRight, Hammer,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { PRODUCT_TYPE_OPTIONS } from "@/lib/buildProductTypes";
 
 // Auto Builder — admin-side queue. The admin creates builds here, then clicks
 // one to enter the EXACT same client portal experience (timeline, StepCoach,
@@ -20,6 +21,7 @@ export default function AutoBuilder() {
   const [businessName, setBusinessName] = useState("");
   const [industry, setIndustry] = useState("");
   const [error, setError] = useState("");
+  const [productType, setProductType] = useState("marketing_site");
   const navigate = useNavigate();
   const autoBuild = useAutoBuild();
 
@@ -52,6 +54,7 @@ export default function AutoBuilder() {
       const created = await base44.entities.AutoBuild.create({
         business_name: businessName.trim(),
         industry: industry.trim(),
+        product_type: productType,
         current_step: "profile",
         status: "queued",
         visited_steps: [],
@@ -140,6 +143,31 @@ export default function AutoBuilder() {
             className="w-full rounded-lg border border-white/15 bg-black px-3 py-2 text-sm text-white placeholder-white/30 focus:border-lime-400 focus:outline-none"
           />
         </div>
+        {/* Product type selector */}
+        <div className="mt-3">
+          <h3 className="mb-2 text-xs font-semibold uppercase tracking-wider text-white/50">Product Type</h3>
+          <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
+            {PRODUCT_TYPE_OPTIONS.map((pt) => {
+              const Icon = pt.icon;
+              const active = productType === pt.value;
+              return (
+                <button
+                  key={pt.value}
+                  type="button"
+                  onClick={() => setProductType(pt.value)}
+                  className={cn(
+                    "flex flex-col gap-1 rounded-lg border p-3 text-left transition-colors",
+                    active ? "border-lime-400 bg-lime-400/10" : "border-white/15 hover:border-white/30"
+                  )}
+                >
+                  <Icon className={cn("h-4 w-4", active ? "text-lime-400" : "text-white/50")} />
+                  <span className={cn("text-xs font-semibold", active ? "text-white" : "text-white/70")}>{pt.label}</span>
+                  <span className="text-[10px] leading-tight text-white/40">{pt.description}</span>
+                </button>
+              );
+            })}
+          </div>
+        </div>
         {error && <p className="mt-2 text-xs text-red-400">{error}</p>}
         <button
           type="button"
@@ -182,6 +210,10 @@ export default function AutoBuilder() {
                 <div className="min-w-0 flex-1">
                   <div className="truncate text-sm font-medium text-white">{b.business_name}</div>
                   <div className="mt-0.5 flex items-center gap-2 text-[10px] text-white/40">
+                    <span className="rounded bg-lime-400/10 px-1 py-0.5 font-medium text-lime-300">
+                      {(b.product_type || "marketing_site").replace("_", " ")}
+                    </span>
+                    <span>·</span>
                     <span>{statusLabel(b.status)}</span>
                     <span>·</span>
                     <span className="capitalize">{b.current_step}</span>
