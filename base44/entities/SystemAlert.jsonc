@@ -1,0 +1,119 @@
+{
+  "name": "SystemAlert",
+  "type": "object",
+  "description": "Alerts raised by the autonomous self-healing loop when a build step fails repeatedly, a circuit breaker trips, or a post-deployment verification check fails. Tracks the alert class, severity, affected build, and resolution status so the autonomous system can escalate to an operator when it can't self-heal.",
+  "properties": {
+    "alert_type": {
+      "type": "string",
+      "enum": [
+        "build_failure",
+        "compile_failure",
+        "validation_failure",
+        "deploy_failure",
+        "post_deploy_check_failure",
+        "circuit_breaker_tripped",
+        "timeout",
+        "dependency_error"
+      ],
+      "description": "What kind of alert this is"
+    },
+    "severity": {
+      "type": "string",
+      "enum": [
+        "info",
+        "warning",
+        "critical"
+      ],
+      "default": "warning"
+    },
+    "build_id": {
+      "type": "string",
+      "description": "AutoBuild ID this alert is about (if applicable)"
+    },
+    "build_name": {
+      "type": "string"
+    },
+    "step": {
+      "type": "string",
+      "description": "Pipeline step where the alert was raised (architecture, data_model, ui_system, codegen, deploy, post_deploy)"
+    },
+    "message": {
+      "type": "string",
+      "description": "Human-readable alert message"
+    },
+    "error_class": {
+      "type": "string",
+      "description": "Classified error class from errorClassifier (transient, structural, schema, logic, dependency, timeout, unknown)"
+    },
+    "recommended_action": {
+      "type": "string",
+      "enum": [
+        "retry",
+        "regenerate",
+        "escalate",
+        "skip"
+      ],
+      "description": "What the system recommends doing about this alert"
+    },
+    "retry_count": {
+      "type": "number",
+      "default": 0,
+      "description": "How many times the system has already tried to self-heal"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "open",
+        "healing",
+        "resolved",
+        "escalated",
+        "dismissed"
+      ],
+      "default": "open"
+    },
+    "context": {
+      "type": "string",
+      "description": "Additional context \u2014 error messages, validation errors, compile errors, etc."
+    },
+    "resolved_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "resolution": {
+      "type": "string",
+      "description": "How the alert was resolved (self-healed, operator fixed, dismissed)"
+    },
+    "logs": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    }
+  },
+  "required": [
+    "alert_type",
+    "message"
+  ],
+  "rls": {
+    "read": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "create": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

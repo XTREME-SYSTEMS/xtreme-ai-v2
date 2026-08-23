@@ -18,13 +18,15 @@ export default async function(req) {
 
     if (!architecture) return Response.json({ error: 'architecture is required' }, { status: 400 });
 
+    // Code manifest is expensive (full file contents) — use 1 attempt, skip judge.
+    // Compile validation is the real quality gate for code.
     const result = await generateWithValidation(
       base44,
       generateCodeManifestSpec,
       strictValidateCodeManifest,
       { architecture, dataModel, uiSystem, productType, businessName },
       "code manifest",
-      { maxAttempts: 3, judgeThreshold: 70 }
+      { maxAttempts: 1, judgeThreshold: 0 }
     );
 
     if (!result.validation.valid) {

@@ -16,7 +16,7 @@ import {
 export default function Codegen() {
   const autoBuild = useAutoBuild();
   const navigate = useNavigate();
-  const { generating, error, approved, validationErrors, warnings, attempt, generate: runGenerate, approve: runApprove } = useSystemBuildStep("generateCodeManifest", "code_manifest", "codegen");
+  const { generating, error, approved, validationErrors, warnings, attempt, compileErrors, compileValid, generate: runGenerate, approve: runApprove } = useSystemBuildStep("generateCodeManifest", "code_manifest", "codegen");
   const [filter, setFilter] = useState("all");
 
   const build = autoBuild.build;
@@ -126,6 +126,22 @@ export default function Codegen() {
           <ul className="space-y-0.5 text-[11px] text-blue-200/70">
             {warnings.map((w, i) => <li key={i}>• {w}</li>)}
           </ul>
+        </div>
+      )}
+
+      {compileErrors.length > 0 && !generating && (
+        <div className="rounded-xl border border-red-400/30 bg-red-400/5 p-4">
+          <p className="mb-1 text-sm font-semibold text-red-300">Compile Validation Issues ({compileErrors.length}):</p>
+          <ul className="space-y-0.5 text-xs text-red-200/80 max-h-40 overflow-y-auto">
+            {compileErrors.map((err, i) => <li key={i}>• {err}</li>)}
+          </ul>
+        </div>
+      )}
+
+      {compileValid === true && codeManifest && !generating && (
+        <div className="rounded-xl border border-lime-400/30 bg-lime-400/5 p-3 flex items-center gap-2">
+          <CheckCircle className="h-4 w-4 text-lime-400" />
+          <span className="text-xs font-medium text-lime-300">Compile validation passed — all files have balanced syntax, valid imports, and proper exports.</span>
         </div>
       )}
 

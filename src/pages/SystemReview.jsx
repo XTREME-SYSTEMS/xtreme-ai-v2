@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAutoBuild } from "@/lib/AutoBuildContext";
 import { base44 } from "@/api/base44Client";
@@ -6,7 +6,7 @@ import { getProductType } from "@/lib/buildProductTypes";
 import BackButton from "@/components/client/BackButton";
 import {
   CheckCircle, ArrowRight, Route, Database, Zap, Plug, Layers, Rocket,
-  FileCode, Server, Globe, ExternalLink,
+  FileCode, Server, Globe, ExternalLink, ShieldCheck, Loader2, XCircle,
 } from "lucide-react";
 
 // System Review — the final review step for web_app / ecommerce / platform
@@ -14,6 +14,8 @@ import {
 export default function SystemReview() {
   const autoBuild = useAutoBuild();
   const navigate = useNavigate();
+  const [verifying, setVerifying] = useState(false);
+  const [verifyResult, setVerifyResult] = useState(null);
 
   const build = autoBuild.build;
   const architecture = build?.architecture;
@@ -24,6 +26,23 @@ export default function SystemReview() {
   useEffect(() => {
     document.title = "System Review · Auto Builder";
   }, []);
+
+  const verifyDeployment = async () => {
+    if (!deployment?.live_url) return;
+    setVerifying(true);
+    setVerifyResult(null);
+    try {
+      const res = await base44.functions.invoke("verifyDeployment", {
+        liveUrl: deployment.live_url,
+        buildId: build.id,
+      });
+      setVerifyResult(res.data);
+    } catch (e) {
+      setVerifyResult({ error: e?.message || "Verification failed" });
+    } finally {
+      setVerifying(false);
+    }
+  };
 
   const finalize = async () => {
     if (!build) return;

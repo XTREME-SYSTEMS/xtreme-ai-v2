@@ -574,18 +574,14 @@ Generate the actual codebase files. For each file, provide:
 
 CRITICAL: The 'content' field must contain ACTUAL CODE that a developer could copy into a file and run. For JSX files, write real React components. For JSONC files, write real JSON schemas. For config files, write real configurations. Do NOT write placeholders or descriptions — write the actual code.
 
-Include these essential files:
+Include these essential files ONLY (keep total under 8 files):
 - src/App.jsx (router with all routes registered)
-- Every page from the architecture spec as a real .jsx file
-- Key UI components (at least 5-8 real components)
-- Entity schemas as .jsonc files
-- Custom hooks for data fetching
-- Utility files
+- The 2-3 most important pages as real .jsx files
+- 1-2 key UI components
 - package.json with real dependencies
 - tailwind.config.js
-- src/index.css with the design system tokens
 
-Keep each file's content focused and production-quality. Prefer fewer files with complete implementations over many files with stubs.
+Keep each file's content focused and production-quality. Write COMPLETE implementations for each file. Do NOT generate more than 8 files.
 
 Return a detailed JSON codebase manifest.`;
 
@@ -616,7 +612,7 @@ Return a detailed JSON codebase manifest.`;
         estimated_loc: { type: "number" },
       },
     },
-    model: "gpt_5_4",
+    model: "claude_sonnet_4_6",
   });
 
   return result;
