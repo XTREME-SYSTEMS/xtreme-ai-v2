@@ -96,11 +96,25 @@ export default function SystemOptimization() {
     }
   };
 
-  const filtered = filter === "all"
+  // Priority order — fixes and heals (failures/gaps) are the system's primary
+  // goal, so they always sort to the top. Hardening, optimization, and
+  // enhancements follow once the system is healthy.
+  const CATEGORY_PRIORITY = { failure: 0, gap: 1, hardening: 2, optimization: 3, enhancement: 4 };
+  const SEVERITY_PRIORITY = { critical: 0, high: 1, medium: 2, low: 3, info: 4 };
+
+  const sortByPriority = (a, b) => {
+    const cp = (CATEGORY_PRIORITY[a.category] ?? 5) - (CATEGORY_PRIORITY[b.category] ?? 5);
+    if (cp !== 0) return cp;
+    return (SEVERITY_PRIORITY[a.severity] ?? 5) - (SEVERITY_PRIORITY[b.severity] ?? 5);
+  };
+
+  const baseFiltered = filter === "all"
     ? findings
     : filter === "open"
     ? findings.filter(f => f.status === "open" || f.status === "fixing" || f.status === "failed")
     : findings.filter(f => f.status === filter);
+
+  const filtered = [...baseFiltered].sort(sortByPriority);
 
   const stats = {
     total: findings.length,
@@ -119,7 +133,7 @@ export default function SystemOptimization() {
         </div>
         <div className="flex-1">
           <h1 className="text-xl font-semibold text-white">System Optimization</h1>
-          <p className="text-sm text-white/50">Self-reflection engine — scans for failures, gaps, and improvement opportunities</p>
+          <p className="text-sm text-white/50">Self-reflection engine — fixes & heals first, then hardening, optimization & enhancements</p>
         </div>
         <button
           onClick={runScan}
@@ -216,8 +230,13 @@ export default function SystemOptimization() {
         </div>
       ) : (
         <div className="space-y-3">
-          {filtered.map((finding) => {
+           {filtered.map((finding, idx) => {
             const cat = CATEGORY_CONFIG[finding.category] || CATEGORY_CONFIG.optimization;
+            // Section divider — shows when transitioning from fixes/heals to hardening/optimization/enhancements
+            const prevCat = idx > 0 ? filtered[idx - 1].category : null;
+            const isPrimary = finding.category === "failure" || finding.category === "gap";
+            const prevIsPrimary = prevCat === "failure" || prevCat === "gap";
+            const showDivider = idx > 0 && isPrimary !== prevIsPrimary;
             const action = ACTION_CONFIG[finding.recommended_action] || ACTION_CONFIG.fix;
             const ActionIcon = action.icon;
             const CatIcon = cat.icon;
@@ -225,7 +244,17 @@ export default function SystemOptimization() {
             const canAct = finding.status === "open" || finding.status === "failed";
 
             return (
-              <div key={finding.id} className={`rounded-xl border ${cat.border} ${cat.bg} p-4`}>
+              <div key={finding.id}>
+                {showDivider && (
+                  <div className="my-4 flex items-center gap-3">
+                    <div className="h-px flex-1 bg-white/10" />
+                    <span className="text-[10px] uppercase tracking-wider text-white/30">
+                      {isPrimary ? "Primary Goal — Fix & Heal" : "Secondary — Harden, Optimize & Enhance"}
+                    </span>
+                    <div className="h-px flex-1 bg-white/10" />
+                  </div>
+                )}
+                <div className={`rounded-xl border ${cat.border} ${cat.bg} p-4`}>
                 <div className="flex items-start gap-3">
                   <div className={`mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg ${cat.bg} ${cat.color}`}>
                     <CatIcon className="h-4 w-4" />
@@ -298,6 +327,7 @@ export default function SystemOptimization() {
                     )}
                   </div>
                 </div>
+              </div>
               </div>
             );
           })}
