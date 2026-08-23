@@ -5,6 +5,7 @@ import { getProductType } from "@/lib/buildProductTypes";
 import BackButton from "@/components/client/BackButton";
 import {
   CheckCircle, ArrowRight, Route, Database, Zap, Plug, Layers, Rocket,
+  FileCode, Server, Globe, ExternalLink,
 } from "lucide-react";
 
 // System Review — the final review step for web_app / ecommerce / platform
@@ -15,6 +16,8 @@ export default function SystemReview() {
 
   const build = autoBuild.build;
   const architecture = build?.architecture;
+  const codeManifest = build?.code_manifest;
+  const deployment = build?.deployment;
   const productType = getProductType(build?.product_type);
 
   useEffect(() => {
@@ -29,7 +32,7 @@ export default function SystemReview() {
       visited_steps: visited,
       status: "complete",
       current_step: "complete",
-      logs: [...(build.logs || []), `[${new Date().toISOString()}] Build finalized — architecture approved`],
+      logs: [...(build.logs || []), `[${new Date().toISOString()}] Build finalized — all system steps complete`],
     });
     navigate("/receipts");
   };
@@ -65,6 +68,8 @@ export default function SystemReview() {
     { icon: Database, label: "Data Models", count: architecture.data_models?.length || 0 },
     { icon: Zap, label: "Features", count: architecture.features?.length || 0 },
     { icon: Plug, label: "Integrations", count: architecture.integrations?.length || 0 },
+    { icon: FileCode, label: "Code Files", count: codeManifest?.files?.length || 0 },
+    { icon: Server, label: "Est. LOC", count: codeManifest?.estimated_loc?.toLocaleString() || 0 },
   ];
 
   return (
@@ -81,7 +86,7 @@ export default function SystemReview() {
         )}
       </div>
 
-      <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
         {stats.map((s) => {
           const Icon = s.icon;
           return (
@@ -107,6 +112,31 @@ export default function SystemReview() {
       {architecture.estimated_effort && (
         <div className="rounded-xl border border-white/10 bg-zinc-950 p-4 text-sm text-white/60">
           <span className="font-semibold text-white/80">Estimated effort:</span> {architecture.estimated_effort}
+        </div>
+      )}
+
+      {/* Deployment preview */}
+      {deployment?.live_url && (
+        <div className="rounded-xl border border-lime-400/30 bg-lime-400/5 p-5">
+          <div className="mb-2 flex items-center gap-2">
+            <Globe className="h-4 w-4 text-lime-400" />
+            <h2 className="text-sm font-semibold text-white">Deployment Preview</h2>
+            <span className="ml-auto rounded-full bg-lime-400/15 px-2.5 py-1 text-xs text-lime-300">
+              {deployment.status?.replace(/_/g, " ")}
+            </span>
+          </div>
+          <a
+            href={deployment.live_url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-1.5 text-sm text-white hover:text-lime-300"
+          >
+            {deployment.live_url}
+            <ExternalLink className="h-3 w-3" />
+          </a>
+          {deployment.platform && (
+            <p className="mt-1 text-xs text-white/40">Platform: {deployment.platform} · {codeManifest?.framework || "—"}</p>
+          )}
         </div>
       )}
 

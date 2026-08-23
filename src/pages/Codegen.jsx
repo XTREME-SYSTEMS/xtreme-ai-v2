@@ -238,14 +238,6 @@ export default function Codegen() {
                   {file.key_content && (
                     <p className="mt-1 text-[11px] text-white/30">{file.key_content}</p>
                   )}
-                  {file.depends_on?.length > 0 && (
-                    <div className="mt-1.5 flex flex-wrap gap-1">
-                      <span className="text-[9px] text-white/30">imports:</span>
-                      {file.depends_on.map((dep, j) => (
-                        <code key={j} className="text-[9px] text-white/40">{dep}</code>
-                      ))}
-                    </div>
-                  )}
                 </div>
               ))}
             </div>

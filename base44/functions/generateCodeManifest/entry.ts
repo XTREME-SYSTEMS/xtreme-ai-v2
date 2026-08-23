@@ -79,6 +79,7 @@ Return a detailed JSON codebase manifest.`;
       prompt,
       response_json_schema: {
         type: "object",
+        required: ["framework", "repo_name", "files", "build_steps", "estimated_loc"],
         properties: {
           framework: { type: "string", description: "Primary framework, e.g. Next.js 14 (App Router), React + Vite" },
           repo_name: { type: "string", description: "Suggested repo name in kebab-case" },
@@ -87,16 +88,12 @@ Return a detailed JSON codebase manifest.`;
             description: "Complete list of files in the codebase",
             items: {
               type: "object",
+              required: ["path", "category", "description", "key_content"],
               properties: {
                 path: { type: "string", description: "File path relative to repo root, e.g. src/pages/Dashboard.tsx" },
                 category: { type: "string", description: "config | page | component | hook | lib | api | style | test | doc | entity" },
                 description: { type: "string", description: "What this file does" },
-                key_content: { type: "string", description: "Critical code structure, imports, or logic to implement" },
-                depends_on: {
-                  type: "array",
-                  items: { type: "string" },
-                  description: "Other file paths this file imports from"
-                }
+                key_content: { type: "string", description: "Critical code structure, imports, or logic to implement" }
               }
             }
           },
@@ -108,7 +105,7 @@ Return a detailed JSON codebase manifest.`;
           estimated_loc: { type: "number", description: "Estimated total lines of code across all files" }
         }
       },
-      model: "claude_sonnet_4_6",
+      model: "gpt_5_4",
     });
 
     return Response.json({ ok: true, data: result });
