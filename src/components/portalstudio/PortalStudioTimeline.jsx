@@ -27,7 +27,7 @@ export default function PortalStudioTimeline() {
   return (
     <div className="border-b border-white/10 bg-zinc-950">
       <div className="flex items-center justify-between px-4 pt-2 sm:hidden">
-        <span className="text-[11px] font-semibold uppercase tracking-wider text-amber-400">
+        <span className="text-[11px] font-semibold uppercase tracking-wider text-yellow-400">
           Step {Math.max(currentIdx + 1, 1)} of {visibleSteps.length}
         </span>
         <span className="truncate pl-2 text-[11px] font-medium text-white/60">{current?.label || ""}</span>
@@ -51,18 +51,18 @@ export default function PortalStudioTimeline() {
                   className={cn(
                     "flex h-8 w-8 items-center justify-center rounded-full border-2 text-xs font-bold transition-all sm:h-9 sm:w-9",
                     isCurrent
-                      ? "border-amber-400 bg-amber-400 text-black"
-                      : "border-white/15 bg-zinc-900 text-white/40 hover:border-amber-400/40 hover:text-amber-300"
+                      ? "border-yellow-400 bg-yellow-400 text-black"
+                      : "border-white/15 bg-zinc-900 text-white/40 hover:border-yellow-400/40 hover:text-yellow-300"
                   )}
                 >
                   <Icon className="h-4 w-4" />
                 </span>
-                <span className={cn("hidden whitespace-nowrap text-[11px] font-medium sm:block", isCurrent ? "text-amber-400" : "text-white/30")}>
+                <span className={cn("hidden whitespace-nowrap text-[11px] font-medium sm:block", isCurrent ? "text-yellow-400" : "text-white/30")}>
                   {step.label}
                 </span>
               </button>
               {i < visibleSteps.length - 1 && (
-                <div className={cn("mx-0.5 h-0.5 w-3 shrink-0 rounded-full sm:mx-1 sm:w-5", i < currentIdx ? "bg-amber-400" : "bg-white/10")} />
+                <div className={cn("mx-0.5 h-0.5 w-3 shrink-0 rounded-full sm:mx-1 sm:w-5", i < currentIdx ? "bg-yellow-400" : "bg-white/10")} />
               )}
             </div>
           );

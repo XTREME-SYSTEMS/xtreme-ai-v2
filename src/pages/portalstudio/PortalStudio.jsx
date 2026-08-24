@@ -44,7 +44,7 @@ export default function PortalStudio() {
         visited_steps: ["/portal-studio/welcome"],
         brand_config: {
           app_name: "Xtreme AI",
-          primary_color: "#fbbf24",
+          primary_color: "#facc15",
           tagline: "Build anything. Launch everything.",
         },
         logs: [`[Xtreme AI] Project created: ${newName.trim()}`],
@@ -72,8 +72,8 @@ export default function PortalStudio() {
   if (!isActive) {
     return (
       <div className="mx-auto max-w-4xl space-y-8">
-        <section className="rounded-xl border border-amber-400/40 bg-amber-400/5 p-6">
-          <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-amber-400">
+        <section className="rounded-xl border border-yellow-400/40 bg-yellow-400/5 p-6">
+          <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-yellow-400">
             <Hammer className="h-4 w-4" /> Xtreme AI
           </div>
           <h1 className="mt-3 text-2xl font-semibold text-white sm:text-3xl">Build · Refine · Brand · Deploy</h1>
@@ -84,10 +84,10 @@ export default function PortalStudio() {
 
         <section>
           <div className="flex items-center justify-between">
-            <h2 className="text-xs font-semibold uppercase tracking-wider text-amber-400">Build Projects</h2>
+            <h2 className="text-xs font-semibold uppercase tracking-wider text-yellow-400">Build Projects</h2>
             <button
               onClick={() => setShowNew((v) => !v)}
-              className="inline-flex items-center gap-1.5 rounded-lg bg-amber-400 px-3 py-1.5 text-xs font-semibold text-black hover:bg-amber-300"
+              className="inline-flex items-center gap-1.5 rounded-lg bg-yellow-400 px-3 py-1.5 text-xs font-semibold text-black hover:bg-yellow-300"
             >
               <Plus className="h-3.5 w-3.5" /> New Project
             </button>
@@ -100,14 +100,14 @@ export default function PortalStudio() {
                 value={newName}
                 onChange={(e) => setNewName(e.target.value)}
                 placeholder="Project name (e.g. Acme Roofing — Refinement Build)"
-                className="flex-1 rounded-lg border border-white/15 bg-black px-3 py-2 text-sm text-white placeholder-white/30 focus:border-amber-400 focus:outline-none"
+                className="flex-1 rounded-lg border border-white/15 bg-black px-3 py-2 text-sm text-white placeholder-white/30 focus:border-yellow-400 focus:outline-none"
                 onKeyDown={(e) => e.key === "Enter" && createProject()}
                 autoFocus
               />
               <button
                 onClick={createProject}
                 disabled={creating || !newName.trim()}
-                className="inline-flex items-center gap-1.5 rounded-lg bg-amber-400 px-4 py-2 text-sm font-semibold text-black hover:bg-amber-300 disabled:opacity-50"
+                className="inline-flex items-center gap-1.5 rounded-lg bg-yellow-400 px-4 py-2 text-sm font-semibold text-black hover:bg-yellow-300 disabled:opacity-50"
               >
                 {creating ? <Loader2 className="h-4 w-4 animate-spin" /> : <Rocket className="h-4 w-4" />}
                 Create & Open
@@ -117,7 +117,7 @@ export default function PortalStudio() {
 
           {loading ? (
             <div className="mt-6 flex items-center justify-center py-12">
-              <Loader2 className="h-6 w-6 animate-spin text-amber-400" />
+              <Loader2 className="h-6 w-6 animate-spin text-yellow-400" />
             </div>
           ) : projects.length === 0 ? (
             <div className="mt-6 rounded-xl border border-white/10 bg-zinc-950 p-8 text-center">
@@ -130,10 +130,10 @@ export default function PortalStudio() {
                 <button
                   key={p.id}
                   onClick={() => { setActiveProjectId(p.id); navigate("/portal-studio/welcome"); }}
-                  className="group flex items-center gap-3 rounded-xl border border-white/10 bg-zinc-950 p-4 text-left transition-colors hover:border-amber-400/50"
+                  className="group flex items-center gap-3 rounded-xl border border-white/10 bg-zinc-950 p-4 text-left transition-colors hover:border-yellow-400/50"
                 >
-                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-amber-400/10">
-                    <Hammer className="h-5 w-5 text-amber-400" />
+                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-yellow-400/10">
+                    <Hammer className="h-5 w-5 text-yellow-400" />
                   </div>
                   <div className="min-w-0 flex-1">
                     <div className="truncate text-sm font-semibold text-white">{p.name}</div>
@@ -141,7 +141,7 @@ export default function PortalStudio() {
                       {p.product_type || "marketing_site"} · {p.visited_steps?.length || 0} steps visited
                     </div>
                   </div>
-                  <ArrowRight className="h-4 w-4 shrink-0 text-white/30 group-hover:text-amber-400" />
+                  <ArrowRight className="h-4 w-4 shrink-0 text-white/30 group-hover:text-yellow-400" />
                   <button
                     onClick={(e) => deleteProject(p.id, e)}
                     className="shrink-0 rounded-md p-1.5 text-white/30 hover:text-red-400"
@@ -163,8 +163,8 @@ export default function PortalStudio() {
 
   return (
     <div className="mx-auto max-w-3xl space-y-10">
-      <section className="rounded-xl border border-amber-400/40 bg-amber-400/5 p-6">
-        <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-amber-400">
+      <section className="rounded-xl border border-yellow-400/40 bg-yellow-400/5 p-6">
+        <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-yellow-400">
           <Sparkles className="h-4 w-4" /> {project?.name || "Sandbox Build"}
         </div>
         <h1 className="mt-3 text-2xl font-semibold text-white sm:text-3xl">Xtreme AI — Build Studio</h1>
@@ -178,7 +178,7 @@ export default function PortalStudio() {
               <span>{progress.done} / {progress.total} steps</span>
             </div>
             <div className="mt-1 h-2 overflow-hidden rounded-full bg-white/10">
-              <div className="h-full rounded-full bg-amber-400 transition-all" style={{ width: `${progress.percent}%` }} />
+              <div className="h-full rounded-full bg-yellow-400 transition-all" style={{ width: `${progress.percent}%` }} />
             </div>
           </div>
           <button
@@ -191,9 +191,9 @@ export default function PortalStudio() {
       </section>
 
       <section>
-        <h2 className="text-xs font-semibold uppercase tracking-wider text-amber-400">Your build pipeline</h2>
+        <h2 className="text-xs font-semibold uppercase tracking-wider text-yellow-400">Your build pipeline</h2>
         <p className="mt-2 text-sm text-white/70">
-          Every build follows the same steps. Steps marked <span className="font-semibold text-amber-400">Approval</span> pause for sign-off in the real portal — here they auto-complete so you can move fast.
+          Every build follows the same steps. Steps marked <span className="font-semibold text-yellow-400">Approval</span> pause for sign-off in the real portal — here they auto-complete so you can move fast.
         </p>
         <div className="mt-6 space-y-3">
           {states.map((s, i) => {
@@ -205,21 +205,21 @@ export default function PortalStudio() {
               <StepTag
                 key={step.key}
                 {...stepProps}
-                className={`flex gap-4 rounded-xl border border-white/10 bg-zinc-950 p-4 ${step.to ? "transition-colors hover:border-amber-400/40" : ""}`}
+                className={`flex gap-4 rounded-xl border border-white/10 bg-zinc-950 p-4 ${step.to ? "transition-colors hover:border-yellow-400/40" : ""}`}
               >
                 <div className="flex flex-col items-center">
                   <div className={`flex h-10 w-10 items-center justify-center rounded-full border text-sm font-bold ${
-                    s.completed ? "border-amber-400 bg-amber-400/10 text-amber-400" :
-                    s.isCurrent ? "border-amber-400 bg-amber-400/15 text-amber-400" :
+                    s.completed ? "border-yellow-400 bg-yellow-400/10 text-yellow-400" :
+                    s.isCurrent ? "border-yellow-400 bg-yellow-400/15 text-yellow-400" :
                     "border-white/15 bg-zinc-900 text-white/80"
                   }`}>
-                    {s.completed ? <CheckCircle2 className="h-5 w-5 text-amber-400" /> : i + 1}
+                    {s.completed ? <CheckCircle2 className="h-5 w-5 text-yellow-400" /> : i + 1}
                   </div>
                   {i < states.length - 1 && <div className="mt-1 h-full w-px flex-1 bg-white/10" />}
                 </div>
                 <div className="flex-1 pb-2">
                   <div className="flex items-center gap-2">
-                    <Icon className="h-4 w-4 shrink-0 text-amber-400" />
+                    <Icon className="h-4 w-4 shrink-0 text-yellow-400" />
                     <h3 className="text-sm font-semibold text-white">{step.label}</h3>
                     {step.gate && step.gate !== "auto" ? (
                       <span className="inline-flex items-center gap-1 rounded-md border border-rose-400/40 bg-rose-400/10 px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-rose-300">
@@ -229,7 +229,7 @@ export default function PortalStudio() {
                       <span className="rounded-md border border-white/10 px-1.5 py-0.5 text-[10px] font-medium uppercase tracking-wide text-white/40">Automatic</span>
                     )}
                     {s.completed && (
-                      <span className="ml-auto inline-flex items-center gap-1 text-[10px] font-medium text-amber-400">
+                      <span className="ml-auto inline-flex items-center gap-1 text-[10px] font-medium text-yellow-400">
                         <CheckCircle2 className="h-3 w-3" /> Done
                       </span>
                     )}
