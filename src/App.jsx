@@ -119,6 +119,8 @@ import SystemAlerts from '@/pages/SystemAlerts';
 import SystemOptimization from '@/pages/SystemOptimization';
 import VisionCortex from '@/pages/VisionCortex';
 import Architect from '@/pages/Architect';
+import XtremeLayout from '@/components/xtreme/XtremeLayout';
+import XtremeLanding from '@/components/xtreme/XtremeLanding';
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin, isAuthenticated } = useAuth();
@@ -255,6 +257,28 @@ const AuthenticatedApp = () => {
           <Route path="/system-optimization" element={<SystemOptimization />} />
           <Route path="/vision-cortex" element={<VisionCortex />} />
       <Route path="/architect" element={<Architect />} />
+        </Route>
+        {/* Xtreme AI — secluded client-portal staging section. Isolated from
+            the admin Layout: own branding, own sidebar, /xtreme route prefix.
+            Refine, brand, and harden here, then extract to GitHub. */}
+        <Route path="/xtreme" element={<XtremeLayout />}>
+          <Route index element={<XtremeLanding />} />
+          <Route path="my-package" element={<MyPackage />} />
+          <Route path="business-name-studio" element={<BusinessNameStudio />} />
+          <Route path="business-profile" element={<BusinessProfile />} />
+          <Route path="content-generator" element={<ContentGenerator />} />
+          <Route path="logo-generator" element={<LogoGenerator />} />
+          <Route path="brand-generator" element={<BrandGenerator />} />
+          <Route path="design-direction" element={<DesignDirection />} />
+          <Route path="social-media" element={<SocialMediaGenerator />} />
+          <Route path="social-media-studio" element={<SocialMediaStudio />} />
+          <Route path="video-generator" element={<VideoGenerator />} />
+          <Route path="your-designs" element={<YourDesigns />} />
+          <Route path="enhancements" element={<Enhancements />} />
+          <Route path="signatures" element={<Signatures />} />
+          <Route path="walkthrough-studio" element={<WalkthroughStudio />} />
+          <Route path="client-portal" element={<Dashboard />} />
+          <Route path="settings" element={<Settings />} />
         </Route>
       </Route>
       <Route path="*" element={<PageNotFound />} />
