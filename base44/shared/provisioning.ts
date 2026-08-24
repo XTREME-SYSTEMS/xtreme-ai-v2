@@ -138,12 +138,13 @@ export async function provisionGithub(base44, market, files, existingRepo) {
     const createRes = await fetch("https://api.github.com/user/repos", { method: "POST", headers, body: JSON.stringify({ name: repoName, private: true, auto_init: true }) });
     if (createRes.ok) { repo = await createRes.json(); owner = repo.owner.login; }
     else if (createRes.status === 422) {
-      // repo already exists — find it among the authenticated user's own repos
-      const listRes = await fetch("https://api.github.com/user/repos?per_page=100&affiliation=owner", { headers });
-      if (!listRes.ok) throw new Error(`GitHub list repos failed: ${listRes.status}`);
-      const list = await listRes.json();
-      repo = (list || []).find((r) => r.name === repoName);
-      if (!repo) throw new Error(`GitHub repo "${repoName}" not found among your repos`);
+      // repo already exists — look it up directly by name under the authenticated user
+      const meRes = await fetch("https://api.github.com/user", { headers });
+      if (!meRes.ok) throw new Error(`GitHub get user failed: ${meRes.status}`);
+      const me = await meRes.json();
+      const repoRes = await fetch(`https://api.github.com/repos/${me.login}/${repoName}`, { headers });
+      if (!repoRes.ok) throw new Error(`GitHub repo "${repoName}" not found for user ${me.login}`);
+      repo = await repoRes.json();
       owner = repo.owner.login;
     } else throw new Error(`GitHub create repo failed: ${createRes.status} ${await createRes.text()}`);
   }
@@ -222,6 +223,18 @@ export async function provisionVercel(market, repoFullName, files) {
     const r = await fetch(`https://api.vercel.com/v9/projects/${name}${qs}`, { headers: { Authorization: `Bearer ${token}` } });
     if (!r.ok) throw new Error(`Vercel project lookup failed: ${r.status}`);
     project = await r.json();
+    // Re-link the git repo if the project exists but lost its link (causes 410 GONE
+    // on old deployment URLs). The link endpoint is idempotent.
+    if (repoFullName && !project.link) {
+      try {
+        const [o, rn] = repoFullName.split("/");
+        await fetch(`https://api.vercel.com/v9/projects/${project.id}/link${qs}`, {
+          method: "POST",
+          headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
+          body: JSON.stringify({ type: "github", repo: repoFullName, ref: "main" }),
+        });
+      } catch (e) { /* non-fatal — will retry via gitSource deploy */ }
+    }
   } else throw new Error(`Vercel create project failed: ${createRes.status} ${await createRes.text()}`);
 
   // Disable Vercel SSO Protection (Vercel Authentication) so the site is
