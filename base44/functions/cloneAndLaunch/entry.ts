@@ -1,5 +1,5 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.40';
-import { slugify, provisionGithub, provisionDrive, provisionSupabase, provisionVercel } from '../../shared/provisioning.ts';
+import { slugify, provisionGithub, provisionDrive, provisionSupabase, provisionVercel, generateSiteApp } from '../../shared/provisioning.ts';
 import { detectIndustry as detectIndustryShared, scrapeTarget } from '../../shared/cloneUtils.ts';
 
 // The unified clone-to-launch pipeline.
@@ -177,7 +177,21 @@ async function doProvision(base44, project, log, persist) {
     phone: project.rebranded_content?.phone || '(555) 123-4567',
     domain: project.selected_domain,
   };
-  const files = buildCloneSiteFiles(project);
+  const files = generateSiteApp({
+    slug: slugify(project.selected_name || project.industry),
+    city: 'National', state: 'US',
+    public_business_name: project.selected_name,
+    brand_name: project.selected_name,
+    phone: project.rebranded_content?.phone || '(555) 123-4567',
+    email: project.rebranded_content?.email || '',
+    domain: project.selected_domain,
+    industry: project.industry,
+  }, {
+    meta_title: `${project.selected_name} | ${project.industry}`,
+    meta_description: project.rebranded_content?.hero_subhead || '',
+    faq: project.rebranded_content?.faq || [],
+    services: project.rebranded_content?.services || [],
+  });
   log('Provisioning Drive...');
   const drive = await provisionDrive(base44, market).catch(e => { log(`Drive failed: ${e.message}`); return null; });
   log('Provisioning GitHub + pushing files...');

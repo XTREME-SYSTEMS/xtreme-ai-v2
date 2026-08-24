@@ -3,6 +3,10 @@
 // granular provision-* function). Each step is self-contained and returns its
 // result so the orchestrator can persist partial progress on ProvisioningRecord.
 
+import { generateSiteApp } from './siteAppGenerator.ts';
+
+export { generateSiteApp };
+
 export function slugify(s) {
   return String(s || "").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
 }
@@ -188,6 +192,9 @@ export async function provisionSupabase(market) {
 }
 
 // ---- Vercel -----------------------------------------------------------------
+// Tries git-based deployment first (Vercel builds the React app from the GitHub
+// repo with framework: "vite"). Falls back to direct file upload of static HTML
+// if the Vercel GitHub app isn't installed or git deploy fails.
 export async function provisionVercel(market, repoFullName, files) {
   const token = Deno.env.get("VERCEL_TOKEN");
   const team = Deno.env.get("VERCEL_TEAM_ID");
@@ -195,28 +202,29 @@ export async function provisionVercel(market, repoFullName, files) {
   const qs = team ? `?teamId=${team}` : "";
   const name = (market.slug || slugify(market.state + "-" + market.city)).replace(/[^a-z0-9-]/g, "-").slice(0, 40);
 
-  // Create or reuse the project (git-linked for history).
+  // Create or reuse the project — git-linked with Vite framework so Vercel
+  // knows to run `npm install && npm run build` on deploy.
   let project;
   const createRes = await fetch(`https://api.vercel.com/v10/projects${qs}`, {
     method: "POST",
     headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
-    body: JSON.stringify({ name, gitRepository: { type: "github", repo: repoFullName } }),
+    body: JSON.stringify({
+      name,
+      gitRepository: { type: "github", repo: repoFullName },
+      framework: "vite",
+      buildCommand: "npm run build",
+      outputDirectory: "dist",
+      installCommand: "npm install",
+    }),
   });
   if (createRes.ok) project = await createRes.json();
-  else if (createRes.status === 409) { const r = await fetch(`https://api.vercel.com/v9/projects/${name}${qs}`, { headers: { Authorization: `Bearer ${token}` } }); if (!r.ok) throw new Error(`Vercel project lookup failed: ${r.status}`); project = await r.json(); }
-  else throw new Error(`Vercel create project failed: ${createRes.status} ${await createRes.text()}`);
+  else if (createRes.status === 409) {
+    const r = await fetch(`https://api.vercel.com/v9/projects/${name}${qs}`, { headers: { Authorization: `Bearer ${token}` } });
+    if (!r.ok) throw new Error(`Vercel project lookup failed: ${r.status}`);
+    project = await r.json();
+  } else throw new Error(`Vercel create project failed: ${createRes.status} ${await createRes.text()}`);
 
-  // Direct file-upload deployment to production — reliable, does not require the
-  // Vercel GitHub app to be installed (git auto-deploy would otherwise never fire).
-  const fileList = Object.entries(files).map(([path, content]) => ({ file: path, data: b64(content), encoding: "base64" }));
-  const deployRes = await fetch(`https://api.vercel.com/v13/deployments${qs}`, {
-    method: "POST",
-    headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
-    body: JSON.stringify({ name, files: fileList, target: "production", projectSettings: { framework: null } }),
-  });
-  if (!deployRes.ok) throw new Error(`Vercel deploy failed: ${deployRes.status} ${await deployRes.text()}`);
-  const d = await deployRes.json();
-  // Public production URL: {name}-{teamSlug}.vercel.app for team projects, {name}.vercel.app otherwise.
+  // Public production URL: {name}-{teamSlug}.vercel.app for team projects.
   let url = `https://${name}.vercel.app`;
   if (team) {
     try {
@@ -224,5 +232,47 @@ export async function provisionVercel(market, repoFullName, files) {
       if (teamRes.ok) { const t = await teamRes.json(); if (t.slug) url = `https://${name}-${t.slug}.vercel.app`; }
     } catch (e) { /* fall back to default */ }
   }
-  return { project_id: project.id, url };
+
+  // Try git-based deployment — Vercel clones the repo and builds the Vite app.
+  if (repoFullName) {
+    try {
+      const [owner, repoName] = repoFullName.split("/");
+      const gitDeployRes = await fetch(`https://api.vercel.com/v13/deployments${qs}`, {
+        method: "POST",
+        headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name,
+          gitSource: { type: "github", org: owner, repo: repoName, ref: "main" },
+          target: "production",
+          projectSettings: {
+            framework: "vite",
+            buildCommand: "npm run build",
+            outputDirectory: "dist",
+            installCommand: "npm install",
+          },
+        }),
+      });
+      if (gitDeployRes.ok) {
+        const d = await gitDeployRes.json();
+        const gitUrl = d.url ? `https://${d.url}` : url;
+        return { project_id: project.id, url: gitUrl, deploy_method: "git_build" };
+      }
+      // Git deploy failed (likely Vercel GitHub app not installed) — fall through to direct upload
+    } catch (e) {
+      // Git deploy failed — fall through to direct upload
+    }
+  }
+
+  // Fallback: direct file upload of static HTML (no build, immediate but basic)
+  // The React source files can't render without a build, so generate a static
+  // HTML version for the direct-upload fallback.
+  const staticFiles = generateSiteFiles(market, null);
+  const fileList = Object.entries(staticFiles).map(([path, content]) => ({ file: path, data: b64(content), encoding: "base64" }));
+  const deployRes = await fetch(`https://api.vercel.com/v13/deployments${qs}`, {
+    method: "POST",
+    headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
+    body: JSON.stringify({ name, files: fileList, target: "production", projectSettings: { framework: null } }),
+  });
+  if (!deployRes.ok) throw new Error(`Vercel deploy failed: ${deployRes.status} ${await deployRes.text()}`);
+  return { project_id: project.id, url, deploy_method: "static_fallback" };
 }

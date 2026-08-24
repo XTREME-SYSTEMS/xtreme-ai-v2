@@ -1,5 +1,5 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.40';
-import { generateSiteFiles, provisionGithub, provisionDrive, provisionSupabase, provisionVercel } from '../../shared/provisioning.ts';
+import { generateSiteApp, provisionGithub, provisionDrive, provisionSupabase, provisionVercel } from '../../shared/provisioning.ts';
 
 // AI Site Factory — auto-provisioning orchestrator.
 // Given a market_id, generates the static site, then provisions GitHub repo +
@@ -36,8 +36,8 @@ export default async function(req) {
     const log = async (m) => { const logs = [...(record.logs || []), `${new Date().toISOString()} ${m}`]; await patch({ logs }); };
 
     try {
-      await log("Generating static site files…");
-      const files = generateSiteFiles(market, seo);
+      await log("Generating React + Vite + Tailwind web application…");
+      const files = generateSiteApp(market, seo);
 
       await log("Provisioning GitHub repo + pushing site…");
       const gh = await provisionGithub(base44, market, files, record.github_repo);
