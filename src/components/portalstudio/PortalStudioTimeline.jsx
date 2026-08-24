@@ -1,6 +1,6 @@
 import { useEffect, useRef } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { getStudioStepByPath, getVisibleStudioSteps } from "@/lib/portalStudioSteps";
+import { getStudioStepByPath } from "@/lib/portalStudioSteps";
 import { usePortalStudio } from "@/lib/PortalStudioContext";
 import { usePortalStudioPipeline } from "@/hooks/usePortalStudioPipeline";
 import { cn } from "@/lib/utils";

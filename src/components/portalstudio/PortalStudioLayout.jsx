@@ -1,5 +1,5 @@
 import { Outlet, useNavigate } from "react-router-dom";
-import { ArrowLeft, LogOut, Hammer } from "lucide-react";
+import { ArrowLeft, LogOut } from "lucide-react";
 import { base44 } from "@/api/base44Client";
 import { Image } from "@/components/ui/image";
 import { LOGO_ICON } from "@/lib/brandAssets";
