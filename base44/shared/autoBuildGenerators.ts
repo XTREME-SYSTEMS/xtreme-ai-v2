@@ -10,8 +10,19 @@
 // ============================================================
 
 import { compileBrief, briefText, photoStyleSuffix } from "./generatorBrief.ts";
+import { researchBusinessNamesDeep } from "./businessNameResearcher.ts";
 
 // ── Names (from recommendBusinessNames) ─────────────────────────────────
+// Now uses the deep research pipeline (businessNameResearcher.ts) which
+// combines AI generation, Browserbase Google scraping, OpenCorporates US
+// state registry checks, RDAP domain verification, and AI re-scoring.
+// Only returns names with 100% confirmed available .com domains.
+
+export async function generateNamesWithResearch(base44: any, params: Record<string, any>) {
+  return researchBusinessNamesDeep(base44, params);
+}
+
+// ── Legacy name generation (kept for backward compat, replaced by deep research above) ───
 
 function getRdapUrl(domain: string): string {
   const tld = domain.split(".").pop();
@@ -37,6 +48,13 @@ async function checkDomain(domain: string) {
 }
 
 export async function generateNames(base44: any, params: Record<string, any>) {
+  // Delegate to the deep research pipeline — Browserbase + OpenCorporates + RDAP + AI re-scoring.
+  const result = await researchBusinessNamesDeep(base44, params);
+  return result.suggestions;
+}
+
+// ── Legacy implementation (unused — kept for reference) ──────────────────
+async function _legacyGenerateNames(base44: any, params: Record<string, any>) {
   const { industry, location, keywords, businessType, businessName } = params;
   const prompt = `You are an expert brand strategist and domain investor. Generate 10 highly successful, potentially VIRAL business name suggestions for a ${businessType || "local service business"} in the "${industry}" industry${location ? ` serving ${location}` : ""}${keywords ? ` with these keywords/themes: ${keywords}` : ""}${businessName ? `. The current business name is "${businessName}" — use it as inspiration but generate alternatives too.` : ""}.
 

@@ -1,8 +1,13 @@
 import { useState } from "react";
 import { base44 } from "@/api/base44Client";
-import { Lightbulb, Loader2, Search, CheckCircle2, XCircle, AlertCircle, TrendingUp, Globe, Building2, Sparkles, ArrowRight } from "lucide-react";
+import {
+  Lightbulb, Loader2, Search, AlertCircle, TrendingUp, Sparkles,
+  Brain, Globe, Building2, CheckCircle, Zap,
+} from "lucide-react";
 import { useClientUser } from "@/hooks/useClientUser";
 import BackButton from "@/components/client/BackButton";
+import NameResearchCard from "@/components/names/NameResearchCard";
+import ResearchPhases from "@/components/names/ResearchPhases";
 
 const INDUSTRIES = [
   "roofing", "hvac", "plumbing", "epoxy flooring", "water damage restoration",
@@ -12,10 +17,10 @@ const INDUSTRIES = [
   "chiropractor", "dentist", "med spa", "personal injury lawyer", "dui lawyer",
 ];
 
-// AI-powered business name + domain recommender. The user enters their
-// industry and location, the system generates 10 scored name suggestions,
-// checks Google + state registries for existing businesses, and verifies
-// .com availability in real-time. The user picks a favorite to request.
+// AI-powered business name + URL generator with deep web research.
+// Scrapes Google search results (Browserbase) + US state business registries
+// (OpenCorporates) + RDAP domain verification. Only shows 100% available domains.
+// Full transparency: shows the 5-phase research pipeline and all scoring data.
 export default function BusinessNameStudio() {
   const { user } = useClientUser();
   const [industry, setIndustry] = useState(user?.epoxyProfile?.industry || user?.industry || "");
@@ -24,6 +29,7 @@ export default function BusinessNameStudio() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [suggestions, setSuggestions] = useState([]);
+  const [phases, setPhases] = useState([]);
   const [saving, setSaving] = useState(null);
   const [savedId, setSavedId] = useState(null);
   const [purchasing, setPurchasing] = useState(null);
@@ -38,6 +44,7 @@ export default function BusinessNameStudio() {
     setLoading(true);
     setError("");
     setSuggestions([]);
+    setPhases([]);
     try {
       const res = await base44.functions.invoke("recommendBusinessNames", {
         industry: industry.trim(),
@@ -47,8 +54,10 @@ export default function BusinessNameStudio() {
       const data = res?.data || res;
       if (data?.suggestions?.length > 0) {
         setSuggestions(data.suggestions);
+        setPhases(data.phases || []);
       } else {
-        setError(data?.error || "No suggestions generated. Try again.");
+        setError(data?.error || "No 100% available domains found. Try different keywords.");
+        if (data.phases) setPhases(data.phases);
       }
     } catch (e) {
       setError(e?.message || "Could not generate suggestions. Please try again.");
@@ -66,19 +75,16 @@ export default function BusinessNameStudio() {
         business_name: s.name,
         tagline: s.tagline || "",
         industry: industry.trim(),
-        status: s.domain_available ? "purchasing" : "requested",
-        viral_score: s.viral_score || 0,
-        domain_available: s.domain_available || false,
-        domain_status: s.domain_status || "UNKNOWN",
-        state_registry_status: s.state_registry_status || "",
-        google_search_status: s.google_search_status || "",
+        status: "purchasing",
+        viral_score: s.overall_score || s.viral_score || 0,
+        domain_available: true,
+        domain_status: "AVAILABLE",
+        state_registry_status: s.state_registry?.status || "",
+        google_search_status: s.google_research?.uniqueness || "",
         rationale: s.rationale || "",
       });
       setSavedId(s.domain);
-      // Available domains are purchased automatically via Vercel in the
-      // background — the client never fills out a form. Unavailable domains
-      // fall back to a manual request for our team.
-      if (s.domain_available && created?.id) {
+      if (created?.id) {
         setPurchasing(s.domain);
         try {
           const res = await base44.functions.invoke("purchaseDomainViaVercel", { clientDomainId: created.id });
@@ -109,9 +115,9 @@ export default function BusinessNameStudio() {
             <Lightbulb className="h-5 w-5 text-lime-400" />
           </div>
           <div>
-            <h1 className="text-xl font-semibold text-white">Business Name & Domain Studio</h1>
+            <h1 className="text-xl font-semibold text-white">Business Name & URL Generator</h1>
             <p className="text-sm text-white/50">
-              AI scans Google & state registries to find available, potentially viral business names with matching .com domains.
+              AI scrapes Google + US state registries to find unique, viral names with 100% available .com domains.
             </p>
           </div>
         </div>
@@ -161,9 +167,37 @@ export default function BusinessNameStudio() {
           className="inline-flex items-center gap-2 rounded-lg bg-lime-400 px-5 py-2.5 text-sm font-semibold text-black transition-colors hover:bg-lime-300 disabled:opacity-50"
         >
           {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Sparkles className="h-4 w-4" />}
-          {loading ? "Scanning Google & registries…" : "Generate Names"}
+          {loading ? "Researching names…" : "Generate Names"}
         </button>
       </div>
+
+      {/* Loading state — shows the 5-phase research pipeline */}
+      {loading && (
+        <div className="rounded-xl border border-lime-400/30 bg-lime-400/5 p-5">
+          <div className="flex items-center gap-2 text-sm text-lime-300">
+            <Loader2 className="h-4 w-4 animate-spin" />
+            <span className="font-medium">Deep research in progress…</span>
+          </div>
+          <div className="mt-4 space-y-2.5">
+            {[
+              { icon: Brain, label: "AI generating 10 candidate names with web search" },
+              { icon: Globe, label: "Verifying domain availability via RDAP registry" },
+              { icon: Search, label: "Scraping Google search results for name uniqueness" },
+              { icon: Building2, label: "Checking US state business registries (OpenCorporates)" },
+              { icon: Zap, label: "AI re-scoring with real research data" },
+            ].map((phase, i) => (
+              <div key={i} className="flex items-center gap-2.5 text-xs text-white/50">
+                <phase.icon className="h-3.5 w-3.5 text-lime-400/60" />
+                <span>{phase.label}</span>
+                <Loader2 className="ml-auto h-3 w-3 animate-spin text-lime-400/40" />
+              </div>
+            ))}
+          </div>
+          <p className="mt-3 text-[11px] text-white/30">
+            This takes 30-60 seconds. We only show names with 100% confirmed available .com domains.
+          </p>
+        </div>
+      )}
 
       {error && (
         <div className="flex items-center gap-2 rounded-lg border border-red-400/40 bg-red-400/10 px-3 py-2 text-sm text-red-300">
@@ -171,14 +205,17 @@ export default function BusinessNameStudio() {
         </div>
       )}
 
+      {/* Research phases transparency */}
+      {!loading && phases.length > 0 && <ResearchPhases phases={phases} />}
+
       {/* Results */}
-      {suggestions.length > 0 && (
+      {!loading && suggestions.length > 0 && (
         <div className="space-y-3">
           <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-lime-400">
-            <TrendingUp className="h-3.5 w-3.5" /> AI Recommendations — sorted by viral potential
+            <TrendingUp className="h-3.5 w-3.5" /> AI Recommendations — only 100% available domains, sorted by overall brand score
           </div>
           {suggestions.map((s, i) => (
-            <NameCard
+            <NameResearchCard
               key={i}
               suggestion={s}
               rank={i + 1}
@@ -193,145 +230,20 @@ export default function BusinessNameStudio() {
           ))}
         </div>
       )}
-    </div>
-  );
-}
 
-function NameCard({ suggestion: s, rank, saving, saved, purchasing, purchased, purchaseError, onRetry, onRequest }) {
-  const score = s.viral_score || 0;
-  const scoreColor = score >= 80 ? "text-lime-400" : score >= 60 ? "text-amber-400" : "text-white/60";
-  const scoreBg = score >= 80 ? "bg-lime-400" : score >= 60 ? "bg-amber-400" : "bg-white/30";
-
-  return (
-    <div className={`rounded-xl border bg-zinc-950 p-4 transition-colors ${
-      s.domain_available ? "border-lime-400/40" : "border-white/10"
-    }`}>
-      <div className="flex items-start gap-3">
-        {/* Rank */}
-        <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-lime-400/30 bg-lime-400/10 text-sm font-bold text-lime-400">
-          {rank}
-        </div>
-
-        <div className="min-w-0 flex-1">
-          {/* Name + domain */}
-          <div className="flex flex-wrap items-center gap-2">
-            <h3 className="text-base font-semibold text-white">{s.name}</h3>
-            {s.tagline && <span className="text-xs text-white/40">— {s.tagline}</span>}
-          </div>
-          <div className="mt-1 flex items-center gap-2">
-            <Globe className="h-3.5 w-3.5 text-white/40" />
-            <span className="text-sm font-mono text-white/70">{s.domain}</span>
-            {s.domain_available && (
-              <span className="rounded border border-lime-400/40 bg-lime-400/10 px-1.5 py-0.5 text-[10px] font-bold text-lime-300">
-                <CheckCircle2 className="mr-0.5 inline h-2.5 w-2.5" /> AVAILABLE
-              </span>
-            )}
-            {s.domain_status === "REGISTERED" && (
-              <span className="rounded border border-red-400/40 bg-red-400/10 px-1.5 py-0.5 text-[10px] font-bold text-red-300">
-                <XCircle className="mr-0.5 inline h-2.5 w-2.5" /> TAKEN
-              </span>
-            )}
-            {s.domain_status === "UNKNOWN" && (
-              <span className="rounded border border-white/20 bg-white/5 px-1.5 py-0.5 text-[10px] font-bold text-white/40">UNKNOWN</span>
-            )}
-          </div>
-
-          {/* Viral score */}
-          <div className="mt-3 flex items-center gap-3">
-            <div className="flex-1">
-              <div className="flex items-center justify-between text-xs">
-                <span className="text-white/40">Viral Potential</span>
-                <span className={`font-mono font-semibold ${scoreColor}`}>{score}/100</span>
-              </div>
-              <div className="mt-1 h-1.5 rounded-full bg-white/10">
-                <div className={`h-full rounded-full ${scoreBg}`} style={{ width: `${score}%` }} />
-              </div>
+      {/* Info footer */}
+      {!loading && suggestions.length === 0 && !error && (
+        <div className="rounded-xl border border-white/10 bg-zinc-950 p-5">
+          <div className="flex items-start gap-2 text-xs text-white/50">
+            <CheckCircle className="h-4 w-4 shrink-0 text-lime-400" />
+            <div>
+              <p className="font-medium text-white/70">How it works:</p>
+              <p className="mt-1">Our AI generates 15 candidate names, then verifies each one through a 5-phase research pipeline — Google search scraping, US state business registry checks, and RDAP domain verification. We only show names with <span className="text-lime-400">100% confirmed available .com domains</span>, scored across 8 dimensions including viral potential, local SEO, searchability, and trademark safety.</p>
+              <p className="mt-2 text-white/30">Click "Research" on any result to see the full Google search data and state registry findings.</p>
             </div>
           </div>
-
-          {/* Status checks */}
-          <div className="mt-3 grid grid-cols-1 gap-2 sm:grid-cols-2">
-            <StatusCheck
-              icon={Building2}
-              label="State Registry"
-              status={s.state_registry_status}
-              notes={s.state_registry_notes}
-            />
-            <StatusCheck
-              icon={Search}
-              label="Google Search"
-              status={s.google_search_status}
-              notes={s.google_search_notes}
-            />
-          </div>
-
-          {/* Rationale */}
-          {s.rationale && (
-            <div className="mt-3 rounded-lg border border-lime-400/10 bg-lime-400/5 p-2.5">
-              <div className="text-[10px] font-semibold uppercase tracking-wider text-lime-400/60 mb-1">Why it could go viral</div>
-              <p className="text-xs text-lime-300/70 leading-relaxed">{s.rationale}</p>
-            </div>
-          )}
-
-          {/* Action */}
-          <div className="mt-3">
-            {purchased ? (
-              <div className="flex items-center gap-2 rounded-lg border border-lime-400/40 bg-lime-400/10 px-3 py-2 text-xs text-lime-300">
-                <CheckCircle2 className="h-4 w-4" /> Purchased! We're securing <span className="font-mono">{s.domain}</span> for you now.
-              </div>
-            ) : purchasing ? (
-              <div className="flex items-center gap-2 rounded-lg border border-lime-400/30 bg-lime-400/5 px-3 py-2 text-xs text-lime-300">
-                <Loader2 className="h-4 w-4 animate-spin" /> Purchasing your domain…
-              </div>
-            ) : saved && s.domain_available && purchaseError ? (
-              <div className="space-y-2">
-                <div className="flex items-center gap-2 rounded-lg border border-amber-400/40 bg-amber-400/10 px-3 py-2 text-xs text-amber-300">
-                  <AlertCircle className="h-4 w-4" /> {purchaseError}
-                </div>
-                <button onClick={onRetry} className="inline-flex items-center gap-1.5 rounded-lg bg-lime-400 px-4 py-2 text-xs font-semibold text-black hover:bg-lime-300">
-                  <ArrowRight className="h-3.5 w-3.5" /> Try again
-                </button>
-              </div>
-            ) : saved ? (
-              <div className="flex items-center gap-2 rounded-lg border border-lime-400/40 bg-lime-400/10 px-3 py-2 text-xs text-lime-300">
-                <CheckCircle2 className="h-4 w-4" /> Request sent! Our team will secure this domain for you.
-              </div>
-            ) : (
-              <button
-                onClick={onRequest}
-                disabled={saving}
-                className="inline-flex items-center gap-1.5 rounded-lg bg-lime-400 px-4 py-2 text-xs font-semibold text-black transition-colors hover:bg-lime-300 disabled:opacity-50"
-              >
-                {saving ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <ArrowRight className="h-3.5 w-3.5" />}
-                {saving ? "Working…" : s.domain_available ? "Buy This Domain" : "Request This Domain"}
-              </button>
-            )}
-          </div>
         </div>
-      </div>
-    </div>
-  );
-}
-
-function StatusCheck({ icon: Icon, label, status, notes }) {
-  const isAvailable = status === "likely_available" || status === "unique";
-  const isTaken = status === "likely_taken" || status === "exists";
-  const color = isAvailable ? "text-lime-400" : isTaken ? "text-red-400" : "text-white/40";
-  const badgeColor = isAvailable
-    ? "border-lime-400/30 bg-lime-400/10 text-lime-300"
-    : isTaken
-    ? "border-red-400/30 bg-red-400/10 text-red-300"
-    : "border-white/15 bg-white/5 text-white/40";
-  const badgeText = isAvailable ? "CLEAR" : isTaken ? "TAKEN" : "UNKNOWN";
-
-  return (
-    <div className="rounded-lg border border-white/10 bg-black/30 p-2.5">
-      <div className="flex items-center gap-2">
-        <Icon className={`h-3.5 w-3.5 ${color}`} />
-        <span className="text-[10px] font-semibold uppercase tracking-wider text-white/40">{label}</span>
-        <span className={`ml-auto rounded border px-1.5 py-0.5 text-[10px] font-bold ${badgeColor}`}>{badgeText}</span>
-      </div>
-      {notes && <p className="mt-1.5 text-[11px] text-white/50 leading-relaxed">{notes}</p>}
+      )}
     </div>
   );
 }
