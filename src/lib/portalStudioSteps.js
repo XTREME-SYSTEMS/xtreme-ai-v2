@@ -3,7 +3,7 @@ import {
   Video, LayoutTemplate, FileSignature, ShieldCheck, Rocket, Sparkles, Compass,
 } from "lucide-react";
 
-// Portal Studio step library — an independent copy of the client portal
+// Xtreme AI step library — an independent copy of the client portal
 // steps, with routes prefixed under /portal-studio/. This is a separate
 // config so the clone can diverge (refine, harden, brand) without touching
 // the live client portal's step definitions.
@@ -15,8 +15,8 @@ export const PORTAL_STUDIO_STEPS = {
     key: "welcome",
     to: `${BASE}/welcome`, label: "Welcome", icon: Package, gate: "auto",
     activityLabel: "Review your package",
-    title: "Welcome to Portal Studio",
-    body: "This is your sandbox — an isolated clone of the client portal. Pick a project, walk the full build journey, refine the UX, harden the flows, and brand it for launch.",
+    title: "Welcome to Xtreme AI",
+    body: "Xtreme AI is your AI-guided system for building businesses, apps, brands, websites, and automated social media. Walk the full build journey, refine the UX, and brand it for launch.",
     nextLabel: "Go to Business Name", nextTo: `${BASE}/business-name`,
   },
   "business-name": {
@@ -119,8 +119,8 @@ export const PORTAL_STUDIO_STEPS = {
     key: "launch",
     to: `${BASE}/launch`, label: "Launch", icon: Rocket, gate: "auto",
     activityLabel: "Track your launch",
-    title: "Your Website Is Launching",
-    body: "Every action your team takes to build and launch your website is logged here for full transparency.",
+    title: "Package & Deploy",
+    body: "Package your Xtreme AI build and push it separately to GitHub, Google Drive, Vercel, and Supabase. Every deployment action is logged for full transparency.",
     nextLabel: null, nextTo: null,
   },
 };
