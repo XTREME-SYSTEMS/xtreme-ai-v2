@@ -27,6 +27,8 @@ const NAV = [
   { to: "/architect", label: "AI Chief Architect", icon: Brain, end: true },
   { to: "/auto-builder", label: "Auto Builder", icon: Hammer, end: true },
   { to: "/autonomous-system", label: "Autonomous Engine", icon: Bot, end: true },
+  { section: "Portal Studio" },
+  { to: "/portal-studio", label: "Portal Studio", icon: Hammer, end: true },
   { section: "Discovery" },
   { to: "/idea-discovery", label: "Autonomous Discovery", icon: Radar },
   { to: "/discovery", label: "Business Discovery", icon: Search },

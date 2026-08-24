@@ -1,0 +1,250 @@
+{
+  "name": "PortalStudioProject",
+  "type": "object",
+  "description": "Sandbox project for the Portal Studio \u2014 an isolated clone of the client portal where admins refine, harden, and brand the portal experience without touching real client data. Each project is a self-contained build with its own profile, content, logo, brand, website, social, and video assets. Admin-only.",
+  "properties": {
+    "name": {
+      "type": "string",
+      "description": "Project name (e.g. 'Acme Roofing \u2014 Refinement Build')"
+    },
+    "product_type": {
+      "type": "string",
+      "enum": [
+        "marketing_site",
+        "web_app",
+        "ecommerce",
+        "platform"
+      ],
+      "default": "marketing_site",
+      "description": "Which pipeline this sandbox project uses"
+    },
+    "business_name": {
+      "type": "string"
+    },
+    "industry": {
+      "type": "string"
+    },
+    "sub_industry": {
+      "type": "string"
+    },
+    "business_type": {
+      "type": "string"
+    },
+    "business_stage": {
+      "type": "string"
+    },
+    "profile": {
+      "type": "object",
+      "description": "Business profile data \u2014 the input that feeds all downstream generators",
+      "properties": {
+        "phone": {
+          "type": "string"
+        },
+        "email": {
+          "type": "string"
+        },
+        "website": {
+          "type": "string"
+        },
+        "primary_location": {
+          "type": "string"
+        },
+        "address": {
+          "type": "string"
+        },
+        "zip": {
+          "type": "string"
+        },
+        "radius": {
+          "type": "string"
+        },
+        "years_in_business": {
+          "type": "string"
+        },
+        "services": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "tagline": {
+          "type": "string"
+        },
+        "industry_answers": {
+          "type": "object"
+        },
+        "financial_intelligence": {
+          "type": "object"
+        },
+        "logo_url": {
+          "type": "string"
+        },
+        "gallery_urls": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "content_templates": {
+      "type": "array",
+      "items": {
+        "type": "object"
+      }
+    },
+    "chosen_content_template": {
+      "type": "string"
+    },
+    "content_templates_chosen": {
+      "type": "boolean",
+      "default": false
+    },
+    "logo_options": {
+      "type": "array",
+      "items": {
+        "type": "object"
+      }
+    },
+    "chosen_logo_url": {
+      "type": "string"
+    },
+    "brand_packs": {
+      "type": "array",
+      "items": {
+        "type": "object"
+      }
+    },
+    "chosen_brand_images": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "website_content": {
+      "type": "object"
+    },
+    "website_images": {
+      "type": "array",
+      "items": {
+        "type": "object"
+      }
+    },
+    "chosen_website_layout": {
+      "type": "string"
+    },
+    "chosen_palette": {
+      "type": "string"
+    },
+    "design_packs_chosen": {
+      "type": "boolean",
+      "default": false
+    },
+    "social_media_pack": {
+      "type": "object"
+    },
+    "social_media_chosen": {
+      "type": "boolean",
+      "default": false
+    },
+    "video_pack": {
+      "type": "object"
+    },
+    "video_chosen": {
+      "type": "boolean",
+      "default": false
+    },
+    "enhancements": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "enhancements_total": {
+      "type": "number",
+      "default": 0
+    },
+    "enhancements_chosen": {
+      "type": "boolean",
+      "default": false
+    },
+    "name_options": {
+      "type": "array",
+      "items": {
+        "type": "object"
+      }
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "draft",
+        "in_progress",
+        "review",
+        "complete",
+        "archived"
+      ],
+      "default": "draft"
+    },
+    "current_step": {
+      "type": "string",
+      "default": "welcome"
+    },
+    "visited_steps": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "default": [],
+      "description": "Portal Studio step paths that have been visited/completed"
+    },
+    "brand_config": {
+      "type": "object",
+      "description": "Custom branding for this sandbox project \u2014 the look-and-feel that will eventually be packaged into the standalone app",
+      "properties": {
+        "app_name": {
+          "type": "string"
+        },
+        "primary_color": {
+          "type": "string"
+        },
+        "logo_url": {
+          "type": "string"
+        },
+        "tagline": {
+          "type": "string"
+        }
+      }
+    },
+    "logs": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    }
+  },
+  "required": [
+    "name"
+  ],
+  "rls": {
+    "read": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "create": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

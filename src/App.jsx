@@ -119,6 +119,10 @@ import SystemAlerts from '@/pages/SystemAlerts';
 import SystemOptimization from '@/pages/SystemOptimization';
 import VisionCortex from '@/pages/VisionCortex';
 import Architect from '@/pages/Architect';
+import { PortalStudioProvider } from '@/lib/PortalStudioContext';
+import PortalStudioLayout from '@/components/portalstudio/PortalStudioLayout';
+import PortalStudio from '@/pages/portalstudio/PortalStudio';
+import PortalStudioStep from '@/pages/portalstudio/PortalStudioStep';
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin, isAuthenticated } = useAuth();
@@ -256,6 +260,25 @@ const AuthenticatedApp = () => {
           <Route path="/vision-cortex" element={<VisionCortex />} />
       <Route path="/architect" element={<Architect />} />
         </Route>
+      </Route>
+      {/* Portal Studio — full-screen workspace, no admin sidebar. Isolated
+          clone of the client portal for refinement, hardening, and branding. */}
+      <Route element={<PortalStudioProvider><PortalStudioLayout /></PortalStudioProvider>}>
+        <Route path="/portal-studio" element={<PortalStudio />} />
+        <Route path="/portal-studio/welcome" element={<PortalStudioStep />} />
+        <Route path="/portal-studio/business-name" element={<PortalStudioStep />} />
+        <Route path="/portal-studio/business-profile" element={<PortalStudioStep />} />
+        <Route path="/portal-studio/content" element={<PortalStudioStep />} />
+        <Route path="/portal-studio/logo" element={<PortalStudioStep />} />
+        <Route path="/portal-studio/brand" element={<PortalStudioStep />} />
+        <Route path="/portal-studio/website" element={<PortalStudioStep />} />
+        <Route path="/portal-studio/social" element={<PortalStudioStep />} />
+        <Route path="/portal-studio/video" element={<PortalStudioStep />} />
+        <Route path="/portal-studio/enhancements" element={<PortalStudioStep />} />
+        <Route path="/portal-studio/your-designs" element={<PortalStudioStep />} />
+        <Route path="/portal-studio/signatures" element={<PortalStudioStep />} />
+        <Route path="/portal-studio/approvals" element={<PortalStudioStep />} />
+        <Route path="/portal-studio/launch" element={<PortalStudioStep />} />
       </Route>
       <Route path="*" element={<PageNotFound />} />
     </Routes>
