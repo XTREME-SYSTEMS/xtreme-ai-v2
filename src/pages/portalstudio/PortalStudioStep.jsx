@@ -38,17 +38,17 @@ export default function PortalStudioStep() {
 
   return (
     <div className="mx-auto max-w-2xl space-y-6">
-      <div className="rounded-xl border border-yellow-400/30 bg-yellow-400/5 p-6">
+      <div className="rounded-xl border border-yellow-300/30 bg-yellow-300/5 p-6">
         <div className="flex items-center gap-3">
-          <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-yellow-400/15">
-            <Icon className="h-6 w-6 text-yellow-400" />
+          <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-yellow-300/15">
+            <Icon className="h-6 w-6 text-yellow-300" />
           </div>
           <div>
             <h1 className="text-xl font-semibold text-white">{step.label}</h1>
-            <p className="text-xs uppercase tracking-wider text-yellow-400">Step {step.step} · Xtreme AI Build</p>
+            <p className="text-xs uppercase tracking-wider text-yellow-300">Step {step.step} · Xtreme AI Build</p>
           </div>
           {isComplete && (
-            <span className="ml-auto inline-flex items-center gap-1 rounded-md border border-yellow-400/40 bg-yellow-400/10 px-2 py-1 text-xs font-semibold text-yellow-300">
+            <span className="ml-auto inline-flex items-center gap-1 rounded-md border border-yellow-300/40 bg-yellow-300/10 px-2 py-1 text-xs font-semibold text-yellow-300">
               <CheckCircle2 className="h-3.5 w-3.5" /> Complete
             </span>
           )}
@@ -58,7 +58,7 @@ export default function PortalStudioStep() {
 
       <div className="rounded-xl border border-white/10 bg-zinc-950 p-6">
         <div className="flex items-start gap-3">
-          <Hammer className="h-5 w-5 shrink-0 text-yellow-400" />
+          <Hammer className="h-5 w-5 shrink-0 text-yellow-300" />
           <div>
             <h2 className="text-sm font-semibold text-white">Ready for cloning</h2>
             <p className="mt-1 text-sm text-white/60">
@@ -71,7 +71,7 @@ export default function PortalStudioStep() {
         </div>
         <button
           onClick={markDone}
-          className="mt-5 inline-flex items-center gap-1.5 rounded-lg bg-yellow-400 px-4 py-2.5 text-sm font-semibold text-black hover:bg-yellow-300"
+          className="mt-5 inline-flex items-center gap-1.5 rounded-lg bg-yellow-300 px-4 py-2.5 text-sm font-semibold text-black hover:bg-yellow-300"
         >
           Mark step complete & continue <ArrowRight className="h-4 w-4" />
         </button>

@@ -33,13 +33,13 @@ export default function PortalStudioLayout() {
         <Image src={XTREME_AI_LOGO} alt="Xtreme AI" className="h-8 w-8 rounded" fittingType="fit" />
         <div className="leading-tight">
           <div className="text-sm font-semibold text-white">Xtreme AI</div>
-          <div className="text-[10px] uppercase tracking-wider text-yellow-400">
+          <div className="text-[10px] uppercase tracking-wider text-yellow-300">
             {isActive ? project?.name || "Sandbox Build" : "No project selected"}
           </div>
         </div>
         <button
           onClick={exit}
-          className="ml-2 flex items-center gap-1.5 rounded-md border border-yellow-400 px-2.5 py-1.5 text-xs font-semibold text-yellow-400 hover:bg-yellow-400/10"
+          className="ml-2 flex items-center gap-1.5 rounded-md border border-yellow-300 px-2.5 py-1.5 text-xs font-semibold text-yellow-300 hover:bg-yellow-300/10"
         >
           <ArrowLeft className="h-3.5 w-3.5" /> Exit to Admin
         </button>
