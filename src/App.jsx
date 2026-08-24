@@ -120,7 +120,7 @@ import SystemOptimization from '@/pages/SystemOptimization';
 import VisionCortex from '@/pages/VisionCortex';
 import Architect from '@/pages/Architect';
 import { PortalStudioProvider } from '@/lib/PortalStudioContext';
-import PortalStudioLayout from '@/components/portalstudio/PortalStudioLayout';
+import XtremeShell from '@/components/xtremeai/XtremeShell';
 import PortalStudio from '@/pages/portalstudio/PortalStudio';
 import PortalStudioStep from '@/pages/portalstudio/PortalStudioStep';
 
@@ -261,9 +261,9 @@ const AuthenticatedApp = () => {
       <Route path="/architect" element={<Architect />} />
         </Route>
       </Route>
-      {/* Portal Studio — full-screen workspace, no admin sidebar. Isolated
+      {/* Xtreme AI — mobile device shell with bottom tab bar. Isolated
           clone of the client portal for refinement, hardening, and branding. */}
-      <Route element={<PortalStudioProvider><PortalStudioLayout /></PortalStudioProvider>}>
+      <Route element={<PortalStudioProvider><XtremeShell /></PortalStudioProvider>}>
         <Route path="/portal-studio" element={<PortalStudio />} />
         <Route path="/portal-studio/welcome" element={<PortalStudioStep />} />
         <Route path="/portal-studio/business-name" element={<PortalStudioStep />} />
