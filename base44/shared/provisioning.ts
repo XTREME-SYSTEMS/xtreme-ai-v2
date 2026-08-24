@@ -224,6 +224,17 @@ export async function provisionVercel(market, repoFullName, files) {
     project = await r.json();
   } else throw new Error(`Vercel create project failed: ${createRes.status} ${await createRes.text()}`);
 
+  // Disable Vercel SSO Protection (Vercel Authentication) so the site is
+  // publicly accessible without a login wall. Vercel enables this by default
+  // on new projects — it's the #1 cause of "the URL went to error."
+  try {
+    await fetch(`https://api.vercel.com/v9/projects/${project.id}${qs}`, {
+      method: "PATCH",
+      headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
+      body: JSON.stringify({ ssoProtection: null }),
+    });
+  } catch (e) { /* non-fatal — best effort */ }
+
   // Public production URL: {name}-{teamSlug}.vercel.app for team projects.
   let url = `https://${name}.vercel.app`;
   if (team) {
