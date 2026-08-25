@@ -33,10 +33,11 @@ const PRODUCT_CATALOG = { to: "/product-catalog", label: "Product Catalog", icon
 const EMPLOYEE_PORTAL = { to: "/employee-portal", label: "Employee Portal", icon: Users, end: true };
 
 const PIPELINE_STEPS = [
-  { to: "/architect",     label: "AI Chief Architect", icon: Brain,  step: 1, desc: "AI chat that operates the system" },
-  { to: "/vision-cortex", label: "Vision Cortex",      icon: Eye,   step: 2, desc: "Finds ideas for websites & systems" },
-  { to: "/build-queue",   label: "Queue System",       icon: Boxes,  step: 3, desc: "Ideas queued for building" },
-  { to: "/auto-builder",  label: "Auto Builder",       icon: Rocket, step: 4, desc: "Full builder pipeline" },
+  { to: "/architect",        label: "AI Chief Architect", icon: Brain,  step: 1, desc: "AI chat that operates the system" },
+  { to: "/vision-cortex",    label: "Vision Cortex",      icon: Eye,    step: 2, desc: "Finds ideas for websites & systems" },
+  { to: "/pipeline-catalog", label: "Pipeline Catalog",   icon: Layers, step: 3, desc: "Browse packages, templates & tools" },
+  { to: "/build-queue",      label: "Queue System",       icon: Boxes,  step: 4, desc: "Ideas queued for building" },
+  { to: "/auto-builder",     label: "Auto Builder",       icon: Rocket, step: 5, desc: "Full builder pipeline" },
 ];
 
 // Auto Builder sub-steps — the builder's own pipeline, shown as a nested
@@ -209,20 +210,6 @@ export default function Layout() {
           >
             <Bot className="h-4 w-4 shrink-0" />
             {PIPELINE_OVERVIEW.label}
-          </NavLink>
-
-          {/* Pipeline Catalog — choose a pre-existing package/template to start */}
-          <NavLink
-            to={PIPELINE_CATALOG.to}
-            end={PIPELINE_CATALOG.end}
-            onClick={() => setOpen(false)}
-            className={({ isActive }) => cn(
-              "flex items-center gap-2.5 rounded-lg px-2.5 py-2 text-sm transition-colors",
-              isActive ? "bg-amber-400/10 text-amber-400 font-semibold" : "text-white hover:bg-white/5"
-            )}
-          >
-            <Layers className="h-4 w-4 shrink-0" />
-            {PIPELINE_CATALOG.label}
           </NavLink>
 
           {/* Product Catalog — finished, validated products ready for deployment */}
