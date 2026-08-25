@@ -68,7 +68,7 @@ export default function PreviewAsClientModal({ onClose }) {
           </div>
           <div className="flex-1">
             <h2 className="text-sm font-semibold text-white">Preview as Client</h2>
-            <p className="text-xs text-white/50">Pick a client to see their portal exactly as they see it.</p>
+            <p className="text-xs text-white/50">Pick a user to see the Business Generator exactly as they see it.</p>
           </div>
           <button
             onClick={onClose}

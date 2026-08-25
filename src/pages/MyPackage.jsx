@@ -16,6 +16,7 @@ import BrandedButton from "@/components/client/BrandedButton";
 import ExpandableLineItems from "@/components/client/ExpandableLineItems";
 import { useRevisionThreads } from "@/hooks/useRevisionThreads";
 import RevisionThreadPanel from "@/components/client/RevisionThreadPanel";
+import SystemActivities from "@/components/client/SystemActivities";
 
 // Dedicated page for the client's purchased package — the top-level
 // destination of the client portal. Shows only the package and its items.
@@ -123,6 +124,8 @@ export default function MyPackage() {
   return (
     <div className="space-y-5">
       {isPreviewing && <PreviewBanner />}
+      {/* System capabilities — orients the user on everything they can do */}
+      <SystemActivities />
       {/* What you paid for — the source of truth the whole system keys off */}
       <div className="rounded-xl border border-lime-400/40 bg-lime-400/5 p-5">
         <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-lime-400">

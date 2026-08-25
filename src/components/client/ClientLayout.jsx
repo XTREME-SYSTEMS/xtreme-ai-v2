@@ -35,7 +35,7 @@ export default function ClientLayout({ user }) {
         <div className="leading-tight">
           <div className="text-sm font-semibold text-white">Xtreme AI</div>
           <div className="text-[10px] uppercase tracking-wider text-amber-400">
-            {autoBuild.isActive ? "Auto Builder" : "Client Portal"}
+            {autoBuild.isActive ? "Auto Builder" : "Business Generator"}
           </div>
         </div>
         {autoBuild.isActive && (

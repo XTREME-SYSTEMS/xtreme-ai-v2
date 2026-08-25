@@ -2,7 +2,7 @@ import { useState } from "react";
 import { base44 } from "@/api/base44Client";
 import {
   Lightbulb, Loader2, Search, AlertCircle, TrendingUp, Sparkles,
-  Brain, Globe, Building2, CheckCircle, Zap,
+  Brain, Globe, Building2, CheckCircle, Zap, RefreshCw, Edit3, Plus,
 } from "lucide-react";
 import { useClientUser } from "@/hooks/useClientUser";
 import BackButton from "@/components/client/BackButton";
@@ -35,15 +35,21 @@ export default function BusinessNameStudio() {
   const [purchasing, setPurchasing] = useState(null);
   const [purchased, setPurchased] = useState(null);
   const [purchaseError, setPurchaseError] = useState({});
+  const [showManual, setShowManual] = useState(false);
+  const [manualName, setManualName] = useState("");
+  const [manualChecking, setManualChecking] = useState(false);
+  const [manualResult, setManualResult] = useState(null);
+  const [manualError, setManualError] = useState("");
+  const [genCount, setGenCount] = useState(0);
 
-  const generate = async () => {
+  const generate = async (append = false) => {
     if (!industry.trim()) {
       setError("Enter your industry to get started.");
       return;
     }
     setLoading(true);
     setError("");
-    setSuggestions([]);
+    if (!append) setSuggestions([]);
     setPhases([]);
     try {
       const res = await base44.functions.invoke("recommendBusinessNames", {
@@ -53,7 +59,7 @@ export default function BusinessNameStudio() {
       });
       const data = res?.data || res;
       if (data?.suggestions?.length > 0) {
-        setSuggestions(data.suggestions);
+        setSuggestions((prev) => append ? [...prev, ...data.suggestions] : data.suggestions);
         setPhases(data.phases || []);
       } else {
         setError(data?.error || "No 100% available domains found. Try different keywords.");
@@ -63,7 +69,53 @@ export default function BusinessNameStudio() {
       setError(e?.message || "Could not generate suggestions. Please try again.");
     } finally {
       setLoading(false);
+      setGenCount((c) => c + 1);
     }
+  };
+
+  // Check a manually-entered business name for domain availability
+  const checkManualName = async () => {
+    if (!manualName.trim()) {
+      setManualError("Enter a business name to check.");
+      return;
+    }
+    setManualChecking(true);
+    setManualError("");
+    setManualResult(null);
+    try {
+      const cleanName = manualName.trim().toLowerCase().replace(/[^a-z0-9]/g, "");
+      const domain = `${cleanName}.com`;
+      const res = await base44.functions.invoke("checkDomainAvailability", { domain });
+      const data = res?.data || res;
+      setManualResult({
+        name: manualName.trim(),
+        domain,
+        available: data?.available !== false,
+        status: data?.status || (data?.available !== false ? "AVAILABLE" : "TAKEN"),
+      });
+    } catch (e) {
+      setManualError(e?.message || "Could not check domain. Please try again.");
+    } finally {
+      setManualChecking(false);
+    }
+  };
+
+  // Save a manually-entered name as a suggestion the user can purchase
+  const useManualName = async () => {
+    if (!manualResult) return;
+    const s = {
+      name: manualResult.name,
+      domain: manualResult.domain,
+      tagline: "",
+      overall_score: 0,
+      rationale: "Manually entered by user",
+      state_registry: { status: "not_checked" },
+      google_research: { uniqueness: "not_checked" },
+    };
+    setSuggestions((prev) => [s, ...prev]);
+    setShowManual(false);
+    setManualName("");
+    setManualResult(null);
   };
 
   const requestDomain = async (s) => {
@@ -211,8 +263,11 @@ export default function BusinessNameStudio() {
       {/* Results */}
       {!loading && suggestions.length > 0 && (
         <div className="space-y-3">
-          <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-lime-400">
-            <TrendingUp className="h-3.5 w-3.5" /> AI Recommendations — only 100% available domains, sorted by overall brand score
+          <div className="flex items-center justify-between gap-2">
+            <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-lime-400">
+              <TrendingUp className="h-3.5 w-3.5" /> AI Recommendations — only 100% available domains, sorted by overall brand score
+            </div>
+            <span className="text-[10px] text-white/30">Round {genCount}</span>
           </div>
           {suggestions.map((s, i) => (
             <NameResearchCard
@@ -228,20 +283,159 @@ export default function BusinessNameStudio() {
               onRequest={() => requestDomain(s)}
             />
           ))}
+
+          {/* Regenerate + Manual input actions */}
+          <div className="flex flex-wrap items-center gap-2 border-t border-white/10 pt-3">
+            <button
+              onClick={() => generate(true)}
+              disabled={loading}
+              className="inline-flex items-center gap-1.5 rounded-lg border border-lime-400/40 bg-lime-400/10 px-4 py-2 text-sm font-semibold text-lime-300 transition-colors hover:bg-lime-400/20 disabled:opacity-50"
+            >
+              <RefreshCw className="h-4 w-4" /> Generate More Names
+            </button>
+            <button
+              onClick={() => setShowManual((v) => !v)}
+              className="inline-flex items-center gap-1.5 rounded-lg border border-white/15 px-4 py-2 text-sm font-medium text-white/70 transition-colors hover:border-lime-400/40 hover:text-lime-300"
+            >
+              <Edit3 className="h-4 w-4" /> Enter My Own Name
+            </button>
+          </div>
+
+          {/* Manual name input */}
+          {showManual && (
+            <div className="rounded-xl border border-lime-400/30 bg-lime-400/5 p-4 space-y-3">
+              <div>
+                <label className="mb-1 block text-xs font-medium text-white/60">Enter a business name to check domain availability</label>
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    value={manualName}
+                    onChange={(e) => setManualName(e.target.value)}
+                    onKeyDown={(e) => e.key === "Enter" && checkManualName()}
+                    placeholder="e.g. Apex Epoxy Coatings"
+                    className="flex-1 rounded-lg border border-white/15 bg-black px-3 py-2 text-sm text-white placeholder-white/30 focus:border-lime-400 focus:outline-none"
+                  />
+                  <button
+                    onClick={checkManualName}
+                    disabled={manualChecking}
+                    className="inline-flex items-center gap-1.5 rounded-lg bg-lime-400 px-4 py-2 text-sm font-semibold text-black transition-colors hover:bg-lime-300 disabled:opacity-50"
+                  >
+                    {manualChecking ? <Loader2 className="h-4 w-4 animate-spin" /> : <Search className="h-4 w-4" />}
+                    {manualChecking ? "Checking…" : "Check"}
+                  </button>
+                </div>
+              </div>
+              {manualError && (
+                <p className="text-xs text-red-400">{manualError}</p>
+              )}
+              {manualResult && (
+                <div className="rounded-lg border border-white/10 bg-black/40 p-3">
+                  <div className="flex items-center gap-2">
+                    {manualResult.available ? (
+                      <CheckCircle className="h-5 w-5 text-lime-400" />
+                    ) : (
+                      <AlertCircle className="h-5 w-5 text-red-400" />
+                    )}
+                    <div className="flex-1">
+                      <div className="text-sm font-semibold text-white">{manualResult.name}</div>
+                      <div className="text-xs text-white/50">
+                        {manualResult.domain} —{" "}
+                        <span className={manualResult.available ? "text-lime-400 font-semibold" : "text-red-400 font-semibold"}>
+                          {manualResult.available ? "AVAILABLE" : "TAKEN"}
+                        </span>
+                      </div>
+                    </div>
+                    {manualResult.available && (
+                      <button
+                        onClick={useManualName}
+                        className="inline-flex items-center gap-1.5 rounded-lg border border-lime-400/40 bg-lime-400/10 px-3 py-1.5 text-xs font-semibold text-lime-300 hover:bg-lime-400/20"
+                      >
+                        <Plus className="h-3.5 w-3.5" /> Use This Name
+                      </button>
+                    )}
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
         </div>
       )}
 
       {/* Info footer */}
       {!loading && suggestions.length === 0 && !error && (
-        <div className="rounded-xl border border-white/10 bg-zinc-950 p-5">
-          <div className="flex items-start gap-2 text-xs text-white/50">
-            <CheckCircle className="h-4 w-4 shrink-0 text-lime-400" />
-            <div>
-              <p className="font-medium text-white/70">How it works:</p>
-              <p className="mt-1">Our AI generates 15 candidate names, then verifies each one through a 5-phase research pipeline — Google search scraping, US state business registry checks, and RDAP domain verification. We only show names with <span className="text-lime-400">100% confirmed available .com domains</span>, scored across 8 dimensions including viral potential, local SEO, searchability, and trademark safety.</p>
-              <p className="mt-2 text-white/30">Click "Research" on any result to see the full Google search data and state registry findings.</p>
+        <div className="space-y-3">
+          <div className="rounded-xl border border-white/10 bg-zinc-950 p-5">
+            <div className="flex items-start gap-2 text-xs text-white/50">
+              <CheckCircle className="h-4 w-4 shrink-0 text-lime-400" />
+              <div>
+                <p className="font-medium text-white/70">How it works:</p>
+                <p className="mt-1">Our AI generates 15 candidate names, then verifies each one through a 5-phase research pipeline — Google search scraping, US state business registry checks, and RDAP domain verification. We only show names with <span className="text-lime-400">100% confirmed available .com domains</span>, scored across 8 dimensions including viral potential, local SEO, searchability, and trademark safety.</p>
+                <p className="mt-2 text-white/30">Click "Research" on any result to see the full Google search data and state registry findings.</p>
+              </div>
             </div>
           </div>
+          <div className="flex flex-wrap items-center gap-2">
+            <button
+              onClick={() => setShowManual((v) => !v)}
+              className="inline-flex items-center gap-1.5 rounded-lg border border-white/15 px-4 py-2 text-sm font-medium text-white/70 transition-colors hover:border-lime-400/40 hover:text-lime-300"
+            >
+              <Edit3 className="h-4 w-4" /> Enter My Own Name
+            </button>
+          </div>
+          {showManual && (
+            <div className="rounded-xl border border-lime-400/30 bg-lime-400/5 p-4 space-y-3">
+              <div>
+                <label className="mb-1 block text-xs font-medium text-white/60">Enter a business name to check domain availability</label>
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    value={manualName}
+                    onChange={(e) => setManualName(e.target.value)}
+                    onKeyDown={(e) => e.key === "Enter" && checkManualName()}
+                    placeholder="e.g. Apex Epoxy Coatings"
+                    className="flex-1 rounded-lg border border-white/15 bg-black px-3 py-2 text-sm text-white placeholder-white/30 focus:border-lime-400 focus:outline-none"
+                  />
+                  <button
+                    onClick={checkManualName}
+                    disabled={manualChecking}
+                    className="inline-flex items-center gap-1.5 rounded-lg bg-lime-400 px-4 py-2 text-sm font-semibold text-black transition-colors hover:bg-lime-300 disabled:opacity-50"
+                  >
+                    {manualChecking ? <Loader2 className="h-4 w-4 animate-spin" /> : <Search className="h-4 w-4" />}
+                    {manualChecking ? "Checking…" : "Check"}
+                  </button>
+                </div>
+              </div>
+              {manualError && <p className="text-xs text-red-400">{manualError}</p>}
+              {manualResult && (
+                <div className="rounded-lg border border-white/10 bg-black/40 p-3">
+                  <div className="flex items-center gap-2">
+                    {manualResult.available ? (
+                      <CheckCircle className="h-5 w-5 text-lime-400" />
+                    ) : (
+                      <AlertCircle className="h-5 w-5 text-red-400" />
+                    )}
+                    <div className="flex-1">
+                      <div className="text-sm font-semibold text-white">{manualResult.name}</div>
+                      <div className="text-xs text-white/50">
+                        {manualResult.domain} —{" "}
+                        <span className={manualResult.available ? "text-lime-400 font-semibold" : "text-red-400 font-semibold"}>
+                          {manualResult.available ? "AVAILABLE" : "TAKEN"}
+                        </span>
+                      </div>
+                    </div>
+                    {manualResult.available && (
+                      <button
+                        onClick={useManualName}
+                        className="inline-flex items-center gap-1.5 rounded-lg border border-lime-400/40 bg-lime-400/10 px-3 py-1.5 text-xs font-semibold text-lime-300 hover:bg-lime-400/20"
+                      >
+                        <Plus className="h-3.5 w-3.5" /> Use This Name
+                      </button>
+                    )}
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
         </div>
       )}
     </div>

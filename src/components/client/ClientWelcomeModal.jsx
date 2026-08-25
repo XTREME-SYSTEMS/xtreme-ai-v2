@@ -113,7 +113,7 @@ export default function ClientWelcomeModal({ user }) {
               <h2 className="text-2xl font-bold text-white">
                 Welcome{firstName ? `, ${firstName}` : ""}! 👋
               </h2>
-              <p className="text-sm text-white/60">Your client portal is ready. Here's how it works.</p>
+              <p className="text-sm text-white/60">Your Xtreme AI Business Generator is ready. Here's how it works.</p>
             </div>
           </div>
         </div>
