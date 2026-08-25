@@ -1,0 +1,55 @@
+{
+  "name": "ArchiveRecord",
+  "type": "object",
+  "description": "A snapshot of a record archived from another entity. Holds the original entity name, original record ID, and the full record data as a JSON string so it can be restored if needed. Created by the archiveAllData backend function when the operator wants to clean the pipeline without losing data.",
+  "properties": {
+    "source_entity": {
+      "type": "string",
+      "description": "Name of the entity this record was archived from"
+    },
+    "source_id": {
+      "type": "string",
+      "description": "Original record ID"
+    },
+    "source_created_date": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When the original record was created"
+    },
+    "source_data": {
+      "type": "string",
+      "description": "JSON-stringified copy of the full original record (minus built-in fields)"
+    },
+    "archived_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When this archive snapshot was created"
+    }
+  },
+  "required": [
+    "source_entity",
+    "source_data"
+  ],
+  "rls": {
+    "read": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "create": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}
