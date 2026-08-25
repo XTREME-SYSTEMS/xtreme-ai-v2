@@ -64,6 +64,7 @@ import Invoices from '@/pages/billing/Invoices';
 import Expenses from '@/pages/billing/Expenses';
 import BillingDashboard from '@/pages/billing/BillingDashboard';
 import AutonomousSystem from '@/pages/AutonomousSystem';
+import PipelineCatalog from '@/pages/PipelineCatalog';
 import WebsiteFactory from '@/pages/WebsiteFactory';
 import BrandFactory from '@/pages/BrandFactory';
 import TemplateLibrary from '@/pages/TemplateLibrary';
@@ -225,6 +226,7 @@ const AuthenticatedApp = () => {
           <Route path="/billing/invoices" element={<Invoices />} />
           <Route path="/billing/expenses" element={<Expenses />} />
           <Route path="/autonomous-system" element={<AutonomousSystem />} />
+          <Route path="/pipeline-catalog" element={<PipelineCatalog />} />
           <Route path="/website-factory" element={<WebsiteFactory />} />
           <Route path="/brand-factory" element={<BrandFactory />} />
           <Route path="/template-library" element={<TemplateLibrary />} />

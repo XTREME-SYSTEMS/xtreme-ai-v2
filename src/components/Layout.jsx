@@ -7,7 +7,7 @@ import {
   Hammer, ShieldCheck, FileText, TrendingUp, FlaskConical, Dna, Network, BarChart3,
   BookMarked, CheckCircle, ScrollText, Plug, Settings, LogOut, Menu, X,
   MapPin, Plus, Rocket, Bot, LayoutTemplate, Copy, Wand2, Crosshair, Activity, Radar, Package, UserPlus, Tag, Box, ShieldAlert, Sparkles, Brain,
-  Archive, ChevronDown, Compass, Building2, MessageSquareText, PenTool, Shirt, Share2, Video,
+  Archive, ChevronDown, Compass, Building2, MessageSquareText, PenTool, Shirt, Share2, Video, Layers,
 } from "lucide-react";
 import { Image } from "@/components/ui/image";
 import { cn } from "@/lib/utils";
@@ -27,6 +27,8 @@ import { useAutoBuild } from "@/lib/AutoBuildContext";
 // Step 3: Queue System         → Ideas queued for building
 // Step 4: Auto Builder         → Full builder pipeline
 const PIPELINE_OVERVIEW = { to: "/autonomous-system", label: "Pipeline Overview", icon: Bot, end: true };
+
+const PIPELINE_CATALOG = { to: "/pipeline-catalog", label: "Pipeline Catalog", icon: Layers, end: true };
 
 const PIPELINE_STEPS = [
   { to: "/architect",     label: "AI Chief Architect", icon: Brain,  step: 1, desc: "AI chat that operates the system" },
@@ -203,6 +205,20 @@ export default function Layout() {
           >
             <Bot className="h-4 w-4 shrink-0" />
             {PIPELINE_OVERVIEW.label}
+          </NavLink>
+
+          {/* Pipeline Catalog — choose a pre-existing package/template to start */}
+          <NavLink
+            to={PIPELINE_CATALOG.to}
+            end={PIPELINE_CATALOG.end}
+            onClick={() => setOpen(false)}
+            className={({ isActive }) => cn(
+              "flex items-center gap-2.5 rounded-lg px-2.5 py-2 text-sm transition-colors",
+              isActive ? "bg-amber-400/10 text-amber-400 font-semibold" : "text-white hover:bg-white/5"
+            )}
+          >
+            <Layers className="h-4 w-4 shrink-0" />
+            {PIPELINE_CATALOG.label}
           </NavLink>
 
           {/* Timeline header */}
