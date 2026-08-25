@@ -233,7 +233,7 @@ export default function Layout() {
                         <div className={cn(
                           "relative z-10 flex h-11 w-11 shrink-0 items-center justify-center rounded-full border-2 text-sm font-bold transition-all duration-200",
                           isActive || (isAutoBuilder && showAutoBuilderSub)
-                            ? "border-amber-400 bg-amber-400 text-black shadow-[0_0_12px_2px_rgba(255,255,0,0.5)]"
+                            ? "border-amber-400 bg-amber-400 text-black shadow-[0_0_12px_2px_rgba(255,234,0,0.5)]"
                             : "border-white/15 bg-zinc-900 text-white/50"
                         )}>
                           {step.step}
@@ -267,7 +267,7 @@ export default function Layout() {
                             <div className={cn(
                               "flex h-7 w-7 shrink-0 items-center justify-center rounded-full border text-[10px] font-bold transition-all",
                               subActive
-                                ? "border-amber-400 bg-amber-400 text-black shadow-[0_0_8px_1px_rgba(255,255,0,0.4)]"
+                                ? "border-amber-400 bg-amber-400 text-black shadow-[0_0_8px_1px_rgba(255,234,0,0.4)]"
                                 : "border-white/15 bg-zinc-900 text-white/40"
                             )}>
                               {j + 1}

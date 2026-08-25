@@ -63,7 +63,7 @@ export default function ParticleNetwork({ className }) {
 
         ctx.beginPath();
         ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
-        ctx.fillStyle = "rgba(255, 255, 0, 0.55)";
+        ctx.fillStyle = "rgba(255, 234, 0, 0.55)";
         ctx.fill();
       }
 
@@ -77,7 +77,7 @@ export default function ParticleNetwork({ className }) {
             ctx.beginPath();
             ctx.moveTo(particles[i].x, particles[i].y);
             ctx.lineTo(particles[j].x, particles[j].y);
-            ctx.strokeStyle = `rgba(255, 255, 0, ${o})`;
+            ctx.strokeStyle = `rgba(255, 234, 0, ${o})`;
             ctx.lineWidth = 0.7;
             ctx.stroke();
           }
