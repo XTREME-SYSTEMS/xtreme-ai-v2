@@ -56,7 +56,8 @@ export default function XtremeShell() {
   };
 
   const onTab = TABS.some(isActive);
-  const showBack = !onTab && location.pathname !== "/portal-studio";
+  const isHome = location.pathname === "/portal-studio";
+  const showBack = !onTab || isHome;
 
   return (
     <div className="xa-stage">
@@ -66,7 +67,11 @@ export default function XtremeShell() {
           <div className="xa-brandbar">
             <div className="xa-brandbar-left">
               {showBack && (
-                <button onClick={() => navigate(-1)} className="xa-back-btn" aria-label="Back">
+                <button
+                  onClick={() => (isHome ? navigate("/client-portal") : navigate(-1))}
+                  className="xa-back-btn"
+                  aria-label="Back"
+                >
                   <ChevronLeft className="h-5 w-5" />
                 </button>
               )}
