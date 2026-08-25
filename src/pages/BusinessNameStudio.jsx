@@ -5,9 +5,11 @@ import {
   Brain, Globe, Building2, CheckCircle, Zap, RefreshCw, Edit3, Plus,
 } from "lucide-react";
 import { useClientUser } from "@/hooks/useClientUser";
+import { useClientProject } from "@/hooks/useClientProject";
 import BackButton from "@/components/client/BackButton";
 import NameResearchCard from "@/components/names/NameResearchCard";
 import ResearchPhases from "@/components/names/ResearchPhases";
+import AiAssistInput from "@/components/client/AiAssistInput";
 
 // This system is exclusively focused on epoxy & concrete contracting.
 const INDUSTRIES = [
@@ -24,6 +26,7 @@ const INDUSTRIES = [
 // Full transparency: shows the 5-phase research pipeline and all scoring data.
 export default function BusinessNameStudio() {
   const { user } = useClientUser();
+  const { project } = useClientProject(user);
   const [industry, setIndustry] = useState(user?.epoxyProfile?.industry || user?.industry || "");
   const [location, setLocation] = useState(user?.epoxyProfile?.primaryLocation || user?.epoxyProfile?.location || "");
   const [keywords, setKeywords] = useState("");
@@ -42,6 +45,19 @@ export default function BusinessNameStudio() {
   const [manualResult, setManualResult] = useState(null);
   const [manualError, setManualError] = useState("");
   const [genCount, setGenCount] = useState(0);
+
+  // Context from prior steps — vision, strategy, profile — fed to the
+  // AI-assist so suggestions build on what the user already chose.
+  const assistContext = {
+    industry: industry || user?.epoxyProfile?.industry || "",
+    location: location || user?.epoxyProfile?.primaryLocation || "",
+    businessName: user?.epoxyProfile?.businessName || "",
+    businessStage: user?.epoxyProfile?.businessStage || "",
+    businessType: user?.epoxyProfile?.businessType || [],
+    vision: project?.vision?.mission || "",
+    strategy: project?.strategy?.competitive_positioning || "",
+    priorAnswers: user?.epoxyProfile?.industryAnswers || {},
+  };
 
   const generate = async (append = false) => {
     if (!industry.trim()) {
@@ -187,13 +203,12 @@ export default function BusinessNameStudio() {
         <div className="grid gap-4 sm:grid-cols-2">
           <div>
             <label className="mb-1 block text-xs font-medium text-white/60">Epoxy/Concrete Niche *</label>
-            <input
-              type="text"
-              list="industry-list"
+            <AiAssistInput
               value={industry}
               onChange={(e) => setIndustry(e.target.value)}
               placeholder="e.g. epoxy flooring, polished concrete"
-              className="w-full rounded-lg border border-white/15 bg-black px-3 py-2 text-sm text-white placeholder-white/30 focus:border-lime-400 focus:outline-none"
+              field="industry"
+              context={assistContext}
             />
             <datalist id="industry-list">
               {INDUSTRIES.map((n) => <option key={n} value={n} />)}
@@ -201,23 +216,23 @@ export default function BusinessNameStudio() {
           </div>
           <div>
             <label className="mb-1 block text-xs font-medium text-white/60">Location (city, state)</label>
-            <input
-              type="text"
+            <AiAssistInput
               value={location}
               onChange={(e) => setLocation(e.target.value)}
               placeholder="e.g. Dallas, TX"
-              className="w-full rounded-lg border border-white/15 bg-black px-3 py-2 text-sm text-white placeholder-white/30 focus:border-lime-400 focus:outline-none"
+              field="primaryLocation"
+              context={assistContext}
             />
           </div>
         </div>
         <div>
           <label className="mb-1 block text-xs font-medium text-white/60">Keywords / themes (optional)</label>
-          <input
-            type="text"
+          <AiAssistInput
             value={keywords}
             onChange={(e) => setKeywords(e.target.value)}
             placeholder="e.g. metallic, garage, commercial, fast install"
-            className="w-full rounded-lg border border-white/15 bg-black px-3 py-2 text-sm text-white placeholder-white/30 focus:border-lime-400 focus:outline-none"
+            field="keywords"
+            context={assistContext}
           />
         </div>
         <button

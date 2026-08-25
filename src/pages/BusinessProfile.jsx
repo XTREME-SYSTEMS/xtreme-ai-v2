@@ -21,6 +21,7 @@ import {
   Section, Field, Chips, OptionCard, ProgressDots, NavButtons, inputCls,
 } from "@/components/onboarding/WizardUI";
 import FinancialIntelligencePanel from "@/components/onboarding/FinancialIntelligencePanel";
+import AiAssistInput from "@/components/client/AiAssistInput";
 
 const STAGE_ICONS = { RefreshCw, Sparkles, Rocket };
 
@@ -335,6 +336,20 @@ export default function BusinessProfile() {
   const ind = INDUSTRIES.find((i) => i.id === form.industry);
   const hasLocation = !!(form.address.trim() && form.zip.trim());
 
+  // Context from prior steps — fed to AI-assist so each fill-in box can
+  // suggest best choices based on what the user already chose.
+  const assistContext = {
+    industry: form.industry || ind?.label || "",
+    subIndustry: form.subIndustry || form.customSubIndustry || "",
+    businessName: form.businessName || "",
+    location: form.primaryLocation || "",
+    address: form.address || "",
+    zip: form.zip || "",
+    businessStage: form.businessStage || "",
+    businessType: form.businessType || [],
+    priorAnswers: industryAnswers || {},
+  };
+
   return (
     <div className="mx-auto max-w-2xl">
       <BackButton to="/business-generator" />
@@ -436,11 +451,13 @@ export default function BusinessProfile() {
                   single
                 />
                 <Field label="Or type your own" hint="If none of the above fit exactly">
-                  <input
+                  <AiAssistInput
                     value={form.customSubIndustry}
                     onChange={set("customSubIndustry")}
                     placeholder="e.g. Epoxy Floor Coatings"
-                    className={inputCls}
+                    field="customSubIndustry"
+                    context={assistContext}
+                    inputClassName={inputCls}
                   />
                 </Field>
               </Section>
@@ -449,11 +466,13 @@ export default function BusinessProfile() {
             {ind && ind.subIndustries.length === 0 && (
               <Section title="What's your sub-industry?" icon={Star}>
                 <Field label="Describe your specific business type" required>
-                  <input
+                  <AiAssistInput
                     value={form.customSubIndustry}
                     onChange={set("customSubIndustry")}
                     placeholder="e.g. Mobile detailing service"
-                    className={inputCls}
+                    field="customSubIndustry"
+                    context={assistContext}
+                    inputClassName={inputCls}
                   />
                 </Field>
               </Section>
@@ -485,30 +504,30 @@ export default function BusinessProfile() {
           <div className="space-y-5">
             <Section title="Your business" icon={Building2}>
               <Field label="Business name" required>
-                <input value={form.businessName} onChange={set("businessName")} placeholder="Acme Epoxy Floors LLC" className={inputCls} />
+                <AiAssistInput value={form.businessName} onChange={set("businessName")} placeholder="Acme Epoxy Floors LLC" field="businessName" context={assistContext} inputClassName={inputCls} />
               </Field>
               <div className="grid gap-4 sm:grid-cols-2">
                 <Field label="Phone">
-                  <input value={form.phone} onChange={set("phone")} placeholder="(555) 123-4567" className={inputCls} />
+                  <AiAssistInput value={form.phone} onChange={set("phone")} placeholder="(555) 123-4567" field="phone" context={assistContext} inputClassName={inputCls} />
                 </Field>
                 <Field label="Email">
-                  <input value={form.email} onChange={set("email")} placeholder="info@acmeepoxy.com" className={inputCls} />
+                  <AiAssistInput value={form.email} onChange={set("email")} placeholder="info@acmeepoxy.com" field="email" context={assistContext} inputClassName={inputCls} />
                 </Field>
               </div>
               <Field label="Current website (if any)">
-                <input value={form.website} onChange={set("website")} placeholder="https://acmeepoxy.com" className={inputCls} />
+                <AiAssistInput value={form.website} onChange={set("website")} placeholder="https://acmeepoxy.com" field="website" context={assistContext} inputClassName={inputCls} />
               </Field>
             </Section>
 
             <Section title="Where you're located" icon={MapPin}>
               <Field label="Primary city & state" required>
-                <input value={form.primaryLocation} onChange={set("primaryLocation")} placeholder="Dallas, TX" className={inputCls} />
+                <AiAssistInput value={form.primaryLocation} onChange={set("primaryLocation")} placeholder="Dallas, TX" field="primaryLocation" context={assistContext} inputClassName={inputCls} />
               </Field>
               <Field label="Street address" hint="Used for financial intelligence & local SEO">
-                <input value={form.address} onChange={set("address")} placeholder="123 Main St, Dallas, TX 75201" className={inputCls} />
+                <AiAssistInput value={form.address} onChange={set("address")} placeholder="123 Main St, Dallas, TX 75201" field="address" context={assistContext} inputClassName={inputCls} />
               </Field>
               <Field label="ZIP code">
-                <input value={form.zip} onChange={set("zip")} placeholder="75201" className={inputCls} />
+                <AiAssistInput value={form.zip} onChange={set("zip")} placeholder="75201" field="zip" context={assistContext} inputClassName={inputCls} />
               </Field>
               <Field label="How far do you travel?" hint="Pick one">
                 <Chips
@@ -553,11 +572,13 @@ export default function BusinessProfile() {
                 return (
                   <Section key={q.id} title={q.question} hint={q.type === "text" ? (q.why ? `· ${q.why}` : "") : `Select all that apply${q.why ? ` · ${q.why}` : ""}`}>
                     {q.type === "text" ? (
-                      <input
+                      <AiAssistInput
                         value={ans || ""}
                         onChange={(e) => setIndustryAnswers((a) => ({ ...a, [q.id]: e.target.value }))}
                         placeholder="Type your answer…"
-                        className={inputCls}
+                        field="answer"
+                        context={{ ...assistContext, question: q.question }}
+                        inputClassName={inputCls}
                       />
                     ) : (
                       // Universal multi-select: both "single" and "multi" type questions
