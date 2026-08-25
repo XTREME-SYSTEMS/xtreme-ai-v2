@@ -120,6 +120,9 @@ import SystemAlerts from '@/pages/SystemAlerts';
 import SystemOptimization from '@/pages/SystemOptimization';
 import VisionCortex from '@/pages/VisionCortex';
 import Architect from '@/pages/Architect';
+import EmployeePortal from '@/pages/EmployeePortal';
+import EmployeeManagement from '@/pages/EmployeeManagement';
+import ProductCatalog from '@/pages/ProductCatalog';
 import { PortalStudioProvider } from '@/lib/PortalStudioContext';
 import XtremeShell from '@/components/xtremeai/XtremeShell';
 import PortalStudio from '@/pages/portalstudio/PortalStudio';
@@ -261,6 +264,9 @@ const AuthenticatedApp = () => {
           <Route path="/system-optimization" element={<SystemOptimization />} />
           <Route path="/vision-cortex" element={<VisionCortex />} />
       <Route path="/architect" element={<Architect />} />
+      <Route path="/employee-portal" element={<EmployeePortal />} />
+      <Route path="/employee-management" element={<EmployeeManagement />} />
+      <Route path="/product-catalog" element={<ProductCatalog />} />
         </Route>
       </Route>
       {/* Xtreme AI — mobile device shell with bottom tab bar. Isolated

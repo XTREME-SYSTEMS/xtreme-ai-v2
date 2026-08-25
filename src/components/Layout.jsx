@@ -29,6 +29,8 @@ import { useAutoBuild } from "@/lib/AutoBuildContext";
 const PIPELINE_OVERVIEW = { to: "/autonomous-system", label: "Pipeline Overview", icon: Bot, end: true };
 
 const PIPELINE_CATALOG = { to: "/pipeline-catalog", label: "Pipeline Catalog", icon: Layers, end: true };
+const PRODUCT_CATALOG = { to: "/product-catalog", label: "Product Catalog", icon: Package, end: true };
+const EMPLOYEE_PORTAL = { to: "/employee-portal", label: "Employee Portal", icon: Users, end: true };
 
 const PIPELINE_STEPS = [
   { to: "/architect",     label: "AI Chief Architect", icon: Brain,  step: 1, desc: "AI chat that operates the system" },
@@ -128,6 +130,7 @@ const ARCHIVE_ITEMS = [
   { to: "/admin-packages", label: "Package Gallery", icon: Package },
   { to: "/admin-promo-codes", label: "Promo Codes", icon: Tag },
   { to: "/admin-domain-purchase", label: "Domain Purchaser", icon: Globe },
+  { to: "/employee-management", label: "Employee Management", icon: Users },
   { to: "/walkthrough-studio", label: "3D Walkthroughs", icon: Box },
   { to: "/system-alerts", label: "System Alerts", icon: ShieldAlert },
   { to: "/system-optimization", label: "System Optimization", icon: Sparkles },
@@ -167,10 +170,11 @@ export default function Layout() {
     );
   }
   const isAdmin = user?.role === "admin";
+  const isEmployee = user?.role === "employee";
   // AutoBuild mode: render the client portal shell so the admin walks the
   // same guided timeline + StepCoach as a real client.
   if (isAdmin && autoBuild.isActive) return <ClientLayout user={user} />;
-  if (!isAdmin || previewAsClient) return <ClientLayout user={user} />;
+  if ((!isAdmin && !isEmployee) || previewAsClient) return <ClientLayout user={user} />;
 
   return (
     <div className="flex h-screen bg-black text-white">
@@ -219,6 +223,34 @@ export default function Layout() {
           >
             <Layers className="h-4 w-4 shrink-0" />
             {PIPELINE_CATALOG.label}
+          </NavLink>
+
+          {/* Product Catalog — finished, validated products ready for deployment */}
+          <NavLink
+            to={PRODUCT_CATALOG.to}
+            end={PRODUCT_CATALOG.end}
+            onClick={() => setOpen(false)}
+            className={({ isActive }) => cn(
+              "flex items-center gap-2.5 rounded-lg px-2.5 py-2 text-sm transition-colors",
+              isActive ? "bg-amber-400/10 text-amber-400 font-semibold" : "text-white hover:bg-white/5"
+            )}
+          >
+            <Package className="h-4 w-4 shrink-0" />
+            {PRODUCT_CATALOG.label}
+          </NavLink>
+
+          {/* Employee Portal — for employees; admins see it too for oversight */}
+          <NavLink
+            to={EMPLOYEE_PORTAL.to}
+            end={EMPLOYEE_PORTAL.end}
+            onClick={() => setOpen(false)}
+            className={({ isActive }) => cn(
+              "flex items-center gap-2.5 rounded-lg px-2.5 py-2 text-sm transition-colors",
+              isActive ? "bg-amber-400/10 text-amber-400 font-semibold" : "text-white hover:bg-white/5"
+            )}
+          >
+            <Users className="h-4 w-4 shrink-0" />
+            {EMPLOYEE_PORTAL.label}
           </NavLink>
 
           {/* Timeline header */}

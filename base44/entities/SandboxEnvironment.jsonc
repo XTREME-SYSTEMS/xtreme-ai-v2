@@ -1,0 +1,143 @@
+{
+  "name": "SandboxEnvironment",
+  "type": "object",
+  "description": "An isolated preview environment for an AutoBuild. Each build gets its own sandbox with a unique preview URL, allocated resources, and a lifecycle from provisioning through validation to destruction. The sandbox is where the Auto Builder generates, deploys, and tests the product before it gets packaged as a finished product.",
+  "properties": {
+    "build_id": {
+      "type": "string",
+      "description": "AutoBuild ID this sandbox environment belongs to"
+    },
+    "build_name": {
+      "type": "string",
+      "description": "Business/product name (denormalized from AutoBuild for quick display)"
+    },
+    "preview_url": {
+      "type": "string",
+      "description": "The live preview URL where the sandbox build is deployed and accessible"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "provisioning",
+        "active",
+        "validating",
+        "validated",
+        "failed",
+        "destroyed"
+      ],
+      "default": "provisioning",
+      "description": "Lifecycle: provisioning \u2192 active (deployed) \u2192 validating (validation loop running) \u2192 validated (passed) or failed \u2192 destroyed (sandbox torn down after packaging)"
+    },
+    "isolation_level": {
+      "type": "string",
+      "enum": [
+        "preview",
+        "staging",
+        "production"
+      ],
+      "default": "preview",
+      "description": "How isolated the sandbox is. preview = temporary preview URL, staging = persistent staging env, production = full production-like environment"
+    },
+    "resources": {
+      "type": "object",
+      "description": "Allocated resources for this sandbox",
+      "properties": {
+        "cpu": {
+          "type": "string"
+        },
+        "memory": {
+          "type": "string"
+        },
+        "storage": {
+          "type": "string"
+        },
+        "bandwidth": {
+          "type": "string"
+        }
+      }
+    },
+    "deployment_config": {
+      "type": "object",
+      "description": "Deployment configuration used to provision this sandbox",
+      "properties": {
+        "platform": {
+          "type": "string",
+          "description": "vercel, netlify, etc."
+        },
+        "project_id": {
+          "type": "string"
+        },
+        "environment_variables": {
+          "type": "object"
+        },
+        "build_command": {
+          "type": "string"
+        },
+        "output_directory": {
+          "type": "string"
+        }
+      }
+    },
+    "provisioned_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "validated_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "destroyed_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "validation_score": {
+      "type": "number",
+      "default": 0,
+      "description": "Final validation score (0-100) from the validation pipeline"
+    },
+    "error": {
+      "type": "string",
+      "description": "Error message if provisioning or validation failed"
+    },
+    "logs": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    }
+  },
+  "required": [
+    "build_id"
+  ],
+  "rls": {
+    "read": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "employee"
+          }
+        }
+      ]
+    },
+    "create": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

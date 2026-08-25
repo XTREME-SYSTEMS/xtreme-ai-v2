@@ -1,0 +1,157 @@
+{
+  "name": "ValidationPipeline",
+  "type": "object",
+  "description": "Orchestrates the auto-audit \u2192 auto-fix \u2192 auto-heal \u2192 auto-harden \u2192 auto-optimize validation loop for a single AutoBuild. Created when a build enters the sandbox. Runs recursively until the build passes the quality gate (\u226575% score) or exhausts retries. Tracks each phase, the checks performed, the score, and the retry count.",
+  "properties": {
+    "build_id": {
+      "type": "string",
+      "description": "AutoBuild ID being validated"
+    },
+    "sandbox_id": {
+      "type": "string",
+      "description": "SandboxEnvironment ID where the build is deployed"
+    },
+    "build_name": {
+      "type": "string"
+    },
+    "current_phase": {
+      "type": "string",
+      "enum": [
+        "audit",
+        "fix",
+        "heal",
+        "harden",
+        "optimize",
+        "complete",
+        "failed"
+      ],
+      "default": "audit",
+      "description": "Which validation phase is currently running: audit = scan for issues, fix = apply fixes, heal = repair failures, harden = security/stability hardening, optimize = performance optimization, complete = passed, failed = exhausted retries"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "pending",
+        "running",
+        "passed",
+        "failed",
+        "escalated"
+      ],
+      "default": "pending",
+      "description": "Overall validation status: pending = not started, running = loop in progress, passed = quality gate cleared, failed = retries exhausted, escalated = needs human attention"
+    },
+    "score": {
+      "type": "number",
+      "default": 0,
+      "description": "Current validation score (0-100). Must reach \u226575 to pass the quality gate."
+    },
+    "quality_gate_threshold": {
+      "type": "number",
+      "default": 75,
+      "description": "Minimum score required to pass (default 75%)"
+    },
+    "retry_count": {
+      "type": "number",
+      "default": 0,
+      "description": "How many validation loop iterations have been attempted"
+    },
+    "max_retries": {
+      "type": "number",
+      "default": 3,
+      "description": "Maximum validation loop iterations before escalating"
+    },
+    "checks": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "phase": {
+            "type": "string",
+            "description": "audit/fix/heal/harden/optimize"
+          },
+          "check_name": {
+            "type": "string"
+          },
+          "passed": {
+            "type": "boolean"
+          },
+          "score": {
+            "type": "number"
+          },
+          "findings": {
+            "type": "string",
+            "description": "Issues found during this check"
+          },
+          "fixes_applied": {
+            "type": "string",
+            "description": "What was fixed"
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "description": "Detailed results from each validation check across all phases"
+    },
+    "findings_summary": {
+      "type": "string",
+      "description": "Summary of all findings from the latest audit cycle"
+    },
+    "fixes_summary": {
+      "type": "string",
+      "description": "Summary of all fixes applied across the latest loop iteration"
+    },
+    "started_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "completed_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "error": {
+      "type": "string"
+    },
+    "logs": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    }
+  },
+  "required": [
+    "build_id"
+  ],
+  "rls": {
+    "read": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "employee"
+          }
+        }
+      ]
+    },
+    "create": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

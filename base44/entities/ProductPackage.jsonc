@@ -1,0 +1,176 @@
+{
+  "name": "ProductPackage",
+  "type": "object",
+  "description": "A finalized, validated, shelved product \u2014 the output of the autonomous build factory. Created when an AutoBuild passes the full validation pipeline and is packaged as a finished, deployable product. Each package contains the complete code manifest, deployment config, validation score, and is ready to be deployed to a real client domain.",
+  "properties": {
+    "build_id": {
+      "type": "string",
+      "description": "Source AutoBuild ID"
+    },
+    "sandbox_id": {
+      "type": "string",
+      "description": "SandboxEnvironment where it was validated"
+    },
+    "validation_pipeline_id": {
+      "type": "string",
+      "description": "ValidationPipeline that certified this package"
+    },
+    "name": {
+      "type": "string",
+      "description": "Product name (e.g. 'Acme Roofing \u2014 Marketing Site')"
+    },
+    "business_name": {
+      "type": "string"
+    },
+    "industry": {
+      "type": "string"
+    },
+    "product_type": {
+      "type": "string",
+      "enum": [
+        "marketing_site",
+        "web_app",
+        "ecommerce",
+        "platform"
+      ],
+      "default": "marketing_site"
+    },
+    "validation_score": {
+      "type": "number",
+      "default": 0,
+      "description": "Final validation score (0-100) from the validation pipeline"
+    },
+    "quality_gate_passed": {
+      "type": "boolean",
+      "default": false,
+      "description": "Whether this package passed the quality gate (\u226575%)"
+    },
+    "manifest": {
+      "type": "object",
+      "description": "Complete code manifest \u2014 the full codebase blueprint ready for deployment",
+      "properties": {
+        "repo_url": {
+          "type": "string"
+        },
+        "files": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        },
+        "framework": {
+          "type": "string"
+        },
+        "generated_at": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
+    "deployment_config": {
+      "type": "object",
+      "description": "How to deploy this package to production",
+      "properties": {
+        "platform": {
+          "type": "string"
+        },
+        "build_command": {
+          "type": "string"
+        },
+        "output_directory": {
+          "type": "string"
+        },
+        "environment_variables": {
+          "type": "object"
+        },
+        "custom_domain": {
+          "type": "string"
+        }
+      }
+    },
+    "preview_url": {
+      "type": "string",
+      "description": "The sandbox preview URL where this package can be reviewed before deployment"
+    },
+    "package_url": {
+      "type": "string",
+      "description": "Downloadable package URL (zip, tarball, or repo clone URL)"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "packaged",
+        "deployed",
+        "archived",
+        "deprecated"
+      ],
+      "default": "packaged",
+      "description": "Lifecycle: packaged = just shelved, deployed = deployed to client domain, archived = old version, deprecated = no longer supported"
+    },
+    "deployed_url": {
+      "type": "string",
+      "description": "The live production URL where this package was deployed (if deployed)"
+    },
+    "deployed_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "packaged_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "validation_summary": {
+      "type": "string",
+      "description": "Summary of the validation results that certified this package"
+    },
+    "tags": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Organizational tags for catalog browsing (e.g. 'roofing', 'premium', 'ecommerce')"
+    },
+    "logs": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    }
+  },
+  "required": [
+    "name",
+    "build_id",
+    "product_type"
+  ],
+  "rls": {
+    "read": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "employee"
+          }
+        }
+      ]
+    },
+    "create": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

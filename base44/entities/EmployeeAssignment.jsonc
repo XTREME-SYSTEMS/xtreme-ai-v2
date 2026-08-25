@@ -1,0 +1,110 @@
+{
+  "name": "EmployeeAssignment",
+  "type": "object",
+  "description": "Links an employee (user with role=employee) to a specific build, market, or task. Employees see only the builds and tasks assigned to them. Admins create assignments to distribute work across the team.",
+  "properties": {
+    "employee_email": {
+      "type": "string",
+      "description": "Email of the assigned employee"
+    },
+    "employee_name": {
+      "type": "string"
+    },
+    "assignment_type": {
+      "type": "string",
+      "enum": [
+        "build",
+        "market",
+        "idea",
+        "validation",
+        "general"
+      ],
+      "default": "build",
+      "description": "What kind of entity is assigned: build = AutoBuild, market = Market, idea = VisionCortexIdea, validation = ValidationPipeline, general = ad-hoc task"
+    },
+    "entity_id": {
+      "type": "string",
+      "description": "ID of the assigned entity (AutoBuild ID, Market ID, etc.)"
+    },
+    "entity_name": {
+      "type": "string",
+      "description": "Display name of the assigned entity"
+    },
+    "role": {
+      "type": "string",
+      "enum": [
+        "builder",
+        "reviewer",
+        "manager",
+        "validator"
+      ],
+      "default": "builder",
+      "description": "Employee's role on this assignment: builder = execute the build, reviewer = review/approve, manager = oversee, validator = run validation"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "active",
+        "completed",
+        "paused",
+        "cancelled"
+      ],
+      "default": "active"
+    },
+    "assigned_by": {
+      "type": "string",
+      "description": "Admin who created this assignment"
+    },
+    "assigned_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "completed_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "notes": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "employee_email",
+    "assignment_type"
+  ],
+  "rls": {
+    "read": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "data.employee_email": "{{user.email}}"
+        }
+      ]
+    },
+    "create": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "update": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "data.employee_email": "{{user.email}}"
+        }
+      ]
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}
