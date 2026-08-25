@@ -3,7 +3,6 @@ import { useNavigate } from "react-router-dom";
 import { base44 } from "@/api/base44Client";
 import { Package, CheckCircle, MessageSquare, Send, X, Loader2 } from "lucide-react";
 import { getProductDetails } from "@/lib/productDetails";
-import { getMonthlyServices } from "@/lib/serviceCatalog";
 import PurchaseDetailModal from "@/components/client/PurchaseDetailModal";
 import PreviewBanner from "@/components/client/PreviewBanner";
 import { usePreviewEmail } from "@/hooks/usePreviewEmail";
@@ -135,14 +134,7 @@ export default function MyPackage() {
           <div className="mt-4 flex items-center gap-2 text-sm text-white/50">
             <div className="h-5 w-5 animate-spin rounded-full border-2 border-white/20 border-t-lime-400" /> Loading your purchase…
           </div>
-        ) : purchases.length === 0 ? (
-          <div className="mt-3">
-            <h1 className="text-xl font-semibold text-white sm:text-2xl">No package yet</h1>
-            <p className="mt-1 text-sm text-white/50">
-              You haven't purchased a package. Choose a plan, tool, or service below to get started.
-            </p>
-          </div>
-        ) : (
+        ) : purchases.length === 0 ? null : (
           <div className="mt-3 space-y-4">
             {purchases.map((p, idx) => {
               const detail = getProductDetails(p.productId);
@@ -287,9 +279,6 @@ export default function MyPackage() {
         )}
       </div>
 
-      {/* Monthly Services & Add-Ons */}
-      <MonthlyServicesSection onBuy={() => navigate("/pricing")} />
-
       <PurchaseDetailModal
         purchase={activePurchase}
         onClose={() => setActivePurchase(null)}
@@ -305,48 +294,6 @@ function Fact({ label, value, valueClass = "text-white" }) {
     <div className="min-w-0">
       <div className="text-white/40">{label}</div>
       <div className={`truncate font-medium ${valueClass}`}>{value}</div>
-    </div>
-  );
-}
-
-function MonthlyServicesSection({ onBuy }) {
-  const services = getMonthlyServices();
-  return (
-    <div className="rounded-xl border border-white/10 bg-zinc-950 p-5">
-      <div className="flex items-center justify-between">
-        <div>
-          <h2 className="text-lg font-semibold text-white">Monthly Services & Add-Ons</h2>
-          <p className="mt-0.5 text-sm text-white/50">
-            Ongoing execution — SEO, citations, content, social & more. Billed monthly.
-          </p>
-        </div>
-        <button
-          type="button"
-          onClick={onBuy}
-          className="inline-flex items-center gap-1.5 rounded-lg bg-lime-400 px-4 py-2 text-sm font-semibold text-black hover:bg-lime-300"
-        >
-          Browse All
-        </button>
-      </div>
-      <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-        {services.slice(0, 6).map((s) => {
-          const Icon = s.icon;
-          return (
-            <div key={s.id} className="rounded-lg border border-white/10 bg-black/30 p-3">
-              <div className="flex items-center gap-2">
-                <div className={`flex h-8 w-8 items-center justify-center rounded-md bg-gradient-to-br ${s.accent}`}>
-                  <Icon className="h-4 w-4 text-lime-400" />
-                </div>
-                <div className="min-w-0 flex-1">
-                  <h3 className="truncate text-sm font-medium text-white">{s.name}</h3>
-                  <p className="text-xs text-lime-400">{s.priceLabel}</p>
-                </div>
-              </div>
-              <p className="mt-2 line-clamp-2 text-xs text-white/50">{s.tagline}</p>
-            </div>
-          );
-        })}
-      </div>
     </div>
   );
 }
