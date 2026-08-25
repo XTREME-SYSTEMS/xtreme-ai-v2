@@ -42,7 +42,7 @@ export const PORTAL_STEPS = {
     activityLabel: "Complete your business profile",
     title: "Tell Us About Your Business",
     body: "Fill out your business details — industry, name, services, service area, logo and photos. Our team uses this to build everything else.",
-    nextLabel: "Go to Vision", nextTo: "/vision",
+    nextLabel: "Go to Strategy", nextTo: "/strategy",
   },
   vision: {
     key: "vision",
@@ -212,13 +212,13 @@ export const PORTAL_STEPS = {
 // BEFORE Your Designs so the customer can add optional AI tools and add-ons
 // to their contract before reviewing the final package and signing.
 const FULL_BUILD = [
-  "welcome", "business-name", "business-profile", "vision", "strategy", "content", "logo", "brand", "website",
+  "welcome", "business-name", "business-profile", "strategy", "content", "logo", "brand", "website",
   "enhancements", "your-designs", "signatures", "approvals", "launch",
 ];
 
 // Build with social media + video pack included
 const FULL_BUILD_PLUS_MEDIA = [
-  "welcome", "business-name", "business-profile", "vision", "strategy", "content", "logo", "brand", "website",
+  "welcome", "business-name", "business-profile", "strategy", "content", "logo", "brand", "website",
   "social", "video", "enhancements", "your-designs", "signatures",
   "approvals", "launch",
 ];
@@ -226,7 +226,7 @@ const FULL_BUILD_PLUS_MEDIA = [
 // System build pipeline (web_app / ecommerce / platform).
 // profile → vision → strategy → architecture → data-model → ui-system → codegen → deploy → review → launch
 const SYSTEM_BUILD = [
-  "welcome", "business-profile", "vision", "strategy", "system-architecture", "data-model", "ui-system", "codegen", "deploy", "system-review", "launch",
+  "welcome", "business-profile", "strategy", "system-architecture", "data-model", "ui-system", "codegen", "deploy", "system-review", "launch",
 ];
 
 export const PRODUCT_STEPS = {
