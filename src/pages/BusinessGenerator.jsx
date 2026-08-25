@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { base44 } from "@/api/base44Client";
-import { Package, CheckCircle, MessageSquare, Send, X, Loader2, Rocket } from "lucide-react";
+import { Package, CheckCircle, MessageSquare, Send, X, Loader2, Rocket, FolderOpen } from "lucide-react";
 import { getProductDetails } from "@/lib/productDetails";
 import PurchaseDetailModal from "@/components/client/PurchaseDetailModal";
 import PreviewBanner from "@/components/client/PreviewBanner";
@@ -144,7 +144,16 @@ export default function BusinessGenerator() {
             </div>
           )}
         </div>
-        <StartNewProjectButton user={user} project={project} />
+        <div className="flex items-center gap-2">
+          <button
+            type="button"
+            onClick={() => navigate("/projects")}
+            className="inline-flex items-center gap-1.5 rounded-lg border border-white/15 px-3 py-2 text-xs font-medium text-white/70 transition-colors hover:border-lime-400/50 hover:text-lime-300"
+          >
+            <FolderOpen className="h-3.5 w-3.5" /> My Projects
+          </button>
+          <StartNewProjectButton user={user} project={project} />
+        </div>
       </div>
 
       {/* ── Vision Generator — AI-assisted, discovery-driven vision builder ── */}

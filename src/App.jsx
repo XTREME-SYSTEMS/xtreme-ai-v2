@@ -88,6 +88,7 @@ import Register from '@/pages/Register';
 import ForgotPassword from '@/pages/ForgotPassword';
 import ResetPassword from '@/pages/ResetPassword';
 import BusinessGenerator from '@/pages/BusinessGenerator';
+import Projects from '@/pages/Projects';
 import Assistant from '@/pages/Assistant';
 import Signatures from '@/pages/Signatures';
 import BusinessProfile from '@/pages/BusinessProfile';
@@ -173,6 +174,7 @@ const AuthenticatedApp = () => {
         <Route element={<Layout />}>
           <Route path="/client-portal" element={<Dashboard />} />
           <Route path="/business-generator" element={<BusinessGenerator />} />
+          <Route path="/projects" element={<Projects />} />
           <Route path="/assistant" element={<Assistant />} />
           <Route path="/business-profile" element={<BusinessProfile />} />
           <Route path="/vision" element={<Vision />} />

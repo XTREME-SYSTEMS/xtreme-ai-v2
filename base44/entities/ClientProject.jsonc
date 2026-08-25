@@ -1,7 +1,7 @@
 {
   "name": "ClientProject",
   "type": "object",
-  "description": "Offloads creative work from the User record \u2014 stores all generated assets (vision, strategy, content, logo, brand, website, social, video) for a client's project, keyed by client email. One project per client.",
+  "description": "Offloads creative work from the User record \u2014 stores all generated assets (vision, strategy, content, logo, brand, website, social, video) for a client's project, keyed by client email. Supports multiple projects per client: one active at a time, others archived (with a user_pipeline_snapshot) so they can be resumed from the Projects page.",
   "properties": {
     "client_email": {
       "type": "string",
@@ -272,6 +272,15 @@
       },
       "default": [],
       "description": "Portal step paths the client has visited/completed (server-persisted, replaces per-device localStorage coach:done keys)."
+    },
+    "archived": {
+      "type": "boolean",
+      "default": false,
+      "description": "True when the user started a new project \u2014 this project is preserved (with a user_pipeline_snapshot) so it can be resumed later from the Projects page. Only one non-archived project is active per client at a time."
+    },
+    "user_pipeline_snapshot": {
+      "type": "object",
+      "description": "Snapshot of the user's pipeline fields (epoxyProfile, content, logo, brand, website, social, video, enhancements) captured when the project was archived, so the user record can be restored on resume."
     }
   },
   "required": [

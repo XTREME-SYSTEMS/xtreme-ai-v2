@@ -1,12 +1,13 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Plus, Loader2, AlertTriangle, X } from "lucide-react";
-import { resetCurrentProject } from "@/lib/projectReset";
+import { Plus, Loader2, Archive, X } from "lucide-react";
+import { archiveCurrentProject } from "@/lib/projectReset";
 
-// "Start New Project" — wipes all pipeline-generated data (vision, strategy,
-// content, logo, brand, website, social, video) and the business profile so
-// the user can begin a brand-new project without old data leaking in. The
-// account, plan, and purchases are untouched.
+// "Start New Project" — archives the current project (business profile,
+// vision, strategy, content, logo, brand, website, social, video) so it's
+// saved to the Projects page and can be resumed later, then wipes the user
+// record so a fresh project can begin. The account, plan, and purchases are
+// untouched.
 export default function StartNewProjectButton({ user, project, className = "" }) {
   const [open, setOpen] = useState(false);
   const [resetting, setResetting] = useState(false);
@@ -17,7 +18,7 @@ export default function StartNewProjectButton({ user, project, className = "" })
     setResetting(true);
     setError("");
     try {
-      await resetCurrentProject(user, project);
+      await archiveCurrentProject(user, project);
       navigate("/business-name-studio");
     } catch (e) {
       setError("Couldn't start a new project. Please try again.");
@@ -39,8 +40,8 @@ export default function StartNewProjectButton({ user, project, className = "" })
         <div className="fixed inset-0 z-[70] flex items-center justify-center bg-black/90 p-4 backdrop-blur-sm">
           <div className="w-full max-w-md rounded-xl border border-white/10 bg-zinc-950 p-6">
             <div className="flex items-start justify-between">
-              <div className="flex items-center gap-2 text-amber-400">
-                <AlertTriangle className="h-5 w-5" />
+              <div className="flex items-center gap-2 text-lime-400">
+                <Archive className="h-5 w-5" />
                 <h2 className="text-lg font-bold text-white">Start a New Project?</h2>
               </div>
               <button
@@ -51,9 +52,9 @@ export default function StartNewProjectButton({ user, project, className = "" })
               </button>
             </div>
             <p className="mt-3 text-sm text-white/70">
-              This will <span className="font-semibold text-white">permanently clear</span> your current project —
-              your business profile, vision, strategy, content, logo, brand, website, social, and video assets.
-              You'll start fresh from the Business Name step.
+              Your current project will be <span className="font-semibold text-lime-300">saved</span> to your
+              Projects page — you can pick up right where you left off anytime. We'll start a fresh
+              project from the Business Name step.
             </p>
             <p className="mt-2 text-xs text-white/50">
               Your account, plan, and purchases are not affected.
@@ -65,7 +66,7 @@ export default function StartNewProjectButton({ user, project, className = "" })
                 disabled={resetting}
                 className="inline-flex flex-1 items-center justify-center gap-1.5 rounded-lg bg-lime-400 px-4 py-2.5 text-sm font-semibold text-black transition-colors hover:bg-lime-300 disabled:opacity-50"
               >
-                {resetting ? <><Loader2 className="h-4 w-4 animate-spin" /> Resetting…</> : <>Yes, Start Fresh</>}
+                {resetting ? <><Loader2 className="h-4 w-4 animate-spin" /> Saving…</> : <>Save & Start Fresh</>}
               </button>
               <button
                 onClick={() => setOpen(false)}

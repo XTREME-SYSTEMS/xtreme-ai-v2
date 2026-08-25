@@ -30,11 +30,13 @@ export function useClientProject(user) {
     if (autoBuild.isActive) return; // AutoBuild mode handles its own state
     if (!effectiveEmail) { setLoading(false); return; }
     try {
+      // Fetch recent projects and pick the most recent non-archived one as the
+      // "current" project. Archived projects are preserved for resume later.
       const existing = await base44.entities.ClientProject.filter(
-        { client_email: effectiveEmail }, "-created_date", 1
+        { client_email: effectiveEmail }, "-created_date", 20
       );
-      if (existing && existing.length > 0) setProject(existing[0]);
-      else setProject(null);
+      const active = (existing || []).find((p) => p.archived !== true);
+      setProject(active || null);
     } catch { setProject(null); }
     finally { setLoading(false); }
   }, [effectiveEmail, autoBuild.isActive]);

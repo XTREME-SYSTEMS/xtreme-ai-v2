@@ -107,3 +107,105 @@ export async function resetCurrentProject(user, project) {
   clearStepCache();
   return true;
 }
+
+// ─────────────────────────────────────────────────────────────────────────
+// Archive + Resume — preserves a project so the user can return to it later
+// instead of permanently deleting it when they start a new one.
+// ─────────────────────────────────────────────────────────────────────────
+
+// User-record pipeline fields that must be snapshotted at archive time and
+// restored on resume (the pipeline reads these off the User record, not the
+// ClientProject, so they must travel with the archived project).
+export const PIPELINE_SNAPSHOT_FIELDS = [
+  "epoxyProfile",
+  "contentTemplates",
+  "chosenContentTemplate",
+  "chosenContentTone",
+  "contentTemplatesChosen",
+  "logoOptions",
+  "chosenLogoUrl",
+  "brandPacks",
+  "chosenBrandImages",
+  "websiteContent",
+  "websiteImages",
+  "chosenWebsiteLayout",
+  "chosenPalette",
+  "designPacksChosen",
+  "socialMediaPack",
+  "socialMediaChosen",
+  "videoPack",
+  "videoChosen",
+  "enhancements",
+  "enhancementsTotal",
+  "enhancementsChosen",
+];
+
+export function snapshotUserPipeline(user) {
+  const snap = {};
+  for (const k of PIPELINE_SNAPSHOT_FIELDS) snap[k] = user?.[k] ?? null;
+  return snap;
+}
+
+// Archive the current project: snapshot the user's pipeline fields onto the
+// ClientProject, mark it archived, then wipe the user record so a fresh
+// project can begin. The project is preserved and resumable from the Projects
+// page. Account, plan, and purchases are untouched.
+export async function archiveCurrentProject(user, project) {
+  // 1. Snapshot pipeline fields + mark archived (preserve the project).
+  if (project?.id) {
+    const snapshot = snapshotUserPipeline(user);
+    try {
+      await base44.entities.ClientProject.update(project.id, {
+        archived: true,
+        user_pipeline_snapshot: snapshot,
+      });
+    } catch (e) {
+      // Non-fatal — the user wipe below still resets the active state.
+    }
+  }
+
+  // 2. Wipe pipeline fields from the user record so the new project is clean.
+  try {
+    await base44.auth.updateMe(PIPELINE_USER_FIELDS);
+  } catch (e) {}
+
+  // 3. Clear local step cache so the timeline resets visually.
+  clearStepCache();
+  return true;
+}
+
+// Resume a previously-archived project: archive the currently-active project
+// (snapshotting it first), restore the target's snapshot to the user record,
+// and un-archive the target. After this, the target is the active project.
+export async function resumeProject(user, currentProject, targetProject) {
+  // 1. Archive the current active project first (if it's a different one).
+  if (currentProject?.id && currentProject.id !== targetProject.id && !currentProject.archived) {
+    const snapshot = snapshotUserPipeline(user);
+    try {
+      await base44.entities.ClientProject.update(currentProject.id, {
+        archived: true,
+        user_pipeline_snapshot: snapshot,
+      });
+    } catch (e) {}
+  }
+
+  // 2. Restore the target's snapshot to the user record.
+  const snap = targetProject.user_pipeline_snapshot || {};
+  const restore = {};
+  for (const k of PIPELINE_SNAPSHOT_FIELDS) {
+    if (snap[k] !== undefined && snap[k] !== null) restore[k] = snap[k];
+  }
+  try {
+    await base44.auth.updateMe(restore);
+  } catch (e) {}
+
+  // 3. Un-archive the target project so it becomes the active one.
+  let updated = null;
+  try {
+    updated = await base44.entities.ClientProject.update(targetProject.id, { archived: false });
+  } catch (e) {}
+
+  // 4. Clear local step cache so the timeline reflects the restored progress.
+  clearStepCache();
+  return updated || targetProject;
+}
