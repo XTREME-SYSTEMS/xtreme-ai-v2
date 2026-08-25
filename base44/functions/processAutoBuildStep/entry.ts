@@ -238,17 +238,18 @@ Deno.serve(async (req: Request) => {
     }
     const base44 = createClientFromRequest(req);
 
-    // Admin-only
+    // Admin or employee
     let user: any = null;
     try { user = await base44.auth.me(); } catch { user = null; }
-    if (!user || user.role !== "admin") {
-      return new Response(JSON.stringify({ error: "Admin access required" }), { status: 403 });
+    if (!user || (user.role !== "admin" && user.role !== "employee")) {
+      return new Response(JSON.stringify({ error: "Admin or employee access required" }), { status: 403 });
     }
 
     const body = await req.json().catch(() => ({}));
     const buildId = String(body.build_id || "");
     const step = String(body.step || "");
     const advance = body.advance !== false;
+    const skipValidation = body.skip_validation === true;
 
     if (!buildId || !step) {
       return new Response(JSON.stringify({ error: "build_id and step are required" }), { status: 400 });
@@ -363,11 +364,36 @@ Deno.serve(async (req: Request) => {
       });
     } catch {}
 
+    // ── Trigger validation loop after meaningful steps ────────────────
+    // After each generation step completes, run the validation loop so the
+    // build is continuously audited → fixed → healed → hardened → optimized.
+    // Skipped for empty steps (profile, review, system_review) and when
+    // the caller passes skip_validation=true.
+    const VALIDATABLE_STEPS = ["names", "content", "logo", "brand", "website", "social", "video", "architecture", "data_model", "ui_system", "codegen", "deploy"];
+    let validationResult: Record<string, any> | null = null;
+    if (!skipValidation && VALIDATABLE_STEPS.includes(step)) {
+      try {
+        logs = log({ logs } as any, `Triggering validation loop for step: ${step}`);
+        await base44.asServiceRole.entities.AutoBuild.update(buildId, { logs });
+
+        // Call the shared validation logic directly (no HTTP round-trip)
+        const { executeValidationLoop } = await import("../../shared/validationLoop.ts");
+        validationResult = await executeValidationLoop(base44, buildId, false);
+        logs = log({ logs } as any, `Validation complete: score=${validationResult?.score}, passed=${validationResult?.passed}`);
+        await base44.asServiceRole.entities.AutoBuild.update(buildId, { logs });
+      } catch (valErr) {
+        // Validation failure is non-blocking — the step still succeeded
+        logs = log({ logs } as any, `Validation skipped (error): ${String((valErr as any)?.message || valErr)}`);
+        await base44.asServiceRole.entities.AutoBuild.update(buildId, { logs });
+      }
+    }
+
     return new Response(JSON.stringify({
       success: true,
       step,
       build: updated,
       advanced_to: updateData.current_step || build.current_step,
+      validation: validationResult,
     }), { status: 200 });
   } catch (e) {
     console.error("processAutoBuildStep error:", e);

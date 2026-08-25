@@ -134,7 +134,7 @@ export default function EmployeeManagement() {
           <EmptyState
             icon={Users}
             title="No employees yet"
-            description="Invite your first team member above."
+            subtitle="Invite your first team member above."
           />
         ) : (
           <div className="space-y-2">
@@ -167,7 +167,7 @@ export default function EmployeeManagement() {
       {/* Recent Assignments */}
       <Panel title="Recent Assignments">
         {assignments.length === 0 ? (
-          <EmptyState icon={Boxes} title="No assignments yet" description="Assign builds to employees above." />
+          <EmptyState icon={Boxes} title="No assignments yet" subtitle="Assign builds to employees above." />
         ) : (
           <div className="space-y-2">
             {assignments.slice(0, 10).map((a) => (

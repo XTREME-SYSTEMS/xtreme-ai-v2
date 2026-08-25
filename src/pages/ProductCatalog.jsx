@@ -89,7 +89,7 @@ export default function ProductCatalog() {
         <EmptyState
           icon={Package}
           title="No products yet"
-          description="Completed and validated builds will appear here as packaged products."
+          subtitle="Completed and validated builds will appear here as packaged products."
         />
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">

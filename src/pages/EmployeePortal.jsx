@@ -109,7 +109,7 @@ export default function EmployeePortal() {
           <EmptyState
             icon={Boxes}
             title="No active assignments"
-            description="Your admin will assign builds and tasks to you. Check back soon."
+            subtitle="Your admin will assign builds and tasks to you. Check back soon."
           />
         ) : (
           <div className="space-y-3">
@@ -127,15 +127,13 @@ export default function EmployeePortal() {
                 {a.assignment_type === "build" && (
                   <div className="flex gap-2">
                     <LoadingButton
-                      size="sm"
                       onClick={() => runBuildStep(a.entity_id)}
                       loading={actionLoading[`build-${a.entity_id}`]}
                     >
                       <Rocket className="h-3.5 w-3.5 mr-1" /> Run Build Step
                     </LoadingButton>
                     <LoadingButton
-                      size="sm"
-                      variant="outline"
+                      variant="ghost"
                       onClick={() => runValidation(a.entity_id)}
                       loading={actionLoading[`val-${a.entity_id}`]}
                     >
