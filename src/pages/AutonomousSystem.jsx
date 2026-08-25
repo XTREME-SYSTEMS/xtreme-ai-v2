@@ -3,6 +3,7 @@ import { base44 } from "@/api/base44Client";
 import { PageHeader, Panel, LoadingButton, EmptyState } from "@/components/ui";
 import StatusBadge from "@/components/StatusBadge";
 import { Bot, ShieldCheck, RefreshCw, Play, Rocket, Activity, AlertTriangle, CheckCircle2, Cpu, Radar, Database } from "lucide-react";
+import PipelineOperatorGuide from "@/components/autonomous/PipelineOperatorGuide";
 
 export default function AutonomousSystem() {
   const [plans, setPlans] = useState([]);
@@ -142,7 +143,8 @@ export default function AutonomousSystem() {
   if (!plan) {
     return (
       <div>
-        <PageHeader title="Autonomous Implementation Engine" subtitle="Self-driving integration of the Faultline AI modules — generate → validate → reflect → heal to 100%" />
+        <PageHeader title="Pipeline Overview" subtitle="The autonomous growth operating system — discover, validate, build, and deploy" />
+        <PipelineOperatorGuide />
         <EmptyState icon={Bot} title="No active implementation plan" subtitle="Seed a plan to bootstrap phases. The autonomous build loop will then drive each phase to 100% with the validator checking everything installed.">
           <div className="flex flex-wrap items-center justify-center gap-2">
             <LoadingButton loading={seeding} onClick={seed}><Rocket className="h-4 w-4" /> Seed Faultline Plan</LoadingButton>
@@ -155,7 +157,7 @@ export default function AutonomousSystem() {
 
   return (
     <div>
-      <PageHeader title="Autonomous Implementation Engine" subtitle={`Plan: ${plan.name} · Source: ${plan.source_system}`}>
+      <PageHeader title="Pipeline Overview" subtitle={`Plan: ${plan.name} · Source: ${plan.source_system}`}>
         {plans.length > 1 && (
           <select
             value={plan.id}
@@ -171,6 +173,9 @@ export default function AutonomousSystem() {
         <LoadingButton loading={auditing} onClick={runAudit} variant="ghost"><ShieldCheck className="h-4 w-4" /> Forensic Audit</LoadingButton>
         <LoadingButton onClick={load} variant="ghost"><RefreshCw className="h-4 w-4" /> Refresh</LoadingButton>
       </PageHeader>
+
+      {/* Operator Guide — what the pipeline is, how to operate it, capabilities */}
+      <PipelineOperatorGuide />
 
       {/* Autonomous Discovery — integrated into the system */}
       <Panel title="Autonomous Discovery Engine" className="mb-6">
