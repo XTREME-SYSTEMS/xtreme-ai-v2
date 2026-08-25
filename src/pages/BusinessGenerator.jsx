@@ -18,6 +18,7 @@ import { useRevisionThreads } from "@/hooks/useRevisionThreads";
 import RevisionThreadPanel from "@/components/client/RevisionThreadPanel";
 import SystemActivities from "@/components/client/SystemActivities";
 import VisionGeneratorPanel from "@/components/client/VisionGeneratorPanel";
+import StartNewProjectButton from "@/components/client/StartNewProjectButton";
 
 // The Business Generator — the top-level destination of the client portal.
 // Shows the package, the full system capability overview, and the mandatory
@@ -129,6 +130,22 @@ export default function BusinessGenerator() {
   return (
     <div className="space-y-5">
       {isPreviewing && <PreviewBanner />}
+
+      {/* ── Current project header — auto-named for organization ── */}
+      <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-white/10 bg-zinc-950 p-4">
+        <div className="min-w-0">
+          <div className="text-[10px] font-semibold uppercase tracking-wider text-white/40">Current Project</div>
+          <h2 className="truncate text-base font-semibold text-white">
+            {project?.project_name || project?.business_name || "Untitled Project"}
+          </h2>
+          {project?.created_date && (
+            <div className="mt-0.5 text-xs text-white/40">
+              Started {fmtDate(project.created_date)}
+            </div>
+          )}
+        </div>
+        <StartNewProjectButton user={user} project={project} />
+      </div>
 
       {/* ── Vision Generator — AI-assisted, discovery-driven vision builder ── */}
       <VisionGeneratorPanel />

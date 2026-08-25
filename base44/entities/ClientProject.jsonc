@@ -7,6 +7,10 @@
       "type": "string",
       "description": "Email of the client who owns this project. Used for row-level isolation."
     },
+    "project_name": {
+      "type": "string",
+      "description": "Auto-generated project name for organization/identification (e.g. 'Apex Epoxy Floors \u00b7 Dayton, OH \u00b7 Aug 25 2026'). Set automatically when the project is created or when a business name is saved."
+    },
     "business_name": {
       "type": "string"
     },
