@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { base44 } from "@/api/base44Client";
 import ReactMarkdown from "react-markdown";
-import { Brain, Send, Loader2, RefreshCw, Wrench, CheckCircle, XCircle, ChevronDown, User } from "lucide-react";
+import { Brain, Send, Loader2, RefreshCw, Wrench, CheckCircle, XCircle, ChevronDown, User, Trash2 } from "lucide-react";
 
 const AGENT_NAME = "chief_architect";
 
@@ -19,7 +19,7 @@ function ToolCallDisplay({ toolCall }) {
   if (isRunning) {
     statusIcon = <Loader2 className="h-3 w-3 animate-spin" />;
     statusText = proj.active_label || "Running";
-    statusColor = "text-cyan-400";
+    statusColor = "text-amber-400";
   } else if (isFailed) {
     statusIcon = <XCircle className="h-3 w-3" />;
     statusText = proj.error_label || "Failed";
@@ -86,14 +86,14 @@ function MessageBubble({ message }) {
           {isUser ? (
             <><span className="text-[10px] text-white/40">You</span><User className="h-3 w-3 text-white/40" /></>
           ) : (
-            <><Brain className="h-3 w-3 text-cyan-400" /><span className="text-[10px] text-cyan-400/70">AI Chief Architect</span></>
+            <><Brain className="h-3 w-3 text-amber-400" /><span className="text-[10px] text-amber-400/70">AI Chief Architect</span></>
           )}
         </div>
         <div className={`rounded-2xl px-3.5 py-2.5 ${isUser ? "bg-lime-400/15 border border-lime-400/20" : "bg-zinc-900 border border-white/10"}`}>
           {message.content && (
             isUser
               ? <p className="text-sm text-white/90 whitespace-pre-wrap">{message.content}</p>
-              : <ReactMarkdown className="text-sm text-white/80 prose prose-sm prose-invert max-w-none [&_p]:my-1 [&_ul]:my-1 [&_ol]:my-1 [&_li]:my-0.5 [&_code]:text-cyan-300 [&_a]:text-cyan-400">{message.content}</ReactMarkdown>
+              : <ReactMarkdown className="text-sm text-white/80 prose prose-sm prose-invert max-w-none [&_p]:my-1 [&_ul]:my-1 [&_ol]:my-1 [&_li]:my-0.5 [&_code]:text-amber-300 [&_a]:text-amber-400">{message.content}</ReactMarkdown>
           )}
           {message.tool_calls?.map((tc, i) => <ToolCallDisplay key={i} toolCall={tc} />)}
         </div>
@@ -158,6 +158,18 @@ export default function ArchitectChat() {
     }
   };
 
+  const clearChat = async () => {
+    if (!activeConv) return;
+    try {
+      await base44.agents.deleteConversation(activeConv);
+      setActiveConv(null);
+      setMessages([]);
+      await loadConversations();
+    } catch (e) {
+      console.error("Failed to clear chat", e);
+    }
+  };
+
   const send = async () => {
     if (!input.trim() || sending) return;
     const text = input.trim();
@@ -197,29 +209,38 @@ export default function ArchitectChat() {
   };
 
   return (
-    <div className="flex flex-col rounded-xl border border-cyan-400/20 bg-gradient-to-br from-cyan-400/5 to-transparent overflow-hidden" style={{ height: "600px" }}>
+    <div className="flex flex-col rounded-xl border border-amber-400/20 bg-gradient-to-br from-amber-400/5 to-transparent overflow-hidden" style={{ height: "600px" }}>
       {/* Header */}
       <div className="flex items-center gap-2 border-b border-white/10 px-4 py-3">
-        <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-cyan-400/15">
-          <Brain className="h-4 w-4 text-cyan-400" />
+        <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-amber-400/15">
+          <Brain className="h-4 w-4 text-amber-400" />
         </div>
         <div className="flex-1">
           <h3 className="text-sm font-semibold text-white">AI Chief Architect — Chat Agent</h3>
           <p className="text-[10px] text-white/40">Full system access · web browser · cloud browser · Google Workspace · operates on your behalf</p>
         </div>
-        <button
-          onClick={newConversation}
-          className="flex items-center gap-1.5 rounded-lg border border-cyan-400/30 bg-cyan-400/10 px-2.5 py-1.5 text-[11px] font-medium text-cyan-300 hover:bg-cyan-400/20"
-        >
-          <RefreshCw className="h-3 w-3" /> New Chat
-        </button>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={newConversation}
+            className="flex items-center gap-1.5 rounded-lg border border-amber-400/30 bg-amber-400/10 px-2.5 py-1.5 text-[11px] font-medium text-amber-300 hover:bg-amber-400/20"
+          >
+            <RefreshCw className="h-3 w-3" /> New Chat
+          </button>
+          <button
+            onClick={clearChat}
+            disabled={!activeConv}
+            className="flex items-center gap-1.5 rounded-lg border border-white/10 px-2.5 py-1.5 text-[11px] font-medium text-white/40 hover:border-red-400/30 hover:text-red-300 disabled:opacity-30 disabled:hover:border-white/10 disabled:hover:text-white/40"
+          >
+            <Trash2 className="h-3 w-3" /> Clear
+          </button>
+        </div>
       </div>
 
       {/* Messages */}
       <div ref={scrollRef} className="flex-1 overflow-y-auto space-y-3 p-4">
         {messages.length === 0 ? (
           <div className="flex flex-col items-center justify-center h-full text-center">
-            <Brain className="h-10 w-10 text-cyan-400/30" />
+            <Brain className="h-10 w-10 text-amber-400/30" />
             <p className="mt-3 text-sm text-white/50">Ask me anything. I have full access to your system.</p>
             <p className="mt-1 text-xs text-white/30">I can run builds, provision ideas, scan for new tech, send emails, manage your calendar, and operate across your entire Google Workspace.</p>
             <div className="mt-4 flex flex-wrap justify-center gap-2">
@@ -232,7 +253,7 @@ export default function ArchitectChat() {
                 <button
                   key={s}
                   onClick={() => { setInput(s); }}
-                  className="rounded-lg border border-white/10 bg-white/5 px-3 py-1.5 text-[11px] text-white/60 hover:border-cyan-400/30 hover:text-cyan-300"
+                  className="rounded-lg border border-white/10 bg-white/5 px-3 py-1.5 text-[11px] text-white/60 hover:border-amber-400/30 hover:text-amber-300"
                 >
                   {s}
                 </button>
@@ -253,13 +274,13 @@ export default function ArchitectChat() {
             onKeyDown={handleKey}
             placeholder="Ask the Architect to do anything — run builds, scan for tech, send emails, manage your calendar..."
             rows={1}
-            className="flex-1 resize-none rounded-xl border border-white/10 bg-zinc-950 px-3 py-2.5 text-sm text-white placeholder:text-white/30 focus:border-cyan-400/40 focus:outline-none"
+            className="flex-1 resize-none rounded-xl border border-white/10 bg-zinc-950 px-3 py-2.5 text-sm text-white placeholder:text-white/30 focus:border-amber-400/40 focus:outline-none"
             style={{ maxHeight: "120px" }}
           />
           <button
             onClick={send}
             disabled={sending || !input.trim()}
-            className="flex items-center justify-center rounded-xl bg-cyan-400 px-3.5 py-2.5 text-black hover:bg-cyan-300 disabled:opacity-40"
+            className="flex items-center justify-center rounded-xl bg-amber-400 px-3.5 py-2.5 text-black hover:bg-amber-300 disabled:opacity-40"
           >
             {sending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
           </button>

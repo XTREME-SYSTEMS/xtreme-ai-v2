@@ -121,7 +121,7 @@ export default function Architect() {
               key={f}
               onClick={() => setFilter(f)}
               className={`rounded-lg px-2.5 py-1 text-[11px] font-medium capitalize transition-colors ${
-                filter === f ? "bg-cyan-400/15 text-cyan-300 border border-cyan-400/30" : "border border-white/10 text-white/50 hover:text-white"
+                filter === f ? "bg-amber-400/15 text-amber-300 border border-amber-400/30" : "border border-white/10 text-white/50 hover:text-white"
               }`}
             >
               {f}
@@ -148,7 +148,7 @@ export default function Architect() {
       {/* Proposals */}
       {loading ? (
         <div className="flex justify-center py-12">
-          <RefreshCw className="h-6 w-6 animate-spin text-cyan-400" />
+          <RefreshCw className="h-6 w-6 animate-spin text-amber-400" />
         </div>
       ) : filtered.length === 0 ? (
         <EmptyState
@@ -169,9 +169,9 @@ export default function Architect() {
       )}
 
       {/* Info footer */}
-      <div className="mt-6 rounded-xl border border-cyan-400/20 bg-cyan-400/5 p-4">
+      <div className="mt-6 rounded-xl border border-amber-400/20 bg-amber-400/5 p-4">
         <div className="flex items-start gap-2 text-xs text-white/50">
-          <Brain className="h-4 w-4 shrink-0 text-cyan-400 mt-0.5" />
+          <Brain className="h-4 w-4 shrink-0 text-amber-400 mt-0.5" />
           <div>
             <p className="text-white/70 font-medium mb-1">How the AI Chief Architect works</p>
             <p>
