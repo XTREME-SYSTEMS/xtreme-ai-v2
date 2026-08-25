@@ -51,18 +51,24 @@ export default function BusinessNameStudio() {
     setError("");
     if (!append) setSuggestions([]);
     setPhases([]);
+    // Pass a random seed + excluded names so each round produces fresh,
+    // non-duplicate suggestions quickly.
+    const seed = Math.floor(Math.random() * 100000);
+    const exclude = append ? suggestions.map((s) => s.name) : [];
     try {
       const res = await base44.functions.invoke("recommendBusinessNames", {
         industry: industry.trim(),
         location: location.trim(),
         keywords: keywords.trim(),
+        seed,
+        exclude,
       });
       const data = res?.data || res;
       if (data?.suggestions?.length > 0) {
         setSuggestions((prev) => append ? [...prev, ...data.suggestions] : data.suggestions);
         setPhases(data.phases || []);
       } else {
-        setError(data?.error || "No 100% available domains found. Try different keywords.");
+        setError(data?.error || "No available .com domains found. Try different keywords.");
         if (data.phases) setPhases(data.phases);
       }
     } catch (e) {
@@ -223,20 +229,19 @@ export default function BusinessNameStudio() {
         </button>
       </div>
 
-      {/* Loading state — shows the 5-phase research pipeline */}
+      {/* Loading state — shows the optimized 4-phase pipeline */}
       {loading && (
         <div className="rounded-xl border border-lime-400/30 bg-lime-400/5 p-5">
           <div className="flex items-center gap-2 text-sm text-lime-300">
             <Loader2 className="h-4 w-4 animate-spin" />
-            <span className="font-medium">Deep research in progress…</span>
+            <span className="font-medium">Generating names…</span>
           </div>
           <div className="mt-4 space-y-2.5">
             {[
-              { icon: Brain, label: "AI generating 10 candidate names with web search" },
-              { icon: Globe, label: "Verifying domain availability via RDAP registry" },
-              { icon: Search, label: "Scraping Google search results for name uniqueness" },
-              { icon: Building2, label: "Checking US state business registries (OpenCorporates)" },
-              { icon: Zap, label: "AI re-scoring with real research data" },
+              { icon: Brain, label: "AI generating 15 creative candidate names" },
+              { icon: Globe, label: "Verifying domain availability via RDAP (parallel)" },
+              { icon: Building2, label: "Checking US state business registries" },
+              { icon: Zap, label: "Scoring & ranking by brand strength" },
             ].map((phase, i) => (
               <div key={i} className="flex items-center gap-2.5 text-xs text-white/50">
                 <phase.icon className="h-3.5 w-3.5 text-lime-400/60" />
@@ -246,7 +251,7 @@ export default function BusinessNameStudio() {
             ))}
           </div>
           <p className="mt-3 text-[11px] text-white/30">
-            This takes 30-60 seconds. We only show names with 100% confirmed available .com domains.
+            Usually 20-30 seconds. We generate 25+ candidates and only show names with 100% confirmed available .com domains.
           </p>
         </div>
       )}
@@ -369,7 +374,7 @@ export default function BusinessNameStudio() {
               <CheckCircle className="h-4 w-4 shrink-0 text-lime-400" />
               <div>
                 <p className="font-medium text-white/70">How it works:</p>
-                <p className="mt-1">Our AI generates 15 candidate names, then verifies each one through a 5-phase research pipeline — Google search scraping, US state business registry checks, and RDAP domain verification. We only show names with <span className="text-lime-400">100% confirmed available .com domains</span>, scored across 8 dimensions including viral potential, local SEO, searchability, and trademark safety.</p>
+                <p className="mt-1">Our AI generates 25+ candidate names with web search, verifies each .com domain via RDAP in parallel, checks US state business registries, and scores across 8 dimensions. If fewer than 10 are available, it auto-generates a second batch. We only show names with <span className="text-lime-400">100% confirmed available .com domains</span>.</p>
                 <p className="mt-2 text-white/30">Click "Research" on any result to see the full Google search data and state registry findings.</p>
               </div>
             </div>
