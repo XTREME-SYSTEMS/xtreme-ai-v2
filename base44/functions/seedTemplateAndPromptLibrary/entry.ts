@@ -263,29 +263,40 @@ export default async function(req) {
       return Response.json({ error: "Admin only" }, { status: 403 });
     }
 
-    let templatesCreated = 0, templatesSkipped = 0;
-    for (const t of TEMPLATES) {
-      const existing = await base44.asServiceRole.entities.TemplateLibrary.filter({ name: t.name }, null, 1);
-      if (existing.length) { templatesSkipped++; continue; }
-      await base44.asServiceRole.entities.TemplateLibrary.create({ ...t, status: "active" });
-      templatesCreated++;
-    }
+    // Batch 1: Fetch ALL existing templates + prompts in 2 calls (not 26)
+    const [existingTemplates, existingPrompts] = await Promise.all([
+      base44.asServiceRole.entities.TemplateLibrary.list("-created_date", 100),
+      base44.asServiceRole.entities.PromptLibrary.list("-created_date", 100),
+    ]);
+    const existingTemplateNames = new Set((existingTemplates || []).map((t: any) => t.name));
+    const existingPromptKeys = new Set((existingPrompts || []).map((p: any) => `${p.name}::${p.step}`));
 
-    let promptsCreated = 0, promptsSkipped = 0;
-    for (const p of PROMPTS) {
-      const existing = await base44.asServiceRole.entities.PromptLibrary.filter({ name: p.name, step: p.step }, null, 1);
-      if (existing.length) { promptsSkipped++; continue; }
-      await base44.asServiceRole.entities.PromptLibrary.create({ ...p, status: "active" });
-      promptsCreated++;
+    // Batch 2: Filter to only new records
+    const newTemplates = TEMPLATES
+      .filter((t) => !existingTemplateNames.has(t.name))
+      .map((t) => ({ ...t, status: "active" }));
+    const newPrompts = PROMPTS
+      .filter((p) => !existingPromptKeys.has(`${p.name}::${p.step}`))
+      .map((p) => ({ ...p, status: "active" }));
+
+    // Batch 3: Bulk create all new records in 2 calls
+    let createdTemplates = 0, createdPrompts = 0;
+    if (newTemplates.length) {
+      await base44.asServiceRole.entities.TemplateLibrary.bulkCreate(newTemplates);
+      createdTemplates = newTemplates.length;
+    }
+    if (newPrompts.length) {
+      await base44.asServiceRole.entities.PromptLibrary.bulkCreate(newPrompts);
+      createdPrompts = newPrompts.length;
     }
 
     return Response.json({
       ok: true,
-      templates: { created: templatesCreated, skipped: templatesSkipped, total: TEMPLATES.length },
-      prompts: { created: promptsCreated, skipped: promptsSkipped, total: PROMPTS.length }
+      templates: { created: createdTemplates, skipped: TEMPLATES.length - createdTemplates, total: TEMPLATES.length },
+      prompts: { created: createdPrompts, skipped: PROMPTS.length - createdPrompts, total: PROMPTS.length }
     });
   } catch (error) {
     console.error("[seed-library] error", error);
-    return Response.json({ error: error.message, stack: error.stack }, { status: 500 });
+    return Response.json({ error: error.message }, { status: 500 });
   }
 }
