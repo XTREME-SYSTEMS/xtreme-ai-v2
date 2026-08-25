@@ -1,0 +1,80 @@
+{
+  "name": "TrendingCategory",
+  "type": "object",
+  "description": "Researched trending categories and subcategories of topics people want or need. Updated weekly by the researchTrendingCategories function using web search. Used by the Vision Generator to give users multiple-choice starting points. Also includes system capabilities (marketing site, web app, e-commerce, platform) as seeded categories.",
+  "properties": {
+    "name": {
+      "type": "string",
+      "description": "Category name (e.g. 'AI Tools & Automation')"
+    },
+    "description": {
+      "type": "string",
+      "description": "One-sentence description of what this category is"
+    },
+    "icon": {
+      "type": "string",
+      "description": "Single emoji representing this category for display"
+    },
+    "subcategories": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          }
+        }
+      },
+      "description": "Sub-categories within this category"
+    },
+    "trending_score": {
+      "type": "number",
+      "default": 50,
+      "description": "0-100: how trending this category is right now"
+    },
+    "market_size": {
+      "type": "string",
+      "description": "Brief description of the market size"
+    },
+    "profitability": {
+      "type": "string",
+      "description": "Brief description of profitability potential"
+    },
+    "is_system_capability": {
+      "type": "boolean",
+      "default": false,
+      "description": "True if this is a system capability (marketing site, web app, etc.) vs a trending topic"
+    },
+    "active": {
+      "type": "boolean",
+      "default": true
+    },
+    "last_updated": {
+      "type": "string",
+      "format": "date-time"
+    }
+  },
+  "required": [
+    "name"
+  ],
+  "rls": {
+    "create": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

@@ -1,0 +1,45 @@
+{
+  "name": "Weekly Trending Categories Refresh",
+  "trigger": {
+    "condition": null,
+    "config": {
+      "trigger_type": "scheduled",
+      "events": [],
+      "schedule_mode": "recurring",
+      "cron_expression": "0 3 * * 1",
+      "one_time_date": null,
+      "timezone": "America/New_York",
+      "interval_value": null,
+      "interval_unit": null,
+      "interval_anchor": null,
+      "ends_type": "never",
+      "ends_on_date": null,
+      "ends_after_count": null
+    }
+  },
+  "description": "Refreshes the TrendingCategory entity every Monday at 3am ET by calling researchTrendingCategories, which uses web search to find the latest trending topics people want or need. Keeps the Vision Generator's category buttons current.",
+  "definition": {
+    "document": {
+      "dsl": "1.0.0",
+      "name": "weekly_trending_categories",
+      "version": "1.0",
+      "namespace": "base44"
+    },
+    "do": [
+      {
+        "research": {
+          "call": "invoke_backend_function",
+          "with": {
+            "function_name": "researchTrendingCategories",
+            "args": {}
+          },
+          "then": "end",
+          "x-base44": {
+            "title": "Research trending categories",
+            "description": "Web-search top trending topics and update the catalog"
+          }
+        }
+      }
+    ]
+  }
+}

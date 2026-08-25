@@ -17,7 +17,7 @@ import ExpandableLineItems from "@/components/client/ExpandableLineItems";
 import { useRevisionThreads } from "@/hooks/useRevisionThreads";
 import RevisionThreadPanel from "@/components/client/RevisionThreadPanel";
 import SystemActivities from "@/components/client/SystemActivities";
-import VisionStrategyPanel from "@/components/client/VisionStrategyPanel";
+import VisionGeneratorPanel from "@/components/client/VisionGeneratorPanel";
 
 // The Business Generator — the top-level destination of the client portal.
 // Shows the package, the full system capability overview, and the mandatory
@@ -129,6 +129,10 @@ export default function BusinessGenerator() {
   return (
     <div className="space-y-5">
       {isPreviewing && <PreviewBanner />}
+
+      {/* ── Vision Generator — AI-assisted, discovery-driven vision builder ── */}
+      <VisionGeneratorPanel />
+
       {/* System capabilities — orients the user on everything they can do */}
       <SystemActivities />
 
@@ -271,17 +275,7 @@ export default function BusinessGenerator() {
         )}
       </div>
 
-      {/* ── Vision & Strategy — mandatory foundation ─────────────────── */}
-      <div className="rounded-xl border border-lime-400/40 bg-lime-400/5 p-5">
-        <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-lime-400">
-          <Rocket className="h-4 w-4" /> Define Your Foundation — Vision & Strategy
-        </div>
-        <p className="mt-1 text-sm text-white/50">
-          Before any building begins, you must define your <span className="text-lime-400">Vision</span> (what we're building and why) and your <span className="text-lime-400">Strategy</span> (how we'll get there). Every downstream decision flows from these.
-        </p>
-      </div>
 
-      <VisionStrategyPanel />
 
       {/* ── Continue to Build — only after Vision + Strategy approved ── */}
       <div className="rounded-xl border border-white/10 bg-zinc-950 p-5">
