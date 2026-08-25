@@ -1,4 +1,4 @@
-import { NavLink, Outlet, useNavigate } from "react-router-dom";
+import { NavLink, Outlet, useNavigate, useLocation } from "react-router-dom";
 import { base44 } from "@/api/base44Client";
 import { useState, useEffect } from "react";
 import {
@@ -7,7 +7,7 @@ import {
   Hammer, ShieldCheck, FileText, TrendingUp, FlaskConical, Dna, Network, BarChart3,
   BookMarked, CheckCircle, ScrollText, Plug, Settings, LogOut, Menu, X,
   MapPin, Plus, Rocket, Bot, LayoutTemplate, Copy, Wand2, Crosshair, Activity, Radar, Package, UserPlus, Tag, Box, ShieldAlert, Sparkles, Brain,
-  Archive, ChevronDown,
+  Archive, ChevronDown, Compass, Building2, MessageSquareText, PenTool, Shirt, Share2, Video,
 } from "lucide-react";
 import { Image } from "@/components/ui/image";
 import { cn } from "@/lib/utils";
@@ -34,6 +34,25 @@ const PIPELINE_STEPS = [
   { to: "/build-queue",   label: "Queue System",       icon: Boxes,  step: 3, desc: "Ideas queued for building" },
   { to: "/auto-builder",  label: "Auto Builder",       icon: Rocket, step: 4, desc: "Full builder pipeline" },
 ];
+
+// Auto Builder sub-steps — the builder's own pipeline, shown as a nested
+// timeline when the user is on the Auto Builder step. Mirrors the client
+// portal journey: Welcome → Business Name → Profile → Content → Logo →
+// Brand → Website → Social → Video → Review.
+const AUTOBUILDER_STEPS = [
+  { to: "/my-package",           label: "Welcome",       icon: Package },
+  { to: "/business-name-studio", label: "Business Name", icon: Compass },
+  { to: "/business-profile",     label: "Profile",       icon: Building2 },
+  { to: "/content-generator",    label: "Content",       icon: MessageSquareText },
+  { to: "/logo-generator",       label: "Logo",          icon: PenTool },
+  { to: "/brand-generator",      label: "Brand",         icon: Shirt },
+  { to: "/design-direction",     label: "Website",       icon: Palette },
+  { to: "/social-media",         label: "Social",        icon: Share2 },
+  { to: "/video-generator",      label: "Video",         icon: Video },
+  { to: "/your-designs",         label: "Review",        icon: LayoutTemplate },
+];
+
+const AUTOBUILDER_ROUTES = ["/auto-builder", ...AUTOBUILDER_STEPS.map((s) => s.to)];
 
 // Archived items — still accessible but collapsed out of the way.
 const ARCHIVE_ITEMS = [
@@ -122,6 +141,8 @@ export default function Layout() {
   const [showPreviewModal, setShowPreviewModal] = useState(false);
   const [archiveOpen, setArchiveOpen] = useState(false);
   const navigate = useNavigate();
+  const location = useLocation();
+  const showAutoBuilderSub = AUTOBUILDER_ROUTES.includes(location.pathname);
 
   useEffect(() => {
     base44.auth.me().then(setUser).catch(() => {});
@@ -191,44 +212,79 @@ export default function Layout() {
 
           {/* Vertical step-by-step timeline */}
           <div className="relative mt-2">
-            {/* Connecting line */}
-            <div className="absolute left-[22px] top-6 bottom-6 w-0.5 bg-white/10" />
+            {/* Thin connecting line */}
+            <div className="absolute left-[26px] top-6 bottom-6 w-px bg-white/10" />
             {PIPELINE_STEPS.map((step) => {
               const Icon = step.icon;
+              const isAutoBuilder = step.to === "/auto-builder";
               return (
-                <NavLink
-                  key={step.to}
-                  to={step.to}
-                  end={step.end}
-                  onClick={() => setOpen(false)}
-                  className={({ isActive }) => cn(
-                    "relative flex items-center gap-3.5 rounded-lg px-1 py-2.5 transition-colors",
-                    isActive ? "" : "hover:bg-white/5"
-                  )}
-                >
-                  {({ isActive }) => (
-                    <>
-                      <div className={cn(
-                        "relative z-10 flex h-11 w-11 shrink-0 items-center justify-center rounded-full border-2 text-sm font-bold transition-all duration-200",
-                        isActive
-                          ? "border-amber-400 bg-amber-400 text-black shadow-[0_0_12px_2px_rgba(251,191,36,0.5)]"
-                          : "border-white/15 bg-zinc-900 text-white/50"
-                      )}>
-                        {step.step}
-                      </div>
-                      <div>
+                <div key={step.to}>
+                  <NavLink
+                    to={step.to}
+                    end={step.end}
+                    onClick={() => setOpen(false)}
+                    className={({ isActive }) => cn(
+                      "relative flex items-center gap-3.5 rounded-lg px-1 py-2.5 transition-colors",
+                      isActive ? "" : "hover:bg-white/5"
+                    )}
+                  >
+                    {({ isActive }) => (
+                      <>
                         <div className={cn(
-                          "flex items-center gap-1.5 text-sm font-medium transition-colors",
-                          isActive ? "text-amber-400" : "text-white"
+                          "relative z-10 flex h-11 w-11 shrink-0 items-center justify-center rounded-full border-2 text-sm font-bold transition-all duration-200",
+                          isActive || (isAutoBuilder && showAutoBuilderSub)
+                            ? "border-amber-400 bg-amber-400 text-black shadow-[0_0_12px_2px_rgba(251,191,36,0.5)]"
+                            : "border-white/15 bg-zinc-900 text-white/50"
                         )}>
-                          <Icon className="h-3.5 w-3.5 shrink-0" />
-                          {step.label}
+                          {step.step}
                         </div>
-                        <div className="text-[11px] leading-tight text-white/40">{step.desc}</div>
-                      </div>
-                    </>
+                        <div>
+                          <div className={cn(
+                            "flex items-center gap-1.5 text-sm font-medium transition-colors",
+                            isActive || (isAutoBuilder && showAutoBuilderSub) ? "text-amber-400" : "text-white"
+                          )}>
+                            <Icon className="h-3.5 w-3.5 shrink-0" />
+                            {step.label}
+                          </div>
+                          <div className="text-[11px] leading-tight text-white/40">{step.desc}</div>
+                        </div>
+                      </>
+                    )}
+                  </NavLink>
+                  {/* Auto Builder sub-timeline — expands when active */}
+                  {isAutoBuilder && showAutoBuilderSub && (
+                    <div className="relative ml-[26px] mt-1 mb-2 border-l border-white/10 pl-5">
+                      {AUTOBUILDER_STEPS.map((sub, j) => {
+                        const SubIcon = sub.icon;
+                        const subActive = location.pathname === sub.to;
+                        return (
+                          <NavLink
+                            key={sub.to}
+                            to={sub.to}
+                            onClick={() => setOpen(false)}
+                            className="relative flex items-center gap-2.5 rounded-lg px-1 py-1.5 transition-colors hover:bg-white/5"
+                          >
+                            <div className={cn(
+                              "flex h-7 w-7 shrink-0 items-center justify-center rounded-full border text-[10px] font-bold transition-all",
+                              subActive
+                                ? "border-amber-400 bg-amber-400 text-black shadow-[0_0_8px_1px_rgba(251,191,36,0.4)]"
+                                : "border-white/15 bg-zinc-900 text-white/40"
+                            )}>
+                              {j + 1}
+                            </div>
+                            <span className={cn(
+                              "flex items-center gap-1.5 text-[13px] font-medium",
+                              subActive ? "text-amber-400" : "text-white/60"
+                            )}>
+                              <SubIcon className="h-3 w-3 shrink-0" />
+                              {sub.label}
+                            </span>
+                          </NavLink>
+                        );
+                      })}
+                    </div>
                   )}
-                </NavLink>
+                </div>
               );
             })}
           </div>
