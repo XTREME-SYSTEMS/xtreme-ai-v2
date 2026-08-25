@@ -7,6 +7,8 @@ import { logReceipt } from "@/lib/pipelineUtils";
 import BackButton from "@/components/client/BackButton";
 import { useClientUser } from "@/hooks/useClientUser";
 import { useClientUpdate } from "@/hooks/useClientUpdate";
+import { useClientProject } from "@/hooks/useClientProject";
+import { deriveFoundation } from "@/lib/pipelineFoundation";
 import { notifyStepComplete } from "@/lib/pipelineNotify";
 
 // Step: Content Generator. Scrapes the client's market (location, industry,
@@ -32,6 +34,7 @@ export default function ContentGenerator() {
   const [reviseError, setReviseError] = useState("");
   const { user } = useClientUser();
   const { update } = useClientUpdate();
+  const { project } = useClientProject(user);
 
   useEffect(() => { document.title = "Content Generator · Lead Gen Near You"; }, []);
 
@@ -45,6 +48,7 @@ export default function ContentGenerator() {
 
   const generate = async () => {
     if (!profile?.businessName) { setGenError("Complete your Business Profile first."); return; }
+    const foundation = deriveFoundation(project, user);
     setGenerating(true); setGenError("");
     try {
       const res = await base44.functions.invoke("generateContentTemplates", {
@@ -56,6 +60,11 @@ export default function ContentGenerator() {
         businessType: profile.businessType || "",
         financialIntelligence: user?.financialIntelligence || null,
         industryAnswers: user?.industryAnswers || null,
+        vision: foundation.vision,
+        strategy: foundation.strategy,
+        chosenName: foundation.chosenName,
+        tagline: foundation.tagline,
+        contentTone: foundation.contentTone,
       });
       const d = res?.data?.data;
       if (!d?.templates?.length) throw new Error("no templates");
@@ -90,9 +99,9 @@ export default function ContentGenerator() {
   };
 
   useEffect(() => {
-    if (profile && !data && !generating && !genError) generate();
+    if (profile && project && !data && !generating && !genError) generate();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [profile]);
+  }, [profile, project]);
 
   // Auto-pick: pre-select and persist the recommended tone so the step is
   // already done — the user just clicks "Continue" to proceed.

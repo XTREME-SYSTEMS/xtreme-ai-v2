@@ -9,6 +9,8 @@ import BrandPackPreview from "@/components/client/BrandPackPreview";
 import BackButton from "@/components/client/BackButton";
 import { useClientUser } from "@/hooks/useClientUser";
 import { useClientUpdate } from "@/hooks/useClientUpdate";
+import { useClientProject } from "@/hooks/useClientProject";
+import { deriveFoundation } from "@/lib/pipelineFoundation";
 import { notifyStepComplete } from "@/lib/pipelineNotify";
 
 // Step: Brand Generator. Uses the client's chosen logo to generate 10 brand
@@ -36,6 +38,7 @@ export default function BrandGenerator() {
   const [industry, setIndustry] = useState("");
   const { user } = useClientUser();
   const { update } = useClientUpdate();
+  const { project } = useClientProject(user);
 
   useEffect(() => {
     document.title = "Brand Generator · Lead Gen Near You";
@@ -58,11 +61,12 @@ export default function BrandGenerator() {
     }
     setGenerating(true);
     setError("");
+    const foundation = deriveFoundation(project, user);
     try {
       const results = await Promise.allSettled(
         BRAND_TYPES.map(async (b) => {
           const res = await base44.integrations.Core.GenerateImage({
-            prompt: b.prompt(businessName || "your business", industry),
+            prompt: b.prompt(businessName || "your business", industry) + foundation.brandEssence,
             existing_image_urls: [logoUrl],
           });
           return { id: b.id, label: b.label, url: res.url };
@@ -107,8 +111,9 @@ export default function BrandGenerator() {
     setRegeneratingId(pack.id);
     setError("");
     try {
+      const foundation = deriveFoundation(project, user);
       const res = await base44.integrations.Core.GenerateImage({
-        prompt: b.prompt(businessName || "your business", industry),
+        prompt: b.prompt(businessName || "your business", industry) + foundation.brandEssence,
         existing_image_urls: [logoUrl],
       });
       const next = packs.map((p) => (p.id === pack.id ? { ...p, url: res.url } : p));

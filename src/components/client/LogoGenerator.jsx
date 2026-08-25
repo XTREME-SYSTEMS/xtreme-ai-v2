@@ -9,6 +9,8 @@ import { LOGO_STYLES, ACCENT_COLORS } from "@/lib/designPrompts";
 import BackButton from "@/components/client/BackButton";
 import { useClientUser } from "@/hooks/useClientUser";
 import { useClientUpdate } from "@/hooks/useClientUpdate";
+import { useClientProject } from "@/hooks/useClientProject";
+import { deriveFoundation } from "@/lib/pipelineFoundation";
 import { notifyStepComplete } from "@/lib/pipelineNotify";
 
 // Second-pass prompt that strips the background off a generated logo so it
@@ -58,6 +60,7 @@ export default function LogoGenerator() {
   const [regeneratingId, setRegeneratingId] = useState(null);
   const { user } = useClientUser();
   const { update } = useClientUpdate();
+  const { project } = useClientProject(user);
 
   useEffect(() => {
     document.title = "Logo Generator · Lead Gen Near You";
@@ -81,10 +84,11 @@ export default function LogoGenerator() {
     }
     setGenerating(true);
     setError("");
+    const foundation = deriveFoundation(project, user);
     try {
       const results = await Promise.allSettled(
         LOGO_STYLES.map(async (s) => {
-          const url = await generateTransparentLogo(s.prompt(businessName, undefined, industry));
+          const url = await generateTransparentLogo(s.prompt(businessName, undefined, industry) + foundation.brandEssence);
           return { id: s.id, label: s.label, url };
         })
       );
@@ -106,7 +110,8 @@ export default function LogoGenerator() {
     setError("");
     try {
       const style = LOGO_STYLES.find((s) => s.id === pack.id);
-      const url = await generateTransparentLogo(style.prompt(businessName, accent, industry));
+      const foundation = deriveFoundation(project, user);
+      const url = await generateTransparentLogo(style.prompt(businessName, accent, industry) + foundation.brandEssence);
       const next = packs.map((p) =>
         p.id === pack.id ? { ...p, url, accentColor: accent } : p
       );

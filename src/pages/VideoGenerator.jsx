@@ -9,6 +9,8 @@ import BackButton from "@/components/client/BackButton";
 import VideoClipPlayer from "@/components/video/VideoClipPlayer";
 import { useClientUser } from "@/hooks/useClientUser";
 import { useClientUpdate } from "@/hooks/useClientUpdate";
+import { useClientProject } from "@/hooks/useClientProject";
+import { deriveFoundation } from "@/lib/pipelineFoundation";
 import { notifyStepComplete } from "@/lib/pipelineNotify";
 
 // Duration options for generated videos. The platform generates up to 8
@@ -48,6 +50,7 @@ export default function VideoGenerator() {
 
   const { user } = useClientUser();
   const { update } = useClientUpdate();
+  const { project } = useClientProject(user);
 
   useEffect(() => { document.title = "Video Generator · Lead Gen Near You"; }, []);
 
@@ -62,6 +65,7 @@ export default function VideoGenerator() {
 
   const generate = async () => {
     if (!profile?.businessName) { setGenError("Complete your Business Profile first."); return; }
+    const foundation = deriveFoundation(project, user);
     setGenerating(true); setGenError("");
     try {
       const res = await base44.functions.invoke("generateVideoPack", {
@@ -71,6 +75,10 @@ export default function VideoGenerator() {
         businessType: profile.businessType || "",
         industryAnswers: profile.industryAnswers || profile.industry_answers || {},
         differentiators: profile.differentiators || [],
+        vision: foundation.vision,
+        strategy: foundation.strategy,
+        chosenName: foundation.chosenName,
+        tagline: foundation.tagline,
       });
       const d = res?.data?.data;
       if (!d?.concepts?.length) throw new Error("no data");
@@ -81,9 +89,9 @@ export default function VideoGenerator() {
   };
 
   useEffect(() => {
-    if (profile && !data && !generating && !genError) generate();
+    if (profile && project && !data && !generating && !genError) generate();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [profile]);
+  }, [profile, project]);
 
   // Auto-pick: all concepts included — pre-approve so the step is done.
   const autoPicked = useRef(false);

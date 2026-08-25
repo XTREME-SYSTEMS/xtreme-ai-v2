@@ -170,6 +170,8 @@ CLIENT BRIEF:
 ${briefBlock}
 EXISTING WEBSITE: ${site || "none"}${finContext}
 
+IMPORTANT: The CLIENT BRIEF above includes the approved VISION, STRATEGY, chosen business name, tagline, and content tone. ALIGN every tone and message with that foundation — it is the source of truth for positioning and brand voice. Do not contradict the vision or strategy.
+
 STEP 1 — Research the market. Use real web data about ${loc}: the local ${ind} competition, typical pricing, what customers there care about, and what messaging the top competitors use. Note 3-5 key findings.
 
 STEP 2 — Create exactly 10 DISTINCT content/tone templates. Each must be a genuinely different voice/approach (not just reworded) — e.g. direct/benefit-driven, local-proud, premium/luxury, urgent/problem-solver, story-driven, data-driven, contrarian, community-focused, aspirational, humorous. Each template includes a hero headline, hero subhead, a 2-sentence about summary, and a CTA — all in that tone. Make them specific to the ${ind} industry and ${loc} area.
@@ -269,6 +271,7 @@ CLIENT BRIEF:
 ${briefBlock}${finContext}
 
 INSTRUCTIONS:
+- ALIGN all copy with the approved VISION, STRATEGY, chosen name, tagline, and content tone in the brief above — they are the source of truth for positioning and voice.
 - Weave the client's DIFFERENTIATORS and SIGNATURE WORK into the hero and about sections.
 - Address the CUSTOMER PAIN POINTS directly in the FAQ and service descriptions.
 - Match the BRAND PERSONALITY in every line of copy.
@@ -347,6 +350,7 @@ export async function generateSocial(base44: any, params: Record<string, any>) {
 CLIENT BRIEF:
 ${briefBlock}
 
+ALIGN every caption with the approved VISION, STRATEGY, chosen name, tagline, and content tone in the brief above — they are the source of truth for brand voice and positioning.
 Services: ${svc}. Mix post types: before/after, tips, testimonials, behind-the-scenes, promotions, educational. Make every caption specific to the ${ind} industry and weave in the client's DIFFERENTIATORS, SIGNATURE WORK, and BRAND PERSONALITY. Address the CUSTOMER PAIN POINTS in educational/tips posts. Return exactly 30 posts, one per day, each with a day number (1-30), platform (Instagram, Facebook, or Google Business), a caption (2-3 sentences with hashtags), and a post type category.`,
     model: "claude_opus_4_8",
     response_json_schema: {
@@ -415,6 +419,7 @@ export async function generateVideo(base44: any, params: Record<string, any>) {
 CLIENT BRIEF:
 ${briefBlock}
 
+ALIGN every script with the approved VISION, STRATEGY, chosen name, tagline, and content tone in the brief above — they are the source of truth for messaging and positioning.
 Services: ${svc}. Tone: ${tone}. Make every script specific to the ${ind} industry. Weave in the client's DIFFERENTIATORS and SIGNATURE WORK. Speak directly to the CUSTOMER PAIN POINTS. Match the BRAND PERSONALITY. Each script should be punchy, 15-30 seconds spoken, with a clear hook in the first 3 seconds and a strong call-to-action at the end. Return one script per concept id.
 
 Concepts: ${JSON.stringify(concepts.map((c) => ({ id: c.id, title: c.title, description: c.description })))}`,

@@ -9,6 +9,8 @@ import WebsitePreview, { ScaledPreview } from "@/components/website/WebsitePrevi
 import BackButton from "@/components/client/BackButton";
 import { useClientUser } from "@/hooks/useClientUser";
 import { useClientUpdate } from "@/hooks/useClientUpdate";
+import { useClientProject } from "@/hooks/useClientProject";
+import { deriveFoundation } from "@/lib/pipelineFoundation";
 import { notifyStepComplete } from "@/lib/pipelineNotify";
 
 const REVISE_CHIPS = ["Different layout", "Different colors", "Different content", "Different images", "Too plain", "Not local enough", "Doesn't match my brand", "Other"];
@@ -29,6 +31,7 @@ export default function WebsiteDesignStudio() {
   const navigate = useNavigate();
   const { user: hookUser } = useClientUser();
   const { update } = useClientUpdate();
+  const { project } = useClientProject(hookUser);
   const [user, setUser] = useState(null);
   const [profile, setProfile] = useState(null);
   const [logoUrl, setLogoUrl] = useState("");
@@ -80,6 +83,7 @@ export default function WebsiteDesignStudio() {
   }, [hookUser]);
 
   const callGenerate = async (p) => {
+    const foundation = deriveFoundation(project, hookUser);
     const res = await base44.functions.invoke("generateWebsiteContent", {
       businessName: p?.businessName || "", services: p?.services || [],
       serviceArea: p?.primaryLocation || "", city: p?.primaryLocation || "", state: "",
@@ -89,6 +93,11 @@ export default function WebsiteDesignStudio() {
       businessType: p?.businessType || "",
       financialIntelligence: hookUser?.financialIntelligence || null,
       industryAnswers: hookUser?.industryAnswers || null,
+      vision: foundation.vision,
+      strategy: foundation.strategy,
+      chosenName: foundation.chosenName,
+      tagline: foundation.tagline,
+      contentTone: foundation.contentTone,
     });
     return res?.data?.content;
   };
@@ -105,9 +114,9 @@ export default function WebsiteDesignStudio() {
   };
 
   useEffect(() => {
-    if (profile && !content && !generating && !genError) generateContent(profile);
+    if (profile && project && !content && !generating && !genError) generateContent(profile);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [profile]);
+  }, [profile, project]);
 
   // Auto-pick: pre-select the first layout and persist so the step is done.
   useEffect(() => {

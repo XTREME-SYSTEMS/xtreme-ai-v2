@@ -8,6 +8,8 @@ import { logReceipt } from "@/lib/pipelineUtils";
 import BackButton from "@/components/client/BackButton";
 import { useClientUser } from "@/hooks/useClientUser";
 import { useClientUpdate } from "@/hooks/useClientUpdate";
+import { useClientProject } from "@/hooks/useClientProject";
+import { deriveFoundation } from "@/lib/pipelineFoundation";
 import { notifyStepComplete } from "@/lib/pipelineNotify";
 
 // Step: Social Media Generator. Generates 10 on-brand social media template
@@ -33,6 +35,7 @@ export default function SocialMediaGenerator() {
 
   const { user } = useClientUser();
   const { update } = useClientUpdate();
+  const { project } = useClientProject(user);
 
   useEffect(() => { document.title = "Social Media · Lead Gen Near You"; }, []);
 
@@ -46,6 +49,7 @@ export default function SocialMediaGenerator() {
 
   const generate = async () => {
     if (!profile?.businessName) { setGenError("Complete your Business Profile first."); return; }
+    const foundation = deriveFoundation(project, user);
     setGenerating(true); setGenError("");
     try {
       const res = await base44.functions.invoke("generateSocialMediaPack", {
@@ -55,6 +59,11 @@ export default function SocialMediaGenerator() {
         businessType: profile.businessType || "",
         industryAnswers: profile.industryAnswers || profile.industry_answers || {},
         differentiators: profile.differentiators || [],
+        vision: foundation.vision,
+        strategy: foundation.strategy,
+        chosenName: foundation.chosenName,
+        tagline: foundation.tagline,
+        contentTone: foundation.contentTone,
       });
       const d = res?.data?.data;
       if (!d?.templates?.length) throw new Error("no data");
@@ -65,9 +74,9 @@ export default function SocialMediaGenerator() {
   };
 
   useEffect(() => {
-    if (profile && !data && !generating && !genError) generate();
+    if (profile && project && !data && !generating && !genError) generate();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [profile]);
+  }, [profile, project]);
 
   // Auto-pick: all templates included — pre-approve so the step is done.
   const autoPicked = useRef(false);

@@ -30,6 +30,14 @@ export interface ClientBrief {
   email?: string;
   website?: string;
   rawAnswers?: Record<string, any>;
+  // Strategic foundation — the approved vision + strategy + chosen name +
+  // tagline + content tone from prior pipeline steps. Every downstream
+  // generator aligns its output to these so each step builds on the last.
+  vision?: any;
+  strategy?: any;
+  chosenName?: string;
+  tagline?: string;
+  contentTone?: string;
 }
 
 // Normalize an onboarding answer value (multi-select arrives as array or string).
@@ -84,6 +92,11 @@ export function compileBrief(input: any): ClientBrief {
     email: input?.email || p.email || "",
     website: input?.website || p.website || "",
     rawAnswers: answers,
+    vision: input?.vision || null,
+    strategy: input?.strategy || null,
+    chosenName: input?.chosenName || input?.businessName || "",
+    tagline: input?.tagline || "",
+    contentTone: input?.contentTone || "",
   };
 }
 
@@ -109,6 +122,29 @@ export function briefText(b: ClientBrief): string {
   if (b.phone) lines.push(`PHONE: ${b.phone}`);
   if (b.email) lines.push(`EMAIL: ${b.email}`);
   if (b.website) lines.push(`WEBSITE: ${b.website}`);
+  // Strategic foundation — approved in prior steps. This is the source of
+  // truth every downstream generator must align to.
+  if (b.chosenName && b.chosenName !== b.businessName) lines.push(`CHOSEN BUSINESS NAME: ${b.chosenName}`);
+  if (b.tagline) lines.push(`TAGLINE: ${b.tagline}`);
+  if (b.contentTone) lines.push(`APPROVED CONTENT TONE: ${b.contentTone}`);
+  if (b.vision) {
+    const v = b.vision;
+    lines.push("APPROVED VISION (the foundation — align all output to this):");
+    if (v.mission) lines.push(`  Mission: ${v.mission}`);
+    if (v.problem) lines.push(`  Problem solved: ${v.problem}`);
+    if (v.target_audience) lines.push(`  Target audience: ${v.target_audience}`);
+    if (v.value_proposition) lines.push(`  Value proposition: ${v.value_proposition}`);
+    if (v.long_term_vision) lines.push(`  Long-term vision: ${v.long_term_vision}`);
+  }
+  if (b.strategy) {
+    const s = b.strategy;
+    lines.push("APPROVED STRATEGY (how we win — align all positioning to this):");
+    if (s.competitive_positioning) lines.push(`  Positioning: ${s.competitive_positioning}`);
+    if (s.differentiation) lines.push(`  Differentiation: ${s.differentiation}`);
+    if (s.go_to_market) lines.push(`  Go-to-market: ${s.go_to_market}`);
+    if (s.revenue_model) lines.push(`  Revenue model: ${s.revenue_model}`);
+    if (s.pricing_strategy) lines.push(`  Pricing: ${s.pricing_strategy}`);
+  }
   return lines.join("\n");
 }
 
