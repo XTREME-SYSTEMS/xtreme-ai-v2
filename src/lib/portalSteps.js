@@ -22,7 +22,7 @@ import {
 export const PORTAL_STEPS = {
   welcome: {
     key: "welcome",
-    to: "/my-package", label: "Welcome", icon: Package, gate: "auto",
+    to: "/business-generator", label: "Welcome", icon: Package, gate: "auto",
     activityLabel: "Review your package",
     title: "Welcome to Your Build",
     body: "Here's everything included in your package. Review what's included, then continue to tell us about your business.",

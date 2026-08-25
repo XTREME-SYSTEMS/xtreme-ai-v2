@@ -149,7 +149,7 @@ export const TRACKS = {
     subtitle: "Try the full workflow — pay to finalize.",
     greeting: "Welcome to your demo! You can explore the entire workflow — build your brand, website, social media, and videos. When you're ready to finalize and export, choose a plan.",
     start: [
-      { to: "/my-package", icon: Sparkles, label: "Start Demo", desc: "Review your demo package and begin the workflow." },
+      { to: "/business-generator", icon: Sparkles, label: "Start Demo", desc: "Review your demo package and begin the workflow." },
       { to: "/business-profile", icon: LayoutDashboard, label: "Business Profile", desc: "Tell us about your business." },
     ],
     steps: [
@@ -158,7 +158,7 @@ export const TRACKS = {
       "Review everything in Your Designs.",
       "Choose a plan to finalize and export your project.",
     ],
-    cta: { to: "/my-package", label: "Start Demo" },
+    cta: { to: "/business-generator", label: "Start Demo" },
   },
   default: {
     key: "default",

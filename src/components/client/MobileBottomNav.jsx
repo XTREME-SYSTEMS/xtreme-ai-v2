@@ -36,7 +36,7 @@ export default function MobileBottomNav() {
   };
 
   const navItems = [
-    { to: "/my-package", label: "Package", icon: Package },
+    { to: "/business-generator", label: "Package", icon: Package },
     { to: "/your-designs", label: "Designs", icon: LayoutTemplate },
     { to: "/signatures", label: "Sign", icon: FileSignature },
     { to: "/assistant", label: "Help", icon: MessageCircle },

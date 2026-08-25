@@ -56,7 +56,7 @@ export default function PipelineCatalog() {
         logs: [`[${new Date().toISOString()}] Build created from package: ${pkg.name}`],
       });
       autoBuild.setActiveBuildId(created.id);
-      navigate("/my-package");
+      navigate("/business-generator");
     } catch {
       setLaunching(null);
     }
@@ -75,7 +75,7 @@ export default function PipelineCatalog() {
         logs: [`[${new Date().toISOString()}] Build created from template: ${tmpl.name}`],
       });
       autoBuild.setActiveBuildId(created.id);
-      navigate("/my-package");
+      navigate("/business-generator");
     } catch {
       setLaunching(null);
     }

@@ -87,7 +87,7 @@ import Login from '@/pages/Login';
 import Register from '@/pages/Register';
 import ForgotPassword from '@/pages/ForgotPassword';
 import ResetPassword from '@/pages/ResetPassword';
-import MyPackage from '@/pages/MyPackage';
+import BusinessGenerator from '@/pages/BusinessGenerator';
 import Assistant from '@/pages/Assistant';
 import Signatures from '@/pages/Signatures';
 import BusinessProfile from '@/pages/BusinessProfile';
@@ -156,7 +156,7 @@ const AuthenticatedApp = () => {
   // Render the main app
   return (
     <Routes>
-      <Route path="/" element={isAuthenticated ? <Navigate to="/my-package" replace /> : <Marketing />} />
+      <Route path="/" element={isAuthenticated ? <Navigate to="/business-generator" replace /> : <Marketing />} />
       <Route path="/pricing" element={<Pricing />} />
       <Route path="/ThankYou" element={<ThankYou />} />
       <Route path="/seo/:slug" element={<SeoLanding />} />
@@ -172,7 +172,7 @@ const AuthenticatedApp = () => {
       <Route element={<ProtectedRoute unauthenticatedElement={<Navigate to="/login" replace />} />}>
         <Route element={<Layout />}>
           <Route path="/client-portal" element={<Dashboard />} />
-          <Route path="/my-package" element={<MyPackage />} />
+          <Route path="/business-generator" element={<BusinessGenerator />} />
           <Route path="/assistant" element={<Assistant />} />
           <Route path="/business-profile" element={<BusinessProfile />} />
           <Route path="/vision" element={<Vision />} />

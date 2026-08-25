@@ -65,7 +65,7 @@ export default function AutoBuilder() {
       load();
       // Immediately enter the build
       autoBuild.setActiveBuildId(created.id);
-      navigate("/my-package");
+      navigate("/business-generator");
     } catch {
       setError("Couldn't create build. Try again.");
     } finally {
@@ -95,7 +95,7 @@ export default function AutoBuilder() {
       system_review: "/system-review",
       complete: "/receipts",
     };
-    const route = stepRoutes[build.current_step] || "/my-package";
+    const route = stepRoutes[build.current_step] || "/business-generator";
     navigate(route);
   };
 

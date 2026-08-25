@@ -84,7 +84,7 @@ export default function ContractReview({ user, project, productId }) {
         </p>
       </div>
 
-      <ReviewSection icon={Package} title="Package & Plan" editTo="/my-package">
+      <ReviewSection icon={Package} title="Package & Plan" editTo="/business-generator">
         <p className="text-xs font-semibold text-lime-300">{product.tagline}</p>
         <p className="mt-1 text-xs text-white/60">{product.description}</p>
         <ul className="mt-2 space-y-1">

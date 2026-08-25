@@ -43,7 +43,7 @@ export default function ClientDashboard() {
             {
               title: "Review your package",
               body: "Open My Package to confirm everything you paid for is listed and nothing is missing.",
-              to: "/my-package",
+              to: "/business-generator",
               cta: "Go to My Package",
             },
             {
@@ -177,7 +177,7 @@ export default function ClientDashboard() {
 
       {/* Quick links */}
       <section className="grid gap-3 sm:grid-cols-2">
-        <Link to="/my-package" className="group flex items-center gap-3 rounded-xl border border-white/10 bg-zinc-950 p-4 transition-colors hover:border-lime-400/50">
+        <Link to="/business-generator" className="group flex items-center gap-3 rounded-xl border border-white/10 bg-zinc-950 p-4 transition-colors hover:border-lime-400/50">
           <Package className="h-5 w-5 shrink-0 text-lime-400" />
           <div className="min-w-0 flex-1">
             <div className="text-sm font-semibold text-white">My Package</div>

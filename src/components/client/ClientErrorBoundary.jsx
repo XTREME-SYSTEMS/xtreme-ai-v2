@@ -39,7 +39,7 @@ export default class ClientErrorBoundary extends React.Component {
                 Try again
               </button>
               <button
-                onClick={() => { window.location.href = "/my-package"; }}
+                onClick={() => { window.location.href = "/business-generator"; }}
                 className="rounded-lg bg-lime-400 px-4 py-2 text-sm font-semibold text-black hover:bg-lime-300"
               >
                 Go to My Package

@@ -46,7 +46,7 @@ const PIPELINE_STEPS = [
 // portal journey: Welcome → Business Name → Profile → Content → Logo →
 // Brand → Website → Social → Video → Review.
 const AUTOBUILDER_STEPS = [
-  { to: "/my-package",           label: "Welcome",       icon: Package },
+  { to: "/business-generator",   label: "Welcome",       icon: Package },
   { to: "/business-name-studio", label: "Business Name", icon: Compass },
   { to: "/business-profile",     label: "Profile",       icon: Building2 },
   { to: "/content-generator",    label: "Content",       icon: MessageSquareText },

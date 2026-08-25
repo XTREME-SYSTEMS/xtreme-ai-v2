@@ -149,7 +149,7 @@ export default function WalkthroughStudio() {
 
   return (
     <div className="space-y-5">
-      <BackButton to="/my-package" />
+      <BackButton to="/business-generator" />
 
       {/* Header */}
       <div className="rounded-xl border border-lime-400/30 bg-gradient-to-br from-lime-400/5 to-transparent p-5">

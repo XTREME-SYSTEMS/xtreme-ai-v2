@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { base44 } from "@/api/base44Client";
-import { Package, CheckCircle, MessageSquare, Send, X, Loader2 } from "lucide-react";
+import { Package, CheckCircle, MessageSquare, Send, X, Loader2, Rocket } from "lucide-react";
 import { getProductDetails } from "@/lib/productDetails";
 import PurchaseDetailModal from "@/components/client/PurchaseDetailModal";
 import PreviewBanner from "@/components/client/PreviewBanner";
@@ -10,22 +10,27 @@ import { useClientUser } from "@/hooks/useClientUser";
 import { useClientUpdate } from "@/hooks/useClientUpdate";
 import { getVisibleSteps } from "@/lib/clientSteps";
 import { useClientTrack } from "@/hooks/useClientTrack";
+import { useClientProject } from "@/hooks/useClientProject";
 import { notifyStepComplete } from "@/lib/pipelineNotify";
 import BrandedButton from "@/components/client/BrandedButton";
 import ExpandableLineItems from "@/components/client/ExpandableLineItems";
 import { useRevisionThreads } from "@/hooks/useRevisionThreads";
 import RevisionThreadPanel from "@/components/client/RevisionThreadPanel";
 import SystemActivities from "@/components/client/SystemActivities";
+import VisionStrategyPanel from "@/components/client/VisionStrategyPanel";
 
-// Dedicated page for the client's purchased package — the top-level
-// destination of the client portal. Shows only the package and its items.
-export default function MyPackage() {
+// The Business Generator — the top-level destination of the client portal.
+// Shows the package, the full system capability overview, and the mandatory
+// Vision + Strategy generation UI so users define their foundation before
+// any building begins.
+export default function BusinessGenerator() {
   const [purchases, setPurchases] = useState([]);
   const [loading, setLoading] = useState(true);
   const [activePurchase, setActivePurchase] = useState(null);
   const { user } = useClientUser();
   const { productId } = useClientTrack(user);
   const visibleSteps = getVisibleSteps(productId, user);
+  const { project } = useClientProject(user);
   const { update } = useClientUpdate();
   const [revising, setRevising] = useState(false);
   const [reviseComment, setReviseComment] = useState("");
@@ -36,19 +41,22 @@ export default function MyPackage() {
   const { effectiveEmail, isScoped, isPreviewing } = usePreviewEmail(user);
   const { threads, sendMessage } = useRevisionThreads(user);
 
-  // Reviewing the package completes the Welcome step and advances the client
-  // to onboarding (Business Profile) — the epoxy intake questions live there.
-  const continueToOnboarding = () => {
+  const visionApproved = !!project?.vision?.approved;
+  const strategyApproved = !!project?.strategy?.approved;
+  const bothApproved = visionApproved && strategyApproved;
+
+  // Completes the Welcome step and advances to the build pipeline
+  // (Business Name Studio). Only available after Vision + Strategy are
+  // both approved — they are the mandatory foundation.
+  const continueToBuild = () => {
     setActivePurchase(null);
-    try { localStorage.setItem("coach:done:/my-package", "1"); } catch {}
+    try { localStorage.setItem("coach:done:/business-generator", "1"); } catch {}
     notifyStepComplete("welcome", { clientEmail: user?.email || "" });
-    const idx = visibleSteps.findIndex((s) => s.to === "/my-package");
+    const idx = visibleSteps.findIndex((s) => s.to === "/business-generator");
     const next = idx >= 0 && idx < visibleSteps.length - 1 ? visibleSteps[idx + 1] : null;
     navigate(next ? next.to : "/business-name-studio");
   };
 
-  // Sends the client's revision note to the team: creates a pending Approval
-  // (admin-visible) and emails every admin immediately.
   const requestRevision = async () => {
     if (!reviseComment.trim()) { setReviseError("Add a note for our team."); return; }
     setSendingRevise(true);
@@ -73,8 +81,6 @@ export default function MyPackage() {
     const query = { status: "paid" };
     if (isScoped) query.buyerEmail = effectiveEmail;
     let paid = await base44.entities.Base44Purchase.filter(query, "-paidAt", 20);
-    // C1 — Free starter users have plan="elite" but no purchase record.
-    // Synthesize a purchase from their plan so they can proceed past step 1.
     if ((!paid || paid.length === 0) && (user?.plan === "elite" || user?.plan === "pro" || user?.plan === "demo")) {
       const planProduct = user.plan === "elite" ? "elite-monthly" : user.plan === "pro" ? "pro-monthly" : "demo";
       const planName = user.plan === "elite" ? "Elite Plan (Free Starter)" : user.plan === "pro" ? "Pro Plan (Free Starter)" : "Demo Mode";
@@ -106,7 +112,7 @@ export default function MyPackage() {
   }, [effectiveEmail, isScoped, isPreviewing]);
 
   useEffect(() => {
-    document.title = "My Package · Lead Gen Near You";
+    document.title = "Business Generator · Lead Gen Near You";
   }, []);
 
   const fmtMoney = (p) => {
@@ -125,6 +131,7 @@ export default function MyPackage() {
       {isPreviewing && <PreviewBanner />}
       {/* System capabilities — orients the user on everything they can do */}
       <SystemActivities />
+
       {/* What you paid for — the source of truth the whole system keys off */}
       <div className="rounded-xl border border-lime-400/40 bg-lime-400/5 p-5">
         <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-lime-400">
@@ -141,7 +148,6 @@ export default function MyPackage() {
               const Icon = detail.icon;
               return (
                 <div key={p.id} className="overflow-hidden rounded-lg border border-white/10 bg-zinc-950">
-                  {/* Header */}
                   <div className="flex items-center gap-4 border-b border-white/10 p-4">
                     <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-lime-400/40 text-sm font-semibold text-lime-400">
                       {idx + 1}
@@ -162,7 +168,6 @@ export default function MyPackage() {
                     </div>
                   </div>
 
-                  {/* Purchase facts */}
                   <div className="grid grid-cols-2 gap-2 border-b border-white/10 bg-black/30 p-3 text-xs sm:grid-cols-4">
                     <Fact label="Status" value="Active" valueClass="text-lime-400" />
                     <Fact label="Paid on" value={fmtDate(p.paidAt) || "—"} />
@@ -170,17 +175,12 @@ export default function MyPackage() {
                     <Fact label="Buyer" value={p.buyerEmail || "—"} />
                   </div>
 
-                  {/* Full line-item invoice — line items + deliverables side by side */}
                   <div className="p-4">
                     <p className="text-sm text-white/70">{detail.description}</p>
-
                     <div className="mt-4 grid gap-4 lg:grid-cols-2">
-                      {/* Line items included — numbered */}
                       {detail.features.length > 0 && (
                         <ExpandableLineItems features={detail.features} productId={p.productId} />
                       )}
-
-                      {/* Deliverables — numbered */}
                       {detail.deliverables.length > 0 && (
                         <div className="rounded-lg border border-white/10 bg-black/20 p-4">
                           <h4 className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-lime-400">
@@ -208,7 +208,6 @@ export default function MyPackage() {
 
         {purchases.length > 0 && (
           <div className="mt-5 space-y-2 border-t border-white/10 pt-4">
-            {/* H3 — Fixed dead branch: thread panel shows when sent + threads exist */}
             {reviseSent && threads.length > 0 ? (
               <div className="space-y-3">
                 <div className="flex items-center gap-2 rounded-lg border border-lime-400/50 bg-lime-400/10 px-3 py-2.5 text-sm text-lime-300">
@@ -260,21 +259,47 @@ export default function MyPackage() {
                 </div>
               </div>
             ) : (
-              <>
-                <div>
-                  <button
-                    type="button"
-                    onClick={() => setRevising(true)}
-                    className="inline-flex items-center gap-1.5 rounded-lg border border-white/15 px-3 py-2 text-xs font-medium text-white/70 hover:border-lime-400/50 hover:text-lime-300"
-                  >
-                    <MessageSquare className="h-3.5 w-3.5" /> Request Revision
-                  </button>
-                </div>
-                <BrandedButton onClick={continueToOnboarding} icon={CheckCircle} trailingIcon={null} showLogo>
-                  Approve Package
-                </BrandedButton>
-              </>
+              <button
+                type="button"
+                onClick={() => setRevising(true)}
+                className="inline-flex items-center gap-1.5 rounded-lg border border-white/15 px-3 py-2 text-xs font-medium text-white/70 hover:border-lime-400/50 hover:text-lime-300"
+              >
+                <MessageSquare className="h-3.5 w-3.5" /> Request Revision
+              </button>
             )}
+          </div>
+        )}
+      </div>
+
+      {/* ── Vision & Strategy — mandatory foundation ─────────────────── */}
+      <div className="rounded-xl border border-lime-400/40 bg-lime-400/5 p-5">
+        <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-lime-400">
+          <Rocket className="h-4 w-4" /> Define Your Foundation — Vision & Strategy
+        </div>
+        <p className="mt-1 text-sm text-white/50">
+          Before any building begins, you must define your <span className="text-lime-400">Vision</span> (what we're building and why) and your <span className="text-lime-400">Strategy</span> (how we'll get there). Every downstream decision flows from these.
+        </p>
+      </div>
+
+      <VisionStrategyPanel />
+
+      {/* ── Continue to Build — only after Vision + Strategy approved ── */}
+      <div className="rounded-xl border border-white/10 bg-zinc-950 p-5">
+        {bothApproved ? (
+          <>
+            <div className="flex items-center gap-2 text-sm text-lime-300">
+              <CheckCircle className="h-4 w-4" /> Your foundation is set. You're ready to start building!
+            </div>
+            <div className="mt-4">
+              <BrandedButton onClick={continueToBuild} icon={Rocket} trailingIcon={null} showLogo>
+                Continue to Build
+              </BrandedButton>
+            </div>
+          </>
+        ) : (
+          <div className="flex items-center gap-2 text-sm text-white/50">
+            <CheckCircle className="h-4 w-4 text-white/30" />
+            Complete your Vision and Strategy above to unlock the build pipeline.
           </div>
         )}
       </div>
@@ -282,8 +307,8 @@ export default function MyPackage() {
       <PurchaseDetailModal
         purchase={activePurchase}
         onClose={() => setActivePurchase(null)}
-        onContinue={continueToOnboarding}
-        continueLabel="Continue to Business Profile"
+        onContinue={continueToBuild}
+        continueLabel="Continue to Build"
       />
     </div>
   );

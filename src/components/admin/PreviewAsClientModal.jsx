@@ -7,7 +7,7 @@ import { usePreview } from "@/lib/PreviewContext";
 // Modal that lets an admin pick which client to preview as. Lists all
 // non-admin users, with clients who have a paid package shown first. Once
 // a client is picked, the preview context is scoped to their email and the
-// admin is dropped into the client portal at /my-package.
+// admin is dropped into the client portal at /business-generator.
 export default function PreviewAsClientModal({ onClose }) {
   const navigate = useNavigate();
   const { setPreviewClient } = usePreview();
@@ -55,7 +55,7 @@ export default function PreviewAsClientModal({ onClose }) {
   const pick = (email) => {
     setPreviewClient(email);
     onClose();
-    navigate("/my-package");
+    navigate("/business-generator");
   };
 
   return (
