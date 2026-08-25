@@ -1,8 +1,8 @@
-import { createClientFromRequest } from 'npm:@base44/sdk@0.8.41';
-import { buildAuditPrompt } from "../../shared/autonomousEngine.ts";
+import { createClientFromRequest } from 'npm:@base44/sdk@0.8.43';
 
-// Deep Forensic Audit & Auto-Harden — audits the entire autonomous system,
-// identifies hardening actions, and applies auto-fixes. Runs on the nightly workflow.
+// Deep Forensic Audit & Auto-Harden — audits the AutoBuilder pipeline,
+// identifies hardening actions, and applies auto-fixes.
+// Called manually from the Pipeline Overview page ("Forensic Audit" button).
 export default async function(req) {
   try {
     const base44 = createClientFromRequest(req);
@@ -10,30 +10,61 @@ export default async function(req) {
     if (!user) return Response.json({ error: 'Unauthorized' }, { status: 401 });
     if (user.role !== 'admin') return Response.json({ error: 'Admin only' }, { status: 403 });
 
-    const body = await req.json().catch(() => ({}));
-    const { plan_id } = body;
+    // Gather AutoBuilder system snapshot
+    const [builds, openAlerts, openOpts, failedJobs, recentHealth] = await Promise.all([
+      base44.asServiceRole.entities.AutoBuild.list('-created_date', 100),
+      base44.asServiceRole.entities.SystemAlert.filter({ status: 'open' }, '-created_date', 20).catch(() => []),
+      base44.asServiceRole.entities.SystemOptimization.filter({ status: 'open' }, '-created_date', 20).catch(() => []),
+      base44.asServiceRole.entities.GenerationJob.filter({ status: 'failed' }, '-created_date', 20).catch(() => []),
+      base44.asServiceRole.entities.SystemHealthScore.list('-created_date', 1).catch(() => []),
+    ]);
 
-    // Gather system snapshot
-    const plans = plan_id
-      ? await base44.asServiceRole.entities.ImplementationPlan.filter({ id: plan_id }, '-created_date', 1)
-      : await base44.asServiceRole.entities.ImplementationPlan.filter({ status: 'active' }, '-created_date', 1);
-    const plan = plans[0];
-    if (!plan) return Response.json({ error: 'No active plan found' }, { status: 404 });
+    const allBuilds = (builds || []) as any[];
+    const total = allBuilds.length;
+    const complete = allBuilds.filter(b => b.status === 'complete').length;
+    const failed = allBuilds.filter(b => b.status === 'failed').length;
+    const running = allBuilds.filter(b => b.status === 'running').length;
+    const queued = allBuilds.filter(b => b.status === 'queued').length;
+    const paused = allBuilds.filter(b => b.status === 'paused').length;
 
-    const phases = await base44.asServiceRole.entities.ImplementationPhase.filter({ plan_id: plan.id });
-    const openTasks = await base44.asServiceRole.entities.RepairTask.filter({ plan_id: plan.id, status: 'open' });
-    const recentValidations = await base44.asServiceRole.entities.ValidationResult.filter({ plan_id: plan.id }, '-created_date', 20);
+    // Check for stuck builds (running > 30 min with no update)
+    const thirtyMinAgo = Date.now() - 30 * 60 * 1000;
+    const stuck = allBuilds.filter(b =>
+      b.status === 'running' &&
+      b.updated_date &&
+      new Date(b.updated_date).getTime() < thirtyMinAgo
+    );
+
+    const completionRate = total > 0 ? Math.round((complete / total) * 100) : 0;
+    const failureRate = total > 0 ? Math.round((failed / total) * 100) : 0;
+    const previousHealth = ((recentHealth as any[])?.[0]?.overall_score) || 0;
 
     const snapshot = {
-      plan: { name: plan.name, status: plan.status, total_phases: plan.total_phases, completed_phases: plan.completed_phases, overall_score: plan.overall_score },
-      phases: phases.map((p) => ({ title: p.title, status: p.status, score: p.score, iteration: p.iteration })),
-      open_repair_tasks: openTasks.length,
-      recent_validation_scores: recentValidations.map((v) => v.overall_score)
+      builds: { total, complete, failed, running, queued, paused, completionRate, failureRate, stuck: stuck.length },
+      alerts: (openAlerts as any[])?.length || 0,
+      open_optimizations: (openOpts as any[])?.length || 0,
+      failed_jobs: (failedJobs as any[])?.length || 0,
+      previous_health: previousHealth,
     };
 
     // Run the forensic audit via LLM
+    const auditPrompt = `You are the autonomous forensic auditor for the Xtreme AI Pipeline — an autonomous growth factory that discovers ideas, builds websites/apps, deploys them, and runs SEO/marketing engines.
+
+CURRENT SYSTEM SNAPSHOT:
+${JSON.stringify(snapshot, null, 2)}
+
+Audit across these dimensions (0-100 each):
+- completeness: Are all pipeline steps functional? Are builds completing?
+- correctness: Are builds succeeding? Are there error patterns?
+- integration: Do the pipeline stages connect? Are there broken handoffs?
+- security: Are admin guards in place? Are secrets handled correctly?
+- performance: Are builds processing efficiently? Are there stuck builds?
+- autonomy: Can the system run without manual intervention?
+
+Return JSON with: overall_score, completeness_score, correctness_score, integration_score, security_score, performance_score, autonomy_score, critical_findings (array of strings), hardening_actions (array of {area, action, priority}), recommendation (string).`;
+
     const auditRes = await base44.asServiceRole.integrations.Core.InvokeLLM({
-      prompt: buildAuditPrompt(snapshot),
+      prompt: auditPrompt,
       response_json_schema: {
         type: "object",
         properties: {
@@ -51,11 +82,10 @@ export default async function(req) {
       }
     });
 
-    const a = typeof auditRes === 'object' ? auditRes : JSON.parse(auditRes);
+    const a = typeof auditRes === 'object' ? auditRes : JSON.parse(auditRes as string);
 
     // Persist the system health score
     await base44.asServiceRole.entities.SystemHealthScore.create({
-      plan_id: plan.id,
       overall_score: a.overall_score || 0,
       completeness_score: a.completeness_score || 0,
       correctness_score: a.correctness_score || 0,
@@ -63,45 +93,51 @@ export default async function(req) {
       security_score: a.security_score || 0,
       performance_score: a.performance_score || 0,
       autonomy_score: a.autonomy_score || 0,
-      qa_pass_rate: phases.length ? (phases.filter((p) => p.status === 'passed').length / phases.length) * 100 : 0,
-      phases_passed: phases.filter((p) => p.status === 'passed').length,
-      phases_total: phases.length,
-      open_repair_tasks: openTasks.length,
-      trend: (a.overall_score || 0) >= (plan.overall_score || 0) ? 'improving' : 'declining',
+      qa_pass_rate: completionRate,
+      phases_passed: complete,
+      phases_total: total,
+      open_repair_tasks: (openAlerts as any[])?.length || 0,
+      trend: (a.overall_score || 0) >= previousHealth ? 'improving' : 'declining',
       last_audited_at: new Date().toISOString(),
-      active_remediation: (a.hardening_actions || []).slice(0, 3).map((h) => h.action || h.area).join('; ')
+      active_remediation: (a.hardening_actions || []).slice(0, 3).map((h: any) => h.action || h.area).join('; ')
     });
 
-    // Update the plan's overall score
-    await base44.asServiceRole.entities.ImplementationPlan.update(plan.id, {
-      overall_score: a.overall_score || 0,
-      completed_phases: phases.filter((p) => p.status === 'passed').length
-    });
-
-    // Auto-create repair tasks for hardening actions (attach to first phase —
-    // RepairTask requires phase_id; system-level repairs use the lead phase).
-    const fallbackPhaseId = phases[0]?.id || '';
+    // Create SystemOptimization findings for hardening actions
     for (const action of (a.hardening_actions || []).slice(0, 10)) {
-      await base44.asServiceRole.entities.RepairTask.create({
-        plan_id: plan.id,
-        phase_id: action.phase_id || fallbackPhaseId,
-        area: action.area || 'system',
-        description: action.action || '',
-        fix_strategy: action.action || '',
-        severity: action.priority || 'medium',
-        status: 'open'
-      });
+      try {
+        await base44.asServiceRole.entities.SystemOptimization.create({
+          category: 'hardening',
+          severity: (action as any).priority || 'medium',
+          area: (action as any).area || 'system',
+          title: String((action as any).action || '').slice(0, 200),
+          description: String((action as any).action || ''),
+          recommended_action: 'harden',
+          status: 'open',
+          scan_id: `audit_${Date.now()}`,
+        });
+      } catch {}
+    }
+
+    // Auto-recover stuck builds
+    for (const build of stuck) {
+      try {
+        await base44.asServiceRole.entities.AutoBuild.update(build.id, {
+          status: 'paused',
+          error: 'Recovered from stuck state by forensic audit',
+        });
+      } catch {}
     }
 
     return Response.json({
       ok: true,
-      plan_id: plan.id,
       overall_score: a.overall_score || 0,
       critical_findings: a.critical_findings || [],
       hardening_actions: a.hardening_actions || [],
-      recommendation: a.recommendation || ''
+      recommendation: a.recommendation || '',
+      stuck_builds_recovered: stuck.length,
     });
-  } catch (error) {
-    return Response.json({ error: error.message }, { status: 500 });
+  } catch (error: any) {
+    console.error('forensicAuditAndHarden error', error?.message || error);
+    return Response.json({ error: error?.message || 'server error' }, { status: 500 });
   }
 }
