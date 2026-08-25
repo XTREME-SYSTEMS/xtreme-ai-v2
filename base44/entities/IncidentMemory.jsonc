@@ -1,0 +1,124 @@
+{
+  "name": "IncidentMemory",
+  "type": "object",
+  "description": "The learning loop's memory store \u2014 records every failure episode (symptoms \u2192 diagnosis \u2192 action \u2192 outcome) so future incidents with the same error signature can be resolved deterministically without an LLM call. The deterministic policy engine queries this before invoking the LLM audit.",
+  "properties": {
+    "error_signature": {
+      "type": "string",
+      "description": "Normalized hash/key of the error message + step \u2014 used for deterministic matching. e.g. 'architecture:missing_tech_stack'"
+    },
+    "error_class": {
+      "type": "string",
+      "enum": [
+        "transient",
+        "structural",
+        "schema",
+        "logic",
+        "dependency",
+        "timeout",
+        "unknown"
+      ],
+      "description": "Classified error class from errorClassifier"
+    },
+    "step": {
+      "type": "string",
+      "description": "Pipeline step where this incident occurred (architecture, data_model, codegen, etc.)"
+    },
+    "build_id": {
+      "type": "string",
+      "description": "First build where this incident was seen"
+    },
+    "build_name": {
+      "type": "string"
+    },
+    "diagnosis": {
+      "type": "string",
+      "description": "Root cause analysis \u2014 why this failure occurred"
+    },
+    "action_taken": {
+      "type": "string",
+      "description": "What remediation action was applied (retry, regenerate with context, escalate)"
+    },
+    "action_endpoint": {
+      "type": "string",
+      "description": "Backend function that was called to resolve it"
+    },
+    "action_payload": {
+      "type": "string",
+      "description": "JSON-stringified payload that resolved the incident"
+    },
+    "outcome": {
+      "type": "string",
+      "enum": [
+        "resolved",
+        "failed",
+        "escalated"
+      ],
+      "description": "Did the action resolve the incident?"
+    },
+    "occurrence_count": {
+      "type": "number",
+      "default": 1,
+      "description": "How many times this same error signature has been seen"
+    },
+    "first_seen_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "last_seen_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "resolved_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "success_rate": {
+      "type": "number",
+      "default": 0,
+      "description": "Percentage of times this action successfully resolved this error signature (0-100)"
+    },
+    "logs": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    }
+  },
+  "required": [
+    "error_signature",
+    "error_class",
+    "step"
+  ],
+  "rls": {
+    "read": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "employee"
+          }
+        }
+      ]
+    },
+    "create": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

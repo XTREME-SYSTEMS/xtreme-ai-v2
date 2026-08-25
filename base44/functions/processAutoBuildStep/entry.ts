@@ -279,6 +279,7 @@ Deno.serve(async (req: Request) => {
     await base44.asServiceRole.entities.AutoBuild.update(buildId, {
       status: "running",
       error: "",
+      step_started_at: new Date().toISOString(),
       logs,
     });
 

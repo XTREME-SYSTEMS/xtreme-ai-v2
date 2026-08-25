@@ -48,9 +48,14 @@ export default async function (req: Request) {
     };
 
     // ---- Process stuck (running) builds ----
+    // BULLETPROOFED: Use step_started_at (not updated_date) for accurate
+    // stuck detection. updated_date changes on every write (including log
+    // updates), causing false negatives. step_started_at only changes when
+    // a step actually starts, so long-running steps won't be falsely "recovered."
     for (const build of runningBuilds) {
-      const updatedDate = new Date(build.updated_date || build.created_date || now);
-      const ageMinutes = (now - updatedDate.getTime()) / 60000;
+      const startedAt = build.step_started_at || build.updated_date || build.created_date || now;
+      const startedDate = new Date(startedAt);
+      const ageMinutes = (now - startedDate.getTime()) / 60000;
 
       if (ageMinutes < STUCK_THRESHOLD_MINUTES) {
         results.skipped++;

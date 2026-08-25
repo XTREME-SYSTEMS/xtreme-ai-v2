@@ -120,6 +120,35 @@
       "default": false,
       "description": "When true, the queue processor automatically advances to the next step after each step completes \u2014 the autonomy toggle"
     },
+    "governance_tier": {
+      "type": "string",
+      "enum": [
+        "green",
+        "yellow",
+        "red"
+      ],
+      "default": "green",
+      "description": "Autonomy tier: green = fully automatic, yellow = auto-generate but pause before deploy for approval, red = pause at every step for operator approval"
+    },
+    "step_started_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When the current step started executing \u2014 used for accurate stuck detection (not updated_date which changes on every write)"
+    },
+    "actions_today": {
+      "type": "number",
+      "default": 0,
+      "description": "Blast radius cap \u2014 how many autonomous actions taken on this build today (resets daily)"
+    },
+    "last_action_date": {
+      "type": "string",
+      "description": "Date of last action (YYYY-MM-DD) \u2014 used to reset actions_today daily"
+    },
+    "compile_verified": {
+      "type": "boolean",
+      "default": false,
+      "description": "Whether the code manifest passed the deterministic compile gate (compileAndVerify). Cannot be packaged until this is true."
+    },
     "architecture": {
       "type": "object",
       "description": "Generated system architecture spec (for web_app/ecommerce/platform builds) \u2014 the full blueprint: tech stack, pages, data models, features, integrations, user flows. Produced by generateSystemArchitecture.",

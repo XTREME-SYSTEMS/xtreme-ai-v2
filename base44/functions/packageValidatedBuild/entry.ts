@@ -43,6 +43,15 @@ Deno.serve(async (req: Request) => {
       }), { status: 400 });
     }
 
+    // BULLETPROOFED: Require deterministic compile gate for system builds
+    if (build.product_type !== "marketing_site" && !build.compile_verified) {
+      return new Response(JSON.stringify({
+        error: "Build has not passed the deterministic compile gate. Run compileAndVerify first.",
+        compile_verified: false,
+        product_type: build.product_type,
+      }), { status: 400 });
+    }
+
     // Check if a package already exists
     const existing = await base44.asServiceRole.entities.ProductPackage.filter({ build_id: buildId }, "-created_date", 1);
     if (existing?.[0]) {

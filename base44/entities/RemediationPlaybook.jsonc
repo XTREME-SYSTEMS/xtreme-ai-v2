@@ -1,0 +1,122 @@
+{
+  "name": "RemediationPlaybook",
+  "type": "object",
+  "description": "Curated, allowlisted remediation steps \u2014 the only actions the self-healing loop is permitted to execute. Each playbook maps an error class + step to a specific function call with bounded retries and a risk level. The heal phase selects ONLY from this library.",
+  "properties": {
+    "name": {
+      "type": "string",
+      "description": "Human-readable playbook name (e.g. 'Regenerate Architecture on Schema Failure')"
+    },
+    "error_class": {
+      "type": "string",
+      "enum": [
+        "transient",
+        "structural",
+        "schema",
+        "logic",
+        "dependency",
+        "timeout",
+        "unknown"
+      ],
+      "description": "Which error class this playbook handles"
+    },
+    "error_pattern": {
+      "type": "string",
+      "description": "Regex pattern to match against the error message (empty = match all of this class)"
+    },
+    "step": {
+      "type": "string",
+      "description": "Pipeline step this applies to (empty = all steps)"
+    },
+    "action_type": {
+      "type": "string",
+      "enum": [
+        "retry",
+        "regenerate",
+        "escalate",
+        "skip"
+      ],
+      "description": "What kind of remediation action to take"
+    },
+    "function_to_call": {
+      "type": "string",
+      "description": "Backend function to invoke (e.g. processAutoBuildStep, verifyDeployment)"
+    },
+    "args_template": {
+      "type": "string",
+      "description": "JSON-stringified args template \u2014 supports {{build_id}}, {{step}}, {{error}} placeholders"
+    },
+    "max_attempts": {
+      "type": "number",
+      "default": 3,
+      "description": "Maximum times this playbook can be applied to the same build"
+    },
+    "risk_level": {
+      "type": "string",
+      "enum": [
+        "green",
+        "yellow",
+        "red"
+      ],
+      "default": "green",
+      "description": "green = auto-execute, yellow = preview then auto-execute, red = requires operator approval"
+    },
+    "active": {
+      "type": "boolean",
+      "default": true,
+      "description": "Whether this playbook is currently active"
+    },
+    "success_count": {
+      "type": "number",
+      "default": 0,
+      "description": "How many times this playbook successfully resolved an incident"
+    },
+    "failure_count": {
+      "type": "number",
+      "default": 0,
+      "description": "How many times this playbook failed to resolve an incident"
+    },
+    "logs": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    }
+  },
+  "required": [
+    "name",
+    "error_class",
+    "action_type"
+  ],
+  "rls": {
+    "read": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "employee"
+          }
+        }
+      ]
+    },
+    "create": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

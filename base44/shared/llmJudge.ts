@@ -63,7 +63,10 @@ export async function judgeSpec(
         feedback: { type: "string" },
       },
     },
-    model: "claude_sonnet_4_6",
+    // Use a DIFFERENT model family than the generators (which use claude_sonnet_4_6)
+    // to break "correlated optimism" — the judge must not be the same model that
+    // generated the spec, or it can certify its own mistakes.
+    model: "gemini_3_1_pro",
   });
 
   return {

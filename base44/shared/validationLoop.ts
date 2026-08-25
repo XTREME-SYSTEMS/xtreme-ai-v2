@@ -1,6 +1,16 @@
 // Shared validation loop logic — used by both runValidationLoop (the HTTP
 // endpoint) and processAutoBuildStep (which triggers validation after each
 // step). Extracted here so both call the same code without HTTP round-trips.
+//
+// BULLETPROOFED: The phantom fix/heal/harden/optimize phases have been
+// replaced with REAL implementations from bulletproofValidation.ts.
+// Score is now a weighted average (not Math.max inflation). A deterministic
+// compile gate and post-deploy verification are integrated.
+
+import {
+  realFixPhase, realHealPhase, realHardenPhase, realOptimizePhase,
+  calculateWeightedScore, verifyDeploymentInLoop, recordIncident,
+} from "./bulletproofValidation.ts";
 
 const QUALITY_GATE_THRESHOLD = 75;
 const MAX_RETRIES = 3;
@@ -85,14 +95,16 @@ export async function executeValidationLoop(base44: any, buildId: string, force 
   });
   logs.push(`[${new Date().toISOString()}] Audit complete: score=${auditResult.score}`);
 
-  let currentScore = auditResult.score;
+  const phaseScores: { phase: string; score: number; weight: number }[] = [
+    { phase: "audit", score: auditResult.score, weight: 30 },
+  ];
 
-  if (currentScore < QUALITY_GATE_THRESHOLD) {
-    // ── Phase 2: FIX ──────────────────────────────────────────────────
-    logs.push(`[${new Date().toISOString()}] Phase: FIX — applying automated fixes`);
+  if (auditResult.score < QUALITY_GATE_THRESHOLD) {
+    // ── Phase 2: FIX — actually regenerates missing assets ───────────
+    logs.push(`[${new Date().toISOString()}] Phase: FIX — regenerating missing assets`);
     await base44.asServiceRole.entities.ValidationPipeline.update(pipelineId, { current_phase: "fix", logs });
 
-    const fixResult = await runFixPhase(base44, build, auditResult.findings);
+    const fixResult = await realFixPhase(base44, build);
     checks.push({
       phase: "fix",
       check_name: "auto_fix",
@@ -102,13 +114,14 @@ export async function executeValidationLoop(base44: any, buildId: string, force 
       fixes_applied: fixResult.fixesApplied,
       timestamp: new Date().toISOString(),
     });
-    currentScore = Math.max(currentScore, fixResult.score);
+    phaseScores.push({ phase: "fix", score: fixResult.score, weight: 20 });
+    logs.push(`[${new Date().toISOString()}] Fix complete: ${fixResult.fixed} assets regenerated, score=${fixResult.score}`);
 
-    // ── Phase 3: HEAL ─────────────────────────────────────────────────
-    logs.push(`[${new Date().toISOString()}] Phase: HEAL — repairing failures`);
+    // ── Phase 3: HEAL — uses errorClassifier + IncidentMemory + Playbooks ─
+    logs.push(`[${new Date().toISOString()}] Phase: HEAL — classifying and repairing failures`);
     await base44.asServiceRole.entities.ValidationPipeline.update(pipelineId, { current_phase: "heal", logs });
 
-    const healResult = await runHealPhase(base44, build);
+    const healResult = await realHealPhase(base44, build);
     checks.push({
       phase: "heal",
       check_name: "auto_heal",
@@ -118,13 +131,14 @@ export async function executeValidationLoop(base44: any, buildId: string, force 
       fixes_applied: healResult.actions,
       timestamp: new Date().toISOString(),
     });
-    currentScore = Math.max(currentScore, healResult.score);
+    phaseScores.push({ phase: "heal", score: healResult.score, weight: 20 });
+    logs.push(`[${new Date().toISOString()}] Heal complete: ${healResult.healed ? "HEALED" : "not healed"}, score=${healResult.score}, playbook=${healResult.playbookUsed}`);
 
-    // ── Phase 4: HARDEN ───────────────────────────────────────────────
-    logs.push(`[${new Date().toISOString()}] Phase: HARDEN — security and stability`);
+    // ── Phase 4: HARDEN — secret scanning, RLS, input validation ──────
+    logs.push(`[${new Date().toISOString()}] Phase: HARDEN — security and stability checks`);
     await base44.asServiceRole.entities.ValidationPipeline.update(pipelineId, { current_phase: "harden", logs });
 
-    const hardenResult = await runHardenPhase(base44, build);
+    const hardenResult = await realHardenPhase(base44, build);
     checks.push({
       phase: "harden",
       check_name: "auto_harden",
@@ -134,13 +148,14 @@ export async function executeValidationLoop(base44: any, buildId: string, force 
       fixes_applied: hardenResult.actions,
       timestamp: new Date().toISOString(),
     });
-    currentScore = Math.max(currentScore, hardenResult.score);
+    phaseScores.push({ phase: "harden", score: hardenResult.score, weight: 15 });
+    logs.push(`[${new Date().toISOString()}] Harden complete: ${hardenResult.hardened ? "HARDENED" : "vulnerabilities found"}, score=${hardenResult.score}`);
 
-    // ── Phase 5: OPTIMIZE ─────────────────────────────────────────────
-    logs.push(`[${new Date().toISOString()}] Phase: OPTIMIZE — performance`);
+    // ── Phase 5: OPTIMIZE — bundle size, images, accessibility ────────
+    logs.push(`[${new Date().toISOString()}] Phase: OPTIMIZE — performance checks`);
     await base44.asServiceRole.entities.ValidationPipeline.update(pipelineId, { current_phase: "optimize", logs });
 
-    const optimizeResult = await runOptimizePhase(base44, build);
+    const optimizeResult = await realOptimizePhase(base44, build);
     checks.push({
       phase: "optimize",
       check_name: "auto_optimize",
@@ -150,7 +165,61 @@ export async function executeValidationLoop(base44: any, buildId: string, force 
       fixes_applied: optimizeResult.actions,
       timestamp: new Date().toISOString(),
     });
-    currentScore = Math.max(currentScore, optimizeResult.score);
+    phaseScores.push({ phase: "optimize", score: optimizeResult.score, weight: 15 });
+    logs.push(`[${new Date().toISOString()}] Optimize complete: ${optimizeResult.optimized ? "OPTIMIZED" : "bottlenecks found"}, score=${optimizeResult.score}`);
+  }
+
+  // ── Weighted score (NOT Math.max — prevents score inflation) ────────
+  let currentScore = calculateWeightedScore(phaseScores);
+  logs.push(`[${new Date().toISOString()}] Weighted score: ${currentScore} (phases: ${phaseScores.map(p => `${p.phase}=${p.score}`).join(", ")})`);
+
+  // ── Deterministic compile gate (for system builds with code manifests) ──
+  if (build.code_manifest?.files?.length > 0 && build.product_type !== "marketing_site") {
+    logs.push(`[${new Date().toISOString()}] Running deterministic compile gate`);
+    try {
+      const compileRes = await base44.asServiceRole.functions.invoke("compileAndVerify", { build_id: buildId });
+      const compileData = compileRes?.data || compileRes;
+      checks.push({
+        phase: "compile",
+        check_name: "deterministic_compile_gate",
+        passed: compileData?.compiled === true,
+        score: compileData?.score || 0,
+        findings: (compileData?.errors || []).join("; ").slice(0, 2000),
+        fixes_applied: "",
+        timestamp: new Date().toISOString(),
+      });
+      if (!compileData?.compiled) {
+        currentScore = Math.min(currentScore, 40); // Hard cap if compile fails
+        logs.push(`[${new Date().toISOString()}] Compile gate FAILED — score capped at 40. Errors: ${(compileData?.errors || []).length}`);
+      } else {
+        logs.push(`[${new Date().toISOString()}] Compile gate PASSED — score ${compileData.score}%`);
+      }
+    } catch (e: any) {
+      logs.push(`[${new Date().toISOString()}] Compile gate error: ${e?.message}`);
+    }
+  }
+
+  // ── Post-deploy verification (if deployed) ──────────────────────────
+  if (build.deployment?.live_url) {
+    logs.push(`[${new Date().toISOString()}] Running post-deploy verification`);
+    try {
+      const deployResult = await verifyDeploymentInLoop(base44, build);
+      checks.push({
+        phase: "post_deploy",
+        check_name: "post_deploy_verification",
+        passed: deployResult.verified,
+        score: deployResult.score,
+        findings: deployResult.issues,
+        fixes_applied: "",
+        timestamp: new Date().toISOString(),
+      });
+      if (!deployResult.verified && deployResult.score > 0) {
+        currentScore = Math.min(currentScore, 60); // Cap if deploy verification fails
+        logs.push(`[${new Date().toISOString()}] Post-deploy verification FAILED — score capped at 60`);
+      }
+    } catch (e: any) {
+      logs.push(`[${new Date().toISOString()}] Post-deploy verification error: ${e?.message}`);
+    }
   }
 
   // ── Final scoring & quality gate ────────────────────────────────────
@@ -186,7 +255,7 @@ export async function executeValidationLoop(base44: any, buildId: string, force 
     } catch {}
   }
 
-  // If failed after max retries, create alert
+  // If failed after max retries, create alert + record incident
   if (!passed && newRetryCount >= MAX_RETRIES) {
     try {
       await base44.asServiceRole.entities.SystemAlert.create({
@@ -201,6 +270,9 @@ export async function executeValidationLoop(base44: any, buildId: string, force 
         context: auditResult.findings?.slice(0, 4000) || "",
       });
     } catch {}
+
+    // Record the incident for future learning
+    await recordIncident(base44, build, `Validation failed at ${currentScore}%`, `validation_loop_retry_${MAX_RETRIES}`, "escalated", `Exhausted ${MAX_RETRIES} retries at score ${currentScore}`);
   }
 
   return {
@@ -217,7 +289,7 @@ export async function executeValidationLoop(base44: any, buildId: string, force 
   };
 }
 
-// ── Phase implementations ────────────────────────────────────────────────
+// ── Audit phase (kept here — it's the entry point) ──────────────────────
 
 async function runAuditPhase(base44: any, build: any): Promise<{ score: number; findings: string }> {
   const hasArchitecture = !!build.architecture;
@@ -280,80 +352,4 @@ async function runAuditPhase(base44: any, build: any): Promise<{ score: number; 
   }
 
   return { score, findings };
-}
-
-async function runFixPhase(base44: any, build: any, findings: string): Promise<{ fixed: number; fixesApplied: string; score: number }> {
-  const fixes: string[] = [];
-  let score = 0;
-
-  if (!build.name_options) { fixes.push("Names missing — flagged for generation"); score += 5; }
-  if (!build.architecture && build.product_type !== "marketing_site") { fixes.push("Architecture spec missing — flagged for regeneration"); score += 10; }
-  if (!build.data_model && build.architecture) { fixes.push("Data model missing — flagged for regeneration"); score += 10; }
-  if (!build.ui_system && build.architecture) { fixes.push("UI system missing — flagged for regeneration"); score += 10; }
-  if (!build.code_manifest && build.data_model) { fixes.push("Code manifest missing — flagged for regeneration"); score += 10; }
-  if (!build.website_content && build.product_type === "marketing_site") { fixes.push("Website content missing — flagged for regeneration"); score += 10; }
-  if (!build.chosen_logo_url) { fixes.push("Logo not selected — flagged for generation"); score += 5; }
-
-  return {
-    fixed: fixes.length,
-    fixesApplied: fixes.join("; ") || "No fixes needed — all assets present",
-    score: score + 70,
-  };
-}
-
-async function runHealPhase(base44: any, build: any): Promise<{ healed: boolean; issues: string; actions: string; score: number }> {
-  if (build.error) {
-    return { healed: true, issues: build.error, actions: `Cleared build error: ${build.error}`, score: 80 };
-  }
-  if (build.status === "failed") {
-    try {
-      await base44.asServiceRole.entities.AutoBuild.update(build.id, { status: "paused", error: "" });
-      return { healed: true, issues: "Build was in failed state", actions: "Reset build status from 'failed' to 'paused'", score: 85 };
-    } catch {}
-  }
-  return { healed: false, issues: "No failures detected", actions: "No healing needed", score: 90 };
-}
-
-async function runHardenPhase(base44: any, build: any): Promise<{ hardened: boolean; vulnerabilities: string; actions: string; score: number }> {
-  const actions: string[] = [];
-  let score = 85;
-
-  if (build.deployment && !build.deployment.live_url?.startsWith("https")) {
-    actions.push("Flagged: deployment URL should use HTTPS");
-  } else {
-    actions.push("Deployment HTTPS: verified");
-    score += 3;
-  }
-  if (build.architecture?.tech_decisions?.length > 0) {
-    actions.push("Architecture tech decisions: present");
-    score += 2;
-  }
-
-  return {
-    hardened: actions.length > 0,
-    vulnerabilities: actions.filter((a) => a.includes("Flagged")).join("; ") || "None detected",
-    actions: actions.join("; "),
-    score: Math.min(score, 95),
-  };
-}
-
-async function runOptimizePhase(base44: any, build: any): Promise<{ optimized: boolean; bottlenecks: string; actions: string; score: number }> {
-  const actions: string[] = [];
-  let score = 85;
-
-  if (build.code_manifest?.framework) {
-    actions.push(`Framework ${build.code_manifest.framework}: build config verified`);
-    score += 5;
-  }
-  if (build.ui_system?.responsive) {
-    actions.push("Responsive breakpoints: configured");
-    score += 3;
-  }
-
-  return {
-    optimized: actions.length > 0,
-    bottlenecks: "None detected",
-    actions: actions.join("; ") || "No optimizations needed",
-    score: Math.min(score, 95),
-  };
 }
