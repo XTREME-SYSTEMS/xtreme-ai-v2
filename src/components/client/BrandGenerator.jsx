@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { base44 } from "@/api/base44Client";
 import { Image } from "@/components/ui/image";
@@ -84,6 +84,22 @@ export default function BrandGenerator() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [logoUrl]);
 
+  // Auto-pick: all mockups are included — pre-approve so the step is done.
+  const autoPicked = useRef(false);
+  useEffect(() => {
+    if (packs.length > 0 && !saved && !autoPicked.current) {
+      autoPicked.current = true;
+      (async () => {
+        try {
+          await update({ chosenBrandImages: packs.map((p) => p.url), brandPacksChosen: true });
+          await notifyStepComplete("brand", { businessName: businessName || "" });
+          try { localStorage.setItem("coach:done:/brand-generator", "1"); } catch {}
+        } catch {}
+      })();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [packs, saved]);
+
   // Remake a single mockup without touching the rest.
   const regenerateOne = async (pack) => {
     const b = BRAND_TYPES.find((x) => x.id === pack.id);
@@ -167,8 +183,8 @@ export default function BrandGenerator() {
         </div>
         <h1 className="mt-2 text-xl font-semibold text-white sm:text-2xl">Your brand, designed with your logo</h1>
         <p className="mt-1 text-sm text-white/60">
-          We designed all {BRAND_TYPES.length} brand mockups with your logo — they're all included in your package.
-          Just press <span className="font-semibold text-lime-400">Approve Brand</span> below. Don't like one?
+          We designed all {BRAND_TYPES.length} brand mockups with your logo — they're all included and
+          <span className="text-lime-400 font-semibold"> auto-approved</span>. Just click Continue. Don't like one?
           Tap <RefreshCw className="inline h-3 w-3" /> Regenerate under any item to remake only that one.
         </p>
 
@@ -305,7 +321,7 @@ export default function BrandGenerator() {
                   disabled={saving || packs.length === 0}
                   className="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-lime-400 px-4 py-3 text-sm font-semibold text-black transition-colors hover:bg-lime-300 disabled:cursor-not-allowed disabled:bg-white/10 disabled:text-white/40"
                 >
-                  {saving ? <><Loader2 className="h-4 w-4 animate-spin" /> Saving…</> : saved ? <><Check className="h-4 w-4" /> Update selection</> : <>Approve Brand <ArrowRight className="h-4 w-4" /></>}
+                  {saving ? <><Loader2 className="h-4 w-4 animate-spin" /> Saving…</> : <>Continue to Website Design <ArrowRight className="h-4 w-4" /></>}
                 </button>
               </>
             )}

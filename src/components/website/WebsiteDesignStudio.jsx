@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { base44 } from "@/api/base44Client";
 import { LayoutGrid, Monitor, Smartphone, Check, Loader2, Sparkles, Eye, X, MessageSquare, Send, ArrowRight, AlertCircle, Sun, Moon, RefreshCw, Wand2, Images } from "lucide-react";
@@ -58,6 +58,7 @@ export default function WebsiteDesignStudio() {
   const [sectionMsg, setSectionMsg] = useState("");
   const [imageSource, setImageSource] = useState("uploads"); // "uploads" | "ai"
   const [aiFromUploadsDone, setAiFromUploadsDone] = useState(false);
+  const autoPicked = useRef(false);
 
   useEffect(() => { document.title = "Website Design · Lead Gen Near You"; }, []);
 
@@ -107,6 +108,26 @@ export default function WebsiteDesignStudio() {
     if (profile && !content && !generating && !genError) generateContent(profile);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [profile]);
+
+  // Auto-pick: pre-select the first layout and persist so the step is done.
+  useEffect(() => {
+    if (content && !selectedId && !saved && !autoPicked.current && shownLayouts[0]) {
+      autoPicked.current = true;
+      const first = shownLayouts[0];
+      setSelectedId(first.id);
+      (async () => {
+        try {
+          await update({
+            chosenWebsiteLayout: first.id, chosenPalette: paletteId,
+            websiteContent: content, designPacksChosen: true,
+          });
+          await notifyStepComplete("website", { businessName: profile?.businessName || "" });
+          try { localStorage.setItem("coach:done:/design-direction", "1"); } catch {}
+        } catch {}
+      })();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [content, selectedId, saved, shownLayouts]);
 
   // Auto-generate max-quality images when the client did NOT upload any
   // project photos. Uses their full onboarding brief (industry, sub-industry,
@@ -279,7 +300,7 @@ export default function WebsiteDesignStudio() {
         <h1 className="mt-2 text-xl font-semibold text-white sm:text-2xl">See your logo &amp; brand on real website layouts</h1>
         <p className="mt-1 text-sm text-white/60">
           We wrote your site copy from your onboarding answers and real info about {profile?.primaryLocation || "your area"}.
-          Pick the layout you love — what you approve is exactly what we build. Hover any section in the preview to comment or regenerate just that part.
+          We've <span className="text-lime-400 font-semibold">auto-selected a layout</span> — just click Continue, or pick a different one if you prefer.
         </p>
 
         {/* Brand palette picker */}
@@ -453,7 +474,7 @@ export default function WebsiteDesignStudio() {
                   </button>
                 </div>
                 <button type="button" onClick={approve} disabled={saving || !selectedId} className="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-lime-400 px-4 py-3 text-sm font-semibold text-black transition-colors hover:bg-lime-300 disabled:cursor-not-allowed disabled:bg-white/10 disabled:text-white/40">
-                  {saving ? <><Loader2 className="h-4 w-4 animate-spin" /> Saving…</> : saved ? <><Check className="h-4 w-4" /> Update selection</> : <>Approve Website <ArrowRight className="h-4 w-4" /></>}
+                  {saving ? <><Loader2 className="h-4 w-4 animate-spin" /> Saving…</> : <>Continue to Social Media <ArrowRight className="h-4 w-4" /></>}
                 </button>
               </>
             )}

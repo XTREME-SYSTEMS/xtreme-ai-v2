@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { base44 } from "@/api/base44Client";
 import { Image } from "@/components/ui/image";
@@ -125,6 +125,24 @@ export default function LogoGenerator() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [businessName]);
 
+  // Auto-pick: pre-select and persist the first logo so the step is done.
+  const autoPicked = useRef(false);
+  useEffect(() => {
+    if (packs.length > 0 && !chosen && !saved && !autoPicked.current) {
+      autoPicked.current = true;
+      const first = packs[0];
+      setChosen(first.url);
+      (async () => {
+        try {
+          await update({ chosenLogoUrl: first.url, logoPacksChosen: true });
+          await notifyStepComplete("logo", { businessName: profile?.businessName || "" });
+          try { localStorage.setItem("coach:done:/logo-generator", "1"); } catch {}
+        } catch {}
+      })();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [packs, chosen, saved]);
+
   const save = async () => {
     if (!chosen) {
       setError("Pick one logo to continue.");
@@ -162,8 +180,8 @@ export default function LogoGenerator() {
         </div>
         <h1 className="mt-2 text-xl font-semibold text-white sm:text-2xl">Pick your logo</h1>
         <p className="mt-1 text-sm text-white/60">
-          We generated 10 logo concepts for <span className="font-semibold text-white">{businessName || "your business"}</span>. Tap the one that feels right —
-          your team will use it across your entire brand.
+          We generated 10 logo concepts for <span className="font-semibold text-white">{businessName || "your business"}</span> and
+          <span className="text-lime-400 font-semibold"> auto-selected the first one</span>. Just click Continue, or tap a different logo if you prefer.
         </p>
 
         {saved && (
@@ -276,7 +294,7 @@ export default function LogoGenerator() {
             disabled={saving || !chosen}
             className="mt-5 inline-flex w-full items-center justify-center gap-2 rounded-lg bg-lime-400 px-4 py-3 text-sm font-semibold text-black transition-colors hover:bg-lime-300 disabled:cursor-not-allowed disabled:bg-white/10 disabled:text-white/40"
           >
-            {saving ? <><Loader2 className="h-4 w-4 animate-spin" /> Saving…</> : saved ? <><Check className="h-4 w-4" /> Update choice</> : <>Use this logo <ArrowRight className="h-4 w-4" /></>}
+            {saving ? <><Loader2 className="h-4 w-4 animate-spin" /> Saving…</> : <>Continue to Brand <ArrowRight className="h-4 w-4" /></>}
           </button>
         )}
       </div>

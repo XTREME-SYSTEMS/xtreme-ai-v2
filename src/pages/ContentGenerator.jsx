@@ -94,6 +94,25 @@ export default function ContentGenerator() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [profile]);
 
+  // Auto-pick: pre-select and persist the recommended tone so the step is
+  // already done — the user just clicks "Continue" to proceed.
+  useEffect(() => {
+    if (data && !selectedId && !saved) {
+      const rec = data.templates[data.recommendedIndex];
+      if (rec) {
+        setSelectedId(rec.id);
+        (async () => {
+          try {
+            await update({ chosenContentTemplate: rec.id, chosenContentTone: rec.tone || "", contentTemplatesChosen: true });
+            await notifyStepComplete("content", { businessName: profile?.businessName || "" });
+            try { localStorage.setItem("coach:done:/content-generator", "1"); } catch {}
+          } catch {}
+        })();
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [data, selectedId, saved]);
+
   const save = async () => {
     if (!selectedId) { setError("Pick a content tone to continue."); return; }
     setSaving(true); setError("");
@@ -140,7 +159,8 @@ export default function ContentGenerator() {
         <h1 className="mt-2 text-xl font-semibold text-white sm:text-2xl">Choose your website's voice</h1>
         <p className="mt-1 text-sm text-white/60">
           We researched {profile?.primaryLocation || "your area"} — your competitors, pricing, and what local customers respond to —
-          then wrote 10 different messaging tones for your business. We've flagged the one we think will convert best.
+          then wrote 10 different messaging tones. We've <span className="text-lime-400 font-semibold">auto-selected the recommended one</span> —
+          just click Continue, or pick a different tone if you prefer.
         </p>
 
         {data?.marketFindings && (
@@ -283,7 +303,7 @@ export default function ContentGenerator() {
                   <MessageSquare className="h-3.5 w-3.5" /> Request Revision
                 </button>
                 <button type="button" onClick={save} disabled={saving || !selectedId} className="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-lime-400 px-4 py-3 text-sm font-semibold text-black transition-colors hover:bg-lime-300 disabled:cursor-not-allowed disabled:bg-white/10 disabled:text-white/40">
-                  {saving ? <><Loader2 className="h-4 w-4 animate-spin" /> Saving…</> : saved ? <><Check className="h-4 w-4" /> Update</> : <>Approve Content Tone <ArrowRight className="h-4 w-4" /></>}
+                  {saving ? <><Loader2 className="h-4 w-4 animate-spin" /> Saving…</> : <>Continue to Logo <ArrowRight className="h-4 w-4" /></>}
                 </button>
               </>
             )}

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { base44 } from "@/api/base44Client";
 import { Image } from "@/components/ui/image";
@@ -85,6 +85,22 @@ export default function VideoGenerator() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [profile]);
 
+  // Auto-pick: all concepts included — pre-approve so the step is done.
+  const autoPicked = useRef(false);
+  useEffect(() => {
+    if (data && !saved && !autoPicked.current) {
+      autoPicked.current = true;
+      (async () => {
+        try {
+          await update({ videoChosen: true });
+          await notifyStepComplete("video", { businessName: profile?.businessName || "" });
+          try { localStorage.setItem("coach:done:/video-generator", "1"); } catch {}
+        } catch {}
+      })();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [data, saved]);
+
   // Generate the actual video for a single concept at the selected duration.
   // Longer videos (15s/30s/45s) are composed of multiple 8-second clips
   // generated sequentially and played back-to-back as one continuous video.
@@ -146,8 +162,8 @@ export default function VideoGenerator() {
         </div>
         <h1 className="mt-2 text-xl font-semibold text-white sm:text-2xl">10 video concepts for your brand</h1>
         <p className="mt-1 text-sm text-white/60">
-          We created 10 video concepts using your onboarding, content tone, logo, and brand. Preview each concept, then generate the
-          actual video for any you like. All concepts are included — use them on your website, social media, or YouTube.
+          We created 10 video concepts using your onboarding, content tone, logo, and brand. All concepts are included and
+          <span className="text-lime-400 font-semibold"> auto-approved</span> — just click Continue. Generate actual videos for any you like, or use them on your website, social media, or YouTube.
         </p>
 
         <div className="mt-4 flex flex-wrap items-center gap-2">
@@ -256,7 +272,7 @@ export default function VideoGenerator() {
                   <MessageSquare className="h-3.5 w-3.5" /> Request Revision
                 </button>
                 <button type="button" onClick={save} disabled={saving} className="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-lime-400 px-4 py-3 text-sm font-semibold text-black transition-colors hover:bg-lime-300 disabled:opacity-50">
-                  {saving ? <><Loader2 className="h-4 w-4 animate-spin" /> Saving…</> : saved ? <><Check className="h-4 w-4" /> Update</> : <>Approve Videos <ArrowRight className="h-4 w-4" /></>}
+                  {saving ? <><Loader2 className="h-4 w-4 animate-spin" /> Saving…</> : <>Continue to Enhancements <ArrowRight className="h-4 w-4" /></>}
                 </button>
               </>
             )}

@@ -125,8 +125,8 @@ export default function Enhancements() {
         </div>
         <h1 className="mt-2 text-xl font-semibold text-white sm:text-2xl">Supercharge your package</h1>
         <p className="mt-1 text-sm text-white/60">
-          Browse every AI tool and add-on available for your business. Try a live, branded demo of each — then check the ones you
-          want and approve to add them to your contract before signing.
+          We've <span className="text-lime-400 font-semibold">pre-selected the recommended enhancements</span> for your industry.
+          Try a demo of any, uncheck the ones you don't want, then click Continue to add them to your contract.
         </p>
 
         {saved && (
@@ -231,11 +231,9 @@ export default function Enhancements() {
           className="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-lg bg-lime-400 px-4 py-3 text-sm font-semibold text-black transition-colors hover:bg-lime-300 disabled:opacity-50"
         >
           {saving ? (
-            <><Loader2 className="h-4 w-4 animate-spin" /> Approving…</>
-          ) : saved ? (
-            <><Check className="h-4 w-4" /> Approved</>
+            <><Loader2 className="h-4 w-4 animate-spin" /> Saving…</>
           ) : (
-            <>Approve &amp; Add to Contract <ArrowRight className="h-4 w-4" /></>
+            <>Continue to Your Designs <ArrowRight className="h-4 w-4" /></>
           )}
         </button>
 

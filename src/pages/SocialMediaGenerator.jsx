@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { base44 } from "@/api/base44Client";
 import { Image } from "@/components/ui/image";
@@ -69,6 +69,22 @@ export default function SocialMediaGenerator() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [profile]);
 
+  // Auto-pick: all templates included — pre-approve so the step is done.
+  const autoPicked = useRef(false);
+  useEffect(() => {
+    if (data && !saved && !autoPicked.current) {
+      autoPicked.current = true;
+      (async () => {
+        try {
+          await update({ socialMediaChosen: true });
+          await notifyStepComplete("social", { businessName: profile?.businessName || "" });
+          try { localStorage.setItem("coach:done:/social-media", "1"); } catch {}
+        } catch {}
+      })();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [data, saved]);
+
   const save = async () => {
     setSaving(true); setError("");
     try {
@@ -105,7 +121,7 @@ export default function SocialMediaGenerator() {
         <h1 className="mt-2 text-xl font-semibold text-white sm:text-2xl">Your social media brand kit + 30-day content</h1>
         <p className="mt-1 text-sm text-white/60">
           We designed {templates.length || 10} on-brand social templates with your logo — profile, cover, stories, posts, favicon, icons —
-          plus a full 30-day content calendar with captions and best posting times. All included in your package.
+          plus a full 30-day content calendar. All included and <span className="text-lime-400 font-semibold">auto-approved</span> — just click Continue.
         </p>
 
         {saved && (
@@ -206,7 +222,7 @@ export default function SocialMediaGenerator() {
                   <MessageSquare className="h-3.5 w-3.5" /> Request Revision
                 </button>
                 <button type="button" onClick={save} disabled={saving} className="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-lime-400 px-4 py-3 text-sm font-semibold text-black transition-colors hover:bg-lime-300 disabled:opacity-50">
-                  {saving ? <><Loader2 className="h-4 w-4 animate-spin" /> Saving…</> : saved ? <><Check className="h-4 w-4" /> Update</> : <>Approve Social Media Pack <ArrowRight className="h-4 w-4" /></>}
+                  {saving ? <><Loader2 className="h-4 w-4 animate-spin" /> Saving…</> : <>Continue to Videos <ArrowRight className="h-4 w-4" /></>}
                 </button>
               </>
             )}
