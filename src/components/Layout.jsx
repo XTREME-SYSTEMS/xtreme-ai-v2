@@ -351,8 +351,8 @@ export default function Layout() {
         <header className="flex h-14 items-center gap-3 border-b border-amber-400/40 bg-white px-4 backdrop-blur">
           <button onClick={() => setOpen(true)} className="md:hidden text-black/50 hover:text-black"><Menu className="h-5 w-5" /></button>
           <div className="flex items-center gap-2 text-xs">
-            <span className="rounded-md border border-amber-400 bg-amber-400 px-2 py-1 font-mono text-black font-semibold">{user?.role === "admin" ? "THROW THE BOOK AT IT" : "CLIENT PORTAL"}</span>
-            <span className="hidden text-black/50 sm:inline">{user?.role === "admin" ? "Architecture → Preview Build · Production locked" : "Approval-gated workflow"}</span>
+            <span className="rounded-md border border-amber-400 bg-amber-400 px-2 py-1 font-mono text-black font-semibold">{user?.role === "admin" ? "XTREME AI PIPELINE" : "CLIENT PORTAL"}</span>
+            <span className="hidden text-black/50 sm:inline">{user?.role === "admin" ? "Autonomous growth factory · AI-driven pipeline" : "Approval-gated workflow"}</span>
           </div>
           <div className="ml-auto flex items-center gap-3">
             <span className="hidden text-xs text-black/60 sm:inline">{user?.email || ""}</span>
