@@ -10,21 +10,21 @@
     --card-foreground: 0 0% 0%;
     --popover: 0 0% 100%;
     --popover-foreground: 0 0% 0%;
-    --primary: 51 100% 50%;
+    --primary: 60 100% 50%;
     --primary-foreground: 0 0% 0%;
     --secondary: 240 5% 96%;
     --secondary-foreground: 0 0% 0%;
     --muted: 240 5% 96%;
     --muted-foreground: 0 0% 35%;
-    --accent: 51 100% 50%;
+    --accent: 60 100% 50%;
     --accent-foreground: 0 0% 0%;
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 98%;
     --border: 240 6% 90%;
     --input: 240 6% 90%;
-    --ring: 51 100% 50%;
-    --vx-accent: 51 100% 50%;
-    --vx-accent-2: 43 89% 38%;
+    --ring: 60 100% 50%;
+    --vx-accent: 60 100% 50%;
+    --vx-accent-2: 60 100% 40%;
     --chart-1: 12 76% 55%;
     --chart-2: 173 58% 39%;
     --chart-3: 197 37% 40%;
@@ -42,7 +42,7 @@
     --sidebar-accent: 240 4.8% 95.9%;
     --sidebar-accent-foreground: 240 5.9% 10%;
     --sidebar-border: 240 6% 90%;
-    --sidebar-ring: 51 100% 50%;
+    --sidebar-ring: 60 100% 50%;
   }
 
   .dark {
@@ -52,21 +52,21 @@
     --card-foreground: 0 0% 100%;
     --popover: 0 0% 4%;
     --popover-foreground: 0 0% 100%;
-    --primary: 51 100% 50%;
+    --primary: 60 100% 50%;
     --primary-foreground: 0 0% 0%;
     --secondary: 0 0% 8%;
     --secondary-foreground: 0 0% 100%;
     --muted: 0 0% 8%;
     --muted-foreground: 0 0% 60%;
-    --accent: 51 100% 50%;
+    --accent: 60 100% 50%;
     --accent-foreground: 0 0% 0%;
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 0 0% 98%;
     --border: 0 0% 15%;
     --input: 0 0% 15%;
-    --ring: 51 100% 50%;
-    --vx-accent: 51 100% 50%;
-    --vx-accent-2: 43 89% 38%;
+    --ring: 60 100% 50%;
+    --vx-accent: 60 100% 50%;
+    --vx-accent-2: 60 100% 40%;
     --chart-1: 220 70% 50%;
     --chart-2: 160 60% 45%;
     --chart-3: 30 80% 55%;
@@ -74,12 +74,12 @@
     --chart-5: 340 75% 55%;
     --sidebar-background: 240 5.9% 10%;
     --sidebar-foreground: 240 4.8% 95.9%;
-    --sidebar-primary: 224.3 76.3% 48%;
+    --sidebar-primary: 60 100% 50%;
     --sidebar-primary-foreground: 0 0% 100%;
     --sidebar-accent: 240 3.7% 15.9%;
     --sidebar-accent-foreground: 240 4.8% 95.9%;
     --sidebar-border: 240 3.7% 15.9%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    --sidebar-ring: 60 100% 50%;
   }
 }
 
@@ -157,105 +157,105 @@
 
 /* ============================================================
    Gold palette override — forces ALL lime/amber/orange/yellow
-   Tailwind utility classes to metallic gold (#FFD700) and darker
-   goldenrod (#B8860B). This is a CSS-level belt-and-suspenders
+   Tailwind utility classes to metallic gold (#FFFF00) and darker
+   goldenrod (#CCCC00). This is a CSS-level belt-and-suspenders
    alongside the tailwind.config.js palette remap, ensuring the
    gold brand colors render even if the Tailwind build doesn't
    recompile the config.
    ============================================================ */
 
 /* Solid backgrounds */
-.bg-lime-200, .bg-amber-200, .bg-orange-200, .bg-yellow-200 { background-color: #FFE55C; }
-.bg-lime-300, .bg-amber-300, .bg-orange-300, .bg-yellow-300 { background-color: #FFDF33; }
-.bg-lime-400, .bg-amber-400, .bg-orange-400, .bg-yellow-400 { background-color: #FFD700; }
-.bg-lime-500, .bg-amber-500, .bg-orange-500, .bg-yellow-500 { background-color: #F0C400; }
-.bg-lime-600, .bg-amber-600, .bg-orange-600, .bg-yellow-600 { background-color: #B8860B; }
-.bg-lime-700, .bg-amber-700, .bg-orange-700, .bg-yellow-700 { background-color: #9B7208; }
+.bg-lime-200, .bg-amber-200, .bg-orange-200, .bg-yellow-200 { background-color: #FFFF99; }
+.bg-lime-300, .bg-amber-300, .bg-orange-300, .bg-yellow-300 { background-color: #FFFF33; }
+.bg-lime-400, .bg-amber-400, .bg-orange-400, .bg-yellow-400 { background-color: #FFFF00; }
+.bg-lime-500, .bg-amber-500, .bg-orange-500, .bg-yellow-500 { background-color: #E6E600; }
+.bg-lime-600, .bg-amber-600, .bg-orange-600, .bg-yellow-600 { background-color: #CCCC00; }
+.bg-lime-700, .bg-amber-700, .bg-orange-700, .bg-yellow-700 { background-color: #999900; }
 
 /* Background opacity variants */
-.bg-lime-300\/10, .bg-amber-300\/10, .bg-orange-300\/10, .bg-yellow-300\/10 { background-color: rgba(255,223,51,0.1); }
-.bg-lime-400\/5, .bg-amber-400\/5, .bg-orange-400\/5, .bg-yellow-400\/5 { background-color: rgba(255,215,0,0.05); }
-.bg-lime-400\/10, .bg-amber-400\/10, .bg-orange-400\/10, .bg-yellow-400\/10 { background-color: rgba(255,215,0,0.1); }
-.bg-lime-400\/15, .bg-amber-400\/15, .bg-orange-400\/15, .bg-yellow-400\/15 { background-color: rgba(255,215,0,0.15); }
-.bg-lime-400\/20, .bg-amber-400\/20, .bg-orange-400\/20, .bg-yellow-400\/20 { background-color: rgba(255,215,0,0.2); }
-.bg-lime-400\/30, .bg-amber-400\/30, .bg-orange-400\/30, .bg-yellow-400\/30 { background-color: rgba(255,215,0,0.3); }
-.bg-lime-400\/40, .bg-amber-400\/40, .bg-orange-400\/40, .bg-yellow-400\/40 { background-color: rgba(255,215,0,0.4); }
-.bg-lime-500\/10, .bg-amber-500\/10, .bg-orange-500\/10, .bg-yellow-500\/10 { background-color: rgba(240,196,0,0.1); }
-.bg-lime-500\/15, .bg-amber-500\/15, .bg-orange-500\/15, .bg-yellow-500\/15 { background-color: rgba(240,196,0,0.15); }
-.bg-lime-500\/20, .bg-amber-500\/20, .bg-orange-500\/20, .bg-yellow-500\/20 { background-color: rgba(240,196,0,0.2); }
-.bg-lime-500\/30, .bg-amber-500\/30, .bg-orange-500\/30, .bg-yellow-500\/30 { background-color: rgba(240,196,0,0.3); }
-.bg-lime-600\/10, .bg-amber-600\/10, .bg-orange-600\/10, .bg-yellow-600\/10 { background-color: rgba(184,134,11,0.1); }
-.bg-lime-600\/20, .bg-amber-600\/20, .bg-orange-600\/20, .bg-yellow-600\/20 { background-color: rgba(184,134,11,0.2); }
+.bg-lime-300\/10, .bg-amber-300\/10, .bg-orange-300\/10, .bg-yellow-300\/10 { background-color: rgba(255,255,51,0.1); }
+.bg-lime-400\/5, .bg-amber-400\/5, .bg-orange-400\/5, .bg-yellow-400\/5 { background-color: rgba(255,255,0,0.05); }
+.bg-lime-400\/10, .bg-amber-400\/10, .bg-orange-400\/10, .bg-yellow-400\/10 { background-color: rgba(255,255,0,0.1); }
+.bg-lime-400\/15, .bg-amber-400\/15, .bg-orange-400\/15, .bg-yellow-400\/15 { background-color: rgba(255,255,0,0.15); }
+.bg-lime-400\/20, .bg-amber-400\/20, .bg-orange-400\/20, .bg-yellow-400\/20 { background-color: rgba(255,255,0,0.2); }
+.bg-lime-400\/30, .bg-amber-400\/30, .bg-orange-400\/30, .bg-yellow-400\/30 { background-color: rgba(255,255,0,0.3); }
+.bg-lime-400\/40, .bg-amber-400\/40, .bg-orange-400\/40, .bg-yellow-400\/40 { background-color: rgba(255,255,0,0.4); }
+.bg-lime-500\/10, .bg-amber-500\/10, .bg-orange-500\/10, .bg-yellow-500\/10 { background-color: rgba(230,230,0,0.1); }
+.bg-lime-500\/15, .bg-amber-500\/15, .bg-orange-500\/15, .bg-yellow-500\/15 { background-color: rgba(230,230,0,0.15); }
+.bg-lime-500\/20, .bg-amber-500\/20, .bg-orange-500\/20, .bg-yellow-500\/20 { background-color: rgba(230,230,0,0.2); }
+.bg-lime-500\/30, .bg-amber-500\/30, .bg-orange-500\/30, .bg-yellow-500\/30 { background-color: rgba(230,230,0,0.3); }
+.bg-lime-600\/10, .bg-amber-600\/10, .bg-orange-600\/10, .bg-yellow-600\/10 { background-color: rgba(204,204,0,0.1); }
+.bg-lime-600\/20, .bg-amber-600\/20, .bg-orange-600\/20, .bg-yellow-600\/20 { background-color: rgba(204,204,0,0.2); }
 
 /* Text color */
-.text-lime-200, .text-amber-200, .text-orange-200, .text-yellow-200 { color: #FFE55C; }
-.text-lime-300, .text-amber-300, .text-orange-300, .text-yellow-300 { color: #FFDF33; }
-.text-lime-400, .text-amber-400, .text-orange-400, .text-yellow-400 { color: #FFD700; }
-.text-lime-500, .text-amber-500, .text-orange-500, .text-yellow-500 { color: #F0C400; }
-.text-lime-600, .text-amber-600, .text-orange-600, .text-yellow-600 { color: #B8860B; }
-.text-lime-700, .text-amber-700, .text-orange-700, .text-yellow-700 { color: #9B7208; }
+.text-lime-200, .text-amber-200, .text-orange-200, .text-yellow-200 { color: #FFFF99; }
+.text-lime-300, .text-amber-300, .text-orange-300, .text-yellow-300 { color: #FFFF33; }
+.text-lime-400, .text-amber-400, .text-orange-400, .text-yellow-400 { color: #FFFF00; }
+.text-lime-500, .text-amber-500, .text-orange-500, .text-yellow-500 { color: #E6E600; }
+.text-lime-600, .text-amber-600, .text-orange-600, .text-yellow-600 { color: #CCCC00; }
+.text-lime-700, .text-amber-700, .text-orange-700, .text-yellow-700 { color: #999900; }
 
 /* Text opacity variants */
-.text-lime-300\/50, .text-amber-300\/50, .text-orange-300\/50, .text-yellow-300\/50 { color: rgba(255,223,51,0.5); }
-.text-lime-300\/70, .text-amber-300\/70, .text-orange-300\/70, .text-yellow-300\/70 { color: rgba(255,223,51,0.7); }
-.text-lime-400\/50, .text-amber-400\/50, .text-orange-400\/50, .text-yellow-400\/50 { color: rgba(255,215,0,0.5); }
-.text-lime-400\/60, .text-amber-400\/60, .text-orange-400\/60, .text-yellow-400\/60 { color: rgba(255,215,0,0.6); }
-.text-lime-400\/70, .text-amber-400\/70, .text-orange-400\/70, .text-yellow-400\/70 { color: rgba(255,215,0,0.7); }
-.text-lime-400\/80, .text-amber-400\/80, .text-orange-400\/80, .text-yellow-400\/80 { color: rgba(255,215,0,0.8); }
-.text-lime-400\/90, .text-amber-400\/90, .text-orange-400\/90, .text-yellow-400\/90 { color: rgba(255,215,0,0.9); }
-.text-lime-500\/30, .text-amber-500\/30, .text-orange-500\/30, .text-yellow-500\/30 { color: rgba(240,196,0,0.3); }
-.text-lime-500\/50, .text-amber-500\/50, .text-orange-500\/50, .text-yellow-500\/50 { color: rgba(240,196,0,0.5); }
-.text-lime-500\/70, .text-amber-500\/70, .text-orange-500\/70, .text-yellow-500\/70 { color: rgba(240,196,0,0.7); }
+.text-lime-300\/50, .text-amber-300\/50, .text-orange-300\/50, .text-yellow-300\/50 { color: rgba(255,255,51,0.5); }
+.text-lime-300\/70, .text-amber-300\/70, .text-orange-300\/70, .text-yellow-300\/70 { color: rgba(255,255,51,0.7); }
+.text-lime-400\/50, .text-amber-400\/50, .text-orange-400\/50, .text-yellow-400\/50 { color: rgba(255,255,0,0.5); }
+.text-lime-400\/60, .text-amber-400\/60, .text-orange-400\/60, .text-yellow-400\/60 { color: rgba(255,255,0,0.6); }
+.text-lime-400\/70, .text-amber-400\/70, .text-orange-400\/70, .text-yellow-400\/70 { color: rgba(255,255,0,0.7); }
+.text-lime-400\/80, .text-amber-400\/80, .text-orange-400\/80, .text-yellow-400\/80 { color: rgba(255,255,0,0.8); }
+.text-lime-400\/90, .text-amber-400\/90, .text-orange-400\/90, .text-yellow-400\/90 { color: rgba(255,255,0,0.9); }
+.text-lime-500\/30, .text-amber-500\/30, .text-orange-500\/30, .text-yellow-500\/30 { color: rgba(230,230,0,0.3); }
+.text-lime-500\/50, .text-amber-500\/50, .text-orange-500\/50, .text-yellow-500\/50 { color: rgba(230,230,0,0.5); }
+.text-lime-500\/70, .text-amber-500\/70, .text-orange-500\/70, .text-yellow-500\/70 { color: rgba(230,230,0,0.7); }
 
 /* Border color */
-.border-lime-300, .border-amber-300, .border-orange-300, .border-yellow-300 { border-color: #FFDF33; }
-.border-lime-400, .border-amber-400, .border-orange-400, .border-yellow-400 { border-color: #FFD700; }
-.border-lime-500, .border-amber-500, .border-orange-500, .border-yellow-500 { border-color: #F0C400; }
-.border-lime-600, .border-amber-600, .border-orange-600, .border-yellow-600 { border-color: #B8860B; }
+.border-lime-300, .border-amber-300, .border-orange-300, .border-yellow-300 { border-color: #FFFF33; }
+.border-lime-400, .border-amber-400, .border-orange-400, .border-yellow-400 { border-color: #FFFF00; }
+.border-lime-500, .border-amber-500, .border-orange-500, .border-yellow-500 { border-color: #E6E600; }
+.border-lime-600, .border-amber-600, .border-orange-600, .border-yellow-600 { border-color: #CCCC00; }
 
 /* Border opacity variants */
-.border-lime-400\/20, .border-amber-400\/20, .border-orange-400\/20, .border-yellow-400\/20 { border-color: rgba(255,215,0,0.2); }
-.border-lime-400\/30, .border-amber-400\/30, .border-orange-400\/30, .border-yellow-400\/30 { border-color: rgba(255,215,0,0.3); }
-.border-lime-400\/40, .border-amber-400\/40, .border-orange-400\/40, .border-yellow-400\/40 { border-color: rgba(255,215,0,0.4); }
-.border-lime-400\/50, .border-amber-400\/50, .border-orange-400\/50, .border-yellow-400\/50 { border-color: rgba(255,215,0,0.5); }
-.border-lime-500\/30, .border-amber-500\/30, .border-orange-500\/30, .border-yellow-500\/30 { border-color: rgba(240,196,0,0.3); }
-.border-lime-500\/50, .border-amber-500\/50, .border-orange-500\/50, .border-yellow-500\/50 { border-color: rgba(240,196,0,0.5); }
-.border-lime-600\/30, .border-amber-600\/30, .border-orange-600\/30, .border-yellow-600\/30 { border-color: rgba(184,134,11,0.3); }
+.border-lime-400\/20, .border-amber-400\/20, .border-orange-400\/20, .border-yellow-400\/20 { border-color: rgba(255,255,0,0.2); }
+.border-lime-400\/30, .border-amber-400\/30, .border-orange-400\/30, .border-yellow-400\/30 { border-color: rgba(255,255,0,0.3); }
+.border-lime-400\/40, .border-amber-400\/40, .border-orange-400\/40, .border-yellow-400\/40 { border-color: rgba(255,255,0,0.4); }
+.border-lime-400\/50, .border-amber-400\/50, .border-orange-400\/50, .border-yellow-400\/50 { border-color: rgba(255,255,0,0.5); }
+.border-lime-500\/30, .border-amber-500\/30, .border-orange-500\/30, .border-yellow-500\/30 { border-color: rgba(230,230,0,0.3); }
+.border-lime-500\/50, .border-amber-500\/50, .border-orange-500\/50, .border-yellow-500\/50 { border-color: rgba(230,230,0,0.5); }
+.border-lime-600\/30, .border-amber-600\/30, .border-orange-600\/30, .border-yellow-600\/30 { border-color: rgba(204,204,0,0.3); }
 
 /* Ring */
-.ring-lime-400, .ring-amber-400, .ring-orange-400, .ring-yellow-400 { --tw-ring-color: #FFD700; }
-.ring-lime-500, .ring-amber-500, .ring-orange-500, .ring-yellow-500 { --tw-ring-color: #F0C400; }
+.ring-lime-400, .ring-amber-400, .ring-orange-400, .ring-yellow-400 { --tw-ring-color: #FFFF00; }
+.ring-lime-500, .ring-amber-500, .ring-orange-500, .ring-yellow-500 { --tw-ring-color: #E6E600; }
 
 /* Fill / Stroke */
-.fill-lime-400, .fill-amber-400, .fill-orange-400, .fill-yellow-400 { fill: #FFD700; }
-.fill-lime-500, .fill-amber-500, .fill-orange-500, .fill-yellow-500 { fill: #F0C400; }
-.stroke-lime-400, .stroke-amber-400, .stroke-orange-400, .stroke-yellow-400 { stroke: #FFD700; }
+.fill-lime-400, .fill-amber-400, .fill-orange-400, .fill-yellow-400 { fill: #FFFF00; }
+.fill-lime-500, .fill-amber-500, .fill-orange-500, .fill-yellow-500 { fill: #E6E600; }
+.stroke-lime-400, .stroke-amber-400, .stroke-orange-400, .stroke-yellow-400 { stroke: #FFFF00; }
 
 /* Gradient stops */
-.from-lime-300, .from-amber-300, .from-orange-300, .from-yellow-300 { --tw-gradient-from: #FFDF33 var(--tw-gradient-from-position); --tw-gradient-to: transparent var(--tw-gradient-to-position); }
-.from-lime-400, .from-amber-400, .from-orange-400, .from-yellow-400 { --tw-gradient-from: #FFD700 var(--tw-gradient-from-position); --tw-gradient-to: transparent var(--tw-gradient-to-position); }
-.from-lime-500, .from-amber-500, .from-orange-500, .from-yellow-500 { --tw-gradient-from: #F0C400 var(--tw-gradient-from-position); --tw-gradient-to: transparent var(--tw-gradient-to-position); }
-.to-lime-300, .to-amber-300, .to-orange-300, .to-yellow-300 { --tw-gradient-to: #FFDF33 var(--tw-gradient-to-position); }
-.to-lime-400, .to-amber-400, .to-orange-400, .to-yellow-400 { --tw-gradient-to: #FFD700 var(--tw-gradient-to-position); }
-.to-lime-500, .to-amber-500, .to-orange-500, .to-yellow-500 { --tw-gradient-to: #F0C400 var(--tw-gradient-to-position); }
-.to-lime-600, .to-amber-600, .to-orange-600, .to-yellow-600 { --tw-gradient-to: #B8860B var(--tw-gradient-to-position); }
-.via-lime-400, .via-amber-400, .via-orange-400, .via-yellow-400 { --tw-gradient-via: #FFD700 var(--tw-gradient-via-position); }
+.from-lime-300, .from-amber-300, .from-orange-300, .from-yellow-300 { --tw-gradient-from: #FFFF33 var(--tw-gradient-from-position); --tw-gradient-to: transparent var(--tw-gradient-to-position); }
+.from-lime-400, .from-amber-400, .from-orange-400, .from-yellow-400 { --tw-gradient-from: #FFFF00 var(--tw-gradient-from-position); --tw-gradient-to: transparent var(--tw-gradient-to-position); }
+.from-lime-500, .from-amber-500, .from-orange-500, .from-yellow-500 { --tw-gradient-from: #E6E600 var(--tw-gradient-from-position); --tw-gradient-to: transparent var(--tw-gradient-to-position); }
+.to-lime-300, .to-amber-300, .to-orange-300, .to-yellow-300 { --tw-gradient-to: #FFFF33 var(--tw-gradient-to-position); }
+.to-lime-400, .to-amber-400, .to-orange-400, .to-yellow-400 { --tw-gradient-to: #FFFF00 var(--tw-gradient-to-position); }
+.to-lime-500, .to-amber-500, .to-orange-500, .to-yellow-500 { --tw-gradient-to: #E6E600 var(--tw-gradient-to-position); }
+.to-lime-600, .to-amber-600, .to-orange-600, .to-yellow-600 { --tw-gradient-to: #CCCC00 var(--tw-gradient-to-position); }
+.via-lime-400, .via-amber-400, .via-orange-400, .via-yellow-400 { --tw-gradient-via: #FFFF00 var(--tw-gradient-via-position); }
 
 /* Hover variants */
-.hover\:bg-lime-300:hover, .hover\:bg-amber-300:hover, .hover\:bg-orange-300:hover, .hover\:bg-yellow-300:hover { background-color: #FFDF33; }
-.hover\:bg-lime-400:hover, .hover\:bg-amber-400:hover, .hover\:bg-orange-400:hover, .hover\:bg-yellow-400:hover { background-color: #FFD700; }
-.hover\:bg-lime-500:hover, .hover\:bg-amber-500:hover, .hover\:bg-orange-500:hover, .hover\:bg-yellow-500:hover { background-color: #F0C400; }
-.hover\:bg-lime-400\/10:hover, .hover\:bg-amber-400\/10:hover, .hover\:bg-orange-400\/10:hover, .hover\:bg-yellow-400\/10:hover { background-color: rgba(255,215,0,0.1); }
-.hover\:bg-lime-400\/20:hover, .hover\:bg-amber-400\/20:hover, .hover\:bg-orange-400\/20:hover, .hover\:bg-yellow-400\/20:hover { background-color: rgba(255,215,0,0.2); }
-.hover\:text-lime-300:hover, .hover\:text-amber-300:hover, .hover\:text-orange-300:hover, .hover\:text-yellow-300:hover { color: #FFDF33; }
-.hover\:text-lime-400:hover, .hover\:text-amber-400:hover, .hover\:text-orange-400:hover, .hover\:text-yellow-400:hover { color: #FFD700; }
-.hover\:text-lime-500:hover, .hover\:text-amber-500:hover, .hover\:text-orange-500:hover, .hover\:text-yellow-500:hover { color: #F0C400; }
-.hover\:border-lime-400:hover, .hover\:border-amber-400:hover, .hover\:border-orange-400:hover, .hover\:border-yellow-400:hover { border-color: #FFD700; }
-.hover\:border-lime-500:hover, .hover\:border-amber-500:hover, .hover\:border-orange-500:hover, .hover\:border-yellow-500:hover { border-color: #F0C400; }
+.hover\:bg-lime-300:hover, .hover\:bg-amber-300:hover, .hover\:bg-orange-300:hover, .hover\:bg-yellow-300:hover { background-color: #FFFF33; }
+.hover\:bg-lime-400:hover, .hover\:bg-amber-400:hover, .hover\:bg-orange-400:hover, .hover\:bg-yellow-400:hover { background-color: #FFFF00; }
+.hover\:bg-lime-500:hover, .hover\:bg-amber-500:hover, .hover\:bg-orange-500:hover, .hover\:bg-yellow-500:hover { background-color: #E6E600; }
+.hover\:bg-lime-400\/10:hover, .hover\:bg-amber-400\/10:hover, .hover\:bg-orange-400\/10:hover, .hover\:bg-yellow-400\/10:hover { background-color: rgba(255,255,0,0.1); }
+.hover\:bg-lime-400\/20:hover, .hover\:bg-amber-400\/20:hover, .hover\:bg-orange-400\/20:hover, .hover\:bg-yellow-400\/20:hover { background-color: rgba(255,255,0,0.2); }
+.hover\:text-lime-300:hover, .hover\:text-amber-300:hover, .hover\:text-orange-300:hover, .hover\:text-yellow-300:hover { color: #FFFF33; }
+.hover\:text-lime-400:hover, .hover\:text-amber-400:hover, .hover\:text-orange-400:hover, .hover\:text-yellow-400:hover { color: #FFFF00; }
+.hover\:text-lime-500:hover, .hover\:text-amber-500:hover, .hover\:text-orange-500:hover, .hover\:text-yellow-500:hover { color: #E6E600; }
+.hover\:border-lime-400:hover, .hover\:border-amber-400:hover, .hover\:border-orange-400:hover, .hover\:border-yellow-400:hover { border-color: #FFFF00; }
+.hover\:border-lime-500:hover, .hover\:border-amber-500:hover, .hover\:border-orange-500:hover, .hover\:border-yellow-500:hover { border-color: #E6E600; }
 
 /* Focus variants */
-.focus\:border-lime-400:focus, .focus\:border-amber-400:focus, .focus\:border-orange-400:focus, .focus\:border-yellow-400:focus { border-color: #FFD700; }
-.focus\:ring-lime-400:focus, .focus\:ring-amber-400:focus, .focus\:ring-orange-400:focus, .focus\:ring-yellow-400:focus { --tw-ring-color: #FFD700; }
+.focus\:border-lime-400:focus, .focus\:border-amber-400:focus, .focus\:border-orange-400:focus, .focus\:border-yellow-400:focus { border-color: #FFFF00; }
+.focus\:ring-lime-400:focus, .focus\:ring-amber-400:focus, .focus\:ring-orange-400:focus, .focus\:ring-yellow-400:focus { --tw-ring-color: #FFFF00; }
 
 /* ============================================================
    Neon green hover outline — system-wide
@@ -288,21 +288,21 @@
    from bright gold to deep gold with a soft shimmer.
    ============================================================ */
 .xa-gold {
-  background-image: linear-gradient(135deg, #FFD700 0%, #F0C400 45%, #B8860B 100%);
+  background-image: linear-gradient(135deg, #FFFF00 0%, #E6E600 45%, #CCCC00 100%);
   color: #000;
 }
 .xa-gold:hover {
   filter: brightness(1.08);
 }
 .xa-gold-text {
-  background-image: linear-gradient(135deg, #FFD700 0%, #F0C400 45%, #B8860B 100%);
+  background-image: linear-gradient(135deg, #FFFF00 0%, #E6E600 45%, #CCCC00 100%);
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
   color: transparent;
 }
 .xa-gold-border {
-  border-color: #FFD700;
+  border-color: #FFFF00;
 }
 .xa-gold-glow {
   box-shadow: 0 0 0 1px rgba(255, 215, 0, 0.35), 0 0 18px -4px rgba(255, 215, 0, 0.5);
@@ -313,7 +313,7 @@
    A phone-frame layout (390px max) with a top brandbar,
    scrollable content area, and bottom tab bar. Adapted from
    the Xtreme Visualizer's DeviceShell — dark theme with the
-   Xtreme AI gold accent (#FFD700).
+   Xtreme AI gold accent (#FFFF00).
    ============================================================ */
 .xa-stage {
   position: fixed;
@@ -382,7 +382,7 @@
   align-items: center;
 }
 .xa-back-btn:hover {
-  color: #FFD700;
+  color: #FFFF00;
 }
 .xa-icon-btn {
   border: 1px solid #2f2f2f;
@@ -395,8 +395,8 @@
   transition: border-color 0.15s, color 0.15s;
 }
 .xa-icon-btn:hover {
-  border-color: #FFD700;
-  color: #FFD700;
+  border-color: #FFFF00;
+  color: #FFFF00;
 }
 
 /* Content */
@@ -432,7 +432,7 @@
   transition: color 0.15s;
 }
 .xa-nav button.active {
-  color: #FFD700;
+  color: #FFFF00;
 }
 .xa-nav button.active svg {
   filter: drop-shadow(0 0 6px rgba(255, 215, 0, 0.4));
@@ -481,7 +481,7 @@
   align-items: center;
 }
 .xa-drawer-header button:hover {
-  color: #FFD700;
+  color: #FFFF00;
 }
 .xa-drawer-list {
   overflow-y: auto;
@@ -502,11 +502,11 @@
   transition: border-color 0.15s, color 0.15s, background 0.15s;
 }
 .xa-drawer-list button:hover {
-  border-color: #FFD700;
-  color: #FFD700;
+  border-color: #FFFF00;
+  color: #FFFF00;
 }
 .xa-drawer-list button.active {
-  border-color: #FFD700;
-  color: #FFD700;
+  border-color: #FFFF00;
+  color: #FFFF00;
   background: rgba(255, 215, 0, 0.08);
 }
