@@ -23,7 +23,7 @@ const SEV = {
   low: { label: "Low", cls: "bg-white/10 text-white/60 border-white/15" },
 };
 const SEV_ORDER = { critical: 0, high: 1, medium: 2, low: 3 };
-const scoreColor = (s) => (s == null ? "#52525b" : s >= 75 ? "#a3e635" : s >= 50 ? "#fbbf24" : "#f87171");
+const scoreColor = (s) => (s == null ? "#52525b" : s >= 75 ? "#FFD700" : s >= 50 ? "#F0C400" : "#f87171");
 
 export default function FreeAuditPage() {
   const [form, setForm] = useState({ website: "", name: "", email: "", phone: "" });

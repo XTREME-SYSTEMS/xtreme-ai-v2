@@ -45,6 +45,29 @@ module.exports = {
   			ring: 'hsl(var(--ring))',
   			'vx-accent': 'hsl(var(--vx-accent))',
   			'vx-accent-2': 'hsl(var(--vx-accent-2))',
+  			// Gold palette — lime/amber/orange/yellow all remapped to metallic
+			// gold (#FFD700) and darker goldenrod (#B8860B) so every accent across
+			// the app renders as the Xtreme AI brand gold.
+			lime: {
+				50: '#FFF9E0', 100: '#FFF3C4', 200: '#FFE55C', 300: '#FFDF33',
+				400: '#FFD700', 500: '#F0C400', 600: '#B8860B', 700: '#9B7208',
+				800: '#7A5A06', 900: '#5C4205', 950: '#3D2C03'
+			},
+			amber: {
+				50: '#FFF9E0', 100: '#FFF3C4', 200: '#FFE55C', 300: '#FFDF33',
+				400: '#FFD700', 500: '#F0C400', 600: '#B8860B', 700: '#9B7208',
+				800: '#7A5A06', 900: '#5C4205', 950: '#3D2C03'
+			},
+			orange: {
+				50: '#FFF9E0', 100: '#FFF3C4', 200: '#FFE55C', 300: '#FFDF33',
+				400: '#FFD700', 500: '#F0C400', 600: '#B8860B', 700: '#9B7208',
+				800: '#7A5A06', 900: '#5C4205', 950: '#3D2C03'
+			},
+			yellow: {
+				50: '#FFF9E0', 100: '#FFF3C4', 200: '#FFE55C', 300: '#FFDF33',
+				400: '#FFD700', 500: '#F0C400', 600: '#B8860B', 700: '#9B7208',
+				800: '#7A5A06', 900: '#5C4205', 950: '#3D2C03'
+			},
   			chart: {
   				'1': 'hsl(var(--chart-1))',
   				'2': 'hsl(var(--chart-2))',
