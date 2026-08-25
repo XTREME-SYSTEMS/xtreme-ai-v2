@@ -5,29 +5,6 @@ import { createClientFromRequest } from 'npm:@base44/sdk@0.8.41';
 
 const TEMPLATES = [
   {
-    name: "Premium Local Service — Editorial",
-    niche: "general",
-    industry_category: "local-services",
-    layout_style: "Editorial, high-contrast, generous whitespace, full-bleed hero, asymmetric grid, sticky conversion bar.",
-    sections: [
-      { name: "Hero", purpose: "Capture attention + primary CTA", guidance: "Full-bleed cinematic image, 10-word benefit headline, trust badges, single primary CTA." },
-      { name: "Services", purpose: "Surface offerings", guidance: "3-6 cards with benefit-led titles, hover micro-interaction, icon per service." },
-      { name: "Proof", purpose: "Build trust", guidance: "Star rating + review count, 2-3 testimonials, before/after gallery if applicable." },
-      { name: "About", purpose: "Humanize + authority", guidance: "Founder story, credentials, local ties, supporting image." },
-      { name: "FAQ", purpose: "SEO + AEO + objection handling", guidance: "6 Q&As as open indexable text, self-contained answers." },
-      { name: "CTA", purpose: "Final conversion", guidance: "Sticky bar + bottom band, phone + form, urgency without hype." }
-    ],
-    design_direction: {
-      colors: "Dark base #0A0A0A, neon lime #D4FF4D accent, white text, 10% accent usage ratio.",
-      typography: "Display: geometric sans (Inter/Söhne). Body: humanist sans. Tight display tracking, relaxed body leading.",
-      spacing: "8px grid, section padding 96px desktop / 64px mobile, max-width 1200px.",
-      motion: "Subtle fade-up on scroll, 200ms ease, no parallax, no autoplay video.",
-      imagery: "Cinematic, medium-format, directional lighting, real-world authenticity, no stock clichés."
-    },
-    conversion_principles: "One CTA per section, social proof above the fold, frictionless contact, mobile-first.",
-    quality_score: 97
-  },
-  {
     name: "Garage Floor Coating — Premium Trades",
     niche: "garage floor epoxy coating",
     industry_category: "home-improvement",
@@ -49,97 +26,6 @@ const TEMPLATES = [
     },
     conversion_principles: "Visual proof first, warranty authority, transparent pricing language, one-step quote.",
     quality_score: 98
-  },
-  {
-    name: "Roofing — Trust & Speed",
-    niche: "roofing",
-    industry_category: "home-improvement",
-    layout_style: "Trust-forward, storm-ready urgency, certified badges, inspection-first CTA.",
-    sections: [
-      { name: "Hero", purpose: "Storm/season hook", guidance: "Aerial roof image, 'Free Roof Inspection' CTA, licensed + insured badges." },
-      { name: "Services", purpose: "Residential + commercial", guidance: "Replacement, repair, inspection, storm damage — card grid." },
-      { name: "Proof", purpose: "Insurance + credentials", guidance: "GAF Certified, insurance claim help, reviews." },
-      { name: "Process", purpose: "Inspection → estimate → install", guidance: "3-step with timeline." },
-      { name: "FAQ", purpose: "Cost + insurance + lifespan", guidance: "Self-contained answers for AI citation." },
-      { name: "CTA", purpose: "Book inspection", guidance: "Form + call, same-day response promise." }
-    ],
-    design_direction: {
-      colors: "Slate #1A1F2E, safety-orange or lime accent, white text.",
-      typography: "Display: strong geometric. Body: readable humanist.",
-      spacing: "8px grid, badge-forward, 80px sections.",
-      motion: "Subtle, trust-focused, no aggressive animation.",
-      imagery: "Aerial roof shots, install crews, weather drama."
-    },
-    conversion_principles: "Licensed/insured above fold, inspection-first, insurance claim guidance.",
-    quality_score: 96
-  },
-  {
-    name: "HVAC — Comfort & Reliability",
-    niche: "hvac",
-    industry_category: "home-services",
-    layout_style: "Comfort-driven, seasonal urgency, 24/7 availability, financing forward.",
-    sections: [
-      { name: "Hero", purpose: "Seasonal CTA", guidance: "AC/furnace image, 'Same-Day Service' CTA, 24/7 badge." },
-      { name: "Services", purpose: "Install/repair/maintenance", guidance: "Cards with financing badges." },
-      { name: "Why Us", purpose: "Trust", guidance: "NATE-certified, upfront pricing, maintenance plan." },
-      { name: "FAQ", purpose: "Cost + lifespan + efficiency", guidance: "Cite-ready answers." },
-      { name: "CTA", purpose: "Book service", guidance: "Form + call, financing mention." }
-    ],
-    design_direction: {
-      colors: "Cool blue-gray base, lime or cyan accent, white text.",
-      typography: "Display: friendly geometric. Body: humanist.",
-      spacing: "8px grid, comfort-forward, 80px sections.",
-      motion: "Calm, no urgency flashing.",
-      imagery: "Clean install shots, technician + homeowner, comfort scenes."
-    },
-    conversion_principles: "Same-day promise, upfront pricing, financing, 24/7.",
-    quality_score: 95
-  },
-  {
-    name: "Dental Practice — Premium Care",
-    niche: "dentist",
-    industry_category: "healthcare",
-    layout_style: "Calm, premium, patient-centered, booking-first, smile-forward.",
-    sections: [
-      { name: "Hero", purpose: "Book appointment", guidance: "Smile image, 'Book Your Visit' CTA, accept-new-patients badge." },
-      { name: "Services", purpose: "General + cosmetic", guidance: "Cards: cleaning, whitening, implants, aligners." },
-      { name: "About", purpose: "Dentist authority", guidance: "Credentials, technology, comfort-first promise." },
-      { name: "Reviews", purpose: "Social proof", guidance: "5-star testimonials, Google rating." },
-      { name: "FAQ", purpose: "Insurance + comfort + cost", guidance: "Cite-ready answers." },
-      { name: "CTA", purpose: "Book", guidance: "Online scheduling + call." }
-    ],
-    design_direction: {
-      colors: "Soft white base, teal/lime accent, calming neutrals.",
-      typography: "Display: elegant humanist serif or refined sans. Body: humanist sans.",
-      spacing: "Generous, airy, 96px sections.",
-      motion: "Gentle fades, premium feel.",
-      imagery: "Bright smiles, modern operatory, happy patients."
-    },
-    conversion_principles: "Booking above fold, new-patient offer, insurance transparency, comfort language.",
-    quality_score: 96
-  },
-  {
-    name: "Law Firm — Authority & Trust",
-    niche: "attorney",
-    industry_category: "professional-services",
-    layout_style: "Authoritative, restrained, results-driven, consultation-first.",
-    sections: [
-      { name: "Hero", purpose: "Free consultation", guidance: "Courthouse/office image, 'Free Consultation' CTA, results figure." },
-      { name: "Practice Areas", purpose: "Specialties", guidance: "Cards: personal injury, family, criminal, business." },
-      { name: "Results", purpose: "Proof", guidance: "Verdicts/settlements, case results, bar credentials." },
-      { name: "Attorneys", purpose: "Authority", guidance: "Partner bios with credentials." },
-      { name: "FAQ", purpose: "Cost + process", guidance: "Contingency, consultation, timeline — cite-ready." },
-      { name: "CTA", purpose: "Contact", guidance: "Form + call, confidential promise." }
-    ],
-    design_direction: {
-      colors: "Deep navy/charcoal, gold or lime accent, ivory text.",
-      typography: "Display: classical serif. Body: refined sans.",
-      spacing: "Formal, structured, 96px sections.",
-      motion: "Minimal, dignified.",
-      imagery: "Office, scales, cityscape, professional portraits."
-    },
-    conversion_principles: "Consultation-first, results numbers, bar credentials, contingency clarity.",
-    quality_score: 95
   }
 ];
 
