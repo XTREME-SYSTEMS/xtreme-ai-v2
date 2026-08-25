@@ -1,7 +1,7 @@
 {
   "name": "ClientProject",
   "type": "object",
-  "description": "Offloads creative work from the User record \u2014 stores all generated assets (content, logo, brand, website, social, video) for a client's project, keyed by client email. One project per client.",
+  "description": "Offloads creative work from the User record \u2014 stores all generated assets (vision, strategy, content, logo, brand, website, social, video) for a client's project, keyed by client email. One project per client.",
   "properties": {
     "client_email": {
       "type": "string",
@@ -65,6 +65,103 @@
           "items": {
             "type": "string"
           }
+        }
+      }
+    },
+    "vision": {
+      "type": "object",
+      "description": "Generated vision document \u2014 mission, problem, target audience, long-term direction, success metrics, core values, value proposition, market opportunity. Produced by generateVision. Mandatory before building begins.",
+      "properties": {
+        "mission": {
+          "type": "string"
+        },
+        "problem": {
+          "type": "string"
+        },
+        "target_audience": {
+          "type": "string"
+        },
+        "long_term_vision": {
+          "type": "string"
+        },
+        "success_metrics": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "core_values": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "value_proposition": {
+          "type": "string"
+        },
+        "market_opportunity": {
+          "type": "string"
+        },
+        "approved": {
+          "type": "boolean",
+          "default": false
+        },
+        "generated_at": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
+    "strategy": {
+      "type": "object",
+      "description": "Generated strategy document \u2014 competitive positioning, go-to-market, revenue model, pricing, acquisition channels, roadmap, risks, resources, differentiation, partnerships. Produced by generateStrategy from the approved vision. Mandatory before building begins.",
+      "properties": {
+        "competitive_positioning": {
+          "type": "string"
+        },
+        "go_to_market": {
+          "type": "string"
+        },
+        "revenue_model": {
+          "type": "string"
+        },
+        "pricing_strategy": {
+          "type": "string"
+        },
+        "acquisition_channels": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "roadmap": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        },
+        "risks": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        },
+        "resources": {
+          "type": "string"
+        },
+        "differentiation": {
+          "type": "string"
+        },
+        "partnerships": {
+          "type": "string"
+        },
+        "approved": {
+          "type": "boolean",
+          "default": false
+        },
+        "generated_at": {
+          "type": "string",
+          "format": "date-time"
         }
       }
     },

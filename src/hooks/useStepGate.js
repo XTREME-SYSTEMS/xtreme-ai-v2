@@ -77,6 +77,24 @@ export function useStepGate(step, user) {
           const done = !!(user && user.epoxyProfileSubmitted);
           if (!cancelled)
             setState({ isComplete: done, loading: false, pendingLabel: done ? "" : "Business profile needed" });
+        } else if (step.gate === "vision") {
+          if (autoBuild.isActive) {
+            const done = !!autoBuild.build?.vision?.approved;
+            if (!cancelled) setState({ isComplete: done, loading: false, pendingLabel: done ? "" : "Generate & approve your vision" });
+          } else {
+            const projects = await base44.entities.ClientProject.filter({ client_email: effectiveEmail }, "-created_date", 1);
+            const done = !!projects?.[0]?.vision?.approved;
+            if (!cancelled) setState({ isComplete: done, loading: false, pendingLabel: done ? "" : "Generate & approve your vision" });
+          }
+        } else if (step.gate === "strategy") {
+          if (autoBuild.isActive) {
+            const done = !!autoBuild.build?.strategy?.approved;
+            if (!cancelled) setState({ isComplete: done, loading: false, pendingLabel: done ? "" : "Generate & approve your strategy" });
+          } else {
+            const projects = await base44.entities.ClientProject.filter({ client_email: effectiveEmail }, "-created_date", 1);
+            const done = !!projects?.[0]?.strategy?.approved;
+            if (!cancelled) setState({ isComplete: done, loading: false, pendingLabel: done ? "" : "Generate & approve your strategy" });
+          }
         } else if (step.gate === "architecture") {
           const done = !!(autoBuild.isActive && autoBuild.build?.architecture);
           if (!cancelled) setState({ isComplete: done, loading: false, pendingLabel: done ? "" : "Generate architecture spec" });
@@ -150,7 +168,7 @@ export function useStepGate(step, user) {
   }, [step?.to, step?.gate, effectiveEmail, user, autoBuild.isActive,
     autoBuild.build?.architecture, autoBuild.build?.data_model,
     autoBuild.build?.ui_system, autoBuild.build?.code_manifest,
-    autoBuild.build?.deployment]);
+    autoBuild.build?.deployment, autoBuild.build?.vision, autoBuild.build?.strategy]);
 
   return state;
 }

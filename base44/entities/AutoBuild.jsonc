@@ -80,10 +80,109 @@
         }
       }
     },
+    "vision": {
+      "type": "object",
+      "description": "Generated vision document \u2014 the mandatory foundation before building. Defines what we're building, why, for whom, and what success looks like. Produced by generateVisionDoc.",
+      "properties": {
+        "mission": {
+          "type": "string"
+        },
+        "problem": {
+          "type": "string"
+        },
+        "target_audience": {
+          "type": "string"
+        },
+        "long_term_vision": {
+          "type": "string"
+        },
+        "success_metrics": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "core_values": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "value_proposition": {
+          "type": "string"
+        },
+        "market_opportunity": {
+          "type": "string"
+        },
+        "approved": {
+          "type": "boolean",
+          "default": false
+        },
+        "generated_at": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
+    "strategy": {
+      "type": "object",
+      "description": "Generated strategy document \u2014 the mandatory plan before building. Defines how we win: positioning, GTM, revenue, pricing, channels, roadmap, risks. Produced by generateStrategyDoc from the approved vision.",
+      "properties": {
+        "competitive_positioning": {
+          "type": "string"
+        },
+        "go_to_market": {
+          "type": "string"
+        },
+        "revenue_model": {
+          "type": "string"
+        },
+        "pricing_strategy": {
+          "type": "string"
+        },
+        "acquisition_channels": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "roadmap": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        },
+        "risks": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        },
+        "resources": {
+          "type": "string"
+        },
+        "differentiation": {
+          "type": "string"
+        },
+        "partnerships": {
+          "type": "string"
+        },
+        "approved": {
+          "type": "boolean",
+          "default": false
+        },
+        "generated_at": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
     "current_step": {
       "type": "string",
       "enum": [
         "profile",
+        "vision",
+        "strategy",
         "names",
         "content",
         "logo",
@@ -101,7 +200,7 @@
         "complete"
       ],
       "default": "profile",
-      "description": "Which pipeline step this build is on. Marketing builds use profile\u2192names\u2192content\u2192...\u2192review. System builds (web_app/ecommerce/platform) use profile\u2192architecture\u2192data_model\u2192ui_system\u2192codegen\u2192deploy\u2192system_review."
+      "description": "Which pipeline step this build is on. Marketing builds use profile\u2192vision\u2192strategy\u2192names\u2192content\u2192...\u2192review. System builds use profile\u2192vision\u2192strategy\u2192architecture\u2192data_model\u2192ui_system\u2192codegen\u2192deploy\u2192system_review."
     },
     "status": {
       "type": "string",

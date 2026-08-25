@@ -91,6 +91,8 @@ import MyPackage from '@/pages/MyPackage';
 import Assistant from '@/pages/Assistant';
 import Signatures from '@/pages/Signatures';
 import BusinessProfile from '@/pages/BusinessProfile';
+import Vision from '@/pages/Vision';
+import Strategy from '@/pages/Strategy';
 import BusinessNameStudio from '@/pages/BusinessNameStudio';
 import WalkthroughStudio from '@/pages/WalkthroughStudio';
 import WalkthroughView from '@/pages/WalkthroughView';
@@ -173,6 +175,8 @@ const AuthenticatedApp = () => {
           <Route path="/my-package" element={<MyPackage />} />
           <Route path="/assistant" element={<Assistant />} />
           <Route path="/business-profile" element={<BusinessProfile />} />
+          <Route path="/vision" element={<Vision />} />
+          <Route path="/strategy" element={<Strategy />} />
           <Route path="/business-name-studio" element={<BusinessNameStudio />} />
           <Route path="/walkthrough-studio" element={<WalkthroughStudio />} />
           <Route path="/content-generator" element={<ContentGenerator />} />

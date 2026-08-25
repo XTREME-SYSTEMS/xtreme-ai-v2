@@ -14,6 +14,9 @@ import {
   generateWebsite, generateSocial, generateVideo,
 } from "../../shared/autoBuildGenerators.ts";
 import {
+  generateVisionDoc, generateStrategyDoc,
+} from "../../shared/visionStrategyGenerators.ts";
+import {
   generateArchitectureSpec, generateDataModelSpec, generateUiSystemSpec,
   generateCodeManifestSpec, generateDeploymentSpec, generateWithValidation,
 } from "../../shared/systemBuildGenerators.ts";
@@ -28,8 +31,8 @@ import {
 
 // ── Step sequences ──────────────────────────────────────────────────────
 
-const MARKETING_STEPS = ["profile", "names", "content", "logo", "brand", "website", "social", "video", "review", "complete"];
-const SYSTEM_STEPS = ["profile", "architecture", "data_model", "ui_system", "codegen", "deploy", "system_review", "complete"];
+const MARKETING_STEPS = ["profile", "vision", "strategy", "names", "content", "logo", "brand", "website", "social", "video", "review", "complete"];
+const SYSTEM_STEPS = ["profile", "vision", "strategy", "architecture", "data_model", "ui_system", "codegen", "deploy", "system_review", "complete"];
 const SYSTEM_PRODUCT_TYPES = ["web_app", "ecommerce", "platform"];
 
 // Step key → UI route path. The UI pages add ROUTE PATHS to visited_steps
@@ -37,6 +40,8 @@ const SYSTEM_PRODUCT_TYPES = ["web_app", "ecommerce", "platform"];
 // The queue processor must use the same format so the timeline gates work.
 const STEP_PATHS: Record<string, string> = {
   profile: "/business-profile",
+  vision: "/vision",
+  strategy: "/strategy",
   names: "/business-name-studio",
   content: "/content-generator",
   logo: "/logo-generator",
@@ -91,7 +96,32 @@ function buildParams(build: any): Record<string, any> {
     website: p.website,
     logoUrl: build.chosen_logo_url || (build.logo_options?.[0]?.url),
     contentTone: build.chosen_content_template,
+    // Vision & Strategy — feed into downstream generators so every asset
+    // (content, logo, brand, website, social, video) is shaped by the
+    // approved vision and strategy, not generated in a vacuum.
+    vision: build.vision,
+    strategy: build.strategy,
   };
+}
+
+// ── Vision & Strategy step executors ─────────────────────────────────────
+
+async function runVision(base44: any, build: any) {
+  const params = buildParams(build);
+  const vision = await generateVisionDoc(base44, params);
+  // Auto-approve in autonomous mode so the pipeline can proceed without
+  // manual review. In manual mode, the admin must review and approve
+  // on the Vision page before the gate unlocks.
+  if (build.auto_advance) vision.approved = true;
+  return { vision };
+}
+
+async function runStrategy(base44: any, build: any) {
+  if (!build.vision) throw new Error("Vision document is required before generating strategy. Generate and approve the vision first.");
+  const params = { ...buildParams(build), vision: build.vision };
+  const strategy = await generateStrategyDoc(base44, params);
+  if (build.auto_advance) strategy.approved = true;
+  return { strategy };
 }
 
 // ── Marketing step executors ────────────────────────────────────────────
@@ -212,6 +242,8 @@ async function runDeploy(base44: any, build: any) {
 const STEP_EXECUTORS: Record<string, (base44: any, build: any) => Promise<Record<string, any>>> = {
   // Marketing
   profile: async () => ({}),
+  vision: runVision,
+  strategy: runStrategy,
   names: runNames,
   content: runContent,
   logo: runLogo,
@@ -370,7 +402,7 @@ Deno.serve(async (req: Request) => {
     // build is continuously audited → fixed → healed → hardened → optimized.
     // Skipped for empty steps (profile, review, system_review) and when
     // the caller passes skip_validation=true.
-    const VALIDATABLE_STEPS = ["names", "content", "logo", "brand", "website", "social", "video", "architecture", "data_model", "ui_system", "codegen", "deploy"];
+    const VALIDATABLE_STEPS = ["vision", "strategy", "names", "content", "logo", "brand", "website", "social", "video", "architecture", "data_model", "ui_system", "codegen", "deploy"];
     let validationResult: Record<string, any> | null = null;
     if (!skipValidation && VALIDATABLE_STEPS.includes(step)) {
       try {

@@ -2,13 +2,44 @@ import {
   Building2, Globe, Palette, Megaphone, Video, Search,
   Radar, Database, Rocket, FileText, Users, BarChart3, Box,
   Cpu, ShoppingCart, Network, ShieldCheck, TrendingUp, Layers,
+  Eye, ClipboardList, Target, Compass, Lightbulb, DollarSign,
+  AlertTriangle, Zap, Handshake,
 } from "lucide-react";
 
 // All possible activities the Xtreme AI Business Generator can perform,
 // grouped by functional category. Shown on the Welcome step to orient
 // the user on the full scope of the system.
+//
+// Vision and Strategy are the mandatory foundation — they come BEFORE
+// Build. You cannot build without first defining what you're building
+// and why (Vision), and how you plan to get there (Strategy).
 
 const CATEGORIES = [
+  {
+    label: "Vision",
+    icon: Eye,
+    activities: [
+      { icon: Target, title: "Define Your Mission", desc: "One powerful sentence — what this business exists to do and why it matters." },
+      { icon: AlertTriangle, title: "Identify the Problem", desc: "The specific, painful problem you solve. What's broken, missing, or poorly served?" },
+      { icon: Users, title: "Know Your Audience", desc: "Who exactly this is for — a clear persona with needs, pains, and buying behavior." },
+      { icon: Eye, title: "Long-Term Vision", desc: "A vivid 3-5 year picture of what this becomes. The big ambition." },
+      { icon: TrendingUp, title: "Success Metrics", desc: "Measurable indicators of success — specific, trackable, and time-bound." },
+      { icon: ShieldCheck, title: "Core Values & Value Prop", desc: "Guiding principles and the single most compelling reason someone chooses you." },
+    ],
+  },
+  {
+    label: "Strategy",
+    icon: ClipboardList,
+    activities: [
+      { icon: Compass, title: "Competitive Positioning", desc: "How you position against alternatives. Who are the competitors? What's the wedge?" },
+      { icon: Rocket, title: "Go-to-Market Plan", desc: "The concrete plan to get the first 100 customers — channels, tactics, sequence." },
+      { icon: DollarSign, title: "Revenue & Pricing", desc: "How money is made — revenue model, pricing tiers, unit economics, and price points." },
+      { icon: Zap, title: "Acquisition Channels", desc: "5-8 specific channels for reaching your audience, ranked by expected ROI." },
+      { icon: ClipboardList, title: "Execution Roadmap", desc: "3 phases — Foundation, Growth, Scale — with goals and key initiatives for each." },
+      { icon: AlertTriangle, title: "Risks & Mitigations", desc: "Key risks identified with severity and specific mitigation strategies for each." },
+      { icon: Handshake, title: "Differentiation & Partnerships", desc: "Your durable moat and the key partnerships that accelerate execution." },
+    ],
+  },
   {
     label: "Build",
     icon: Layers,
@@ -68,7 +99,7 @@ export default function SystemActivities() {
         <Cpu className="h-4 w-4" /> What This System Can Do
       </div>
       <p className="mt-1 text-sm text-white/50">
-        The Xtreme AI Business Generator is a complete growth factory. Here's everything you can build, generate, and automate:
+        The Xtreme AI Business Generator is a complete growth factory. Here's everything you can vision, strategize, build, generate, and automate:
       </p>
       <div className="mt-4 space-y-4">
         {CATEGORIES.map((cat) => {

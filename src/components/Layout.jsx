@@ -8,6 +8,7 @@ import {
   BookMarked, CheckCircle, ScrollText, Plug, Settings, LogOut, Menu, X,
   MapPin, Plus, Rocket, Bot, LayoutTemplate, Copy, Wand2, Crosshair, Activity, Radar, Package, UserPlus, Tag, Box, ShieldAlert, Sparkles, Brain,
   Archive, ChevronDown, Compass, Building2, MessageSquareText, PenTool, Shirt, Share2, Video, Layers,
+  ClipboardList,
 } from "lucide-react";
 import { Image } from "@/components/ui/image";
 import { cn } from "@/lib/utils";

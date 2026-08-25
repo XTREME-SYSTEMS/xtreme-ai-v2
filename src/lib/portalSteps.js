@@ -3,6 +3,7 @@ import {
   Video, LayoutTemplate, FileSignature, ShieldCheck, Rocket, Sparkles,
   LayoutDashboard, Settings, Compass, Box,
   Cpu, Database, ClipboardCheck, Code, Server,
+  Eye, ClipboardList,
 } from "lucide-react";
 
 // ─────────────────────────────────────────────────────────────────────────
@@ -41,6 +42,22 @@ export const PORTAL_STEPS = {
     activityLabel: "Complete your business profile",
     title: "Tell Us About Your Business",
     body: "Fill out your business details — industry, name, services, service area, logo and photos. Our team uses this to build everything else.",
+    nextLabel: "Go to Vision", nextTo: "/vision",
+  },
+  vision: {
+    key: "vision",
+    to: "/vision", label: "Vision", icon: Eye, gate: "vision",
+    activityLabel: "Generate and approve your vision",
+    title: "Define Your Vision",
+    body: "Before we build anything, we need a clear vision. What are we building? Why does it matter? Who is it for? What does success look like? Every downstream decision flows from this.",
+    nextLabel: "Go to Strategy", nextTo: "/strategy",
+  },
+  strategy: {
+    key: "strategy",
+    to: "/strategy", label: "Strategy", icon: ClipboardList, gate: "strategy",
+    activityLabel: "Generate and approve your strategy",
+    title: "Define Your Strategy",
+    body: "Now that we have a vision, we need a strategy to get there. How do we win? What's the plan? What are the risks? Every execution decision flows from this.",
     nextLabel: "Go to Content Generator", nextTo: "/content-generator",
   },
   content: {
@@ -195,23 +212,21 @@ export const PORTAL_STEPS = {
 // BEFORE Your Designs so the customer can add optional AI tools and add-ons
 // to their contract before reviewing the final package and signing.
 const FULL_BUILD = [
-  "welcome", "business-name", "business-profile", "content", "logo", "brand", "website",
+  "welcome", "business-name", "business-profile", "vision", "strategy", "content", "logo", "brand", "website",
   "enhancements", "your-designs", "signatures", "approvals", "launch",
 ];
 
 // Build with social media + video pack included
 const FULL_BUILD_PLUS_MEDIA = [
-  "welcome", "business-name", "business-profile", "content", "logo", "brand", "website",
+  "welcome", "business-name", "business-profile", "vision", "strategy", "content", "logo", "brand", "website",
   "social", "video", "enhancements", "your-designs", "signatures",
   "approvals", "launch",
 ];
 
-// System build pipeline (web_app / ecommerce / platform). For now:
-// profile → architecture → review → launch. Subsequent turns add
-// data-model, ui-system, codegen, and deploy steps between architecture
-// and review once each generator is built.
+// System build pipeline (web_app / ecommerce / platform).
+// profile → vision → strategy → architecture → data-model → ui-system → codegen → deploy → review → launch
 const SYSTEM_BUILD = [
-  "welcome", "business-profile", "system-architecture", "data-model", "ui-system", "codegen", "deploy", "system-review", "launch",
+  "welcome", "business-profile", "vision", "strategy", "system-architecture", "data-model", "ui-system", "codegen", "deploy", "system-review", "launch",
 ];
 
 export const PRODUCT_STEPS = {
