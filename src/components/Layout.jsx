@@ -190,9 +190,9 @@ export default function Layout() {
           </div>
 
           {/* Vertical step-by-step timeline */}
-          <div className="relative mt-1">
+          <div className="relative mt-2">
             {/* Connecting line */}
-            <div className="absolute left-[19px] top-4 bottom-4 w-0.5 bg-white/10" />
+            <div className="absolute left-[22px] top-6 bottom-6 w-0.5 bg-white/10" />
             {PIPELINE_STEPS.map((step) => {
               const Icon = step.icon;
               return (
@@ -202,23 +202,23 @@ export default function Layout() {
                   end={step.end}
                   onClick={() => setOpen(false)}
                   className={({ isActive }) => cn(
-                    "relative flex items-start gap-3 rounded-lg px-1.5 py-1.5 transition-colors",
+                    "relative flex items-center gap-3.5 rounded-lg px-1 py-2.5 transition-colors",
                     isActive ? "" : "hover:bg-white/5"
                   )}
                 >
                   {({ isActive }) => (
                     <>
                       <div className={cn(
-                        "relative z-10 flex h-9 w-9 shrink-0 items-center justify-center rounded-full border-2 text-xs font-bold transition-colors",
+                        "relative z-10 flex h-11 w-11 shrink-0 items-center justify-center rounded-full border-2 text-sm font-bold transition-all duration-200",
                         isActive
-                          ? "border-amber-400 bg-amber-400 text-black"
-                          : "border-white/15 bg-black text-white/50"
+                          ? "border-amber-400 bg-amber-400 text-black shadow-[0_0_12px_2px_rgba(251,191,36,0.5)]"
+                          : "border-white/15 bg-zinc-900 text-white/50"
                       )}>
                         {step.step}
                       </div>
-                      <div className="pt-1.5">
+                      <div>
                         <div className={cn(
-                          "flex items-center gap-1.5 text-sm font-medium",
+                          "flex items-center gap-1.5 text-sm font-medium transition-colors",
                           isActive ? "text-amber-400" : "text-white"
                         )}>
                           <Icon className="h-3.5 w-3.5 shrink-0" />
