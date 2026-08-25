@@ -22,9 +22,9 @@ export default function AutonomousSystem() {
   const [discovering, setDiscovering] = useState(false);
   const [discoveryRuns, setDiscoveryRuns] = useState([]);
 
-  const load = useCallback(async () => {
+  const load = useCallback(async (silent = false) => {
     try {
-      setLoading(true);
+      if (!silent) setLoading(true);
       const [allBuilds, openAlerts, openOpts, recentHealth, recentRuns] = await Promise.all([
         base44.entities.AutoBuild.list("-created_date", 50),
         base44.entities.SystemAlert.filter({ status: "open" }, "-created_date", 10).catch(() => []),
@@ -46,11 +46,11 @@ export default function AutonomousSystem() {
 
   useEffect(() => { load(); }, [load]);
 
-  // Poll for updates when a build is running
+  // Poll for updates when a build is running (silent — no full-page spinner)
   useEffect(() => {
     const anyRunning = builds.some((b) => b.status === "running");
     if (!anyRunning) return;
-    const interval = setInterval(load, 3000);
+    const interval = setInterval(() => load(true), 3000);
     return () => clearInterval(interval);
   }, [builds, load]);
 
