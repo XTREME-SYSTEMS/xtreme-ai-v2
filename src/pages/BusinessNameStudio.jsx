@@ -374,8 +374,8 @@ export default function BusinessNameStudio() {
               <CheckCircle className="h-4 w-4 shrink-0 text-lime-400" />
               <div>
                 <p className="font-medium text-white/70">How it works:</p>
-                <p className="mt-1">Our AI generates 25+ candidate names with web search, verifies each .com domain via RDAP in parallel, checks US state business registries, and scores across 8 dimensions. If fewer than 10 are available, it auto-generates a second batch. We only show names with <span className="text-lime-400">100% confirmed available .com domains</span>.</p>
-                <p className="mt-2 text-white/30">Click "Research" on any result to see the full Google search data and state registry findings.</p>
+                <p className="mt-1">Our AI generates 15 creative candidate names, verifies each .com domain via RDAP in parallel, checks US state business registries, and scores across 8 dimensions. We only show names with <span className="text-lime-400">100% confirmed available .com domains</span>.</p>
+                <p className="mt-2 text-white/30">Click "Research" on any result to see the full AI uniqueness assessment and state registry findings.</p>
               </div>
             </div>
           </div>

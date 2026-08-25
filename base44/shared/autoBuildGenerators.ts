@@ -13,9 +13,9 @@ import { compileBrief, briefText, photoStyleSuffix } from "./generatorBrief.ts";
 import { researchBusinessNamesDeep } from "./businessNameResearcher.ts";
 
 // ── Names (from recommendBusinessNames) ─────────────────────────────────
-// Now uses the deep research pipeline (businessNameResearcher.ts) which
-// combines AI generation, Browserbase Google scraping, OpenCorporates US
-// state registry checks, RDAP domain verification, and AI re-scoring.
+// Uses the optimized research pipeline (businessNameResearcher.ts): AI
+// generates 15 candidates, RDAP verifies all .com domains in parallel,
+// OpenCorporates checks US state registries, deterministic scoring.
 // Only returns names with 100% confirmed available .com domains.
 
 export async function generateNamesWithResearch(base44: any, params: Record<string, any>) {

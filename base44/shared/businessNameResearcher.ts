@@ -1,12 +1,11 @@
 // businessNameResearcher.ts — Fast business name + URL researcher.
 // ------------------------------------------------------------
-// Optimized pipeline (avg 20-30s, down from 60-120s):
-// 1. AI generates 25 candidates (Gemini Flash + web search) — one LLM call
-// 2. RDAP verifies ALL 25 domains in parallel — fast (~3s)
-// 3. If fewer than 10 available, auto-generate a second batch of 25
-// 4. State registry check for available candidates (parallel, fast)
-// 5. Deterministic scoring (no second LLM call — saves 15-20s)
-// 6. Return top 10 available .com domains, sorted by overall score
+// Optimized pipeline (avg 30-40s, down from 60-120s):
+// 1. AI generates 15 candidates (Gemini Flash, no web search) — one LLM call
+// 2. RDAP verifies ALL 15 domains in parallel — fast (~3s)
+// 3. State registry check for available candidates (parallel, fast)
+// 4. Deterministic scoring (no second LLM call — saves 15-20s)
+// 5. Return up to 10 available .com domains, sorted by overall score
 //
 // Regeneration: pass `seed` (random int) and `exclude` (names already shown)
 // to get fresh, non-duplicate suggestions quickly.
@@ -92,9 +91,9 @@ CRITICAL — .com DOMAIN AVAILABILITY: The .com domain MUST be likely available.
 - Avoid generic terms alone ("pro", "expert", "solutions", "services")
 - Example good patterns: "[Industry][City]", "[Action][Industry]Co", "[Adjective][Material]Works"
 
-For EACH name, use your web search to research:
-1. Search for "[name] [industry]" to check if a business with this exact name exists
-2. Assess if the .com domain is likely available
+For EACH name, assess based on your knowledge:
+1. Does a business with this exact name already exist in this industry?
+2. Is the .com domain likely available (given the name's uniqueness)?
 
 Score each name on these 0-100 scales:
 - viral_score: memorability, brandability, emotional resonance, shareability
@@ -105,8 +104,8 @@ Score each name on these 0-100 scales:
 - trademark_safety_score: low risk of trademark conflict (100 = very safe)
 
 Also provide:
-- google_search_status: "highly_unique" | "unique" | "moderate" | "common" (based on your web search)
-- state_registry_status: "available" | "likely_available" | "exists" (based on your web search)
+- google_search_status: "highly_unique" | "unique" | "moderate" | "common" (based on uniqueness assessment)
+- state_registry_status: "available" | "likely_available" | "exists" (based on your knowledge of existing businesses)
 - tagline: short catchy tagline (3-6 words)
 - rationale: 1-2 sentences on why this name could become viral and successful
 - target_audience: who this name appeals to
@@ -274,7 +273,7 @@ export async function researchBusinessNamesDeep(base44: any, params: Record<stri
       domain_available: true,
       google_research: {
         uniqueness: c.google_search_status || 'unknown',
-        method: 'ai_web_search',
+        method: 'ai_assessment',
         query: `"${c.name}" ${industry} ${location || ''}`.trim(),
         result_count: null,
         top_results: [],
