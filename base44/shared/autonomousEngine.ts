@@ -250,7 +250,7 @@ EXISTING APP CONTEXT:
 - Stack: React + Vite + Tailwind + shadcn/ui + Base44 SDK
 - Existing entities: Market, ProvisioningRecord, GenerationJob, MarketSeo, MarketPricing, CompetitorInsight, SeoLaunchKit, Account, Contact, Deal, Activity, Campaign, Quote, EsignDocument, Invoice, Expense, AuditRequest
 - Existing functions: provisionMarket, generateMarketAssets, generateSeoLaunchKit, generateContract, generateInvoice, esignPortal, sendEsignRequest, run-free-audit, generate-seo-page
-- Brand: dark mode (black bg, white text), neon lime green (#D4FF4D) accents
+- Brand: dark mode (black bg, white text), metallic gold (#FFEA00) accents
 
 Produce a COMPLETE, DETAILED implementation spec for this phase. For each entity, list every field with its type. For each function, describe the handler logic step-by-step. For each page, describe the layout and data flow. Output as structured JSON with keys: entities (array of {name, fields}), functions (array of {name, logic}), pages (array of {name, layout}), integration_notes, estimated_effort_hours.`;
 }

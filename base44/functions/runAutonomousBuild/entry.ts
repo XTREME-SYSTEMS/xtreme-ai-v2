@@ -34,7 +34,7 @@ export default async function(req) {
       }
     }
 
-    return Response.json({ ok: true, plans_run: results.length, results });
+    return Response.json({ ok: true, plan_id: plansToRun[0]?.id || null, plans_run: results.length, results });
   } catch (error) {
     return Response.json({ error: error.message, stack: error.stack }, { status: 500 });
   }

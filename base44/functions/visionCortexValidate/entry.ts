@@ -25,6 +25,7 @@ export default async function(req: Request): Promise<Response> {
       top_n = 10,
       min_score = 40,
       generate_summaries = true,
+      max_ideas_to_score = 15,
     } = body;
 
     // Fetch discovered ideas — either from a specific run or all unvalidated
@@ -40,6 +41,13 @@ export default async function(req: Request): Promise<Response> {
       }, '-created_date', 100);
     }
 
+    // Limit ideas scored per invocation to avoid 120s proxy timeout.
+    // Remaining ideas will be scored in subsequent runs.
+    if (ideas.length > max_ideas_to_score) {
+      logs && logs.push ? null : null; // no-op to keep linter happy
+    }
+    const ideasToScore = ideas.slice(0, max_ideas_to_score);
+
     if (ideas.length === 0) {
       return Response.json({
         ok: true,
@@ -49,11 +57,11 @@ export default async function(req: Request): Promise<Response> {
       });
     }
 
-    const logs: string[] = [`[${new Date().toISOString()}] Vision Cortex validation started — ${ideas.length} ideas to score`];
+    const logs: string[] = [`[${new Date().toISOString()}] Vision Cortex validation started — ${ideasToScore.length}/${ideas.length} ideas to score (batched to avoid timeout)`];
 
-    // Phase 1: Score each idea with the YC framework
+    // Phase 1: Score each idea with the YC framework (batched)
     const scoredIdeas: any[] = [];
-    for (const idea of ideas) {
+    for (const idea of ideasToScore) {
       try {
         const scoring = await scoreIdeaYC(base44, {
           title: idea.title,

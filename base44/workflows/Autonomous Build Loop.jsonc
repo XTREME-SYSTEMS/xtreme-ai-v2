@@ -9,7 +9,7 @@
       "cron_expression": null,
       "one_time_date": null,
       "timezone": "UTC",
-      "interval_value": 10,
+      "interval_value": 30,
       "interval_unit": "minutes",
       "interval_anchor": null,
       "ends_type": "never",
@@ -17,7 +17,7 @@
       "ends_after_count": null
     }
   },
-  "description": "Self-driving build loop \u2014 picks the next pending phase, generates code, validates, reflects on failures, and repeats until 100% or max iterations. Runs every 10 minutes.",
+  "description": "Self-driving build loop \u2014 picks the next pending phase, generates code, validates, reflects on failures, and repeats until 100% or max iterations. Runs every 30 minutes (increased from 10 to avoid 120s proxy timeout).",
   "definition": {
     "document": {
       "dsl": "1.0.0",

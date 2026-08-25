@@ -74,7 +74,7 @@ export default async function(req: Request): Promise<Response> {
       logs: [...(idea.logs || []), `[${new Date().toISOString()}] Provisioned to AutoBuild ${build.id}`],
     });
 
-    // Save the exhaustive summary to Google Drive for team reference
+    // Email the exhaustive summary to the operator for team reference
     try {
       const driveContent = `# Vision Cortex: ${idea.title}
 

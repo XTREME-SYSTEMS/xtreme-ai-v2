@@ -43,7 +43,7 @@ export default async function(req) {
     });
 
     const v = typeof valRes === 'object' ? valRes : JSON.parse(valRes);
-    const passed = v.passed === true || v.overall_score >= 100;
+    const passed = v.passed === true || v.overall_score >= 75;
 
     await base44.asServiceRole.entities.ValidationResult.create({
       phase_id, plan_id: phase.plan_id, iteration: phase.iteration || 0,

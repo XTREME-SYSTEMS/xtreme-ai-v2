@@ -13,15 +13,15 @@
           "with": {
             "function_name": "visionCortexDiscover",
             "args": {
-              "max_sources": 6,
-              "max_ideas_per_source": 10,
-              "max_total": 50,
+              "max_sources": 4,
+              "max_ideas_per_source": 8,
+              "max_total": 25,
               "triggered_by": "workflow"
             }
           },
           "then": "validate",
           "x-base44": {
-            "title": "Discover 50 ideas",
+            "title": "Discover 25 ideas",
             "description": "Scrape Reddit, Product Hunt, Hacker News, AI sites via Browserbase"
           }
         }
@@ -35,13 +35,14 @@
               "run_id": "${ .discover.run_id }",
               "top_n": 10,
               "min_score": 40,
-              "generate_summaries": true
+              "generate_summaries": true,
+              "max_ideas_to_score": 15
             }
           },
           "then": "check_top_idea",
           "x-base44": {
             "title": "Validate & score with YC framework",
-            "description": "Score all ideas, pick top 10, generate exhaustive summaries"
+            "description": "Score up to 15 ideas (batched to avoid timeout), pick top 10, generate exhaustive summaries"
           }
         }
       },
@@ -83,7 +84,7 @@
     ]
   },
   "name": "Vision Cortex Daily Cycle",
-  "description": "Runs the Vision Cortex engine once every 24 hours: scrapes 6+ sources (Reddit, Product Hunt, Hacker News, AI directories, social media) via Browserbase to find 50 ideas, scores each against the YC 10-key-question framework + visionary principles, selects the top 10, generates exhaustive build summaries, and provisions the #1 idea into the Auto Builder pipeline.",
+  "description": "Runs the Vision Cortex engine once every 24 hours: scrapes 4+ sources (Reddit, Product Hunt, Hacker News, AI directories, social media) via Browserbase to find 25 ideas, scores up to 15 per invocation (batched to avoid timeout) against the YC 10-key-question framework, selects the top 10, generates exhaustive build summaries, and provisions the #1 idea into the Auto Builder pipeline.",
   "trigger": {
     "condition": null,
     "config": {

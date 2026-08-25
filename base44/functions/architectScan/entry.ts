@@ -169,17 +169,35 @@ Search the web for the LATEST AI capabilities and emerging technologies. Be bold
         },
         required: ['proposals']
       },
-      model: 'gemini_3_flash',
+      model: 'gemini_3_1_pro',
     });
 
     const proposals = (response as any)?.proposals || [];
     logs.push(`[${new Date().toISOString()}] LLM generated ${proposals.length} proposals`);
 
-    // ── Phase 3: Save proposals ──
+    // ── Phase 3: Save proposals (with deduplication) ──
     const scanId = `architect_${Date.now()}`;
     const saved: any[] = [];
 
+    // Fetch existing proposal titles from the last 48 hours to dedup
+    const existingProposals = await base44.asServiceRole.entities.ArchitectProposal
+      .list('-created_date', 200).catch(() => []);
+    const existingKeys = new Set(
+      (existingProposals as any[]).map((p) => `${p.title}::${p.proposal_type}`)
+    );
+    const dedupCutoff = Date.now() - 48 * 60 * 60 * 1000;
+    const recentKeys = new Set(
+      (existingProposals as any[])
+        .filter((p) => new Date(p.created_date).getTime() > dedupCutoff)
+        .map((p) => `${p.title}::${p.proposal_type}`)
+    );
+
     for (const proposal of proposals) {
+      const key = `${proposal.title}::${proposal.proposal_type}`;
+      if (recentKeys.has(key)) {
+        logs.push(`[${new Date().toISOString()}] Skipping duplicate proposal: "${proposal.title}"`);
+        continue;
+      }
       try {
         const record = await base44.asServiceRole.entities.ArchitectProposal.create({
           title: proposal.title,

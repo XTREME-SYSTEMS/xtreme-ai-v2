@@ -182,9 +182,10 @@ export default async function(req) {
       try {
         if (classified.recommendedAction === 'retry' || classified.recommendedAction === 'regenerate') {
           const invokePayload: any = {
-            buildId,
+            build_id: buildId,
             step: stepKey,
-            action: 'execute',
+            advance: true,
+            force: true,
           };
           if (classified.recommendedAction === 'regenerate') {
             invokePayload.previousErrors = [classified.context];

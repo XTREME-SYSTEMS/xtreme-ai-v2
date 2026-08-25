@@ -10,7 +10,7 @@ import { createClientFromRequest } from "npm:@base44/sdk@0.8.40";
 // ============================================================
 
 const STUCK_THRESHOLD_MINUTES = 10;
-const MAX_FAILURE_RETRIES = 3;
+const MAX_FAILURE_RETRIES = 2;
 
 export default async function (req: Request) {
   try {
@@ -33,6 +33,11 @@ export default async function (req: Request) {
       "-updated_date",
       20
     ).catch(() => []);
+
+    // Early return: nothing to scan — skip the Receipt creation entirely
+    if (runningBuilds.length === 0 && failedBuilds.length === 0) {
+      return Response.json({ ok: true, scanned: 0, recovered: 0, skipped: 0, marked_failed: 0, details: [] });
+    }
 
     const results = {
       scanned: runningBuilds.length + failedBuilds.length,
@@ -107,7 +112,7 @@ export default async function (req: Request) {
     for (const build of failedBuilds) {
       const failureCount = (build.logs || []).filter((l: string) => l.includes("FAILED")).length;
       if (failureCount >= MAX_FAILURE_RETRIES * 3) {
-        // Each step has 3 retry attempts, so 9 FAILED log entries = 3 full step failures
+        // Each step has 3 retry attempts, so 6 FAILED log entries = 2 full step failures
         results.skipped++;
         continue;
       }

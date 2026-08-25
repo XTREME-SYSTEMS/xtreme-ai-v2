@@ -118,18 +118,27 @@ export default async function(req: Request) {
       allPassing = passing === total;
     }
 
-    // Phase 5: Record system health
+    // Phase 5: Record system health (correct fields for SystemHealthScore entity)
     const finalScore = allResults[allResults.length - 1]?.overall_score || 0;
     const capStats = getCapabilityStats();
 
     try {
       await base44.asServiceRole.entities.SystemHealthScore.create({
-        agent_or_workflow: "recursiveHardenSystem",
-        action: "recursive_audit",
-        status: finalScore >= 90 ? "success" : finalScore >= 70 ? "failed" : "escalated",
-        inputs: JSON.stringify({ maxIterations, dryRun, capStats }).slice(0, 4000),
-        outputs: JSON.stringify({ finalScore, iterations: allResults.length }).slice(0, 4000),
-        evidence: `Final score: ${finalScore}/100 after ${allResults.length} iterations`,
+        plan_id: "recursive_harden",
+        overall_score: finalScore,
+        completeness_score: finalScore,
+        correctness_score: finalScore,
+        integration_score: finalScore,
+        security_score: finalScore,
+        performance_score: finalScore,
+        autonomy_score: finalScore,
+        qa_pass_rate: allResults[allResults.length - 1] ? Math.round((allResults[allResults.length - 1].passing / allResults[allResults.length - 1].total) * 100) : 0,
+        phases_passed: allResults[allResults.length - 1]?.passing || 0,
+        phases_total: allResults[allResults.length - 1]?.total || 0,
+        open_repair_tasks: 0,
+        trend: finalScore >= 90 ? 'improving' : 'declining',
+        last_audited_at: new Date().toISOString(),
+        active_remediation: `Recursive harden: ${allResults[allResults.length - 1]?.passing || 0}/${allResults[allResults.length - 1]?.total || 0} capabilities passing`,
       });
     } catch {}
 
@@ -138,6 +147,7 @@ export default async function(req: Request) {
       await base44.asServiceRole.entities.Receipt.create({
         agent_or_workflow: "recursiveHardenSystem",
         action: "recursive_harden",
+        entity_type: "SystemHealthScore",
         status: finalScore >= 90 ? "success" : "failed",
         inputs: JSON.stringify({ maxIterations, dryRun }).slice(0, 4000),
         outputs: JSON.stringify({ finalScore, iterations: allResults.length, passing: allResults[allResults.length-1]?.passing }).slice(0, 4000),
