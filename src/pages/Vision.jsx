@@ -181,9 +181,17 @@ export default function Vision() {
               <Lightbulb className="h-4 w-4" /> Edit
             </button>
             {vision.approved ? (
-              <div className="inline-flex items-center gap-1.5 rounded-lg border border-lime-400/50 bg-lime-400/10 px-4 py-2 text-sm font-semibold text-lime-300">
-                <CheckCircle className="h-4 w-4" /> Vision Approved
-              </div>
+              <BrandedButton
+                onClick={() => {
+                  const idx = visibleSteps.findIndex((s) => s.to === "/vision");
+                  const next = idx >= 0 && idx < visibleSteps.length - 1 ? visibleSteps[idx + 1] : null;
+                  navigate(next ? next.to : "/strategy");
+                }}
+                icon={Rocket}
+                showLogo
+              >
+                Activate & Continue to Strategy
+              </BrandedButton>
             ) : (
               <BrandedButton onClick={approve} icon={CheckCircle} showLogo>
                 Approve Vision & Continue
