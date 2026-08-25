@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { base44 } from "@/api/base44Client";
 import {
   Lightbulb, Loader2, Search, AlertCircle, TrendingUp, Sparkles,
-  Brain, Globe, Building2, CheckCircle, Zap, RefreshCw, Edit3, Plus,
+  Brain, Globe, Building2, CheckCircle, Zap, RefreshCw, Edit3, Plus, ArrowRight,
 } from "lucide-react";
 import { useClientUser } from "@/hooks/useClientUser";
 import { useClientProject } from "@/hooks/useClientProject";
@@ -49,6 +49,9 @@ export default function BusinessNameStudio() {
   const [usingName, setUsingName] = useState(null);
   const [usedName, setUsedName] = useState(null);
   const navigate = useNavigate();
+  const [ownName, setOwnName] = useState("");
+  const [ownDomain, setOwnDomain] = useState("");
+  const [savingOwn, setSavingOwn] = useState(false);
 
   // Context from prior steps — vision, strategy, profile — fed to the
   // AI-assist so suggestions build on what the user already chose.
@@ -145,6 +148,30 @@ export default function BusinessNameStudio() {
     setManualResult(null);
   };
 
+  // Save a name the user already has (no generation, no purchase).
+  const saveOwnName = async () => {
+    if (!ownName.trim()) {
+      setError("Enter your business name to continue.");
+      return;
+    }
+    setSavingOwn(true);
+    setError("");
+    try {
+      await base44.auth.updateMe({
+        epoxyProfile: {
+          ...(user?.epoxyProfile || {}),
+          businessName: ownName.trim(),
+          domain: ownDomain.trim() || undefined,
+        },
+      });
+      setTimeout(() => navigate("/business-profile"), 600);
+    } catch (e) {
+      setError(e?.message || "Could not save your name. Please try again.");
+    } finally {
+      setSavingOwn(false);
+    }
+  };
+
   // Use a chosen name WITHOUT buying the domain — saves it to the user's
   // profile and advances to the next step.
   const saveNameOnly = async (s) => {
@@ -221,6 +248,48 @@ export default function BusinessNameStudio() {
               AI generates unique epoxy & concrete business names with 100% available .com domains, verified via RDAP + state registries.
             </p>
           </div>
+        </div>
+      </div>
+
+      {/* Already have a name? — manual entry for existing businesses */}
+      <div className="rounded-xl border border-lime-400/30 bg-gradient-to-br from-lime-400/5 to-transparent p-5">
+        <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-lime-400">
+          <CheckCircle className="h-4 w-4" /> Already have a business name?
+        </div>
+        <p className="mt-1 text-sm text-white/50">
+          Skip the generator — enter your existing business name and website URL below and continue.
+        </p>
+        <div className="mt-3 grid gap-3 sm:grid-cols-[1fr_1fr_auto] sm:items-end">
+          <div>
+            <label className="mb-1 block text-xs font-medium text-white/60">Business name *</label>
+            <input
+              type="text"
+              value={ownName}
+              onChange={(e) => setOwnName(e.target.value)}
+              onKeyDown={(e) => e.key === "Enter" && saveOwnName()}
+              placeholder="e.g. Apex Epoxy Floors LLC"
+              className="w-full rounded-lg border border-white/15 bg-black px-3 py-2 text-sm text-white placeholder-white/30 focus:border-lime-400 focus:outline-none"
+            />
+          </div>
+          <div>
+            <label className="mb-1 block text-xs font-medium text-white/60">Website URL (optional)</label>
+            <input
+              type="text"
+              value={ownDomain}
+              onChange={(e) => setOwnDomain(e.target.value)}
+              onKeyDown={(e) => e.key === "Enter" && saveOwnName()}
+              placeholder="https://apexepoxy.com"
+              className="w-full rounded-lg border border-white/15 bg-black px-3 py-2 text-sm text-white placeholder-white/30 focus:border-lime-400 focus:outline-none"
+            />
+          </div>
+          <button
+            onClick={saveOwnName}
+            disabled={savingOwn || !ownName.trim()}
+            className="inline-flex items-center justify-center gap-1.5 rounded-lg bg-lime-400 px-5 py-2 text-sm font-semibold text-black transition-colors hover:bg-lime-300 disabled:opacity-50"
+          >
+            {savingOwn ? <Loader2 className="h-4 w-4 animate-spin" /> : <ArrowRight className="h-4 w-4" />}
+            {savingOwn ? "Saving…" : "Use My Name"}
+          </button>
         </div>
       </div>
 
