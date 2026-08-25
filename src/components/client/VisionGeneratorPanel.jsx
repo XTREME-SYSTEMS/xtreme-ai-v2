@@ -14,22 +14,11 @@ import {
 
 // Fallback categories shown immediately while the research function runs.
 const FALLBACK_CATEGORIES = [
-  { name: "AI Tools & Automation", icon: "🤖", description: "AI-powered tools that automate tasks", trending_score: 95, is_system_capability: false },
-  { name: "Health & Wellness", icon: "💪", description: "Health tracking, fitness, mental wellness", trending_score: 88, is_system_capability: false },
-  { name: "Productivity", icon: "⚡", description: "Task management, workflows, note-taking", trending_score: 85, is_system_capability: false },
-  { name: "Finance & Crypto", icon: "💰", description: "Budgeting, investing, fintech tools", trending_score: 90, is_system_capability: false },
-  { name: "Education & Learning", icon: "📚", description: "Online courses, tutoring, skill-building", trending_score: 82, is_system_capability: false },
-  { name: "E-Commerce & Marketplaces", icon: "🛒", description: "Online stores, niche marketplaces", trending_score: 87, is_system_capability: false },
-  { name: "Social & Community", icon: "👥", description: "Social networks, community platforms", trending_score: 80, is_system_capability: false },
-  { name: "Content Creation", icon: "🎬", description: "Video, audio, written content tools", trending_score: 89, is_system_capability: false },
-  { name: "Local Services", icon: "📍", description: "Local business websites & service directories", trending_score: 78, is_system_capability: false },
-  { name: "SaaS & B2B Tools", icon: "🏢", description: "Business software, CRM, project management", trending_score: 86, is_system_capability: false },
-  { name: "Gaming & Entertainment", icon: "🎮", description: "Games, streaming, interactive entertainment", trending_score: 84, is_system_capability: false },
-  { name: "Real Estate & Property", icon: "🏠", description: "Property listings, virtual tours, management", trending_score: 76, is_system_capability: false },
-  { name: "Marketing Website", icon: "🌐", description: "Premium marketing website for any business", trending_score: 100, is_system_capability: true },
-  { name: "Web App / SaaS", icon: "💻", description: "Full web app with auth and database", trending_score: 100, is_system_capability: true },
-  { name: "E-Commerce Store", icon: "🛍️", description: "Online store with catalog and checkout", trending_score: 100, is_system_capability: true },
-  { name: "Platform / Marketplace", icon: "🏗️", description: "Multi-sided marketplace platform", trending_score: 100, is_system_capability: true },
+  { name: "Epoxy Flooring", icon: "🎨", description: "Garage floors, basement floors, metallic epoxy, flake systems, self-leveling epoxy", trending_score: 95, is_system_capability: true },
+  { name: "Epoxy Coatings", icon: "🛡️", description: "Concrete coatings, protective coatings, warehouse floors, anti-slip, food-grade epoxy", trending_score: 92, is_system_capability: true },
+  { name: "Epoxy Contractors", icon: "👷", description: "Full-service epoxy installation — residential, commercial, industrial, repair & resurfacing", trending_score: 90, is_system_capability: true },
+  { name: "Polished Concrete", icon: "✨", description: "Grind & seal, burnished concrete, stained concrete, densification — commercial & residential", trending_score: 88, is_system_capability: true },
+  { name: "Decorative Concrete", icon: "🏛️", description: "Stamped concrete, overlays, micro-toppings, stained concrete, resurfacing, exposed aggregate", trending_score: 87, is_system_capability: true },
 ];
 
 // The Vision Generator — an AI-assisted, discovery-driven vision builder.
@@ -253,7 +242,7 @@ export default function VisionGeneratorPanel() {
           <Eye className="h-4 w-4" /> Vision Generator — AI-Assisted Discovery
         </div>
         <p className="mt-1 text-sm text-white/50">
-          Describe what you want to build in <span className="text-lime-400">one sentence</span>, or pick a trending category below. The system will research, discover, and build your full strategy.
+          Describe your epoxy or concrete business vision in <span className="text-lime-400">one sentence</span>, or pick a category below. The system will research, discover, and build your full strategy.
         </p>
       </div>
 
@@ -270,7 +259,7 @@ export default function VisionGeneratorPanel() {
             type="text"
             value={visionText}
             onChange={(e) => { setVisionText(e.target.value); setSelectedCategory(null); }}
-            placeholder="I want to build a platform that…"
+            placeholder="I want to build an epoxy flooring business that…"
             className="flex-1 rounded-lg border border-white/15 bg-black px-4 py-3 text-sm text-white placeholder-white/30 focus:border-lime-400 focus:outline-none"
             onKeyDown={(e) => { if (e.key === "Enter" && !discovering) handleDiscover(); }}
           />

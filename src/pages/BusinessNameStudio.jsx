@@ -9,12 +9,13 @@ import BackButton from "@/components/client/BackButton";
 import NameResearchCard from "@/components/names/NameResearchCard";
 import ResearchPhases from "@/components/names/ResearchPhases";
 
+// This system is exclusively focused on epoxy & concrete contracting.
 const INDUSTRIES = [
-  "roofing", "hvac", "plumbing", "epoxy flooring", "water damage restoration",
-  "mold remediation", "solar installation", "pest control", "tree removal",
-  "fencing", "concrete", "electrician", "garage door repair", "foundation repair",
-  "junk removal", "moving company", "cleaning services", "landscaping",
-  "chiropractor", "dentist", "med spa", "personal injury lawyer", "dui lawyer",
+  "epoxy flooring",
+  "epoxy coatings",
+  "epoxy contractor",
+  "polished concrete contractor",
+  "decorative concrete contractor",
 ];
 
 // AI-powered business name + URL generator with deep web research.
@@ -173,9 +174,9 @@ export default function BusinessNameStudio() {
             <Lightbulb className="h-5 w-5 text-lime-400" />
           </div>
           <div>
-            <h1 className="text-xl font-semibold text-white">Business Name & URL Generator</h1>
+            <h1 className="text-xl font-semibold text-white">Epoxy & Concrete Business Name Generator</h1>
             <p className="text-sm text-white/50">
-              AI scrapes Google + US state registries to find unique, viral names with 100% available .com domains.
+              AI generates unique epoxy & concrete business names with 100% available .com domains, verified via RDAP + state registries.
             </p>
           </div>
         </div>
@@ -185,13 +186,13 @@ export default function BusinessNameStudio() {
       <div className="rounded-xl border border-white/10 bg-zinc-950 p-5 space-y-4">
         <div className="grid gap-4 sm:grid-cols-2">
           <div>
-            <label className="mb-1 block text-xs font-medium text-white/60">Industry *</label>
+            <label className="mb-1 block text-xs font-medium text-white/60">Epoxy/Concrete Niche *</label>
             <input
               type="text"
               list="industry-list"
               value={industry}
               onChange={(e) => setIndustry(e.target.value)}
-              placeholder="e.g. roofing, hvac, plumbing"
+              placeholder="e.g. epoxy flooring, polished concrete"
               className="w-full rounded-lg border border-white/15 bg-black px-3 py-2 text-sm text-white placeholder-white/30 focus:border-lime-400 focus:outline-none"
             />
             <datalist id="industry-list">
@@ -215,7 +216,7 @@ export default function BusinessNameStudio() {
             type="text"
             value={keywords}
             onChange={(e) => setKeywords(e.target.value)}
-            placeholder="e.g. fast, affordable, premium, 24/7"
+            placeholder="e.g. metallic, garage, commercial, fast install"
             className="w-full rounded-lg border border-white/15 bg-black px-3 py-2 text-sm text-white placeholder-white/30 focus:border-lime-400 focus:outline-none"
           />
         </div>
@@ -307,86 +308,6 @@ export default function BusinessNameStudio() {
           </div>
 
           {/* Manual name input */}
-          {showManual && (
-            <div className="rounded-xl border border-lime-400/30 bg-lime-400/5 p-4 space-y-3">
-              <div>
-                <label className="mb-1 block text-xs font-medium text-white/60">Enter a business name to check domain availability</label>
-                <div className="flex gap-2">
-                  <input
-                    type="text"
-                    value={manualName}
-                    onChange={(e) => setManualName(e.target.value)}
-                    onKeyDown={(e) => e.key === "Enter" && checkManualName()}
-                    placeholder="e.g. Apex Epoxy Coatings"
-                    className="flex-1 rounded-lg border border-white/15 bg-black px-3 py-2 text-sm text-white placeholder-white/30 focus:border-lime-400 focus:outline-none"
-                  />
-                  <button
-                    onClick={checkManualName}
-                    disabled={manualChecking}
-                    className="inline-flex items-center gap-1.5 rounded-lg bg-lime-400 px-4 py-2 text-sm font-semibold text-black transition-colors hover:bg-lime-300 disabled:opacity-50"
-                  >
-                    {manualChecking ? <Loader2 className="h-4 w-4 animate-spin" /> : <Search className="h-4 w-4" />}
-                    {manualChecking ? "Checking…" : "Check"}
-                  </button>
-                </div>
-              </div>
-              {manualError && (
-                <p className="text-xs text-red-400">{manualError}</p>
-              )}
-              {manualResult && (
-                <div className="rounded-lg border border-white/10 bg-black/40 p-3">
-                  <div className="flex items-center gap-2">
-                    {manualResult.available ? (
-                      <CheckCircle className="h-5 w-5 text-lime-400" />
-                    ) : (
-                      <AlertCircle className="h-5 w-5 text-red-400" />
-                    )}
-                    <div className="flex-1">
-                      <div className="text-sm font-semibold text-white">{manualResult.name}</div>
-                      <div className="text-xs text-white/50">
-                        {manualResult.domain} —{" "}
-                        <span className={manualResult.available ? "text-lime-400 font-semibold" : "text-red-400 font-semibold"}>
-                          {manualResult.available ? "AVAILABLE" : "TAKEN"}
-                        </span>
-                      </div>
-                    </div>
-                    {manualResult.available && (
-                      <button
-                        onClick={useManualName}
-                        className="inline-flex items-center gap-1.5 rounded-lg border border-lime-400/40 bg-lime-400/10 px-3 py-1.5 text-xs font-semibold text-lime-300 hover:bg-lime-400/20"
-                      >
-                        <Plus className="h-3.5 w-3.5" /> Use This Name
-                      </button>
-                    )}
-                  </div>
-                </div>
-              )}
-            </div>
-          )}
-        </div>
-      )}
-
-      {/* Info footer */}
-      {!loading && suggestions.length === 0 && !error && (
-        <div className="space-y-3">
-          <div className="rounded-xl border border-white/10 bg-zinc-950 p-5">
-            <div className="flex items-start gap-2 text-xs text-white/50">
-              <CheckCircle className="h-4 w-4 shrink-0 text-lime-400" />
-              <div>
-                <p className="font-medium text-white/70">How it works:</p>
-                <p className="mt-1">Our AI generates 15 creative candidate names, verifies each .com domain via RDAP in parallel, checks US state business registries, and scores across 8 dimensions. We only show names with <span className="text-lime-400">100% confirmed available .com domains</span>.</p>
-                <p className="mt-2 text-white/30">Click "Research" on any result to see the full AI uniqueness assessment and state registry findings.</p>
-              </div>
-            </div>
-          </div>
-          <div className="flex flex-wrap items-center gap-2">
-            <button
-              onClick={() => setShowManual((v) => !v)}
-              className="inline-flex items-center gap-1.5 rounded-lg border border-white/15 px-4 py-2 text-sm font-medium text-white/70 transition-colors hover:border-lime-400/40 hover:text-lime-300"
-            >
-              <Edit3 className="h-4 w-4" /> Enter My Own Name
-            </button>
-          </div>
           {showManual && (
             <div className="rounded-xl border border-lime-400/30 bg-lime-400/5 p-4 space-y-3">
               <div>

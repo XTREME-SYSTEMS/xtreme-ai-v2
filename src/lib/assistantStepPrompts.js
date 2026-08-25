@@ -13,107 +13,108 @@ import { UNIVERSAL_PIPELINE } from "@/lib/universalPipeline";
 // being an open-ended "ask me anything" box.
 export const STEP_GUIDES = {
   onboarding: {
-    focus: "capturing the client's core business details so the team can start work",
+    focus: "capturing the client's core epoxy/concrete business details so the team can start work",
     questions: [
-      "What's your business name (and website, if you have one)?",
-      "What industry or niche are you in, and what services do you offer?",
-      "Which cities or areas do you serve?",
+      "What's your epoxy/concrete business name (and website, if you have one)?",
+      "Which epoxy/concrete niche are you in — epoxy flooring, coatings, polished concrete, or decorative concrete?",
+      "What specific services do you offer — garage epoxy, metallic floors, polished concrete, stamped concrete, overlays?",
+      "Which cities or areas do you serve for epoxy/concrete projects?",
       "What's the best phone number and email for customers to reach you?",
-      "What makes your business different from your local competitors?",
+      "What makes your epoxy/concrete business different from local competitors?",
     ],
     nextSteps:
       "Once I have your details, your team reviews them and prepares your tailored Strategy & Proposal — you'll approve that before we build anything.",
     opener:
-      "Let's get your basics down so your team can start. I'll ask a few quick questions — one at a time.",
+      "Let's get your epoxy/concrete business basics down so your team can start. I'll ask a few quick questions — one at a time.",
   },
   strategy: {
-    focus: "confirming the client's goals so the team can prepare the right strategy & proposal",
+    focus: "confirming the client's epoxy/concrete business goals so the team can prepare the right strategy & proposal",
     questions: [
-      "What's your #1 goal right now — more leads, higher rankings, or a stronger brand?",
-      "Roughly how many new leads per month would make this a win for you?",
-      "Are there competitors you admire or want to out-rank?",
-      "Any special offers, promotions, or seasonal services we should feature?",
+      "What's your #1 goal right now — more epoxy/concrete leads, higher local rankings, or a stronger brand?",
+      "Roughly how many new epoxy/concrete jobs per month would make this a win for you?",
+      "Are there epoxy/concrete competitors you admire or want to out-rank?",
+      "Any special offers — free estimates, seasonal epoxy specials, commercial concrete discounts?",
     ],
     nextSteps:
       "After you approve the strategy, we move into your Brand Kit — logo, colors, business card, brochure and social posts.",
     opener:
-      "Your team is preparing your strategy & proposal. While they work, let me ask a few questions to make sure the plan fits your goals.",
+      "Your team is preparing your epoxy/concrete strategy & proposal. While they work, let me ask a few questions to make sure the plan fits your goals.",
   },
   "brand-kit": {
-    focus: "gathering brand preferences before the team generates the brand kit",
+    focus: "gathering brand preferences before the team generates the epoxy/concrete brand kit",
     questions: [
-      "What's the vibe you want — modern, classic, bold, minimal, friendly?",
-      "Any colors you love (or ones to avoid)?",
+      "What's the vibe you want for your epoxy/concrete brand — modern, bold, industrial, premium, minimal?",
+      "Any colors you love (or ones to avoid)? Metallic epoxy brands often use bold accents.",
       "Do you have an existing logo, or are we starting from scratch?",
-      "Got a tagline in mind, or want us to suggest a few?",
+      "Got a tagline in mind, or want us to suggest a few epoxy/concrete taglines?",
       "Any fonts or styles you're drawn to?",
     ],
     nextSteps:
       "Once you approve the brand kit, we move into your Website Build — design, copy and development.",
     opener:
-      "Before we build your brand kit, let me nail down your style preferences so the first round is on target.",
+      "Before we build your epoxy/concrete brand kit, let me nail down your style preferences so the first round is on target.",
   },
   website: {
-    focus: "confirming website scope and must-haves before the team builds the site",
+    focus: "confirming epoxy/concrete website scope and must-haves before the team builds the site",
     questions: [
-      "Which pages do you need — Home, About, Services, Contact, Blog, others?",
-      "Any must-have features — booking, quote form, gallery, online payments?",
-      "Are there websites you like the look of?",
-      "Do you have content (text, photos) ready, or should we write it all?",
+      "Which pages do you need — Home, About, Services (epoxy, polished concrete, decorative), Gallery, Contact, FAQ?",
+      "Any must-have features — quote form, project gallery, before/after slider, financing?",
+      "Are there epoxy/concrete websites you like the look of?",
+      "Do you have project photos ready, or should we generate epoxy/concrete imagery?",
     ],
     nextSteps:
-      "After you approve the site, we optimize it for SEO & AEO (on-page, schema, AI-search).",
+      "After you approve the site, we optimize it for SEO & AEO (on-page, schema, AI-search) targeting epoxy/concrete keywords.",
     opener:
-      "Let's scope your website so the build matches what you need. A few quick questions:",
+      "Let's scope your epoxy/concrete website so the build matches what you need. A few quick questions:",
   },
   "seo-aeo": {
-    focus: "confirming SEO targets before the team optimizes the site",
+    focus: "confirming epoxy/concrete SEO targets before the team optimizes the site",
     questions: [
-      "What are the top keywords you want to show up for?",
-      "Which cities or neighborhoods matter most to you?",
-      "Do you already have a Google Business Profile set up?",
-      "Any competitors consistently showing up above you in search?",
+      "What are the top epoxy/concrete keywords you want to show up for — 'epoxy flooring near me', 'polished concrete [city]'?",
+      "Which cities or neighborhoods matter most to you for epoxy/concrete jobs?",
+      "Do you already have a Google Business Profile set up for your epoxy/concrete business?",
+      "Any epoxy/concrete competitors consistently showing up above you in search?",
     ],
     nextSteps:
       "After approval, we deploy your site to your live domain (Launch).",
     opener:
-      "Before we optimize for search, let me confirm your targets so we focus on the right keywords.",
+      "Before we optimize for search, let me confirm your epoxy/concrete targets so we focus on the right keywords.",
   },
   launch: {
-    focus: "confirming launch details before the site goes live",
+    focus: "confirming epoxy/concrete website launch details before the site goes live",
     questions: [
-      "Do you already own a domain, or do you need us to acquire one?",
-      "What's your preferred domain name?",
+      "Do you already own a domain for your epoxy/concrete business, or do you need us to acquire one?",
+      "What's your preferred domain name — something with 'epoxy', 'concrete', or your city in it?",
       "Do you need business email set up on that domain?",
       "Is there a specific date or timeframe you'd like to go live?",
     ],
     nextSteps:
-      "Once live, we submit your site to Google Search Console and begin indexing & ranking.",
+      "Once live, we submit your epoxy/concrete site to Google Search Console and begin indexing & ranking for epoxy/concrete keywords.",
     opener:
-      "We're almost live. Just a few launch details to confirm:",
+      "We're almost live. Just a few launch details to confirm for your epoxy/concrete website:",
   },
   "index-rank": {
-    focus: "briefing the client on the indexing & ranking phase (mostly automatic)",
+    focus: "briefing the client on the epoxy/concrete indexing & ranking phase (mostly automatic)",
     questions: [
-      "Have you noticed any searches already bringing you traffic?",
-      "Are there specific pages or services you'd like us to prioritize ranking first?",
+      "Have you noticed any epoxy/concrete searches already bringing you traffic?",
+      "Are there specific epoxy/concrete services you'd like us to prioritize ranking first — garage epoxy, polished concrete, decorative?",
     ],
     nextSteps:
-      "After indexing is underway, we move to ongoing reporting & optimization — tracking, content refreshes and authority building.",
+      "After indexing is underway, we move to ongoing reporting & optimization — tracking, content refreshes and authority building for epoxy/concrete keywords.",
     opener:
-      "Your site is live and we're submitting it to Google. This step runs automatically on our end — any priorities you want us to rank first?",
+      "Your epoxy/concrete site is live and we're submitting it to Google. This step runs automatically — any epoxy/concrete services you want us to rank first?",
   },
   optimize: {
-    focus: "setting ongoing reporting & optimization preferences",
+    focus: "setting ongoing reporting & optimization preferences for epoxy/concrete",
     questions: [
       "Would you prefer weekly or monthly reporting?",
-      "Which metrics matter most to you — leads, calls, rankings, traffic?",
-      "Any new services or promotions you want to push in the coming months?",
+      "Which metrics matter most to you — epoxy/concrete leads, calls, rankings, traffic?",
+      "Any new epoxy/concrete services or seasonal promotions you want to push — garage floor season, commercial coatings, patio stamping?",
     ],
     nextSteps:
-      "From here we keep monitoring, refreshing content and building authority on an ongoing basis.",
+      "From here we keep monitoring, refreshing content and building authority on an ongoing basis for your epoxy/concrete business.",
     opener:
-      "You're in the ongoing optimization phase. Let me know how you'd like reporting and focus set up.",
+      "You're in the ongoing optimization phase. Let me know how you'd like reporting and focus set up for your epoxy/concrete business.",
   },
 };
 

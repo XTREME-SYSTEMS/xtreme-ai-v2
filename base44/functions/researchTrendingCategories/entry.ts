@@ -7,11 +7,45 @@
 
 import { createClientFromRequest } from "npm:@base44/sdk@0.8.40";
 
-const SYSTEM_CAPABILITIES = [
-  { name: "Marketing Website", icon: "🌐", description: "Premium marketing website for any local service business", market_size: "Every business needs one", profitability: "High — one-time + monthly SEO" },
-  { name: "Web App / SaaS", icon: "💻", description: "Full web application with auth, database, and recurring revenue", market_size: "Massive and growing SaaS market", profitability: "Very High — recurring revenue" },
-  { name: "E-Commerce Store", icon: "🛍️", description: "Online store with product catalog, cart, and checkout", market_size: "Trillion-dollar e-commerce market", profitability: "High — product margins + volume" },
-  { name: "Platform / Marketplace", icon: "🏗️", description: "Multi-sided marketplace connecting buyers and sellers", market_size: "Large but requires critical mass", profitability: "Very High — take-rate on every transaction" },
+// This system is exclusively focused on epoxy & concrete contracting.
+// The trending categories below are the 5 supported niches — no universal
+// categories, no system capabilities, no other industries.
+const EPOXY_CONCRETE_CATEGORIES = [
+  {
+    name: "Epoxy Flooring",
+    icon: "🎨",
+    description: "Garage floors, basement floors, metallic epoxy, flake systems, self-leveling epoxy for residential & commercial",
+    market_size: "$9.4B global (2025) → $16.4B (2033), 7.2% CAGR",
+    profitability: "High — $3-$15/SF, 1-2 day installs, strong recurring maintenance",
+  },
+  {
+    name: "Epoxy Coatings",
+    icon: "🛡️",
+    description: "Concrete coatings, protective coatings, warehouse floors, anti-slip, food-grade, chemical-resistant epoxy",
+    market_size: "$45B global coating market, epoxy is 40%+ share",
+    profitability: "Very High — commercial/industrial contracts, large SF projects",
+  },
+  {
+    name: "Epoxy Contractors",
+    icon: "👷",
+    description: "Full-service epoxy installation — residential, commercial, industrial, repair & resurfacing",
+    market_size: "$3B US market (2024) → $5.4B (2033)",
+    profitability: "High — diversified residential + commercial + industrial revenue",
+  },
+  {
+    name: "Polished Concrete",
+    icon: "✨",
+    description: "Grind & seal, burnished concrete, stained concrete, densification — commercial & residential",
+    market_size: "$3.7B floor coatings (2025), polished is fastest growing segment",
+    profitability: "High — $4-$15/SF, low material cost, high labor margin",
+  },
+  {
+    name: "Decorative Concrete",
+    icon: "🏛️",
+    description: "Stamped concrete, overlays, micro-toppings, stained concrete, resurfacing, exposed aggregate",
+    market_size: "$4-$25/SF, growing with outdoor living & patio trends",
+    profitability: "Very High — premium decorative finishes, high per-SF margin",
+  },
 ];
 
 export default async function(req: Request): Promise<Response> {
@@ -32,14 +66,14 @@ export default async function(req: Request): Promise<Response> {
       return Response.json({ categories: existing, cached: true });
     }
 
-    // Seed system capabilities if they don't exist
-    for (const cap of SYSTEM_CAPABILITIES) {
-      const exists = existing?.find(c => c.name === cap.name);
+    // Seed epoxy/concrete categories if they don't exist
+    for (const cat of EPOXY_CONCRETE_CATEGORIES) {
+      const exists = existing?.find(c => c.name === cat.name);
       if (!exists) {
         await base44.asServiceRole.entities.TrendingCategory.create({
-          ...cap,
+          ...cat,
           subcategories: [],
-          trending_score: 100,
+          trending_score: 95,
           is_system_capability: true,
           active: true,
           last_updated: new Date().toISOString(),
@@ -47,10 +81,10 @@ export default async function(req: Request): Promise<Response> {
       }
     }
 
-    // Research trending categories using LLM with web search
+    // Research trending sub-categories within the epoxy & concrete industry
     const year = new Date().getFullYear();
     const llmRes = await base44.asServiceRole.integrations.Core.InvokeLLM({
-      prompt: `Research the top 20 trending categories of digital products, websites, apps, and business ideas that people want or need right now in ${year}. For each category provide: name (short, 2-4 words), description (1 sentence), icon (a single emoji that best represents it), subcategories (3-5 sub-topics each with a name and 1-sentence description), trending_score (0-100, higher = more trending right now), market_size (brief), and profitability (brief). Focus on categories that are: 1) High demand — people actively searching, 2) Profitable — people willing to pay, 3) Buildable with AI/automation, 4) Trending upward. Include diverse categories: AI tools, health/wellness, productivity, finance/crypto, education, e-commerce, social media, content creation, local services, SaaS, gaming, real estate, travel, food, legal, HR, dev tools, and more. Return as JSON.`,
+      prompt: `Research the top trending sub-categories and emerging opportunities WITHIN the epoxy flooring, epoxy coatings, polished concrete, and decorative concrete contracting industry in ${year}. For each sub-category provide: name (short, 2-4 words), description (1 sentence about what it is and why it's trending), icon (a single emoji), subcategories (3-5 specific services or niches within it), trending_score (0-100, higher = more trending right now), market_size (brief), and profitability (brief). Focus on: metallic epoxy floors, garage floor coatings, commercial epoxy, industrial coatings, polished concrete, stamped concrete, concrete overlays, micro-toppings, 3D epoxy, food-safe epoxy, warehouse floors, anti-slip coatings, decorative resurfacing, and other emerging epoxy/concrete trends. Return as JSON.`,
       add_context_from_internet: true,
       model: "gemini_3_flash",
       response_json_schema: {

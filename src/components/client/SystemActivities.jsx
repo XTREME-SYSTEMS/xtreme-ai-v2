@@ -1,8 +1,8 @@
 import {
   Building2, Globe, Palette, Megaphone, Video, Search,
   Radar, Database, Rocket, FileText, Users, BarChart3, Box,
-  Cpu, ShoppingCart, Network, ShieldCheck, TrendingUp, Layers,
-  Eye, ClipboardList, Target, Compass, Lightbulb, DollarSign,
+  Cpu, ShieldCheck, TrendingUp, Layers,
+  Eye, ClipboardList, Target, Compass, DollarSign,
   AlertTriangle, Zap, Handshake,
 } from "lucide-react";
 
@@ -19,75 +19,72 @@ const CATEGORIES = [
     label: "Vision",
     icon: Eye,
     activities: [
-      { icon: Target, title: "Define Your Mission", desc: "One powerful sentence — what this business exists to do and why it matters." },
-      { icon: AlertTriangle, title: "Identify the Problem", desc: "The specific, painful problem you solve. What's broken, missing, or poorly served?" },
-      { icon: Users, title: "Know Your Audience", desc: "Who exactly this is for — a clear persona with needs, pains, and buying behavior." },
-      { icon: Eye, title: "Long-Term Vision", desc: "A vivid 3-5 year picture of what this becomes. The big ambition." },
-      { icon: TrendingUp, title: "Success Metrics", desc: "Measurable indicators of success — specific, trackable, and time-bound." },
-      { icon: ShieldCheck, title: "Core Values & Value Prop", desc: "Guiding principles and the single most compelling reason someone chooses you." },
+      { icon: Target, title: "Define Your Mission", desc: "One powerful sentence — what your epoxy or concrete business exists to do and why it matters." },
+      { icon: AlertTriangle, title: "Identify the Problem", desc: "The specific problem you solve — cracked floors, dull concrete, unprotected surfaces, outdated spaces." },
+      { icon: Users, title: "Know Your Audience", desc: "Who exactly this is for — homeowners, commercial property managers, industrial facilities, or contractors." },
+      { icon: Eye, title: "Long-Term Vision", desc: "A vivid 3-5 year picture of what your epoxy/concrete business becomes. The big ambition." },
+      { icon: TrendingUp, title: "Success Metrics", desc: "Measurable indicators — jobs booked, revenue per square foot, service area coverage, review count." },
+      { icon: ShieldCheck, title: "Core Values & Value Prop", desc: "Guiding principles and the single most compelling reason someone chooses your epoxy/concrete services." },
     ],
   },
   {
     label: "Strategy",
     icon: ClipboardList,
     activities: [
-      { icon: Compass, title: "Competitive Positioning", desc: "How you position against alternatives. Who are the competitors? What's the wedge?" },
-      { icon: Rocket, title: "Go-to-Market Plan", desc: "The concrete plan to get the first 100 customers — channels, tactics, sequence." },
-      { icon: DollarSign, title: "Revenue & Pricing", desc: "How money is made — revenue model, pricing tiers, unit economics, and price points." },
-      { icon: Zap, title: "Acquisition Channels", desc: "5-8 specific channels for reaching your audience, ranked by expected ROI." },
-      { icon: ClipboardList, title: "Execution Roadmap", desc: "3 phases — Foundation, Growth, Scale — with goals and key initiatives for each." },
-      { icon: AlertTriangle, title: "Risks & Mitigations", desc: "Key risks identified with severity and specific mitigation strategies for each." },
-      { icon: Handshake, title: "Differentiation & Partnerships", desc: "Your durable moat and the key partnerships that accelerate execution." },
+      { icon: Compass, title: "Competitive Positioning", desc: "How you position against other epoxy/concrete contractors. What's your wedge — metallic epoxy? fast install? commercial focus?" },
+      { icon: Rocket, title: "Go-to-Market Plan", desc: "The concrete plan to get your first 100 epoxy/concrete jobs — channels, tactics, sequence." },
+      { icon: DollarSign, title: "Revenue & Pricing", desc: "How money is made — per-SF pricing, project minimums, commercial contracts, and recurring maintenance." },
+      { icon: Zap, title: "Acquisition Channels", desc: "5-8 specific channels — Google Local, GBP, Angi, Houzz, builder partnerships, property manager outreach." },
+      { icon: ClipboardList, title: "Execution Roadmap", desc: "3 phases — Foundation, Growth, Scale — with goals and key initiatives for your epoxy/concrete business." },
+      { icon: AlertTriangle, title: "Risks & Mitigations", desc: "Key risks — seasonality, material costs, crew scaling, weather delays — with specific mitigation strategies." },
+      { icon: Handshake, title: "Differentiation & Partnerships", desc: "Your durable moat and key partnerships — general contractors, builders, property managers, epoxy suppliers." },
     ],
   },
   {
     label: "Build",
     icon: Layers,
     activities: [
-      { icon: Building2, title: "Build a Business", desc: "Generate a business name, domain, and full brand identity from scratch." },
-      { icon: Globe, title: "Build a Website", desc: "AI-generated layouts, copy, images, and SEO-ready pages — deployed live." },
-      { icon: Palette, title: "Build a Brand", desc: "Logos, color palettes, typography, brand packs, and design direction." },
-      { icon: Cpu, title: "Build a System", desc: "Architecture, data models, UI systems, and full code manifests for web apps." },
-      { icon: ShoppingCart, title: "Build an E-Commerce Store", desc: "Product catalogs, checkout, pricing, and online store generation." },
-      { icon: Network, title: "Build a Platform", desc: "Multi-sided marketplaces with user flows, integrations, and scale." },
+      { icon: Building2, title: "Build a Business", desc: "Generate an epoxy/concrete business name, domain, and full brand identity from scratch." },
+      { icon: Globe, title: "Build a Website", desc: "AI-generated epoxy/concrete layouts, copy, project galleries, and SEO-ready pages — deployed live." },
+      { icon: Palette, title: "Build a Brand", desc: "Logos, color palettes, typography, brand packs, and design direction for your epoxy/concrete business." },
     ],
   },
   {
     label: "Generate",
     icon: Megaphone,
     activities: [
-      { icon: Megaphone, title: "Generate Content", desc: "Hero copy, about pages, services, FAQs, and blog posts optimized for SEO & AEO." },
-      { icon: Megaphone, title: "Generate Social Media", desc: "Post templates, 30-day content calendars, and platform-specific creative." },
-      { icon: Video, title: "Generate Video", desc: "Video concepts, scripts, and video packs tailored to your brand." },
+      { icon: Megaphone, title: "Generate Content", desc: "Hero copy, about pages, service pages (epoxy, polished concrete, decorative), FAQs, and blog posts optimized for SEO & AEO." },
+      { icon: Megaphone, title: "Generate Social Media", desc: "Post templates, 30-day content calendars, and platform-specific creative showcasing your epoxy/concrete work." },
+      { icon: Video, title: "Generate Video", desc: "Video concepts, scripts, and video packs tailored to your epoxy/concrete brand and project portfolio." },
     ],
   },
   {
     label: "Market & SEO",
     icon: TrendingUp,
     activities: [
-      { icon: Search, title: "SEO Optimization", desc: "Technical SEO, schema markup, AEO answer blocks, and citation building." },
-      { icon: Radar, title: "Lead Generation", desc: "Discover businesses with bad websites, score opportunities, and automate outreach." },
-      { icon: TrendingUp, title: "Market Research", desc: "Competitor analysis, industry DNA, SERP blueprints, and search opportunity gaps." },
-      { icon: Globe, title: "Domain Acquisition", desc: "Find available domains, purchase via Vercel, and manage a domain portfolio." },
+      { icon: Search, title: "SEO Optimization", desc: "Technical SEO, schema markup, AEO answer blocks, and citation building for epoxy/concrete keywords." },
+      { icon: Radar, title: "Lead Generation", desc: "Discover epoxy/concrete businesses with bad websites, score opportunities, and automate outreach." },
+      { icon: TrendingUp, title: "Market Research", desc: "Competitor analysis, epoxy/concrete industry DNA, SERP blueprints, and search opportunity gaps." },
+      { icon: Globe, title: "Domain Acquisition", desc: "Find available epoxy/concrete domains, purchase via Vercel, and manage a domain portfolio." },
     ],
   },
   {
     label: "Deploy & Operate",
     icon: Rocket,
     activities: [
-      { icon: Rocket, title: "Deploy & Launch", desc: "Deploy sites to Vercel, configure DNS, and manage live URLs." },
-      { icon: FileText, title: "E-Sign Documents", desc: "Contracts, agreements, and legally binding e-signature workflows." },
-      { icon: Users, title: "CRM Pipeline", desc: "Contacts, accounts, deals, quotes, invoices, and sales pipeline tracking." },
-      { icon: BarChart3, title: "Analytics & Tracking", desc: "Rank monitoring, GSC traffic, AI citation tracking, and experiment metrics." },
+      { icon: Rocket, title: "Deploy & Launch", desc: "Deploy epoxy/concrete sites to Vercel, configure DNS, and manage live URLs." },
+      { icon: FileText, title: "E-Sign Documents", desc: "Contracts, agreements, and legally binding e-signature workflows for epoxy/concrete projects." },
+      { icon: Users, title: "CRM Pipeline", desc: "Contacts, accounts, deals, quotes, invoices, and sales pipeline tracking for your epoxy/concrete business." },
+      { icon: BarChart3, title: "Analytics & Tracking", desc: "Rank monitoring, GSC traffic, AI citation tracking, and experiment metrics for epoxy/concrete keywords." },
     ],
   },
   {
     label: "Advanced Tools",
     icon: Cpu,
     activities: [
-      { icon: Box, title: "3D Walkthroughs", desc: "Generate 3D property walkthroughs and interactive visual tours." },
-      { icon: ShieldCheck, title: "QA & Validation", desc: "Autonomous audit, fix, heal, harden, and optimize validation pipeline." },
-      { icon: Database, title: "Clone & Rebrand", desc: "Clone competitor sites, rebrand existing businesses, and launch fast." },
+      { icon: Box, title: "3D Walkthroughs", desc: "Generate 3D walkthroughs of epoxy floors and polished concrete spaces for client presentations." },
+      { icon: ShieldCheck, title: "QA & Validation", desc: "Autonomous audit, fix, heal, harden, and optimize validation pipeline for your epoxy/concrete sites." },
+      { icon: Database, title: "Clone & Rebrand", desc: "Clone competitor epoxy/concrete sites, rebrand existing businesses, and launch fast." },
     ],
   },
 ];
@@ -99,7 +96,7 @@ export default function SystemActivities() {
         <Cpu className="h-4 w-4" /> What This System Can Do
       </div>
       <p className="mt-1 text-sm text-white/50">
-        The Xtreme AI Business Generator is a complete growth factory. Here's everything you can vision, strategize, build, generate, and automate:
+        The Xtreme AI Business Generator is a complete growth factory for epoxy flooring, epoxy coatings, epoxy contractors, polished concrete, and decorative concrete businesses. Here's everything you can vision, strategize, build, generate, and automate:
       </p>
       <div className="mt-4 space-y-4">
         {CATEGORIES.map((cat) => {

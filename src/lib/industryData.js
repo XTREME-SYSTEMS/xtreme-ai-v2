@@ -30,165 +30,20 @@ export const BUSINESS_TYPES = [
   { id: "all", label: "All of the above", desc: "Residential, commercial & government" },
 ];
 
+// This system is exclusively focused on the epoxy & concrete contracting
+// industry. The five niches below are the only supported business types.
 export const INDUSTRIES = [
   {
-    id: "home_services",
-    label: "Home Services & Contracting",
-    icon: "🏠",
-    subIndustries: [
-      "Epoxy Flooring", "Roofing", "HVAC", "Plumbing", "Electrical", "Landscaping",
-      "Painting", "Concrete & Masonry", "Fencing", "Garage Doors", "Windows & Doors",
-      "Flooring", "Kitchen & Bath Remodeling", "Solar Installation", "Pest Control",
-      "Cleaning Services", "Handyman Services", "Drywall", "Insulation", "Siding",
-      "Gutter Services", "Deck Building", "Pool & Spa",
-    ],
-  },
-  {
-    id: "construction",
-    label: "Construction & Trades",
+    id: "epoxy_concrete",
+    label: "Epoxy & Concrete Contracting",
     icon: "🏗️",
     subIndustries: [
-      "General Contracting", "Custom Home Building", "Commercial Construction",
-      "Renovation & Remodeling", "Demolition", "Excavation", "Welding & Metalwork",
-      "Carpentry", "Steel Erection", "Roofing (Commercial)", "Concrete (Commercial)",
-      "Drywall (Commercial)", "Fireproofing", "Pre-Construction",
+      "Epoxy Flooring",
+      "Epoxy Coatings",
+      "Epoxy Contractors",
+      "Polished Concrete Contractors",
+      "Decorative Concrete Contractors",
     ],
-  },
-  {
-    id: "health_wellness",
-    label: "Health & Wellness",
-    icon: "⚕️",
-    subIndustries: [
-      "Dental Practice", "Medical Practice", "Chiropractic", "Physical Therapy",
-      "Fitness / Gym", "Yoga Studio", "Spa", "Med Spa / Aesthetics", "Mental Health / Counseling",
-      "Nutrition Coaching", "Massage Therapy", "Acupuncture", "Wellness Center",
-    ],
-  },
-  {
-    id: "food_beverage",
-    label: "Food & Beverage",
-    icon: "🍽️",
-    subIndustries: [
-      "Restaurant", "Catering", "Food Truck", "Bakery", "Coffee Shop", "Bar / Pub",
-      "Meal Prep Service", "Juice Bar", "Ice Cream Shop", "Brewery / Winery",
-    ],
-  },
-  {
-    id: "automotive",
-    label: "Automotive",
-    icon: "🚗",
-    subIndustries: [
-      "Auto Repair", "Auto Body Shop", "Car Wash", "Detailing", "Tires", "Oil Change",
-      "Towing", "Dealership", "Parts Store", "Window Tinting", "Paintless Dent Repair",
-      "Transmission", "Brake Service",
-    ],
-  },
-  {
-    id: "beauty_personal",
-    label: "Beauty & Personal Care",
-    icon: "💅",
-    subIndustries: [
-      "Hair Salon", "Barber Shop", "Nail Salon", "Esthetics / Waxing", "Tattoo Studio",
-      "Makeup Artist", "Lash Studio", "Piercing", "Tanning Salon",
-    ],
-  },
-  {
-    id: "professional_services",
-    label: "Professional Services",
-    icon: "💼",
-    subIndustries: [
-      "Law Firm", "Accounting / Tax", "Insurance Agency", "Real Estate Brokerage",
-      "Property Management", "Business Consulting", "Marketing Agency", "Financial Planning",
-      "Notary Services", "Architect", "Engineering Firm",
-    ],
-  },
-  {
-    id: "retail_ecommerce",
-    label: "Retail & E-commerce",
-    icon: "🛍️",
-    subIndustries: [
-      "Apparel & Fashion", "Electronics", "Home Goods", "Specialty Shop", "Online Store",
-      "Subscription Box", "Dropshipping", "Furniture", "Sporting Goods", "Gift Shop",
-    ],
-  },
-  {
-    id: "education_training",
-    label: "Education & Training",
-    icon: "🎓",
-    subIndustries: [
-      "Tutoring", "Music Lessons", "Driving School", "Trade School", "Online Courses",
-      "Coaching", "Workshops & Seminars", "Language School", "Test Prep",
-    ],
-  },
-  {
-    id: "transportation",
-    label: "Transportation & Logistics",
-    icon: "🚚",
-    subIndustries: [
-      "Moving Company", "Freight & Trucking", "Delivery Service", "Chauffeur / Limo",
-      "Airport Shuttle", "Storage Units", "Warehouse & Fulfillment", "Courier Service",
-    ],
-  },
-  {
-    id: "travel_hospitality",
-    label: "Travel & Hospitality",
-    icon: "✈️",
-    subIndustries: [
-      "Hotel", "Bed & Breakfast", "Vacation Rental", "Travel Agency", "Tour Guide",
-      "Event Venue", "Restaurant Group",
-    ],
-  },
-  {
-    id: "events_entertainment",
-    label: "Events & Entertainment",
-    icon: "🎉",
-    subIndustries: [
-      "Event Planning", "DJ / MC", "Photography", "Videography", "Party Rentals",
-      "Band / Musician", "Magician / Performer", "Lighting & AV", "Photo Booth",
-    ],
-  },
-  {
-    id: "technology_saas",
-    label: "Technology & SaaS",
-    icon: "💻",
-    subIndustries: [
-      "Software Development", "SaaS Product", "IT Services", "Cybersecurity",
-      "Web Design Agency", "App Development", "Data Analytics", "AI / ML Services",
-      "Cloud Services", "Tech Consulting",
-    ],
-  },
-  {
-    id: "agriculture",
-    label: "Agriculture & Farming",
-    icon: "🌾",
-    subIndustries: [
-      "Crop Farming", "Livestock", "Dairy", "Organic Farming", "Agricultural Equipment",
-      "Nursery / Garden Center", "Hydroponics", "Farm-to-Table",
-    ],
-  },
-  {
-    id: "manufacturing",
-    label: "Manufacturing",
-    icon: "🏭",
-    subIndustries: [
-      "Custom Manufacturing", "3D Printing", "Metal Fabrication", "Woodworking",
-      "Textile Manufacturing", "Food Processing", "Packaging", "Plastics",
-    ],
-  },
-  {
-    id: "nonprofit",
-    label: "Non-profit & Community",
-    icon: "🤝",
-    subIndustries: [
-      "Charity / Foundation", "Religious Organization", "Community Center",
-      "Youth Programs", "Animal Rescue", "Food Bank", "Advocacy Group",
-    ],
-  },
-  {
-    id: "other",
-    label: "Other / Not Listed",
-    icon: "📋",
-    subIndustries: [],
   },
 ];
 

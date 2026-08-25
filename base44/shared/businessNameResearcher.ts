@@ -82,33 +82,40 @@ async function generateCandidates(base44: any, params: Record<string, any>): Pro
     : '';
   const seedStr = seed ? `\n\nVariation seed ${seed}: generate distinctly different names from previous rounds.` : '';
 
-  const prompt = `You are an expert brand strategist and viral naming specialist. Generate 15 highly creative, potentially VIRAL business name suggestions for a ${businessType || 'local service business'} in the "${industry}" industry${location ? ` serving ${location}` : ''}${keywords ? ` with keywords/themes: ${keywords}` : ''}${businessName ? `. Current name: "${businessName}" — use as inspiration but generate alternatives too.` : ''}.
+  const prompt = `You are an expert brand strategist and viral naming specialist EXCLUSIVELY for the epoxy flooring, epoxy coatings, epoxy contractors, polished concrete, and decorative concrete contracting industry. Generate 15 highly creative, potentially VIRAL business name suggestions for a ${businessType || 'epoxy/concrete contracting business'} in the "${industry}" niche${location ? ` serving ${location}` : ''}${keywords ? ` with keywords/themes: ${keywords}` : ''}${businessName ? `. Current name: "${businessName}" — use as inspiration but generate alternatives too.` : ''}.
+
+INDUSTRY CONTEXT — This system ONLY serves epoxy & concrete contractors:
+- Epoxy flooring: garage floors, basement floors, commercial/industrial floors, metallic epoxy, flake systems, self-leveling epoxy
+- Epoxy coatings: concrete coatings, protective coatings, warehouse floors, anti-slip coatings, food-grade epoxy
+- Epoxy contractors: full-service epoxy installation, residential & commercial, epoxy repair/resurfacing
+- Polished concrete: grind & seal, burnished concrete, stained concrete, concrete densification, commercial/residential polishing
+- Decorative concrete: stamped concrete, concrete overlays, micro-toppings, stained concrete, decorative resurfacing, exposed aggregate
 
 CRITICAL — .com DOMAIN AVAILABILITY: The .com domain MUST be likely available. To maximize availability:
 - Use creative 2-3 word combinations (not common single words — their .com is always taken)
-- Add location hints, industry-specific terms, or action words
+- Add location hints, epoxy/concrete terms, or action words
 - Use unique spellings, portmanteaus, or coined words
 - Avoid generic terms alone ("pro", "expert", "solutions", "services")
-- Example good patterns: "[Industry][City]", "[Action][Industry]Co", "[Adjective][Material]Works"
+- Example good patterns: "[Epoxy][City]", "[Concrete][Action]Co", "[Adjective][Surface]Works", "[Metallic][Floor]Co"
 
 For EACH name, assess based on your knowledge:
-1. Does a business with this exact name already exist in this industry?
+1. Does a business with this exact name already exist in the epoxy/concrete industry?
 2. Is the .com domain likely available (given the name's uniqueness)?
 
 Score each name on these 0-100 scales:
 - viral_score: memorability, brandability, emotional resonance, shareability
-- local_seo_score: how well name+domain supports ranking for "[industry] near [location]"
-- searchability_score: how easily customers find/recall this business in Google and AI answers
-- brandability_score: potential to build a strong, recognizable brand identity
+- local_seo_score: how well name+domain supports ranking for "epoxy flooring near [location]" or "concrete polishing [location]"
+- searchability_score: how easily customers find/recall this epoxy/concrete business in Google and AI answers
+- brandability_score: potential to build a strong, recognizable epoxy/concrete brand identity
 - domain_strength_score: domain quality (short, no hyphens, .com, easy to spell)
 - trademark_safety_score: low risk of trademark conflict (100 = very safe)
 
 Also provide:
 - google_search_status: "highly_unique" | "unique" | "moderate" | "common" (based on uniqueness assessment)
-- state_registry_status: "available" | "likely_available" | "exists" (based on your knowledge of existing businesses)
-- tagline: short catchy tagline (3-6 words)
-- rationale: 1-2 sentences on why this name could become viral and successful
-- target_audience: who this name appeals to
+- state_registry_status: "available" | "likely_available" | "exists" (based on your knowledge of existing epoxy/concrete businesses)
+- tagline: short catchy tagline (3-6 words) relevant to epoxy/concrete
+- rationale: 1-2 sentences on why this name could become viral and successful for an epoxy/concrete business
+- target_audience: who this name appeals to (homeowners, commercial property managers, industrial facilities, etc.)
 
 Return JSON with "suggestions" array of 15 items, each with: name, domain (lowercase .com), tagline, viral_score, local_seo_score, searchability_score, brandability_score, domain_strength_score, trademark_safety_score, google_search_status, state_registry_status, rationale, target_audience.${excludeStr}${seedStr}`;
 
