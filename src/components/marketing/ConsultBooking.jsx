@@ -44,7 +44,7 @@ export default function ConsultBooking() {
       <div className="mx-auto max-w-3xl px-4 sm:px-6">
         <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.5 }}
           className="mx-auto max-w-2xl text-center">
-          <div className="mb-3 inline-flex items-center gap-2 rounded-full bg-lime-400/15 px-3 py-1 text-xs font-bold uppercase tracking-wider text-lime-400">
+          <div className="mb-3 inline-flex items-center gap-2 rounded-full bg-amber-400/15 px-3 py-1 text-xs font-bold uppercase tracking-wider text-amber-400">
             <Phone className="h-3.5 w-3.5" /> Free 15-Minute Strategy Call
           </div>
           <h2 className="text-3xl font-black tracking-tight text-white sm:text-5xl">Book a Call With Us.</h2>
@@ -53,8 +53,8 @@ export default function ConsultBooking() {
 
         {saved ? (
           <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }}
-            className="mx-auto mt-12 max-w-md rounded-2xl border border-lime-400/40 bg-lime-400/10 p-8 text-center">
-            <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-lime-400">
+            className="mx-auto mt-12 max-w-md rounded-2xl border border-amber-400/40 bg-amber-400/10 p-8 text-center">
+            <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-amber-400">
               <Check className="h-8 w-8 text-black" strokeWidth={3} />
             </div>
             <h3 className="text-xl font-bold text-white">Booking Received!</h3>
@@ -65,30 +65,30 @@ export default function ConsultBooking() {
             <div className="space-y-4">
               <div>
                 <label className="mb-1.5 block text-sm font-medium text-white/80">Your Name</label>
-                <input value={form.name} onChange={set("name")} placeholder="John Smith" className="w-full rounded-lg border border-white/15 bg-black px-3 py-2.5 text-sm text-white placeholder:text-white/30 focus:border-lime-400 focus:outline-none" />
+                <input value={form.name} onChange={set("name")} placeholder="John Smith" className="w-full rounded-lg border border-white/15 bg-black px-3 py-2.5 text-sm text-white placeholder:text-white/30 focus:border-amber-400 focus:outline-none" />
               </div>
               <div className="grid gap-4 sm:grid-cols-2">
                 <div>
                   <label className="mb-1.5 block text-sm font-medium text-white/80">Email</label>
-                  <input type="email" value={form.email} onChange={set("email")} placeholder="john@business.com" className="w-full rounded-lg border border-white/15 bg-black px-3 py-2.5 text-sm text-white placeholder:text-white/30 focus:border-lime-400 focus:outline-none" />
+                  <input type="email" value={form.email} onChange={set("email")} placeholder="john@business.com" className="w-full rounded-lg border border-white/15 bg-black px-3 py-2.5 text-sm text-white placeholder:text-white/30 focus:border-amber-400 focus:outline-none" />
                 </div>
                 <div>
                   <label className="mb-1.5 block text-sm font-medium text-white/80">Phone</label>
-                  <input value={form.phone} onChange={set("phone")} placeholder="(555) 123-4567" className="w-full rounded-lg border border-white/15 bg-black px-3 py-2.5 text-sm text-white placeholder:text-white/30 focus:border-lime-400 focus:outline-none" />
+                  <input value={form.phone} onChange={set("phone")} placeholder="(555) 123-4567" className="w-full rounded-lg border border-white/15 bg-black px-3 py-2.5 text-sm text-white placeholder:text-white/30 focus:border-amber-400 focus:outline-none" />
                 </div>
               </div>
               <div>
                 <label className="mb-1.5 block text-sm font-medium text-white/80">Business Name</label>
-                <input value={form.business} onChange={set("business")} placeholder="Acme Epoxy Floors" className="w-full rounded-lg border border-white/15 bg-black px-3 py-2.5 text-sm text-white placeholder:text-white/30 focus:border-lime-400 focus:outline-none" />
+                <input value={form.business} onChange={set("business")} placeholder="Acme Epoxy Floors" className="w-full rounded-lg border border-white/15 bg-black px-3 py-2.5 text-sm text-white placeholder:text-white/30 focus:border-amber-400 focus:outline-none" />
               </div>
               <div className="grid gap-4 sm:grid-cols-2">
                 <div>
                   <label className="mb-1.5 block text-sm font-medium text-white/80">Preferred Date</label>
-                  <input type="date" value={form.date} onChange={set("date")} className="w-full rounded-lg border border-white/15 bg-black px-3 py-2.5 text-sm text-white focus:border-lime-400 focus:outline-none" />
+                  <input type="date" value={form.date} onChange={set("date")} className="w-full rounded-lg border border-white/15 bg-black px-3 py-2.5 text-sm text-white focus:border-amber-400 focus:outline-none" />
                 </div>
                 <div>
                   <label className="mb-1.5 block text-sm font-medium text-white/80">Preferred Time</label>
-                  <select value={form.time} onChange={set("time")} className="w-full rounded-lg border border-white/15 bg-black px-3 py-2.5 text-sm text-white focus:border-lime-400 focus:outline-none">
+                  <select value={form.time} onChange={set("time")} className="w-full rounded-lg border border-white/15 bg-black px-3 py-2.5 text-sm text-white focus:border-amber-400 focus:outline-none">
                     <option value="">Select a time</option>
                     {timeSlots.map((t) => <option key={t} value={t}>{t}</option>)}
                   </select>
@@ -96,14 +96,14 @@ export default function ConsultBooking() {
               </div>
               <div>
                 <label className="mb-1.5 block text-sm font-medium text-white/80">What do you want to discuss? (optional)</label>
-                <textarea value={form.notes} onChange={set("notes")} rows={2} placeholder="Tell us about your goals…" className="w-full resize-none rounded-lg border border-white/15 bg-black px-3 py-2.5 text-sm text-white placeholder:text-white/30 focus:border-lime-400 focus:outline-none" />
+                <textarea value={form.notes} onChange={set("notes")} rows={2} placeholder="Tell us about your goals…" className="w-full resize-none rounded-lg border border-white/15 bg-black px-3 py-2.5 text-sm text-white placeholder:text-white/30 focus:border-amber-400 focus:outline-none" />
               </div>
             </div>
 
             {error && <p className="mt-3 text-sm text-red-400">{error}</p>}
 
             <button type="submit" disabled={saving}
-              className="mt-5 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-lime-400 px-5 py-3.5 text-sm font-bold text-black transition-all hover:bg-lime-300 disabled:opacity-50">
+              className="mt-5 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-amber-400 px-5 py-3.5 text-sm font-bold text-black transition-all hover:bg-amber-300 disabled:opacity-50">
               {saving ? <><Loader2 className="h-4 w-4 animate-spin" /> Booking…</> : <><Calendar className="h-4 w-4" /> Book My Call</>}
             </button>
 

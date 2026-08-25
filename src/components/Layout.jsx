@@ -128,7 +128,7 @@ export default function Layout() {
   if (user === null) {
     return (
       <div className="flex h-screen items-center justify-center bg-black">
-        <div className="h-8 w-8 animate-spin rounded-full border-2 border-white/20 border-t-lime-400" />
+        <div className="h-8 w-8 animate-spin rounded-full border-2 border-white/20 border-t-amber-400" />
       </div>
     );
   }
@@ -153,8 +153,8 @@ export default function Layout() {
             fittingType="fit"
           />
           <div className="leading-tight">
-            <div className="text-sm font-semibold text-white">Lead Gen Near You</div>
-            <div className="text-[10px] uppercase tracking-wider text-lime-400">{user?.role === "admin" ? "Growth Factory" : "Client Portal"}</div>
+            <div className="text-sm font-semibold text-white">Xtreme AI</div>
+            <div className="text-[10px] uppercase tracking-wider text-amber-400">{user?.role === "admin" ? "Growth Factory" : "Client Portal"}</div>
           </div>
           <button onClick={() => setOpen(false)} className="ml-auto md:hidden text-white/50 hover:text-white"><X className="h-5 w-5" /></button>
         </div>
@@ -172,7 +172,7 @@ export default function Layout() {
                 onClick={() => setOpen(false)}
                 className={({ isActive }) => cn(
                   "flex items-center gap-2.5 rounded-lg px-2.5 py-2 text-sm transition-colors",
-                  isActive ? "bg-lime-400/10 text-white font-medium" : "text-white hover:bg-white/5"
+                  isActive ? "bg-amber-400/10 text-white font-medium" : "text-white hover:bg-white/5"
                 )}
               >
                 <Icon className="h-4 w-4 shrink-0" />
@@ -187,19 +187,19 @@ export default function Layout() {
 
       {/* Main */}
       <div className="flex flex-1 flex-col overflow-hidden">
-        <header className="flex h-14 items-center gap-3 border-b border-lime-400/40 bg-white px-4 backdrop-blur">
+        <header className="flex h-14 items-center gap-3 border-b border-amber-400/40 bg-white px-4 backdrop-blur">
           <button onClick={() => setOpen(true)} className="md:hidden text-black/50 hover:text-black"><Menu className="h-5 w-5" /></button>
           <div className="flex items-center gap-2 text-xs">
-            <span className="rounded-md border border-lime-400 bg-lime-400 px-2 py-1 font-mono text-black font-semibold">{user?.role === "admin" ? "THROW THE BOOK AT IT" : "CLIENT PORTAL"}</span>
+            <span className="rounded-md border border-amber-400 bg-amber-400 px-2 py-1 font-mono text-black font-semibold">{user?.role === "admin" ? "THROW THE BOOK AT IT" : "CLIENT PORTAL"}</span>
             <span className="hidden text-black/50 sm:inline">{user?.role === "admin" ? "Architecture → Preview Build · Production locked" : "Approval-gated workflow"}</span>
           </div>
           <div className="ml-auto flex items-center gap-3">
             <span className="hidden text-xs text-black/60 sm:inline">{user?.email || ""}</span>
-            <button onClick={() => setShowPreviewModal(true)} className="flex items-center gap-1.5 rounded-lg border border-lime-400 px-2.5 py-1.5 text-xs text-black font-medium hover:bg-lime-400/10">
+            <button onClick={() => setShowPreviewModal(true)} className="flex items-center gap-1.5 rounded-lg border border-amber-400 px-2.5 py-1.5 text-xs text-black font-medium hover:bg-amber-400/10">
               <Eye className="h-3.5 w-3.5" /> Preview as Client
             </button>
-            <ThemeToggle className="flex items-center gap-1.5 rounded-lg border border-lime-400 px-2.5 py-1.5 text-xs text-black font-medium hover:bg-lime-400/10" />
-            <button onClick={logout} className="flex items-center gap-1.5 rounded-lg border border-lime-400 px-2.5 py-1.5 text-xs text-black font-medium hover:bg-lime-400/10">
+            <ThemeToggle className="flex items-center gap-1.5 rounded-lg border border-amber-400 px-2.5 py-1.5 text-xs text-black font-medium hover:bg-amber-400/10" />
+            <button onClick={logout} className="flex items-center gap-1.5 rounded-lg border border-amber-400 px-2.5 py-1.5 text-xs text-black font-medium hover:bg-amber-400/10">
               <LogOut className="h-3.5 w-3.5" /> Sign out
             </button>
           </div>

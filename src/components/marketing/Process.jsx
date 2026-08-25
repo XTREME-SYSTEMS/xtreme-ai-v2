@@ -16,7 +16,7 @@ export default function Process() {
       <div className="mx-auto max-w-7xl px-4 sm:px-6">
         <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.5 }}
           className="mx-auto max-w-2xl text-center">
-          <div className="mb-3 inline-flex items-center gap-2 rounded-full bg-lime-400/15 px-3 py-1 text-xs font-bold uppercase tracking-wider text-lime-600">How It Works</div>
+          <div className="mb-3 inline-flex items-center gap-2 rounded-full bg-amber-400/15 px-3 py-1 text-xs font-bold uppercase tracking-wider text-amber-600">How It Works</div>
           <h2 className="text-3xl font-black tracking-tight text-black sm:text-5xl">From Deposit to Done.<br />Every Step Transparent.</h2>
         </motion.div>
 
@@ -25,7 +25,7 @@ export default function Process() {
             <motion.div key={s.title} initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.4, delay: i * 0.07 }}
               className="relative rounded-2xl border border-black/10 bg-white p-6">
               <div className="absolute right-5 top-5 text-5xl font-black text-black/5">{i + 1}</div>
-              <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-lime-400"><s.icon className="h-6 w-6 text-black" /></div>
+              <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-amber-400"><s.icon className="h-6 w-6 text-black" /></div>
               <h3 className="text-lg font-bold text-black">{s.title}</h3>
               <p className="mt-2 text-sm text-black/60">{s.desc}</p>
             </motion.div>

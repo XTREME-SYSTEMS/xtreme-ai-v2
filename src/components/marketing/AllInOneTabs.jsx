@@ -76,7 +76,7 @@ export default function AllInOneTabs() {
           {TABS.map((t, i) => (
             <button key={t.key} onClick={() => setActive(i)}
               className={`rounded-full px-5 py-2.5 text-sm font-semibold transition-all ${
-                active === i ? "bg-lime-400 text-black shadow-lg shadow-lime-400/30" : "bg-white text-black/60 border border-black/10 hover:border-lime-400 hover:text-black"
+                active === i ? "bg-amber-400 text-black shadow-lg shadow-amber-400/30" : "bg-white text-black/60 border border-black/10 hover:border-amber-400 hover:text-black"
               }`}>
               {t.label}
             </button>
@@ -92,11 +92,11 @@ export default function AllInOneTabs() {
               <ul className="mt-6 grid gap-2.5 sm:grid-cols-2">
                 {tab.features.map((f) => (
                   <li key={f} className="flex items-start gap-2 text-sm text-black/70">
-                    <Check className="mt-0.5 h-4 w-4 shrink-0 text-lime-600" /> {f}
+                    <Check className="mt-0.5 h-4 w-4 shrink-0 text-amber-600" /> {f}
                   </li>
                 ))}
               </ul>
-              <Link to="/register" className="group mt-8 inline-flex items-center gap-2 rounded-xl bg-lime-400 px-6 py-3 text-sm font-bold text-black transition-all hover:bg-lime-300">
+              <Link to="/register" className="group mt-8 inline-flex items-center gap-2 rounded-xl bg-amber-400 px-6 py-3 text-sm font-bold text-black transition-all hover:bg-amber-300">
                 Try Demo <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
               </Link>
             </div>

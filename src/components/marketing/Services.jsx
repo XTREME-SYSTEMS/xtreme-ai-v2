@@ -16,10 +16,10 @@ export default function Services() {
     <section className="bg-zinc-50 py-20 sm:py-28">
       <div className="mx-auto max-w-7xl px-4 sm:px-6">
         <div className="text-center">
-          <div className="mb-3 inline-flex items-center gap-2 rounded-full bg-lime-400/15 px-3 py-1 text-xs font-bold uppercase tracking-wider text-lime-600">Platform Features</div>
+          <div className="mb-3 inline-flex items-center gap-2 rounded-full bg-amber-400/15 px-3 py-1 text-xs font-bold uppercase tracking-wider text-amber-600">Platform Features</div>
           <h2 className="text-3xl font-bold tracking-tight text-black sm:text-4xl lg:text-5xl">One platform. Every tool you need.</h2>
-          <p className="mt-4 text-lg text-black/60">Lead Generation Near Me brings CRM, funnels, marketing, bookings, and automations together — so you can run your whole business from a single login.</p>
-          <Link to="/register" className="group mt-6 inline-flex items-center gap-2 rounded-xl bg-lime-400 px-6 py-3 text-sm font-bold text-black transition-all hover:bg-lime-300">
+          <p className="mt-4 text-lg text-black/60">Xtreme AI brings CRM, funnels, marketing, bookings, and automations together — so you can run your whole business from a single login.</p>
+          <Link to="/register" className="group mt-6 inline-flex items-center gap-2 rounded-xl bg-amber-400 px-6 py-3 text-sm font-bold text-black transition-all hover:bg-amber-300">
             Try Demo <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
           </Link>
         </div>
@@ -27,10 +27,10 @@ export default function Services() {
         <div className="mt-14 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {FEATURES.map((f, i) => (
             <motion.div key={f.tag} initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.4, delay: i * 0.06 }}
-              className="overflow-hidden rounded-2xl border border-black/10 bg-white shadow-sm transition-all hover:border-lime-400 hover:shadow-lg">
+              className="overflow-hidden rounded-2xl border border-black/10 bg-white shadow-sm transition-all hover:border-amber-400 hover:shadow-lg">
               <div className="relative h-44 overflow-hidden">
                 <img src={f.img} alt={f.title} className="h-full w-full object-cover" />
-                <div className="absolute left-3 top-3 rounded-md bg-lime-400 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-black">{f.tag}</div>
+                <div className="absolute left-3 top-3 rounded-md bg-amber-400 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-black">{f.tag}</div>
               </div>
               <div className="p-6">
                 <h3 className="text-lg font-bold text-black">{f.title}</h3>

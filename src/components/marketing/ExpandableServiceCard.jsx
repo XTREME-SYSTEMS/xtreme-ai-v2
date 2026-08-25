@@ -49,7 +49,7 @@ export default function ExpandableServiceCard({ service, index }) {
               <h3 className="text-lg font-bold text-black">{service.name}</h3>
               <p className="mt-0.5 text-sm text-black/50">{service.tagline}</p>
               {service.downloadable && (
-                <span className="mt-1.5 inline-flex items-center gap-1 rounded-full border border-lime-400/40 bg-lime-400/10 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-lime-700">
+                <span className="mt-1.5 inline-flex items-center gap-1 rounded-full border border-amber-400/40 bg-amber-400/10 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-amber-700">
                   <Download className="h-3 w-3" /> Downloadable
                 </span>
               )}
@@ -65,9 +65,9 @@ export default function ExpandableServiceCard({ service, index }) {
           {service.statistics && service.statistics.length > 0 && (
             <div className="mt-4 flex flex-wrap gap-2">
               {service.statistics.map((s, i) => (
-                <div key={i} className="flex items-center gap-1.5 rounded-lg border border-lime-400/30 bg-lime-400/10 px-2.5 py-1">
-                  <BarChart3 className="h-3 w-3 text-lime-700" />
-                  <span className="text-xs font-semibold text-lime-700">{s.value}</span>
+                <div key={i} className="flex items-center gap-1.5 rounded-lg border border-amber-400/30 bg-amber-400/10 px-2.5 py-1">
+                  <BarChart3 className="h-3 w-3 text-amber-700" />
+                  <span className="text-xs font-semibold text-amber-700">{s.value}</span>
                   <span className="text-xs text-black/50">{s.label}</span>
                 </div>
               ))}
@@ -79,7 +79,7 @@ export default function ExpandableServiceCard({ service, index }) {
             <button
               onClick={handleBuy}
               disabled={loading}
-              className="inline-flex flex-1 items-center justify-center gap-1.5 rounded-xl bg-black px-4 py-2.5 text-sm font-bold text-white transition-all hover:bg-lime-400 hover:text-black disabled:opacity-50"
+              className="inline-flex flex-1 items-center justify-center gap-1.5 rounded-xl bg-black px-4 py-2.5 text-sm font-bold text-white transition-all hover:bg-amber-400 hover:text-black disabled:opacity-50"
             >
               {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <>Buy Now <ArrowRight className="h-4 w-4" /></>}
             </button>
@@ -105,13 +105,13 @@ export default function ExpandableServiceCard({ service, index }) {
             >
               <div className="border-t border-black/10 bg-zinc-50 p-6">
                 {/* Full feature list */}
-                <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-lime-700">
+                <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-amber-700">
                   <FileText className="h-3.5 w-3.5" /> What's Included
                 </div>
                 <ul className="mt-3 grid gap-2 sm:grid-cols-2">
                   {service.features.map((f, i) => (
                     <li key={i} className="flex items-start gap-2 text-sm text-black/70">
-                      <Check className="mt-0.5 h-4 w-4 shrink-0 text-lime-600" />
+                      <Check className="mt-0.5 h-4 w-4 shrink-0 text-amber-600" />
                       <span>{f}</span>
                     </li>
                   ))}
@@ -134,7 +134,7 @@ export default function ExpandableServiceCard({ service, index }) {
                   </div>
                   <button
                     onClick={() => setContractOpen(true)}
-                    className="inline-flex items-center gap-1.5 rounded-lg border-2 border-lime-400 bg-lime-400/10 px-4 py-2 text-sm font-bold text-lime-700 transition-all hover:bg-lime-400 hover:text-black"
+                    className="inline-flex items-center gap-1.5 rounded-lg border-2 border-amber-400 bg-amber-400/10 px-4 py-2 text-sm font-bold text-amber-700 transition-all hover:bg-amber-400 hover:text-black"
                   >
                     <FileText className="h-4 w-4" /> Review Contract
                   </button>

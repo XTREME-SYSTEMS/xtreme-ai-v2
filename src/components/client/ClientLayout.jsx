@@ -31,17 +31,17 @@ export default function ClientLayout({ user }) {
   return (
     <div className="flex h-screen flex-col bg-black text-white">
       <header className="flex h-14 items-center gap-3 border-b border-white/10 bg-zinc-950 px-4">
-        <Image src={LOGO_ICON} alt="Lead Gen Near You" className="h-8 w-8" fittingType="fit" />
+        <Image src={LOGO_ICON} alt="Xtreme AI" className="h-8 w-8" fittingType="fit" />
         <div className="leading-tight">
-          <div className="text-sm font-semibold text-white">Lead Gen Near You</div>
-          <div className="text-[10px] uppercase tracking-wider text-lime-400">
+          <div className="text-sm font-semibold text-white">Xtreme AI</div>
+          <div className="text-[10px] uppercase tracking-wider text-amber-400">
             {autoBuild.isActive ? "Auto Builder" : "Client Portal"}
           </div>
         </div>
         {autoBuild.isActive && (
           <button
             onClick={() => { autoBuild.clearActiveBuild(); navigate("/auto-builder"); }}
-            className="ml-2 flex items-center gap-1.5 rounded-md border border-lime-400 px-2.5 py-1.5 text-xs font-semibold text-lime-400 hover:bg-lime-400/10"
+            className="ml-2 flex items-center gap-1.5 rounded-md border border-amber-400 px-2.5 py-1.5 text-xs font-semibold text-amber-400 hover:bg-amber-400/10"
           >
             <Hammer className="h-3.5 w-3.5" /> Back to Queue
           </button>
@@ -49,7 +49,7 @@ export default function ClientLayout({ user }) {
         {user?.role === "admin" && !autoBuild.isActive && (
           <button
             onClick={() => { setPreview(false); navigate("/client-portal"); }}
-            className="ml-2 flex items-center gap-1.5 rounded-md border border-lime-400 px-2.5 py-1.5 text-xs font-semibold text-lime-400 hover:bg-lime-400/10"
+            className="ml-2 flex items-center gap-1.5 rounded-md border border-amber-400 px-2.5 py-1.5 text-xs font-semibold text-amber-400 hover:bg-amber-400/10"
           >
             <ArrowLeft className="h-3.5 w-3.5" /> Exit Preview
           </button>

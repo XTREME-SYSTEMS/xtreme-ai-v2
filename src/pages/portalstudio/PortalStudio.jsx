@@ -71,8 +71,8 @@ export default function PortalStudio() {
   if (!isActive) {
     return (
       <div className="space-y-5 p-4">
-        <section className="rounded-2xl border border-yellow-300/30 bg-gradient-to-br from-yellow-300/8 to-transparent p-5">
-          <div className="flex items-center gap-2 text-[11px] font-bold uppercase tracking-wider text-yellow-300">
+        <section className="rounded-2xl border border-amber-400/30 bg-gradient-to-br from-amber-400/8 to-transparent p-5">
+          <div className="flex items-center gap-2 text-[11px] font-bold uppercase tracking-wider text-amber-400">
             <Hammer className="h-4 w-4" /> Xtreme AI
           </div>
           <h1 className="mt-2 text-xl font-bold text-white">Build · Refine · Brand · Deploy</h1>
@@ -83,10 +83,10 @@ export default function PortalStudio() {
 
         <section>
           <div className="flex items-center justify-between px-1">
-            <h2 className="text-[11px] font-bold uppercase tracking-wider text-yellow-300">Projects</h2>
+            <h2 className="text-[11px] font-bold uppercase tracking-wider text-amber-400">Projects</h2>
             <button
               onClick={() => setShowNew((v) => !v)}
-              className="inline-flex items-center gap-1 rounded-lg bg-yellow-300 px-2.5 py-1.5 text-xs font-bold text-black"
+              className="inline-flex items-center gap-1 rounded-lg bg-amber-400 px-2.5 py-1.5 text-xs font-bold text-black"
             >
               <Plus className="h-3.5 w-3.5" /> New
             </button>
@@ -99,14 +99,14 @@ export default function PortalStudio() {
                 value={newName}
                 onChange={(e) => setNewName(e.target.value)}
                 placeholder="Project name…"
-                className="w-full rounded-lg border border-white/15 bg-black px-3 py-2.5 text-sm text-white placeholder-white/30 focus:border-yellow-300 focus:outline-none"
+                className="w-full rounded-lg border border-white/15 bg-black px-3 py-2.5 text-sm text-white placeholder-white/30 focus:border-amber-400 focus:outline-none"
                 onKeyDown={(e) => e.key === "Enter" && createProject()}
                 autoFocus
               />
               <button
                 onClick={createProject}
                 disabled={creating || !newName.trim()}
-                className="inline-flex w-full items-center justify-center gap-1.5 rounded-lg bg-yellow-300 px-4 py-2.5 text-sm font-bold text-black disabled:opacity-50"
+                className="inline-flex w-full items-center justify-center gap-1.5 rounded-lg bg-amber-400 px-4 py-2.5 text-sm font-bold text-black disabled:opacity-50"
               >
                 {creating ? <Loader2 className="h-4 w-4 animate-spin" /> : <Rocket className="h-4 w-4" />}
                 Create & Open
@@ -116,7 +116,7 @@ export default function PortalStudio() {
 
           {loading ? (
             <div className="flex items-center justify-center py-10">
-              <Loader2 className="h-6 w-6 animate-spin text-yellow-300" />
+              <Loader2 className="h-6 w-6 animate-spin text-amber-400" />
             </div>
           ) : projects.length === 0 ? (
             <div className="mt-4 rounded-xl border border-white/10 bg-zinc-950 p-6 text-center">
@@ -129,10 +129,10 @@ export default function PortalStudio() {
                 <button
                   key={p.id}
                   onClick={() => { setActiveProjectId(p.id); navigate("/portal-studio/welcome"); }}
-                  className="group flex w-full items-center gap-3 rounded-xl border border-white/10 bg-zinc-950 p-3.5 text-left transition-colors hover:border-yellow-300/50"
+                  className="group flex w-full items-center gap-3 rounded-xl border border-white/10 bg-zinc-950 p-3.5 text-left transition-colors hover:border-amber-400/50"
                 >
-                  <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-yellow-300/10">
-                    <Hammer className="h-4 w-4 text-yellow-300" />
+                  <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-amber-400/10">
+                    <Hammer className="h-4 w-4 text-amber-400" />
                   </div>
                   <div className="min-w-0 flex-1">
                     <div className="truncate text-sm font-semibold text-white">{p.name}</div>
@@ -140,7 +140,7 @@ export default function PortalStudio() {
                       {p.product_type || "marketing_site"} · {p.visited_steps?.length || 0} steps
                     </div>
                   </div>
-                  <ArrowRight className="h-4 w-4 shrink-0 text-white/30 group-hover:text-yellow-300" />
+                  <ArrowRight className="h-4 w-4 shrink-0 text-white/30 group-hover:text-amber-400" />
                   <button
                     onClick={(e) => deleteProject(p.id, e)}
                     className="shrink-0 rounded-md p-1 text-white/30 hover:text-red-400"
@@ -159,8 +159,8 @@ export default function PortalStudio() {
   // ── Dashboard (active project) ──
   return (
     <div className="space-y-5 p-4">
-      <section className="rounded-2xl border border-yellow-300/30 bg-gradient-to-br from-yellow-300/8 to-transparent p-5">
-        <div className="flex items-center gap-2 text-[11px] font-bold uppercase tracking-wider text-yellow-300">
+      <section className="rounded-2xl border border-amber-400/30 bg-gradient-to-br from-amber-400/8 to-transparent p-5">
+        <div className="flex items-center gap-2 text-[11px] font-bold uppercase tracking-wider text-amber-400">
           <Sparkles className="h-4 w-4" /> {project?.name || "Sandbox Build"}
         </div>
         <h1 className="mt-2 text-xl font-bold text-white">Build Studio</h1>
@@ -171,7 +171,7 @@ export default function PortalStudio() {
               <span>{progress.done} / {progress.total}</span>
             </div>
             <div className="mt-1 h-2 overflow-hidden rounded-full bg-white/10">
-              <div className="h-full rounded-full bg-yellow-300 transition-all" style={{ width: `${progress.percent}%` }} />
+              <div className="h-full rounded-full bg-amber-400 transition-all" style={{ width: `${progress.percent}%` }} />
             </div>
           </div>
           <button
@@ -184,7 +184,7 @@ export default function PortalStudio() {
       </section>
 
       <section>
-        <h2 className="px-1 text-[11px] font-bold uppercase tracking-wider text-yellow-300">Pipeline</h2>
+        <h2 className="px-1 text-[11px] font-bold uppercase tracking-wider text-amber-400">Pipeline</h2>
         <div className="mt-3 space-y-2.5">
           {states.map((s, i) => {
             const step = s.step;
@@ -195,26 +195,26 @@ export default function PortalStudio() {
               <StepTag
                 key={step.key}
                 {...stepProps}
-                className={`flex gap-3 rounded-xl border border-white/10 bg-zinc-950 p-3 ${step.to ? "transition-colors hover:border-yellow-300/40" : ""}`}
+                className={`flex gap-3 rounded-xl border border-white/10 bg-zinc-950 p-3 ${step.to ? "transition-colors hover:border-amber-400/40" : ""}`}
               >
                 <div className="flex flex-col items-center">
                   <div className={`flex h-9 w-9 items-center justify-center rounded-full border text-xs font-bold ${
-                    s.completed ? "border-yellow-300 bg-yellow-300/10 text-yellow-300" :
-                    s.isCurrent ? "border-yellow-300 bg-yellow-300/15 text-yellow-300" :
+                    s.completed ? "border-amber-400 bg-amber-400/10 text-amber-400" :
+                    s.isCurrent ? "border-amber-400 bg-amber-400/15 text-amber-400" :
                     "border-white/15 bg-zinc-900 text-white/60"
                   }`}>
-                    {s.completed ? <CheckCircle2 className="h-4 w-4 text-yellow-300" /> : i + 1}
+                    {s.completed ? <CheckCircle2 className="h-4 w-4 text-amber-400" /> : i + 1}
                   </div>
                 </div>
                 <div className="flex-1">
                   <div className="flex items-center gap-1.5">
-                    <Icon className="h-3.5 w-3.5 shrink-0 text-yellow-300" />
+                    <Icon className="h-3.5 w-3.5 shrink-0 text-amber-400" />
                     <h3 className="text-[13px] font-semibold text-white">{step.label}</h3>
                     {step.gate && step.gate !== "auto" && (
                       <ShieldCheck className="h-3 w-3 text-rose-400" />
                     )}
                     {s.completed && (
-                      <CheckCircle2 className="ml-auto h-3 w-3 text-yellow-300" />
+                      <CheckCircle2 className="ml-auto h-3 w-3 text-amber-400" />
                     )}
                     {step.to && !s.completed && <ArrowRight className="ml-auto h-3 w-3 shrink-0 text-white/30" />}
                   </div>

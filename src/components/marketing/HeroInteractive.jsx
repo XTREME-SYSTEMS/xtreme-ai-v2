@@ -96,15 +96,15 @@ function useTypewriter(messages, typeSpeed = 55, pauseSpeed = 1600) {
 
 function TechBadge({ icon: Icon, label }) {
   return (
-    <div className="flex items-center gap-1.5 rounded-full border border-lime-400/50 bg-white/85 px-3 py-1.5 shadow-md shadow-lime-400/10 backdrop-blur-sm">
-      <Icon className="h-3.5 w-3.5 text-lime-600" />
+    <div className="flex items-center gap-1.5 rounded-full border border-amber-400/50 bg-white/85 px-3 py-1.5 shadow-md shadow-amber-400/10 backdrop-blur-sm">
+      <Icon className="h-3.5 w-3.5 text-amber-600" />
       <span className="text-[10px] font-bold tracking-wider text-black">{label}</span>
     </div>
   );
 }
 
 function CornerBracket({ position }) {
-  const base = "absolute z-[2] h-7 w-7 border-lime-400/50 pointer-events-none";
+  const base = "absolute z-[2] h-7 w-7 border-amber-400/50 pointer-events-none";
   const map = {
     "tl": "top-3 left-3 border-l-2 border-t-2",
     "tr": "top-3 right-3 border-r-2 border-t-2",
@@ -136,7 +136,7 @@ export default function HeroInteractive() {
 
       {/* Scanning sweep line */}
       <motion.div
-        className="absolute left-0 right-0 z-[1] h-px bg-gradient-to-r from-transparent via-lime-400 to-transparent"
+        className="absolute left-0 right-0 z-[1] h-px bg-gradient-to-r from-transparent via-amber-400 to-transparent"
         initial={{ top: "8%", opacity: 0 }}
         animate={{ top: ["8%", "92%", "8%"], opacity: [0, 0.7, 0] }}
         transition={{ duration: 9, repeat: Infinity, ease: "linear" }}
@@ -157,7 +157,7 @@ export default function HeroInteractive() {
           className="flex items-center justify-between pt-6 font-mono text-[10px] sm:text-xs"
         >
           <div className="flex items-center gap-2">
-            <span className="h-2 w-2 rounded-full bg-lime-400 animate-pulse" />
+            <span className="h-2 w-2 rounded-full bg-amber-400 animate-pulse" />
             <span className="text-black/50">SYSTEM ONLINE</span>
           </div>
           <div className="text-black/50">AI ENGINE v2.0</div>
@@ -170,7 +170,7 @@ export default function HeroInteractive() {
             {[0, 1, 2].map((i) => (
               <motion.div
                 key={i}
-                className="absolute h-32 w-32 rounded-full border border-lime-400 sm:h-40 sm:w-40"
+                className="absolute h-32 w-32 rounded-full border border-amber-400 sm:h-40 sm:w-40"
                 initial={{ scale: 1, opacity: 0.45 }}
                 animate={{ scale: [1, 2.3], opacity: [0.45, 0] }}
                 transition={{ duration: 3, repeat: Infinity, delay: i * 1, ease: "easeOut" }}
@@ -178,22 +178,22 @@ export default function HeroInteractive() {
             ))}
 
             {/* Glow halo */}
-            <div className="absolute h-32 w-32 rounded-full bg-lime-400/25 blur-2xl sm:h-40 sm:w-40" />
+            <div className="absolute h-32 w-32 rounded-full bg-amber-400/25 blur-2xl sm:h-40 sm:w-40" />
 
             {/* Rotating dashed ring */}
             <motion.div
-              className="absolute h-36 w-36 rounded-full border border-dashed border-lime-400/30 sm:h-48 sm:w-48"
+              className="absolute h-36 w-36 rounded-full border border-dashed border-amber-400/30 sm:h-48 sm:w-48"
               animate={{ rotate: 360 }}
               transition={{ duration: 30, repeat: Infinity, ease: "linear" }}
             />
 
             {/* Logo icon */}
             <motion.div
-              className="relative z-10 flex h-28 w-28 items-center justify-center rounded-full border-2 border-lime-400 bg-white shadow-lg shadow-lime-400/30 sm:h-36 sm:w-36"
+              className="relative z-10 flex h-28 w-28 items-center justify-center rounded-full border-2 border-amber-400 bg-white shadow-lg shadow-amber-400/30 sm:h-36 sm:w-36"
               animate={{ y: [0, -8, 0] }}
               transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
             >
-              <img src={LOGO_ICON} alt="Lead Generation Near You" className="h-16 w-16 object-contain sm:h-24 sm:w-24" />
+              <img src={LOGO_ICON} alt="Xtreme AI" className="h-16 w-16 object-contain sm:h-24 sm:w-24" />
             </motion.div>
 
             {/* Floating tech badges (desktop) */}
@@ -233,7 +233,7 @@ export default function HeroInteractive() {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.4 }}
-          className="mt-2 text-center font-mono text-xs text-lime-600 sm:text-sm"
+          className="mt-2 text-center font-mono text-xs text-amber-600 sm:text-sm"
         >
           {statusText}
           <span className="animate-pulse">_</span>
@@ -246,7 +246,7 @@ export default function HeroInteractive() {
           transition={{ delay: 0.5, duration: 0.6 }}
           className="mt-6 max-w-3xl text-center text-4xl font-bold leading-[1.1] tracking-tight text-black sm:text-5xl lg:text-6xl mx-auto"
         >
-          The AI-powered business <span className="text-lime-600">operating system</span>
+          The AI-powered business <span className="text-amber-600">operating system</span>
         </motion.h1>
 
         <motion.p
@@ -264,7 +264,7 @@ export default function HeroInteractive() {
           transition={{ delay: 0.9, duration: 0.6 }}
           className="mt-8 flex flex-col items-center gap-3 pb-12 sm:flex-row sm:justify-center"
         >
-          <Link to="/register" className="group inline-flex items-center justify-center gap-2 rounded-xl bg-lime-400 px-7 py-4 text-base font-bold text-black transition-all hover:bg-lime-300 hover:shadow-xl hover:shadow-lime-400/40">
+          <Link to="/register" className="group inline-flex items-center justify-center gap-2 rounded-xl bg-amber-400 px-7 py-4 text-base font-bold text-black transition-all hover:bg-amber-300 hover:shadow-xl hover:shadow-amber-400/40">
             Try Demo <ArrowRight className="h-5 w-5 transition-transform group-hover:translate-x-1" />
           </Link>
           <Link to="/pricing" className="group inline-flex items-center justify-center gap-2 rounded-xl border border-black/15 bg-white px-7 py-4 text-base font-bold text-black transition-all hover:border-black hover:bg-black hover:text-white">

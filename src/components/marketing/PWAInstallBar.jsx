@@ -57,16 +57,16 @@ export default function PWAInstallBar() {
 
   return (
     <>
-      <div className="fixed bottom-0 left-0 right-0 z-40 border-t border-lime-400/30 bg-black/95 backdrop-blur-md">
+      <div className="fixed bottom-0 left-0 right-0 z-40 border-t border-amber-400/30 bg-black/95 backdrop-blur-md">
         <div className="mx-auto flex max-w-7xl items-center justify-between gap-3 px-4 py-3">
           <div className="flex items-center gap-3">
-            <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-gradient-to-br from-lime-300 via-lime-400 to-lime-600 shadow-lg shadow-lime-400/30">
+            <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-gradient-to-br from-amber-300 via-amber-400 to-amber-600 shadow-lg shadow-amber-400/30">
               <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-black">
-                <MapPin className="h-5 w-5 text-lime-400" />
+                <MapPin className="h-5 w-5 text-amber-400" />
               </div>
             </div>
             <div className="leading-tight">
-              <div className="text-sm font-bold text-white">Lead Generation Near You</div>
+              <div className="text-sm font-bold text-white">Xtreme AI</div>
               <div className="text-[11px] text-white/50">
                 {isIOS ? "Tap Share, then \u201CAdd to Home Screen\u201D" : "Install our app \u2014 leads in your pocket"}
               </div>
@@ -74,11 +74,11 @@ export default function PWAInstallBar() {
           </div>
           <div className="flex items-center gap-2">
             {isIOS ? (
-              <button onClick={() => setShowModal(true)} className="inline-flex items-center gap-2 rounded-lg border border-lime-400/40 px-4 py-2.5 text-sm font-bold text-lime-400 transition-colors hover:bg-lime-400/10">
+              <button onClick={() => setShowModal(true)} className="inline-flex items-center gap-2 rounded-lg border border-amber-400/40 px-4 py-2.5 text-sm font-bold text-amber-400 transition-colors hover:bg-amber-400/10">
                 <Share className="h-4 w-4" /> <span className="hidden sm:inline">Add to Home Screen</span><span className="sm:hidden">Add</span>
               </button>
             ) : (
-              <button onClick={handleInstall} className="inline-flex items-center gap-2 rounded-lg bg-lime-400 px-5 py-2.5 text-sm font-bold text-black transition-all hover:bg-lime-300 hover:shadow-lg hover:shadow-lime-400/40">
+              <button onClick={handleInstall} className="inline-flex items-center gap-2 rounded-lg bg-amber-400 px-5 py-2.5 text-sm font-bold text-black transition-all hover:bg-amber-300 hover:shadow-lg hover:shadow-amber-400/40">
                 <Download className="h-4 w-4" />
                 {canNativeInstall ? <><span className="hidden sm:inline">Download App</span><span className="sm:hidden">Install</span></> : <><span className="hidden sm:inline">How to Install</span><span className="sm:hidden">Install</span></>}
               </button>

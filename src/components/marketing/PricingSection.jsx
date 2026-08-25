@@ -49,13 +49,13 @@ export default function PricingSection({ showHeader = true }) {
         {showHeader && (
           <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.5 }}
           className="mx-auto max-w-2xl text-center">
-            <div className="mb-3 inline-flex items-center gap-2 rounded-full bg-lime-400/15 px-3 py-1 text-xs font-bold uppercase tracking-wider text-lime-700">Pricing</div>
+            <div className="mb-3 inline-flex items-center gap-2 rounded-full bg-amber-400/15 px-3 py-1 text-xs font-bold uppercase tracking-wider text-amber-700">Pricing</div>
             <h2 className="text-3xl font-bold tracking-tight text-black sm:text-5xl">Choose Your Plan</h2>
             <p className="mt-4 text-lg text-black/60">Try the full workflow free with Demo mode, or pick a paid plan. Pay only when you're ready to finalize.</p>
 
             <div className="mt-7 inline-flex items-center gap-3 rounded-full border border-black/15 bg-white p-1">
-              <button onClick={() => setAnnual(false)} className={`rounded-full px-4 py-1.5 text-sm font-semibold transition-all ${!annual ? "bg-lime-400 text-black" : "text-black/60"}`}>Monthly</button>
-              <button onClick={() => setAnnual(true)} className={`rounded-full px-4 py-1.5 text-sm font-semibold transition-all ${annual ? "bg-lime-400 text-black" : "text-black/60"}`}>Annual <span className="text-xs opacity-70">Save 2 mo</span></button>
+              <button onClick={() => setAnnual(false)} className={`rounded-full px-4 py-1.5 text-sm font-semibold transition-all ${!annual ? "bg-amber-400 text-black" : "text-black/60"}`}>Monthly</button>
+              <button onClick={() => setAnnual(true)} className={`rounded-full px-4 py-1.5 text-sm font-semibold transition-all ${annual ? "bg-amber-400 text-black" : "text-black/60"}`}>Annual <span className="text-xs opacity-70">Save 2 mo</span></button>
             </div>
 
             {/* Promo code */}
@@ -70,8 +70,8 @@ export default function PricingSection({ showHeader = true }) {
         <div className="mt-14 grid gap-5 lg:grid-cols-4">
           {TIERS.map((t, i) => (
             <motion.div key={t.name} initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.4, delay: i * 0.08 }}
-              className={`relative flex flex-col rounded-2xl border p-6 ${t.highlight ? "border-lime-400 bg-lime-400/5 lg:scale-105 shadow-xl shadow-lime-400/20" : "border-black/10 bg-white"}`}>
-              {t.highlight && <div className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-lime-400 px-3 py-1 text-xs font-bold uppercase tracking-wider text-black">Most Popular</div>}
+              className={`relative flex flex-col rounded-2xl border p-6 ${t.highlight ? "border-amber-400 bg-amber-400/5 lg:scale-105 shadow-xl shadow-amber-400/20" : "border-black/10 bg-white"}`}>
+              {t.highlight && <div className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-amber-400 px-3 py-1 text-xs font-bold uppercase tracking-wider text-black">Most Popular</div>}
               <h3 className="text-lg font-bold text-black">{t.name}</h3>
               <p className="mt-1 text-xs text-black/50">{t.tagline}</p>
               <div className="mt-4 flex items-baseline gap-1">
@@ -79,10 +79,10 @@ export default function PricingSection({ showHeader = true }) {
                   : t.monthly === 0 ? <span className="text-4xl font-bold text-black">$0</span>
                   : <><span className="text-4xl font-bold text-black">${annual && t.yearly ? Math.round(t.yearly / 12) : t.monthly}</span><span className="text-sm text-black/50">/mo</span></>}
               </div>
-              {annual && t.yearly ? <div className="mt-1 text-xs text-lime-700">Billed ${t.yearly.toLocaleString()}/yr</div> : <div className="mt-1 text-xs text-black/20">&nbsp;</div>}
+              {annual && t.yearly ? <div className="mt-1 text-xs text-amber-700">Billed ${t.yearly.toLocaleString()}/yr</div> : <div className="mt-1 text-xs text-black/20">&nbsp;</div>}
 
               {t.free ? (
-                <Link to="/register" className="mt-5 inline-flex items-center justify-center gap-1.5 rounded-xl bg-lime-400 px-4 py-3 text-sm font-bold text-black transition-all hover:bg-lime-300">
+                <Link to="/register" className="mt-5 inline-flex items-center justify-center gap-1.5 rounded-xl bg-amber-400 px-4 py-3 text-sm font-bold text-black transition-all hover:bg-amber-300">
                   {t.cta} <ArrowRight className="h-4 w-4" />
                 </Link>
               ) : t.contact ? (
@@ -91,7 +91,7 @@ export default function PricingSection({ showHeader = true }) {
                 </a>
               ) : (
                 <button onClick={() => handleCheckout(annual ? t.annualId : t.monthlyId, t.name)} disabled={loading === t.name}
-                  className={`mt-5 inline-flex items-center justify-center gap-1.5 rounded-xl px-4 py-3 text-sm font-bold transition-all disabled:opacity-50 ${t.highlight ? "bg-lime-400 text-black hover:bg-lime-300" : "border border-black/20 text-black hover:bg-black hover:text-white"}`}>
+                  className={`mt-5 inline-flex items-center justify-center gap-1.5 rounded-xl px-4 py-3 text-sm font-bold transition-all disabled:opacity-50 ${t.highlight ? "bg-amber-400 text-black hover:bg-amber-300" : "border border-black/20 text-black hover:bg-black hover:text-white"}`}>
                   {loading === t.name ? <Loader2 className="h-4 w-4 animate-spin" /> : <>{t.cta} <ArrowRight className="h-4 w-4" /></>}
                 </button>
               )}
@@ -99,7 +99,7 @@ export default function PricingSection({ showHeader = true }) {
               <ul className="mt-6 space-y-2.5">
                 {t.features.map((f) => (
                   <li key={f} className="flex items-start gap-2 text-sm text-black/70">
-                    <Check className={`mt-0.5 h-4 w-4 shrink-0 ${t.highlight ? "text-lime-600" : "text-black/40"}`} /> {f}
+                    <Check className={`mt-0.5 h-4 w-4 shrink-0 ${t.highlight ? "text-amber-600" : "text-black/40"}`} /> {f}
                   </li>
                 ))}
               </ul>
@@ -108,7 +108,7 @@ export default function PricingSection({ showHeader = true }) {
         </div>
 
         <p className="mt-8 text-center text-sm text-black/40">
-          <Sparkles className="mr-1 inline h-4 w-4 text-lime-600" /> Done-for-you services require a deposit. After payment, create your account and get instant dashboard access.
+          <Sparkles className="mr-1 inline h-4 w-4 text-amber-600" /> Done-for-you services require a deposit. After payment, create your account and get instant dashboard access.
         </p>
       </div>
     </section>

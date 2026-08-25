@@ -19,14 +19,14 @@ export default function AwardBadges() {
           We're in the business of helping you grow your business
         </motion.h2>
         <p className="mx-auto mt-3 max-w-xl text-center text-base text-black/50">
-          Lead Generation Near Me is the AI-powered operating system powering the growth of businesses around the world.
+          Xtreme AI is the AI-powered operating system powering the growth of businesses around the world.
         </p>
 
         <div className="mt-10 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
           {BADGES.map((b, i) => (
             <motion.div key={b.label} initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.4, delay: i * 0.06 }}
               className="flex flex-col items-center gap-2 rounded-xl border border-black/10 bg-zinc-50 px-3 py-5 text-center">
-              <b.icon className="h-6 w-6 text-lime-600" />
+              <b.icon className="h-6 w-6 text-amber-600" />
               <span className="text-[11px] font-semibold leading-tight text-black/60">{b.label}</span>
             </motion.div>
           ))}

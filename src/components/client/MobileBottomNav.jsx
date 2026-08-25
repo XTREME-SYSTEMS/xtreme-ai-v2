@@ -43,7 +43,7 @@ export default function MobileBottomNav() {
   ];
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-40 border-t border-lime-400/20 bg-zinc-950/95 backdrop-blur-md md:hidden">
+    <nav className="fixed bottom-0 left-0 right-0 z-40 border-t border-amber-400/20 bg-zinc-950/95 backdrop-blur-md md:hidden">
       <div className="flex items-stretch justify-around">
         {navItems.map((item) => {
           const Icon = item.icon;
@@ -53,7 +53,7 @@ export default function MobileBottomNav() {
               to={item.to}
               className={({ isActive }) => cn(
                 "flex flex-1 flex-col items-center gap-0.5 py-2 transition-colors",
-                isActive ? "text-lime-400" : "text-white/50 hover:text-white/80"
+                isActive ? "text-amber-400" : "text-white/50 hover:text-white/80"
               )}
             >
               <Icon className="h-5 w-5" />
@@ -67,7 +67,7 @@ export default function MobileBottomNav() {
           onClick={handleInstall}
           className={cn(
             "flex flex-1 flex-col items-center gap-0.5 py-2 transition-colors",
-            installed ? "text-lime-400" : "text-lime-400 hover:text-lime-300"
+            installed ? "text-amber-400" : "text-amber-400 hover:text-amber-300"
           )}
         >
           {installed ? <Check className="h-5 w-5" /> : <Download className="h-5 w-5" />}

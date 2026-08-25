@@ -25,7 +25,7 @@ export default function BrandedButton({
       onClick={onClick}
       disabled={disabled || loading}
       className={cn(
-        "inline-flex w-full items-center justify-center gap-2 rounded-xl bg-lime-400 px-5 py-3.5 text-sm font-bold text-black transition-all hover:bg-lime-300 active:scale-[0.98] disabled:cursor-not-allowed disabled:bg-white/10 disabled:text-white/40 sm:w-auto sm:px-6",
+        "inline-flex w-full items-center justify-center gap-2 rounded-xl bg-amber-400 px-5 py-3.5 text-sm font-bold text-black transition-all hover:bg-amber-300 active:scale-[0.98] disabled:cursor-not-allowed disabled:bg-white/10 disabled:text-white/40 sm:w-auto sm:px-6",
         className
       )}
     >

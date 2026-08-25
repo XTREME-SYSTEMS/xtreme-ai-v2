@@ -23,9 +23,9 @@ export default function About() {
     <section id="about" className="bg-zinc-50 py-20 sm:py-28">
       <div className="mx-auto max-w-7xl px-4 sm:px-6">
         <div className="text-center">
-          <div className="mb-3 inline-flex items-center gap-2 rounded-full bg-lime-400/15 px-3 py-1 text-xs font-bold uppercase tracking-wider text-lime-600">About Us</div>
+          <div className="mb-3 inline-flex items-center gap-2 rounded-full bg-amber-400/15 px-3 py-1 text-xs font-bold uppercase tracking-wider text-amber-600">About Us</div>
           <h2 className="text-3xl font-bold tracking-tight text-black sm:text-4xl lg:text-5xl">We help local businesses win</h2>
-          <p className="mt-4 max-w-2xl mx-auto text-lg text-black/60">Lead Generation Near Me was built to give every local service business the same growth engine the big franchises use — at a price that makes sense.</p>
+          <p className="mt-4 max-w-2xl mx-auto text-lg text-black/60">Xtreme AI was built to give every local service business the same growth engine the big franchises use — at a price that makes sense.</p>
         </div>
 
         <div className="mt-12 overflow-hidden rounded-2xl border border-black/10">
@@ -39,14 +39,14 @@ export default function About() {
               We watched local businesses duct-tape a dozen tools together just to keep up. So we built one platform — CRM, funnels, marketing, bookings, and automations — that replaces all of them and actually gets the phone to ring.
             </p>
             <p className="mt-3 text-base leading-relaxed text-black/60">
-              Today, thousands of businesses across North America use Lead Generation Near Me to capture more leads, book more jobs, and turn one-time customers into repeat referrals.
+              Today, thousands of businesses across North America use Xtreme AI to capture more leads, book more jobs, and turn one-time customers into repeat referrals.
             </p>
           </div>
           <div className="grid gap-4 sm:grid-cols-2">
             {VALUES.map((v) => (
               <div key={v.title} className="rounded-xl border border-black/10 bg-white p-5">
-                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-lime-400/15">
-                  <v.icon className="h-5 w-5 text-lime-600" />
+                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-amber-400/15">
+                  <v.icon className="h-5 w-5 text-amber-600" />
                 </div>
                 <h4 className="mt-3 text-sm font-bold text-black">{v.title}</h4>
                 <p className="mt-1 text-xs leading-relaxed text-black/55">{v.desc}</p>
@@ -68,7 +68,7 @@ export default function About() {
         {/* Final CTA */}
         <div className="mt-16 rounded-3xl bg-black px-8 py-14 text-center sm:px-16">
           <h3 className="text-2xl font-bold text-white sm:text-3xl">Come grow with us</h3>
-          <Link to="/register" className="group mt-6 inline-flex items-center gap-2 rounded-xl bg-lime-400 px-7 py-4 text-base font-bold text-black transition-all hover:bg-lime-300">
+          <Link to="/register" className="group mt-6 inline-flex items-center gap-2 rounded-xl bg-amber-400 px-7 py-4 text-base font-bold text-black transition-all hover:bg-amber-300">
             Try Demo <ArrowRight className="h-5 w-5 transition-transform group-hover:translate-x-1" />
           </Link>
         </div>
