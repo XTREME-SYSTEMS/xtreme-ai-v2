@@ -10,7 +10,7 @@ import {
 // US state registry check results, and the AI's rationale. Only shown for
 // 100% confirmed available domains.
 export default function NameResearchCard({
-  suggestion: s, rank, saving, saved, purchasing, purchased, purchaseError, onRetry, onRequest,
+  suggestion: s, rank, saving, saved, purchasing, purchased, purchaseError, onRetry, onRequest, onUseName, usingName, usedName,
 }) {
   const [expanded, setExpanded] = useState(false);
 
@@ -206,15 +206,29 @@ export default function NameResearchCard({
               <div className="flex items-center gap-2 rounded-lg border border-lime-400/40 bg-lime-400/10 px-3 py-2 text-xs text-lime-300">
                 <CheckCircle2 className="h-4 w-4" /> Request sent! Our team will secure this domain for you.
               </div>
+            ) : usedName ? (
+              <div className="flex items-center gap-2 rounded-lg border border-lime-400/40 bg-lime-400/10 px-3 py-2 text-xs text-lime-300">
+                <CheckCircle2 className="h-4 w-4" /> Name saved! Continue to the next step.
+              </div>
             ) : (
-              <button
-                onClick={onRequest}
-                disabled={saving}
-                className="inline-flex items-center gap-1.5 rounded-lg bg-lime-400 px-4 py-2 text-xs font-semibold text-black transition-colors hover:bg-lime-300 disabled:opacity-50"
-              >
-                {saving ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <ArrowRight className="h-3.5 w-3.5" />}
-                {saving ? "Working…" : "Buy This Domain"}
-              </button>
+              <div className="flex flex-wrap items-center gap-2">
+                <button
+                  onClick={onUseName}
+                  disabled={usingName}
+                  className="inline-flex items-center gap-1.5 rounded-lg border border-lime-400/40 bg-lime-400/10 px-4 py-2 text-xs font-semibold text-lime-300 transition-colors hover:bg-lime-400/20 disabled:opacity-50"
+                >
+                  {usingName ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <CheckCircle2 className="h-3.5 w-3.5" />}
+                  {usingName ? "Saving…" : "Use This Name"}
+                </button>
+                <button
+                  onClick={onRequest}
+                  disabled={saving}
+                  className="inline-flex items-center gap-1.5 rounded-lg bg-lime-400 px-4 py-2 text-xs font-semibold text-black transition-colors hover:bg-lime-300 disabled:opacity-50"
+                >
+                  {saving ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <ArrowRight className="h-3.5 w-3.5" />}
+                  {saving ? "Working…" : "Buy Domain"}
+                </button>
+              </div>
             )}
           </div>
         </div>

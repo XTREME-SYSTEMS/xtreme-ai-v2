@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { base44 } from "@/api/base44Client";
 import {
   Lightbulb, Loader2, Search, AlertCircle, TrendingUp, Sparkles,
@@ -45,6 +46,9 @@ export default function BusinessNameStudio() {
   const [manualResult, setManualResult] = useState(null);
   const [manualError, setManualError] = useState("");
   const [genCount, setGenCount] = useState(0);
+  const [usingName, setUsingName] = useState(null);
+  const [usedName, setUsedName] = useState(null);
+  const navigate = useNavigate();
 
   // Context from prior steps — vision, strategy, profile — fed to the
   // AI-assist so suggestions build on what the user already chose.
@@ -139,6 +143,28 @@ export default function BusinessNameStudio() {
     setShowManual(false);
     setManualName("");
     setManualResult(null);
+  };
+
+  // Use a chosen name WITHOUT buying the domain — saves it to the user's
+  // profile and advances to the next step.
+  const saveNameOnly = async (s) => {
+    setUsingName(s.name);
+    try {
+      await base44.auth.updateMe({
+        epoxyProfile: {
+          ...(user?.epoxyProfile || {}),
+          businessName: s.name,
+          domain: s.domain,
+          tagline: s.tagline || "",
+        },
+      });
+      setUsedName(s.name);
+      setTimeout(() => navigate("/business-profile"), 900);
+    } catch (e) {
+      setError(e?.message || "Could not save your name. Please try again.");
+    } finally {
+      setUsingName(null);
+    }
   };
 
   const requestDomain = async (s) => {
@@ -302,6 +328,9 @@ export default function BusinessNameStudio() {
               purchaseError={purchaseError[s.domain]}
               onRetry={() => requestDomain(s)}
               onRequest={() => requestDomain(s)}
+              onUseName={() => saveNameOnly(s)}
+              usingName={usingName === s.name}
+              usedName={usedName === s.name}
             />
           ))}
 
