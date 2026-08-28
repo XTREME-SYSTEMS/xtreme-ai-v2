@@ -1,5 +1,7 @@
 import { useState, useEffect } from "react";
-import { MapPin, Download, X, Share } from "lucide-react";
+import { Download, X, Share } from "lucide-react";
+import { Image } from "@/components/ui/image";
+import { LOGO_ICON } from "@/lib/brandAssets";
 import InstallInstructionsModal from "@/components/marketing/InstallInstructionsModal";
 
 export default function PWAInstallBar() {
@@ -60,10 +62,8 @@ export default function PWAInstallBar() {
       <div className="fixed bottom-0 left-0 right-0 z-40 border-t border-amber-400/30 bg-black/95 backdrop-blur-md">
         <div className="mx-auto flex max-w-7xl items-center justify-between gap-3 px-4 py-3">
           <div className="flex items-center gap-3">
-            <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-gradient-to-br from-amber-300 via-amber-400 to-amber-600 shadow-lg shadow-amber-400/30">
-              <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-black">
-                <MapPin className="h-5 w-5 text-amber-400" />
-              </div>
+            <div className="flex h-11 w-11 items-center justify-center overflow-hidden rounded-xl bg-black shadow-lg shadow-amber-400/30 ring-1 ring-amber-400/40">
+              <Image src={LOGO_ICON} alt="Xtreme AI" fittingType="fit" className="h-11 w-11" />
             </div>
             <div className="leading-tight">
               <div className="text-sm font-bold text-white">Xtreme AI</div>

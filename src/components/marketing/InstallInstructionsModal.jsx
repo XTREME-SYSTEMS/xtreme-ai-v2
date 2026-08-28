@@ -1,4 +1,6 @@
 import { X, Share, Download, Chrome, Smartphone } from "lucide-react";
+import { Image } from "@/components/ui/image";
+import { LOGO_ICON } from "@/lib/brandAssets";
 
 // Platform-specific install instructions shown when the browser doesn't
 // support the automated beforeinstallprompt event (iOS Safari, Firefox, or
@@ -37,8 +39,8 @@ export default function InstallInstructionsModal({ onClose }) {
           <X className="h-4 w-4" />
         </button>
         <div className="flex flex-col items-center text-center">
-          <div className="flex h-12 w-12 items-center justify-center rounded-full bg-amber-400/15">
-            <Download className="h-5 w-5 text-amber-400" />
+          <div className="flex h-16 w-16 items-center justify-center overflow-hidden rounded-full bg-black ring-1 ring-amber-400/40">
+            <Image src={LOGO_ICON} alt="Xtreme AI" fittingType="fit" className="h-16 w-16" />
           </div>
           <h3 className="mt-4 text-lg font-semibold text-white">Install the App</h3>
           <p className="mt-1 text-sm text-white/60">
