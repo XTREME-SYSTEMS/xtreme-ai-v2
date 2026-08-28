@@ -1,4 +1,8 @@
 import { createClientFromRequest } from "npm:@base44/sdk@0.8.31";
+import {
+  normalizeDomain, checkDomainAvailability, getDomainPrice, buyDomain,
+  attachDomainToProject, buildRegistrantContact,
+} from "../../shared/vercelRegistrar.ts";
 
 // Purchases a domain through Vercel's Registrar API under OUR account
 // (VERCEL_TOKEN + VERCEL_TEAM_ID), then optionally attaches it to the client's
@@ -53,31 +57,15 @@ export default async function (req: Request) {
 
   // Registrant contact — pulled from the client's business profile so they
   // never have to fill out a form. Admins can override via body.contact.
-  const p = user.epoxyProfile || {};
-  const fullName = (user.full_name || p.businessName || user.email || "").trim();
-  const nameParts = fullName.split(/\s+/);
-  const firstName = nameParts[0] || "Owner";
-  const lastName = nameParts.slice(1).join(" ") || firstName;
-  const locParts = (p.primaryLocation || p.location || "").split(",").map((x: string) => x.trim());
-  const registrantContact = contact || {
-    firstName,
-    lastName,
-    email: p.email || user.email,
-    phone: p.phone || "",
-    address1: p.address || "",
-    city: locParts[0] || "",
-    state: locParts[1] || "",
-    zip: p.zip || "",
-    country: "US",
-  };
+  const registrantContact = contact || buildRegistrantContact(
+    user.epoxyProfile || {},
+    user.email,
+    user.full_name || "",
+  );
 
   const token = process.env.VERCEL_TOKEN;
   const team = process.env.VERCEL_TEAM_ID;
   if (!token) return Response.json({ error: "VERCEL_TOKEN not set" }, { status: 500 });
-  const qs = team ? `?teamId=${encodeURIComponent(team)}` : "";
-  const addParam = (url: string, param: string) => (url.includes("?") ? `${url}&${param}` : `${url}?${param}`);
-  const headers = { Authorization: `Bearer ${token}`, "Content-Type": "application/json" };
-  const dom = encodeURIComponent(purchaseDomain);
 
   try {
     // Mark the request as purchasing (client-facing status)
@@ -86,44 +74,37 @@ export default async function (req: Request) {
     }
 
     // 1. Availability
-    const availRes = await fetch(`https://api.vercel.com/v1/registrar/domains/${dom}/availability${qs}`, { headers });
-    if (!availRes.ok) {
-      const t = await availRes.text();
-      console.error("Vercel availability failed:", availRes.status, t);
-      return Response.json({ error: `Availability check failed: ${availRes.status} ${t}` }, { status: 502 });
+    let avail;
+    try {
+      avail = await checkDomainAvailability(token, team, purchaseDomain);
+    } catch (e: any) {
+      console.error("Vercel availability failed:", e?.message);
+      return Response.json({ error: e?.message || "Availability check failed" }, { status: 502 });
     }
-    const avail = await availRes.json();
     if (!avail.available) {
       if (clientDomainId) { try { await base44.asServiceRole.entities.ClientDomain.update(clientDomainId, { status: "unavailable", domain_available: false }); } catch {} }
       return Response.json({ ok: false, available: false, error: "Domain is not available for purchase" }, { status: 200 });
     }
 
     // 2. Price (so we can pass expectedPrice to the buy call)
-    const priceRes = await fetch(`https://api.vercel.com/v1/registrar/domains/${dom}/price${addParam(qs, `years=${years}`)}`, { headers });
-    let price: any = null;
-    if (priceRes.ok) price = await priceRes.json();
-    else console.warn("Vercel price lookup failed:", priceRes.status, await priceRes.text());
-    const expectedPrice = price?.purchasePrice?.amount ?? price?.purchasePrice ?? price?.purchasePrice?.value ?? null;
+    const { price: expectedPrice } = await getDomainPrice(token, team, purchaseDomain, years);
 
     // 3. Buy
-    const buyBody: any = { autoRenew: String(autoRenew), years: String(years), contactInformation: registrantContact };
-    if (expectedPrice != null) buyBody.expectedPrice = expectedPrice;
-    const buyRes = await fetch(`https://api.vercel.com/v1/registrar/domains/${dom}/buy${qs}`, { method: "POST", headers, body: JSON.stringify(buyBody) });
-    if (!buyRes.ok) {
-      const t = await buyRes.text();
-      console.error("Vercel buy failed:", buyRes.status, t);
-      if (clientDomainId) { try { await base44.asServiceRole.entities.ClientDomain.update(clientDomainId, { status: "requested", notes: `Purchase failed: ${buyRes.status} ${t}` }); } catch {} }
-      return Response.json({ error: `Buy failed: ${buyRes.status} ${t}` }, { status: 502 });
+    let order;
+    try {
+      order = await buyDomain(token, team, purchaseDomain, { years, autoRenew, contact: registrantContact, expectedPrice });
+    } catch (e: any) {
+      console.error("Vercel buy failed:", e?.message);
+      if (clientDomainId) { try { await base44.asServiceRole.entities.ClientDomain.update(clientDomainId, { status: "requested", notes: `Purchase failed: ${e?.message}` }); } catch {} }
+      return Response.json({ error: e?.message || "Buy failed" }, { status: 502 });
     }
-    const order = await buyRes.json();
 
     // 4. Optionally attach the domain to a Vercel project
     let attached: any = null;
     if (attachToProjectId) {
       try {
-        const attRes = await fetch(`https://api.vercel.com/v9/projects/${encodeURIComponent(attachToProjectId)}/domains${qs}`, { method: "POST", headers, body: JSON.stringify({ name: purchaseDomain }) });
-        if (attRes.ok) attached = await attRes.json();
-        else console.warn("Vercel attach domain failed:", attRes.status, await attRes.text());
+        const ok = await attachDomainToProject(token, team, attachToProjectId, purchaseDomain);
+        attached = ok ? { ok: true } : null;
       } catch (e) { console.warn("Vercel attach domain error:", (e as Error).message); }
     }
 

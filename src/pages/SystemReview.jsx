@@ -7,7 +7,7 @@ import BackButton from "@/components/client/BackButton";
 import {
   CheckCircle, ArrowRight, Route, Database, Zap, Plug, Layers, Rocket,
   FileCode, Server, Globe, ExternalLink, ShieldCheck, Loader2, XCircle,
-  Github, CloudUpload, FileText, Sparkles,
+  Github, CloudUpload, FileText, Sparkles, Search, ShoppingCart, Check,
 } from "lucide-react";
 
 // System Review — the final review step for web_app / ecommerce / platform
@@ -22,6 +22,11 @@ export default function SystemReview() {
   const [docEmail, setDocEmail] = useState("");
   const [sendingDocs, setSendingDocs] = useState(false);
   const [docsSent, setDocsSent] = useState(null);
+  const [domainInput, setDomainInput] = useState("");
+  const [domainCheck, setDomainCheck] = useState(null);
+  const [checkingDomain, setCheckingDomain] = useState(false);
+  const [purchasingDomain, setPurchasingDomain] = useState(false);
+  const [domainPurchased, setDomainPurchased] = useState(null);
 
   const build = autoBuild.build;
   const architecture = build?.architecture;
@@ -85,6 +90,57 @@ export default function SystemReview() {
       setDocsSent({ error: e?.message || "Failed to send email" });
     } finally {
       setSendingDocs(false);
+    }
+  };
+
+  // Suggest a domain based on the business name
+  useEffect(() => {
+    if (!domainInput && build?.business_name) {
+      const slug = build.business_name.toLowerCase()
+        .replace(/[^a-z0-9]+/g, "")
+        .slice(0, 20);
+      if (slug) setDomainInput(`${slug}.com`);
+    }
+  }, [build?.business_name, domainInput]);
+
+  const checkDomain = async () => {
+    if (!build || !domainInput) return;
+    setCheckingDomain(true);
+    setDomainCheck(null);
+    setDomainPurchased(null);
+    try {
+      const res = await base44.functions.invoke("purchaseBuildDomain", {
+        build_id: build.id,
+        domain: domainInput,
+        confirm: false,
+      });
+      setDomainCheck(res.data);
+    } catch (e) {
+      setDomainCheck({ error: e?.message || "Availability check failed" });
+    } finally {
+      setCheckingDomain(false);
+    }
+  };
+
+  const purchaseDomain = async () => {
+    if (!build || !domainInput) return;
+    setPurchasingDomain(true);
+    setDomainPurchased(null);
+    try {
+      const res = await base44.functions.invoke("purchaseBuildDomain", {
+        build_id: build.id,
+        domain: domainInput,
+        confirm: true,
+      });
+      setDomainPurchased(res.data);
+      if (res.data?.success) {
+        await autoBuild.reload();
+        setDomainCheck(null);
+      }
+    } catch (e) {
+      setDomainPurchased({ error: e?.message || "Purchase failed" });
+    } finally {
+      setPurchasingDomain(false);
     }
   };
 
@@ -331,6 +387,88 @@ export default function SystemReview() {
             ✓ Sent {docsSent.count} documents and all links to {docsSent.email}
             {docsSent.zip ? " — ZIP download included." : "."}
           </p>
+        )}
+      </div>
+
+      {/* Custom Domain Purchase — buy a domain through Vercel with one click */}
+      <div className="rounded-xl border border-amber-400/30 bg-amber-400/5 p-5">
+        <div className="mb-2 flex items-center gap-2">
+          <Globe className="h-4 w-4 text-amber-400" />
+          <h2 className="text-sm font-semibold text-white">Buy a Custom Domain</h2>
+          {deployment?.custom_domain && (
+            <span className="ml-auto inline-flex items-center gap-1 rounded-full bg-lime-400/15 px-2.5 py-0.5 text-xs font-medium text-lime-400">
+              <Check className="h-3 w-3" /> {deployment.custom_domain}
+            </span>
+          )}
+        </div>
+        <p className="mb-3 text-sm text-white/60">
+          Purchase a custom domain through Vercel and we'll automatically attach it to your deployed site.
+          Just type a domain name and click Buy — we handle the rest.
+        </p>
+        <div className="flex flex-col gap-2 sm:flex-row">
+          <input
+            type="text"
+            value={domainInput}
+            onChange={(e) => { setDomainInput(e.target.value); setDomainCheck(null); setDomainPurchased(null); }}
+            placeholder="mybusiness.com"
+            className="flex-1 rounded-lg border border-white/15 bg-zinc-950 px-3 py-2 text-sm text-white placeholder-white/30 focus:border-lime-400 focus:outline-none"
+          />
+          <button
+            type="button"
+            onClick={checkDomain}
+            disabled={checkingDomain || !domainInput}
+            className="inline-flex items-center justify-center gap-1.5 rounded-lg border border-amber-400/40 bg-zinc-950 px-4 py-2 text-sm font-semibold text-amber-400 hover:bg-amber-400/10 disabled:opacity-50"
+          >
+            {checkingDomain ? <Loader2 className="h-4 w-4 animate-spin" /> : <Search className="h-4 w-4" />}
+            {checkingDomain ? "Checking…" : "Check Availability"}
+          </button>
+        </div>
+
+        {/* Availability result */}
+        {domainCheck?.available && !domainPurchased?.success && (
+          <div className="mt-3 flex items-center justify-between rounded-lg border border-lime-400/30 bg-lime-400/5 p-3">
+            <div className="flex items-center gap-2 text-sm">
+              <CheckCircle className="h-4 w-4 text-lime-400" />
+              <span className="font-medium text-white">{domainCheck.domain}</span>
+              <span className="text-white/50">is available</span>
+              {domainCheck.price != null && (
+                <span className="rounded bg-lime-400/15 px-2 py-0.5 text-xs font-semibold text-lime-400">
+                  ${domainCheck.price}/yr
+                </span>
+              )}
+            </div>
+            <button
+              type="button"
+              onClick={purchaseDomain}
+              disabled={purchasingDomain}
+              className="inline-flex items-center gap-1.5 rounded-lg bg-lime-400 px-4 py-2 text-sm font-semibold text-black hover:bg-lime-300 disabled:opacity-50"
+            >
+              {purchasingDomain ? <Loader2 className="h-4 w-4 animate-spin" /> : <ShoppingCart className="h-4 w-4" />}
+              {purchasingDomain ? "Purchasing…" : `Buy for $${domainCheck.price ?? "—"}`}
+            </button>
+          </div>
+        )}
+        {domainCheck?.available === false && (
+          <p className="mt-2 text-xs text-red-400">⚠ {domainCheck.error || `${domainCheck.domain} is not available`}</p>
+        )}
+        {domainCheck?.error && domainCheck.available !== false && (
+          <p className="mt-2 text-xs text-red-400">⚠ {domainCheck.error}</p>
+        )}
+
+        {/* Purchase result */}
+        {domainPurchased?.success && (
+          <div className="mt-3 rounded-lg border border-lime-400/30 bg-lime-400/5 p-3">
+            <div className="flex items-center gap-2 text-sm text-lime-400">
+              <CheckCircle className="h-4 w-4" />
+              <span className="font-semibold">{domainPurchased.domain}</span> purchased successfully!
+            </div>
+            {domainPurchased.attached && (
+              <p className="mt-1 text-xs text-white/60">✓ Attached to your Vercel project — DNS is being configured automatically.</p>
+            )}
+          </div>
+        )}
+        {domainPurchased?.error && (
+          <p className="mt-2 text-xs text-red-400">⚠ {domainPurchased.error}</p>
         )}
       </div>
 
