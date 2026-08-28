@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import {
   Sparkles, Compass, CheckCircle2, Package, ClipboardList, Palette,
-  Monitor, Megaphone, ShieldCheck, FileText, Lock, ArrowRight, Loader2,
+  Monitor, Megaphone, ShieldCheck, FileText, Lock, ArrowRight, Loader2, Eye,
 } from "lucide-react";
 import { LOGO_ICON } from "@/lib/brandAssets";
 import { base44 } from "@/api/base44Client";
@@ -9,16 +9,16 @@ import SignaturePad from "@/components/client/SignaturePad";
 import { useAutoBuild } from "@/lib/AutoBuildContext";
 
 const STEPS = [
-  { icon: Package, title: "Review Your Package", desc: "Confirm what's included in your plan, then approve it." },
+  { icon: Eye, title: "Vision & Strategy", desc: "AI discovers your mission and builds 10 ranked strategies — pick your path." },
   { icon: Compass, title: "Business Name & Domain", desc: "Our AI finds a viral business name with an available .com domain." },
   { icon: ClipboardList, title: "Business Profile", desc: "Answer a few questions so our AI can tailor everything to you." },
-  { icon: Palette, title: "Generate Your Brand", desc: "Pick from AI-generated logos, brand colors, and content options." },
+  { icon: Palette, title: "Logo & Brand", desc: "Pick from AI-generated logos, brand colors, and design direction." },
   { icon: Monitor, title: "Build Your Website", desc: "Choose layouts and images — your site comes together as you go." },
-  { icon: Megaphone, title: "Social & Video", desc: "Get social media posts and video content tailored to your brand." },
+  { icon: Megaphone, title: "Social, Video & Launch", desc: "Get social posts, video content, then review and approve everything." },
 ];
 
 const SYSTEM_TIPS = [
-  "Lime-green buttons are your primary actions — click to generate, approve, or continue.",
+  "Gold buttons are your primary actions — click to generate, approve, or continue.",
   "Each step shows AI-generated options. Pick your favorite and move to the next.",
   "Anything that goes live requires your approval first — you're always in control.",
   "Your progress saves automatically. Close and come back anytime — nothing is lost.",
