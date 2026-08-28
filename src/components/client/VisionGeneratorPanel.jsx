@@ -181,6 +181,23 @@ export default function VisionGeneratorPanel() {
       // Save both to the project/AutoBuild
       await saveProject({ vision, strategy: strategyDoc });
 
+      // Invalidate the downstream cached content + website so they regenerate
+      // with the new foundation on the next visit — each strategy choice
+      // automatically adjusts the content, tone, and website suggestions.
+      try {
+        await base44.auth.updateMe({
+          contentTemplates: null,
+          chosenContentTemplate: null,
+          chosenContentTone: null,
+          contentTemplatesChosen: false,
+          websiteContent: null,
+          websiteImages: null,
+          chosenWebsiteLayout: null,
+          chosenPalette: null,
+          designPacksChosen: false,
+        });
+      } catch {}
+
       // Notify the pipeline
       try { localStorage.setItem("coach:done:/vision", "1"); } catch {}
       try { localStorage.setItem("coach:done:/strategy", "1"); } catch {}

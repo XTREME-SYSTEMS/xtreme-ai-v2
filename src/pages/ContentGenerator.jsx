@@ -9,6 +9,7 @@ import { useClientUser } from "@/hooks/useClientUser";
 import { useClientUpdate } from "@/hooks/useClientUpdate";
 import { useClientProject } from "@/hooks/useClientProject";
 import { deriveFoundation } from "@/lib/pipelineFoundation";
+import FoundationAppliedBanner from "@/components/client/FoundationAppliedBanner";
 import { notifyStepComplete } from "@/lib/pipelineNotify";
 
 // Step: Content Generator. Scrapes the client's market (location, industry,
@@ -171,6 +172,8 @@ export default function ContentGenerator() {
           then wrote 10 different messaging tones. We've <span className="text-lime-400 font-semibold">auto-selected the recommended one</span> —
           just click Continue, or pick a different tone if you prefer.
         </p>
+
+        <FoundationAppliedBanner project={project} className="mt-3" />
 
         {data?.marketFindings && (
           <div className="mt-3 rounded-lg border border-white/10 bg-zinc-950 p-3 text-xs text-white/60">

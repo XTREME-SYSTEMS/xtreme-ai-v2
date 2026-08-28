@@ -11,6 +11,7 @@ import { useClientUser } from "@/hooks/useClientUser";
 import { useClientUpdate } from "@/hooks/useClientUpdate";
 import { useClientProject } from "@/hooks/useClientProject";
 import { deriveFoundation } from "@/lib/pipelineFoundation";
+import FoundationAppliedBanner from "@/components/client/FoundationAppliedBanner";
 import { notifyStepComplete } from "@/lib/pipelineNotify";
 
 const REVISE_CHIPS = ["Different layout", "Different colors", "Different content", "Different images", "Too plain", "Not local enough", "Doesn't match my brand", "Other"];
@@ -311,6 +312,8 @@ export default function WebsiteDesignStudio() {
           We wrote your site copy from your onboarding answers and real info about {profile?.primaryLocation || "your area"}.
           We've <span className="text-lime-400 font-semibold">auto-selected a layout</span> — just click Continue, or pick a different one if you prefer.
         </p>
+
+        <FoundationAppliedBanner project={project} className="mt-3" />
 
         {/* Brand palette picker */}
         <div className="mt-4">
