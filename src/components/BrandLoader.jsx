@@ -9,13 +9,16 @@ import { LOGO_ICON } from "@/lib/brandAssets";
 export default function BrandLoader({ fullScreen = true }) {
   return (
     <div className={`${fullScreen ? "fixed inset-0 " : "flex h-screen w-full "}flex items-center justify-center bg-black`}>
-      <div className="relative h-16 w-16">
-        <div className="absolute inset-0 animate-spin rounded-full border-2 border-white/10 border-t-amber-400" />
+      <div className="relative flex h-24 w-24 items-center justify-center">
+        {/* subtle gold pulse ring behind the emblem */}
+        <div className="absolute inset-0 animate-ping rounded-full border border-amber-400/30" />
+        <div className="absolute inset-2 rounded-full border border-amber-400/15" />
+        {/* the shield + wings emblem — the hero */}
         <Image
           src={LOGO_ICON}
           alt="Xtreme AI"
           fittingType="fit"
-          className="absolute inset-2 h-12 w-12"
+          className="relative h-20 w-20"
         />
       </div>
     </div>
