@@ -186,7 +186,7 @@ export default function Layout() {
           <Image
             src={LOGO_ICON}
             alt="Xtreme AI"
-            className="h-8 w-8"
+            className="h-10 w-10"
             fittingType="fit"
           />
           <div className="leading-tight">
