@@ -4,6 +4,7 @@ import { PageHeader, Panel, LoadingButton, EmptyState } from "@/components/ui";
 import { Boxes, Eye, Play, CheckCircle, Clock, Package, AlertCircle, Rocket } from "lucide-react";
 import { Link } from "react-router-dom";
 import EmployeeInvitePanel from "@/components/employee/EmployeeInvitePanel";
+import EmployeeListPanel from "@/components/employee/EmployeeListPanel";
 import { getBuildStepInfo } from "@/lib/unifiedSteps";
 
 export default function EmployeePortal() {
@@ -99,6 +100,9 @@ export default function EmployeePortal() {
 
       {/* Admin-only: invite new employees by email */}
       {user?.role === "admin" && <EmployeeInvitePanel />}
+
+      {/* Admin-only: list all invited employees with edit/delete/access controls */}
+      {user?.role === "admin" && <EmployeeListPanel />}
 
       {/* Stats */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
