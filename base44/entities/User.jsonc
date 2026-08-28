@@ -63,6 +63,14 @@
           "type": "string"
         }
       }
+    },
+    "access_capabilities": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "default": [],
+      "description": "Page paths this employee is allowed to access. Empty = no restrictions (admin). 'all' = full access. Individual paths like '/architect', '/video-generator' grant access to specific tools."
     }
   },
   "required": [

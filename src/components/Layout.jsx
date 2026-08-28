@@ -14,6 +14,7 @@ import { Image } from "@/components/ui/image";
 import { cn } from "@/lib/utils";
 import { LOGO_ICON } from "@/lib/brandAssets";
 import { UNIFIED_BUILD_STEPS } from "@/lib/unifiedSteps";
+import { hasAccessToPage } from "@/lib/accessCapabilities";
 import BrandLoader from "@/components/BrandLoader";
 import { usePreview } from "@/lib/PreviewContext";
 import ClientLayout from "@/components/client/ClientLayout";
@@ -165,6 +166,9 @@ export default function Layout() {
   }
   const isAdmin = user?.role === "admin";
   const isEmployee = user?.role === "employee";
+  const userCaps = user?.access_capabilities || [];
+  const hasFullAccess = isAdmin || !userCaps.length || userCaps.includes("all");
+  const filterNav = (items) => hasFullAccess ? items : items.filter((item) => !item.to || hasAccessToPage(userCaps, item.to));
   // AutoBuild mode: render the client portal shell so the admin walks the
   // same guided timeline + StepCoach as a real client.
   if (isAdmin && autoBuild.isActive) return <ClientLayout user={user} />;
@@ -206,6 +210,7 @@ export default function Layout() {
           </NavLink>
 
           {/* Product Catalog — finished, validated products ready for deployment */}
+          {(hasFullAccess || hasAccessToPage(userCaps, PRODUCT_CATALOG.to)) && (
           <NavLink
             to={PRODUCT_CATALOG.to}
             end={PRODUCT_CATALOG.end}
@@ -218,6 +223,7 @@ export default function Layout() {
             <Package className="h-4 w-4 shrink-0" />
             {PRODUCT_CATALOG.label}
           </NavLink>
+          )}
 
           {/* Employee Portal — for employees; admins see it too for oversight */}
           <NavLink
@@ -242,7 +248,7 @@ export default function Layout() {
           <div className="relative mt-2">
             {/* Thin connecting line */}
             <div className="absolute left-[26px] top-6 bottom-6 w-px bg-white/10" />
-            {PIPELINE_STEPS.map((step) => {
+            {filterNav(PIPELINE_STEPS).map((step) => {
               const Icon = step.icon;
               const isAutoBuilder = step.to === "/auto-builder";
               return (
@@ -329,7 +335,7 @@ export default function Layout() {
             </button>
             {archiveOpen && (
               <div className="mt-1 space-y-0.5">
-                {ARCHIVE_ITEMS.map((item, i) => {
+                {filterNav(ARCHIVE_ITEMS).map((item, i) => {
                   if (item.section) {
                     return <div key={i} className="mt-3 mb-1 px-2.5 text-[9px] font-semibold uppercase tracking-wider text-white/25">{item.section}</div>;
                   }
