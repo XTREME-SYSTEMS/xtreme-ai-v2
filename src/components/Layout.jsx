@@ -13,6 +13,7 @@ import {
 import { Image } from "@/components/ui/image";
 import { cn } from "@/lib/utils";
 import { LOGO_ICON } from "@/lib/brandAssets";
+import BrandLoader from "@/components/BrandLoader";
 import { usePreview } from "@/lib/PreviewContext";
 import ClientLayout from "@/components/client/ClientLayout";
 import PreviewAsClientModal from "@/components/admin/PreviewAsClientModal";
@@ -165,11 +166,7 @@ export default function Layout() {
   const autoBuild = useAutoBuild();
 
   if (user === null) {
-    return (
-      <div className="flex h-screen items-center justify-center bg-black">
-        <div className="h-8 w-8 animate-spin rounded-full border-2 border-white/20 border-t-amber-400" />
-      </div>
-    );
+    return <BrandLoader />;
   }
   const isAdmin = user?.role === "admin";
   const isEmployee = user?.role === "employee";
