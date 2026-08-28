@@ -258,7 +258,16 @@ const STEP_EXECUTORS: Record<string, (base44: any, build: any) => Promise<Record
   ui_system: runUiSystem,
   codegen: runCodegen,
   deploy: runDeploy,
-  system_review: async () => ({}),
+  // system_review — the final step. Autonomously provisions the full
+  // deployment stack (GitHub + Vercel + Supabase + Drive) and generates
+  // all system documentation (README, architecture, data model, API, UI
+  // system, deployment, setup instructions, user guide) so the user gets
+  // every deliverable. See systemBuildProvisioning.ts.
+  system_review: async (base44: any, build: any) => {
+    const { provisionSystemBuild } = await import("../../shared/systemBuildProvisioning.ts");
+    const { deployment } = await provisionSystemBuild(base44, build.id);
+    return { deployment };
+  },
 };
 
 // ── Main handler ────────────────────────────────────────────────────────
@@ -373,7 +382,10 @@ Deno.serve(async (req: Request) => {
       status: "paused",
     };
 
-    if (advance && step !== "review" && step !== "system_review") {
+    // system_review now does real work (autonomous provisioning + docs), so
+    // it advances to "complete" like any other step. The marketing "review"
+    // step stays a manual gate — the admin approves the final package there.
+    if (advance && step !== "review") {
       const ns = nextStep(step, build.product_type);
       updateData.current_step = ns;
       logs = log({ logs } as any, `Advanced to step: ${ns}`);

@@ -7,6 +7,7 @@ import BackButton from "@/components/client/BackButton";
 import {
   CheckCircle, ArrowRight, Route, Database, Zap, Plug, Layers, Rocket,
   FileCode, Server, Globe, ExternalLink, ShieldCheck, Loader2, XCircle,
+  Github, CloudUpload, FileText, Sparkles,
 } from "lucide-react";
 
 // System Review — the final review step for web_app / ecommerce / platform
@@ -16,6 +17,8 @@ export default function SystemReview() {
   const navigate = useNavigate();
   const [verifying, setVerifying] = useState(false);
   const [verifyResult, setVerifyResult] = useState(null);
+  const [provisioning, setProvisioning] = useState(false);
+  const [provisionResult, setProvisionResult] = useState(null);
 
   const build = autoBuild.build;
   const architecture = build?.architecture;
@@ -41,6 +44,22 @@ export default function SystemReview() {
       setVerifyResult({ error: e?.message || "Verification failed" });
     } finally {
       setVerifying(false);
+    }
+  };
+
+  const provisionBuild = async () => {
+    if (!build) return;
+    setProvisioning(true);
+    setProvisionResult(null);
+    try {
+      const res = await base44.functions.invoke("provisionSystemBuild", { build_id: build.id });
+      setProvisionResult(res.data);
+      // Reload the build to pick up the new deployment field
+      await autoBuild.reload();
+    } catch (e) {
+      setProvisionResult({ error: e?.message || "Provisioning failed" });
+    } finally {
+      setProvisioning(false);
     }
   };
 
@@ -148,30 +167,108 @@ export default function SystemReview() {
         </div>
       )}
 
-      {/* Deployment preview */}
-      {deployment?.live_url && (
-        <div className="rounded-xl border border-lime-400/30 bg-lime-400/5 p-5">
-          <div className="mb-2 flex items-center gap-2">
-            <Globe className="h-4 w-4 text-lime-400" />
-            <h2 className="text-sm font-semibold text-white">Deployment Preview</h2>
-            <span className="ml-auto rounded-full bg-lime-400/15 px-2.5 py-1 text-xs text-lime-300">
-              {deployment.status?.replace(/_/g, " ")}
-            </span>
-          </div>
+      {/* Provisioned resources — GitHub, Vercel, Supabase, Drive, Docs */}
+      <div className="rounded-xl border border-lime-400/30 bg-lime-400/5 p-5">
+        <div className="mb-3 flex items-center gap-2">
+          <Sparkles className="h-4 w-4 text-lime-400" />
+          <h2 className="text-sm font-semibold text-white">Provisioned Resources</h2>
+          <button
+            type="button"
+            onClick={provisionBuild}
+            disabled={provisioning || !codeManifest}
+            className="ml-auto inline-flex items-center gap-1.5 rounded-lg bg-lime-400 px-3 py-1.5 text-xs font-semibold text-black hover:bg-lime-300 disabled:opacity-50"
+          >
+            {provisioning ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Rocket className="h-3.5 w-3.5" />}
+            {provisioning ? "Provisioning…" : "Provision Build"}
+          </button>
+        </div>
+
+        {provisionResult?.error && (
+          <p className="mb-3 text-xs text-red-400">⚠ {provisionResult.error}</p>
+        )}
+        {provisionResult?.success && (
+          <p className="mb-3 text-xs text-lime-400">✓ Provisioning complete — all resources created.</p>
+        )}
+
+        <div className="grid gap-2.5 sm:grid-cols-2">
+          {/* GitHub */}
           <a
-            href={deployment.live_url}
+            href={deployment.repo_url || "#"}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-1.5 text-sm text-white hover:text-lime-300"
+            className={`flex items-center gap-2.5 rounded-lg border border-white/10 bg-zinc-950 p-3 ${deployment.repo_url ? "hover:border-lime-400/40" : "opacity-40 pointer-events-none"}`}
           >
-            {deployment.live_url}
-            <ExternalLink className="h-3 w-3" />
+            <Github className="h-4 w-4 text-lime-400" />
+            <div className="min-w-0">
+              <div className="text-xs font-medium text-white">GitHub Repo</div>
+              <div className="truncate text-[11px] text-white/50">{deployment.repo || "Not provisioned"}</div>
+            </div>
+            {deployment.repo_url && <ExternalLink className="ml-auto h-3 w-3 text-white/30" />}
           </a>
-          {deployment.platform && (
-            <p className="mt-1 text-xs text-white/40">Platform: {deployment.platform} · {codeManifest?.framework || "—"}</p>
-          )}
+
+          {/* Vercel */}
+          <a
+            href={deployment.live_url || "#"}
+            target="_blank"
+            rel="noopener noreferrer"
+            className={`flex items-center gap-2.5 rounded-lg border border-white/10 bg-zinc-950 p-3 ${deployment.live_url ? "hover:border-lime-400/40" : "opacity-40 pointer-events-none"}`}
+          >
+            <Globe className="h-4 w-4 text-lime-400" />
+            <div className="min-w-0">
+              <div className="text-xs font-medium text-white">Vercel Deploy</div>
+              <div className="truncate text-[11px] text-white/50">{deployment.live_url || "Not deployed"}</div>
+            </div>
+            {deployment.live_url && <ExternalLink className="ml-auto h-3 w-3 text-white/30" />}
+          </a>
+
+          {/* Supabase */}
+          <a
+            href={deployment.supabase_url || "#"}
+            target="_blank"
+            rel="noopener noreferrer"
+            className={`flex items-center gap-2.5 rounded-lg border border-white/10 bg-zinc-950 p-3 ${deployment.supabase_url ? "hover:border-lime-400/40" : "opacity-40 pointer-events-none"}`}
+          >
+            <Database className="h-4 w-4 text-lime-400" />
+            <div className="min-w-0">
+              <div className="text-xs font-medium text-white">Supabase DB</div>
+              <div className="truncate text-[11px] text-white/50">{deployment.supabase_url || "Not needed"}</div>
+            </div>
+            {deployment.supabase_url && <ExternalLink className="ml-auto h-3 w-3 text-white/30" />}
+          </a>
+
+          {/* Google Drive */}
+          <a
+            href={deployment.drive_url || "#"}
+            target="_blank"
+            rel="noopener noreferrer"
+            className={`flex items-center gap-2.5 rounded-lg border border-white/10 bg-zinc-950 p-3 ${deployment.drive_url ? "hover:border-lime-400/40" : "opacity-40 pointer-events-none"}`}
+          >
+            <CloudUpload className="h-4 w-4 text-lime-400" />
+            <div className="min-w-0">
+              <div className="text-xs font-medium text-white">Drive (Docs)</div>
+              <div className="truncate text-[11px] text-white/50">{deployment.drive_url ? "Folder ready" : "Not uploaded"}</div>
+            </div>
+            {deployment.drive_url && <ExternalLink className="ml-auto h-3 w-3 text-white/30" />}
+          </a>
         </div>
-      )}
+
+        {/* Generated docs list */}
+        {deployment.docs_list?.length > 0 && (
+          <div className="mt-3 rounded-lg border border-white/10 bg-zinc-950 p-3">
+            <div className="mb-1.5 flex items-center gap-1.5 text-xs font-medium text-white/70">
+              <FileText className="h-3.5 w-3.5 text-lime-400" />
+              Generated Documentation ({deployment.docs_list.length} files)
+            </div>
+            <div className="flex flex-wrap gap-1.5">
+              {deployment.docs_list.map((doc) => (
+                <span key={doc} className="rounded bg-white/5 px-2 py-0.5 text-[10px] font-mono text-white/50">
+                  {doc}
+                </span>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
 
       <div className="flex items-center justify-between rounded-xl border border-lime-400/30 bg-lime-400/5 p-4">
         <div className="flex items-center gap-2 text-sm text-white/70">
