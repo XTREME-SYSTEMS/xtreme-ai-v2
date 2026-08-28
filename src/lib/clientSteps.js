@@ -14,6 +14,7 @@ import {
   shouldSkipStep as _shouldSkipStep,
   CLIENT_UTILITIES,
 } from "@/lib/portalSteps";
+import { UNIFIED_BUILD_STEPS } from "@/lib/unifiedSteps";
 
 // Build the visible, ordered, numbered steps for a given product.
 // Filters out stage-skipped steps and computes nextLabel/nextTo dynamically
@@ -28,12 +29,17 @@ export function getVisibleSteps(productId, user) {
       return true;
     });
 
-  // Renumber and compute next links from actual position in the list
+  // Assign canonical unified numbers (from unifiedSteps.js) so step numbers
+  // match the admin and employee portals. nextLabel/nextTo are computed from
+  // actual position in the product's filtered list so the chain stays correct.
   return steps.map((step, i) => {
     const next = steps[i + 1];
+    const unified = UNIFIED_BUILD_STEPS.find((s) => s.key === step.key);
+    const number = unified ? unified.number : i + 1;
     return {
       ...step,
-      step: i + 1,
+      step: number,
+      number,
       nextLabel: next ? `Go to ${next.label}` : null,
       nextTo: next ? next.to : null,
     };

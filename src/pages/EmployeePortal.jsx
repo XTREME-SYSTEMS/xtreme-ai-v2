@@ -4,11 +4,13 @@ import { PageHeader, Panel, LoadingButton, EmptyState } from "@/components/ui";
 import { Boxes, Eye, Play, CheckCircle, Clock, Package, AlertCircle, Rocket } from "lucide-react";
 import { Link } from "react-router-dom";
 import EmployeeInvitePanel from "@/components/employee/EmployeeInvitePanel";
+import { getBuildStepInfo } from "@/lib/unifiedSteps";
 
 export default function EmployeePortal() {
   const [user, setUser] = useState(null);
   const [assignments, setAssignments] = useState([]);
   const [packages, setPackages] = useState([]);
+  const [builds, setBuilds] = useState({});
   const [loading, setLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState({});
 
@@ -29,6 +31,19 @@ export default function EmployeePortal() {
         ]);
         setAssignments(assigns || []);
         setPackages(pkgs || []);
+        // Fetch build records for build-type assignments so we can show the
+        // unified step number (Step N/Total: Label) on each assignment card.
+        const buildIds = (assigns || [])
+          .filter((a) => a.assignment_type === "build" && a.entity_id)
+          .map((a) => a.entity_id);
+        if (buildIds.length) {
+          const results = await Promise.all(
+            buildIds.map((id) => base44.entities.AutoBuild.get(id).catch(() => null))
+          );
+          const map = {};
+          results.filter(Boolean).forEach((b) => { map[b.id] = b; });
+          setBuilds(map);
+        }
       }
     } catch (e) {
       console.error("Failed to load:", e);
@@ -125,6 +140,14 @@ export default function EmployeePortal() {
                     <div className="flex items-center gap-2 mt-1">
                       <span className="rounded-md bg-amber-400/10 px-2 py-0.5 text-xs text-amber-400">{a.role}</span>
                       <span className="text-xs text-white/40">{a.assignment_type}</span>
+                      {a.assignment_type === "build" && builds[a.entity_id]?.current_step && (() => {
+                        const info = getBuildStepInfo(builds[a.entity_id].current_step);
+                        return info ? (
+                          <span className="rounded-md bg-lime-400/15 px-2 py-0.5 text-xs font-medium text-lime-400">
+                            Step {info.number}/{info.total} · {info.label}
+                          </span>
+                        ) : null;
+                      })()}
                     </div>
                   </div>
                 </div>

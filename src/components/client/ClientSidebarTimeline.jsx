@@ -53,7 +53,7 @@ export default function ClientSidebarTimeline({ user }) {
               dotClass = "bg-amber-400 text-black ring-2 ring-amber-400/30";
               statusLabel = "Awaiting approval";
               statusClass = "text-amber-400";
-              inner = <span className="text-[10px] font-bold">{i + 1}</span>;
+              inner = <span className="text-[10px] font-bold">{step.number || (i + 1)}</span>;
             } else if (s.locked) {
               dotClass = "bg-zinc-900 text-white/30 border border-white/10";
               statusLabel = "Locked";
@@ -63,12 +63,12 @@ export default function ClientSidebarTimeline({ user }) {
               dotClass = "bg-zinc-900 text-lime-400 border border-lime-400 ring-2 ring-lime-400/20";
               statusLabel = "In progress";
               statusClass = "text-lime-400";
-              inner = <span className="text-[10px] font-bold">{i + 1}</span>;
+              inner = <span className="text-[10px] font-bold">{step.number || (i + 1)}</span>;
             } else {
               dotClass = "bg-zinc-900 text-white/40 border border-white/10";
               statusLabel = "Upcoming";
               statusClass = "text-white/40";
-              inner = <span className="text-[10px] font-semibold">{i + 1}</span>;
+              inner = <span className="text-[10px] font-semibold">{step.number || (i + 1)}</span>;
             }
 
             const row = (

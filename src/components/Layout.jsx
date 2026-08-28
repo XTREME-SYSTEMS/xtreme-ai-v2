@@ -13,6 +13,7 @@ import {
 import { Image } from "@/components/ui/image";
 import { cn } from "@/lib/utils";
 import { LOGO_ICON } from "@/lib/brandAssets";
+import { UNIFIED_BUILD_STEPS } from "@/lib/unifiedSteps";
 import BrandLoader from "@/components/BrandLoader";
 import { usePreview } from "@/lib/PreviewContext";
 import ClientLayout from "@/components/client/ClientLayout";
@@ -46,18 +47,12 @@ const PIPELINE_STEPS = [
 // timeline when the user is on the Auto Builder step. Mirrors the client
 // portal journey: Welcome → Business Name → Profile → Content → Logo →
 // Brand → Website → Social → Video → Review.
-const AUTOBUILDER_STEPS = [
-  { to: "/business-generator",   label: "Welcome",       icon: Package },
-  { to: "/business-name-studio", label: "Business Name", icon: Compass },
-  { to: "/business-profile",     label: "Profile",       icon: Building2 },
-  { to: "/content-generator",    label: "Content",       icon: MessageSquareText },
-  { to: "/logo-generator",       label: "Logo",          icon: PenTool },
-  { to: "/brand-generator",      label: "Brand",         icon: Shirt },
-  { to: "/design-direction",     label: "Website",       icon: Palette },
-  { to: "/social-media",         label: "Social",        icon: Share2 },
-  { to: "/video-generator",      label: "Video",         icon: Video },
-  { to: "/your-designs",         label: "Review",        icon: LayoutTemplate },
-];
+// Auto Builder sub-steps — derived from the unified build journey so the
+// admin sub-timeline shows the exact same numbered steps as the client
+// portal and employee portal (single source of truth: unifiedSteps.js).
+const AUTOBUILDER_STEPS = UNIFIED_BUILD_STEPS.map((s) => ({
+  to: s.to, label: s.label, icon: s.icon, number: s.number,
+}));
 
 const AUTOBUILDER_ROUTES = ["/auto-builder", ...AUTOBUILDER_STEPS.map((s) => s.to)];
 
@@ -303,7 +298,7 @@ export default function Layout() {
                                 ? "border-amber-400 bg-amber-400 text-black shadow-[0_0_8px_1px_rgba(255,234,0,0.4)]"
                                 : "border-white/15 bg-zinc-900 text-white/40"
                             )}>
-                              {j + 1}
+                              {sub.number}
                             </div>
                             <span className={cn(
                               "flex items-center gap-1.5 text-[13px] font-medium",

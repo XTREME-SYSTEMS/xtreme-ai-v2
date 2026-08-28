@@ -1,6 +1,7 @@
 import { useEffect, useRef } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { getStepByPath } from "@/lib/clientSteps";
+import { TOTAL_BUILD_STEPS } from "@/lib/unifiedSteps";
 import { useClientUser } from "@/hooks/useClientUser";
 import { usePortalPipeline } from "@/hooks/usePortalPipeline";
 import { cn } from "@/lib/utils";
@@ -33,7 +34,7 @@ export default function ClientTimeline() {
       {/* Mobile: compact "Step X of N" header with current step label */}
       <div className="flex items-center justify-between px-4 pt-2 sm:hidden">
         <span className="text-[11px] font-semibold uppercase tracking-wider text-amber-400">
-          Step {Math.max(currentIdx + 1, 1)} of {visibleSteps.length}
+          Step {current?.step || Math.max(currentIdx + 1, 1)} of {TOTAL_BUILD_STEPS}
         </span>
         <span className="truncate pl-2 text-[11px] font-medium text-white/60">
           {current?.label || ""}
