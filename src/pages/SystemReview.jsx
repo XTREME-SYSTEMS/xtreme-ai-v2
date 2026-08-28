@@ -19,6 +19,9 @@ export default function SystemReview() {
   const [verifyResult, setVerifyResult] = useState(null);
   const [provisioning, setProvisioning] = useState(false);
   const [provisionResult, setProvisionResult] = useState(null);
+  const [docEmail, setDocEmail] = useState("");
+  const [sendingDocs, setSendingDocs] = useState(false);
+  const [docsSent, setDocsSent] = useState(null);
 
   const build = autoBuild.build;
   const architecture = build?.architecture;
@@ -60,6 +63,28 @@ export default function SystemReview() {
       setProvisionResult({ error: e?.message || "Provisioning failed" });
     } finally {
       setProvisioning(false);
+    }
+  };
+
+  // Pre-fill the email field with the build's profile email or the logged-in user
+  useEffect(() => {
+    if (!docEmail && build?.profile?.email) setDocEmail(build.profile.email);
+  }, [build?.profile?.email, docEmail]);
+
+  const sendDocsEmail = async () => {
+    if (!build || !docEmail) return;
+    setSendingDocs(true);
+    setDocsSent(null);
+    try {
+      const res = await base44.functions.invoke("emailBuildDocuments", {
+        build_id: build.id,
+        email: docEmail,
+      });
+      setDocsSent({ success: true, email: docEmail, count: res.data?.docs_count, zip: res.data?.zip_url });
+    } catch (e) {
+      setDocsSent({ error: e?.message || "Failed to send email" });
+    } finally {
+      setSendingDocs(false);
     }
   };
 
@@ -267,6 +292,45 @@ export default function SystemReview() {
               ))}
             </div>
           </div>
+        )}
+      </div>
+
+      {/* Email documents question — let the user get everything in their inbox */}
+      <div className="rounded-xl border border-amber-400/30 bg-amber-400/5 p-5">
+        <div className="mb-2 flex items-center gap-2">
+          <FileText className="h-4 w-4 text-amber-400" />
+          <h2 className="text-sm font-semibold text-white">Get Your Documents by Email</h2>
+        </div>
+        <p className="mb-3 text-sm text-white/60">
+          Want all your documents and links sent to your inbox? We'll email you every link
+          (GitHub, Vercel, Supabase, Drive) plus a one-click ZIP download of all {deployment?.docs_list?.length || 8} docs.
+        </p>
+        <div className="flex flex-col gap-2 sm:flex-row">
+          <input
+            type="email"
+            value={docEmail}
+            onChange={(e) => setDocEmail(e.target.value)}
+            placeholder="your@email.com"
+            className="flex-1 rounded-lg border border-white/15 bg-zinc-950 px-3 py-2 text-sm text-white placeholder-white/30 focus:border-lime-400 focus:outline-none"
+          />
+          <button
+            type="button"
+            onClick={sendDocsEmail}
+            disabled={sendingDocs || !docEmail}
+            className="inline-flex items-center justify-center gap-1.5 rounded-lg bg-lime-400 px-4 py-2 text-sm font-semibold text-black hover:bg-lime-300 disabled:opacity-50"
+          >
+            {sendingDocs ? <Loader2 className="h-4 w-4 animate-spin" /> : <FileText className="h-4 w-4" />}
+            {sendingDocs ? "Sending…" : "Email Me Everything"}
+          </button>
+        </div>
+        {docsSent?.error && (
+          <p className="mt-2 text-xs text-red-400">⚠ {docsSent.error}</p>
+        )}
+        {docsSent?.success && (
+          <p className="mt-2 text-xs text-lime-400">
+            ✓ Sent {docsSent.count} documents and all links to {docsSent.email}
+            {docsSent.zip ? " — ZIP download included." : "."}
+          </p>
         )}
       </div>
 
