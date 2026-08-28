@@ -1,7 +1,8 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Menu, X } from "lucide-react";
-import { LOGO_HORIZONTAL } from "@/lib/brandAssets";
+import { LOGO_ICON } from "@/lib/brandAssets";
+import { Image } from "@/components/ui/image";
 import { cn } from "@/lib/utils";
 import AnnouncementBar from "@/components/marketing/AnnouncementBar";
 
@@ -29,7 +30,11 @@ export default function MarketingNav() {
       <nav className={cn("w-full bg-white transition-all duration-300", scrolled ? "border-b border-black/10 shadow-sm" : "border-b border-black/5")}>
         <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6">
           <Link to="/" className="flex items-center gap-2">
-            <img src={LOGO_HORIZONTAL} alt="Xtreme AI" className="h-9 w-auto" />
+            <Image src={LOGO_ICON} alt="Xtreme AI" className="h-10 w-10" fittingType="fit" />
+            <div className="leading-tight">
+              <div className="text-sm font-bold text-black">Xtreme AI</div>
+              <div className="text-[10px] font-semibold uppercase tracking-wider text-amber-600">Growth Factory</div>
+            </div>
           </Link>
 
           <div className="hidden items-center gap-7 md:flex">
@@ -50,7 +55,13 @@ export default function MarketingNav() {
       {open && (
         <div className="fixed inset-0 z-50 bg-white md:hidden">
           <div className="flex h-16 items-center justify-between px-4">
-            <Link to="/" className="flex items-center gap-2"><img src={LOGO_HORIZONTAL} alt="Xtreme AI" className="h-9 w-auto" /></Link>
+            <Link to="/" className="flex items-center gap-2">
+              <Image src={LOGO_ICON} alt="Xtreme AI" className="h-10 w-10" fittingType="fit" />
+              <div className="leading-tight">
+                <div className="text-sm font-bold text-black">Xtreme AI</div>
+                <div className="text-[10px] font-semibold uppercase tracking-wider text-amber-600">Growth Factory</div>
+              </div>
+            </Link>
             <button onClick={() => setOpen(false)} className="text-black"><X className="h-6 w-6" /></button>
           </div>
           <div className="flex flex-col gap-1 px-4 py-6">
