@@ -8,7 +8,7 @@ import {
   BookMarked, CheckCircle, ScrollText, Plug, Settings, LogOut, Menu, X,
   MapPin, Plus, Rocket, Bot, LayoutTemplate, Copy, Wand2, Crosshair, Activity, Radar, Package, UserPlus, Tag, Box, ShieldAlert, Sparkles, Brain,
   Archive, ChevronDown, Compass, Building2, MessageSquareText, PenTool, Shirt, Share2, Video, Layers,
-  ClipboardList,
+  ClipboardList, Bug,
 } from "lucide-react";
 import { Image } from "@/components/ui/image";
 import { cn } from "@/lib/utils";
@@ -131,6 +131,7 @@ const ARCHIVE_ITEMS = [
   { to: "/admin-domain-purchase", label: "Domain Purchaser", icon: Globe },
   { to: "/employee-management", label: "Employee Management", icon: Users },
   { to: "/walkthrough-studio", label: "3D Walkthroughs", icon: Box },
+  { to: "/qa-agent", label: "QA Agent", icon: Bug },
   { to: "/system-alerts", label: "System Alerts", icon: ShieldAlert },
   { to: "/system-optimization", label: "System Optimization", icon: Sparkles },
   { to: "/approvals", label: "Approvals", icon: CheckCircle },

@@ -1,0 +1,44 @@
+{
+  "trigger": {
+    "condition": null,
+    "config": {
+      "trigger_type": "scheduled",
+      "events": [],
+      "schedule_mode": "recurring",
+      "cron_expression": "0 3 * * *",
+      "one_time_date": null,
+      "timezone": "America/New_York",
+      "interval_value": null,
+      "interval_unit": null,
+      "interval_anchor": null,
+      "ends_type": "never",
+      "ends_on_date": null,
+      "ends_after_count": null
+    }
+  },
+  "name": "Daily QA & Optimization",
+  "description": "Autonomous QA agent \u2014 crawls the site, captures errors, researches fixes, and emails a daily report to admins. Runs every night at 3 AM ET.",
+  "definition": {
+    "document": {
+      "dsl": "1.0.0",
+      "name": "daily_qa_optimization",
+      "version": "1.0",
+      "namespace": "base44"
+    },
+    "do": [
+      {
+        "run_qa_cycle": {
+          "call": "invoke_backend_function",
+          "with": {
+            "function_name": "qaRunFullCycle"
+          },
+          "then": "end",
+          "x-base44": {
+            "title": "Run full QA cycle",
+            "description": "Crawl, analyze, fix, report"
+          }
+        }
+      }
+    ]
+  }
+}
