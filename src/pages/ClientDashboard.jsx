@@ -5,7 +5,6 @@ import {
 } from "lucide-react";
 import { usePortalPipeline } from "@/hooks/usePortalPipeline";
 import { useClientUser } from "@/hooks/useClientUser";
-import QAStatusWidget from "@/components/qa/QAStatusWidget";
 
 // H1 — Now uses the unified portal pipeline (usePortalPipeline) so the
 // dashboard shows the SAME product-aware steps the timeline shows, not the
@@ -174,17 +173,6 @@ export default function ClientDashboard() {
         >
           Go to Approvals <ArrowRight className="h-4 w-4" />
         </Link>
-      </section>
-
-      {/* System Health — QA agents monitor the portal for issues */}
-      <section>
-        <h2 className="text-xs font-semibold uppercase tracking-wider text-lime-400">System Health</h2>
-        <p className="mt-2 text-sm text-white/70">
-          Our QA agents continuously test this portal — touching every button, filling every form, and scoring the experience. Here's the latest health report.
-        </p>
-        <div className="mt-4">
-          <QAStatusWidget canRun={false} />
-        </div>
       </section>
 
       {/* Quick links */}

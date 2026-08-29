@@ -5,7 +5,6 @@ import { Boxes, Eye, Play, CheckCircle, Clock, Package, AlertCircle, Rocket } fr
 import { Link } from "react-router-dom";
 import EmployeeInvitePanel from "@/components/employee/EmployeeInvitePanel";
 import EmployeeListPanel from "@/components/employee/EmployeeListPanel";
-import QAStatusWidget from "@/components/qa/QAStatusWidget";
 import { getBuildStepInfo } from "@/lib/unifiedSteps";
 
 export default function EmployeePortal() {
@@ -126,9 +125,6 @@ export default function EmployeePortal() {
           <div className="text-2xl font-bold text-white">{packages.length}</div>
         </div>
       </div>
-
-      {/* QA System Health — visible to all employees, admins can run tests */}
-      <QAStatusWidget canRun={user?.role === "admin"} />
 
       {/* Active Assignments */}
       <Panel title="Your Active Assignments">

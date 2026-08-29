@@ -48,7 +48,6 @@ export default function BusinessNameStudio() {
   const [genCount, setGenCount] = useState(0);
   const [usingName, setUsingName] = useState(null);
   const [usedName, setUsedName] = useState(null);
-  const [domainAdded, setDomainAdded] = useState(null);
   const navigate = useNavigate();
   const [ownName, setOwnName] = useState("");
   const [ownDomain, setOwnDomain] = useState("");
@@ -192,44 +191,6 @@ export default function BusinessNameStudio() {
       setError(e?.message || "Could not save your name. Please try again.");
     } finally {
       setUsingName(null);
-    }
-  };
-
-  // Add the domain to the user's enhancements bill ($20) instead of
-  // purchasing immediately. The fee is collected at the payment step
-  // after contract signing.
-  const addDomainToBill = async (s) => {
-    setSaving(s.domain);
-    setError("");
-    try {
-      const currentEnhancements = user?.enhancements || [];
-      const currentTotal = user?.enhancementsTotal || 0;
-      if (!currentEnhancements.includes("domain_purchase")) {
-        await base44.auth.updateMe({
-          enhancements: [...currentEnhancements, "domain_purchase"],
-          enhancementsTotal: currentTotal + 20,
-          epoxyProfile: {
-            ...(user?.epoxyProfile || {}),
-            businessName: s.name,
-            domain: s.domain,
-            tagline: s.tagline || "",
-          },
-        });
-      } else {
-        await base44.auth.updateMe({
-          epoxyProfile: {
-            ...(user?.epoxyProfile || {}),
-            businessName: s.name,
-            domain: s.domain,
-            tagline: s.tagline || "",
-          },
-        });
-      }
-      setDomainAdded(s.domain);
-    } catch (e) {
-      setError(e?.message || "Could not add domain to bill.");
-    } finally {
-      setSaving(null);
     }
   };
 
@@ -439,8 +400,6 @@ export default function BusinessNameStudio() {
               onUseName={() => saveNameOnly(s)}
               usingName={usingName === s.name}
               usedName={usedName === s.name}
-              onAddToBill={() => addDomainToBill(s)}
-              domainAdded={domainAdded === s.domain}
             />
           ))}
 

@@ -160,49 +160,41 @@ export default function Enhancements() {
                     return (
                       <div
                         key={e.id}
-                        className={`flex flex-col overflow-hidden rounded-xl border-2 transition-all ${
+                        className={`flex flex-col rounded-xl border-2 p-4 transition-all ${
                           on ? "border-lime-400 bg-lime-400/5" : "border-white/10 bg-zinc-950 hover:border-white/25"
                         }`}
                       >
-                        {/* Visual preview area */}
-                        <div className={`relative flex h-24 items-center justify-center bg-gradient-to-br ${e.gradient || "from-white/5 to-white/5"}`}>
-                          <Icon className={`h-10 w-10 ${on ? "text-lime-400" : "text-white/60"}`} />
+                        <div className="flex items-start gap-3">
                           <button
                             type="button"
                             onClick={() => toggle(e.id)}
-                            className={`absolute right-2 top-2 flex h-6 w-6 items-center justify-center rounded border-2 transition-colors ${
-                              on ? "border-lime-400 bg-lime-400 text-black" : "border-white/30 bg-black/40 text-white/40"
+                            className={`flex h-6 w-6 shrink-0 items-center justify-center rounded border-2 transition-colors ${
+                              on ? "border-lime-400 bg-lime-400 text-black" : "border-white/25 text-white/40"
                             }`}
                           >
                             {on ? <Check className="h-3.5 w-3.5" /> : <Plus className="h-3.5 w-3.5" />}
                           </button>
-                          {isRecommended && (
-                            <span className="absolute left-2 top-2 rounded-full bg-lime-400/90 px-1.5 py-0.5 text-[9px] font-bold uppercase text-black">Rec</span>
-                          )}
-                          <div className="absolute bottom-2 right-2 text-sm font-bold text-lime-400">{e.price === 0 ? "Free" : `+$${e.price}`}</div>
+                          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-white/5">
+                            <Icon className={`h-5 w-5 ${on ? "text-lime-400" : "text-white/50"}`} />
+                          </div>
+                          <div className="min-w-0 flex-1">
+                            <div className="flex items-center gap-2">
+                              <h3 className="text-sm font-semibold text-white">{e.name}</h3>
+                              {isRecommended && <span className="rounded-full bg-lime-400/15 px-1.5 py-0.5 text-[9px] font-bold uppercase text-lime-300">Rec</span>}
+                            </div>
+                            <p className="mt-0.5 text-xs text-white/50">{e.description}</p>
+                          </div>
+                          <div className="shrink-0 text-right">
+                            <div className="text-sm font-bold text-lime-400">{e.price === 0 ? "Free" : `+$${e.price}`}</div>
+                          </div>
                         </div>
-                        {/* Content */}
-                        <div className="flex flex-1 flex-col p-4">
-                          <h3 className="text-sm font-semibold text-white">{e.name}</h3>
-                          <p className="mt-0.5 text-xs text-white/50">{e.description}</p>
-                          {e.benefits && e.benefits.length > 0 && (
-                            <ul className="mt-2.5 space-y-1">
-                              {e.benefits.map((b, i) => (
-                                <li key={i} className="flex gap-1.5 text-[11px] text-white/70">
-                                  <Check className="mt-0.5 h-3 w-3 shrink-0 text-lime-400/70" />
-                                  {b}
-                                </li>
-                              ))}
-                            </ul>
-                          )}
-                          <button
-                            type="button"
-                            onClick={() => setDemo(e)}
-                            className="mt-3 inline-flex items-center justify-center gap-1.5 rounded-md border border-white/15 px-2.5 py-1.5 text-[11px] font-medium text-white/70 hover:border-lime-400/50 hover:text-lime-300"
-                          >
-                            <Eye className="h-3.5 w-3.5" /> Try Demo
-                          </button>
-                        </div>
+                        <button
+                          type="button"
+                          onClick={() => setDemo(e)}
+                          className="mt-3 inline-flex items-center justify-center gap-1.5 rounded-md border border-white/15 px-2.5 py-1.5 text-[11px] font-medium text-white/70 hover:border-lime-400/50 hover:text-lime-300"
+                        >
+                          <Eye className="h-3.5 w-3.5" /> Try Demo
+                        </button>
                       </div>
                     );
                   })}

@@ -3,15 +3,14 @@ import { createContext, useContext, useEffect, useState, useCallback } from "rea
 const ThemeContext = createContext(null);
 
 function getSystem() {
-  // Light mode is the primary/default theme — "system" resolves to light
-  // unless the user has explicitly opted into following their OS preference.
-  return "light";
+  if (typeof window === "undefined") return "dark";
+  return window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
 }
 
 export function ThemeProvider({ children }) {
   const [theme, setThemeState] = useState(() => {
-    if (typeof window === "undefined") return "light";
-    return localStorage.getItem("theme") || "light";
+    if (typeof window === "undefined") return "system";
+    return localStorage.getItem("theme") || "system";
   });
 
   const resolved = theme === "system" ? getSystem() : theme;

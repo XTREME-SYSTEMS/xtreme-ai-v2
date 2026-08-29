@@ -1,4 +1,4 @@
-import { createClientFromRequest } from 'npm:@base44/sdk@0.8.44';
+import { createClientFromRequest } from 'npm:@base44/sdk@0.8.40';
 import { getAdminEmails } from '../../shared/pipelineNotifications.ts';
 
 // Auto-generates a service agreement (EsignDocument) for a client when they
@@ -45,24 +45,6 @@ export default async function(req) {
     const industry = profile.industry || "";
     const enhancements = user.enhancements || [];
     const enhancementsTotal = user.enhancementsTotal || 0;
-    const plan = user.plan || "package";
-
-    // Fetch the full service catalog entry so the contract lists every
-    // service and feature included in the client's purchased package.
-    let packageFeatures = [];
-    let packageName = plan;
-    try {
-      const catalog = await base44.asServiceRole.entities.ServiceCatalogEntry.filter(
-        { product_id: plan }, "-created_date", 1
-      );
-      if (catalog && catalog.length > 0) {
-        const entry = catalog[0];
-        packageName = entry.name || plan;
-        packageFeatures = (entry.features || []).map((f) => f.text || f);
-      }
-    } catch (e) {
-      console.error("autoGenerateClientContract: catalog fetch failed", e?.message || e);
-    }
 
     // Pull the client's creative decisions from their ClientProject so the
     // contract reflects exactly what they chose at each portal step.
@@ -121,10 +103,6 @@ export default async function(req) {
       ? `\n\nAdditional enhancements selected: ${enhancements.length} item(s) totaling $${enhancementsTotal}.`
       : "";
 
-    const packageFeaturesHtml = packageFeatures.length > 0
-      ? `\nPackage: ${packageName}\nIncluded services:\n${packageFeatures.map((f) => `- ${f}`).join("\n")}\n`
-      : `\nPackage: ${packageName}\n`;
-
     const prompt = `Generate a professional service agreement (contract) as clean HTML article content (use <h2>, <p>, <ul>, <li> — no <html>/<body> wrapper). 
 
 Title: "Service Agreement"
@@ -135,28 +113,23 @@ Scope of work: ${scope}${enhancementNote}
 Price: As quoted in selected package and enhancements
 Terms: 50% deposit due at signing, balance due upon project completion. Net 15.
 
-Package & included services (incorporate ALL of these into a "Package & Services" section as a bulleted list so the client can see everything included):
-${packageFeaturesHtml}
-
 Client decisions & specifications (incorporate these into a "Project Specifications" section as a bulleted review of exactly what the client chose at each step):
 ${decisionsSummary}
 
 Include these sections:
 1. Parties (Lead Gen Near You and ${businessName})
-2. Package & Services (list EVERY included service from the package features above as bullets)
-3. Scope of Services (based on the project description above)
-4. Project Specifications (list every item from the client decisions summary above as bullets so the client can review their choices)
-5. Enhancements & Add-ons (list each enhancement by name with its price, then the total)
-6. Project Timeline (standard 2-week build, or 3 business days if rush delivery selected)
-7. Fees & Payment (deposit structure, enhancement costs, total enhancement amount: $${enhancementsTotal})
-8. Client Responsibilities (providing content, photos, timely feedback)
-9. Revision Policy (unlimited revisions during build phase, 30-day post-launch support)
-10. Intellectual Property (client owns final deliverables upon full payment)
-11. Confidentiality
-12. Limitation of Liability
-13. Cancellation & Refund Policy
-14. Governing Law
-15. Signatures
+2. Scope of Services (based on the project description above)
+3. Project Specifications (list every item from the client decisions summary above as bullets so the client can review their choices)
+4. Project Timeline (standard 2-week build, or 3 business days if rush delivery selected)
+5. Fees & Payment (deposit structure, enhancement costs)
+6. Client Responsibilities (providing content, photos, timely feedback)
+7. Revision Policy (unlimited revisions during build phase, 30-day post-launch support)
+8. Intellectual Property (client owns final deliverables upon full payment)
+9. Confidentiality
+10. Limitation of Liability
+11. Cancellation & Refund Policy
+12. Governing Law
+13. Signatures
 
 Make it professional, enforceable, and easy to read. Use clear headings and bullet points where appropriate.`;
 

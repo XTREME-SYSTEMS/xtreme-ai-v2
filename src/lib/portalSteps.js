@@ -212,13 +212,13 @@ export const PORTAL_STEPS = {
 // BEFORE Your Designs so the customer can add optional AI tools and add-ons
 // to their contract before reviewing the final package and signing.
 const FULL_BUILD = [
-  "vision", "strategy", "welcome", "business-name", "business-profile", "content", "logo", "brand", "website",
+  "welcome", "business-name", "business-profile", "strategy", "content", "logo", "brand", "website",
   "enhancements", "your-designs", "signatures", "approvals", "launch",
 ];
 
 // Build with social media + video pack included
 const FULL_BUILD_PLUS_MEDIA = [
-  "vision", "strategy", "welcome", "business-name", "business-profile", "content", "logo", "brand", "website",
+  "welcome", "business-name", "business-profile", "strategy", "content", "logo", "brand", "website",
   "social", "video", "enhancements", "your-designs", "signatures",
   "approvals", "launch",
 ];
