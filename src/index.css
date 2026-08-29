@@ -544,7 +544,11 @@
    ============================================================ */
 
 /* Primary accent backgrounds get a metallic gradient */
-.bg-amber-400, .bg-lime-400, .bg-orange-400, .bg-yellow-400 {
+.bg-amber-200, .bg-lime-200, .bg-orange-200, .bg-yellow-200,
+.bg-amber-300, .bg-lime-300, .bg-orange-300, .bg-yellow-300,
+.bg-amber-400, .bg-lime-400, .bg-orange-400, .bg-yellow-400,
+.bg-amber-500, .bg-lime-500, .bg-orange-500, .bg-yellow-500,
+.bg-amber-600, .bg-lime-600, .bg-orange-600, .bg-yellow-600 {
   background: linear-gradient(135deg,
     #FFF7B3 0%,
     #FFEA00 20%,
@@ -559,8 +563,12 @@
 }
 
 /* Hover shifts the shine position for a reflective effect */
+.hover\:bg-amber-200:hover, .hover\:bg-lime-200:hover, .hover\:bg-orange-200:hover, .hover\:bg-yellow-200:hover,
+.hover\:bg-amber-300:hover, .hover\:bg-lime-300:hover, .hover\:bg-orange-300:hover, .hover\:bg-yellow-300:hover,
 .hover\:bg-amber-400:hover, .hover\:bg-lime-400:hover,
-.hover\:bg-orange-400:hover, .hover\:bg-yellow-400:hover {
+.hover\:bg-orange-400:hover, .hover\:bg-yellow-400:hover,
+.hover\:bg-amber-500:hover, .hover\:bg-lime-500:hover, .hover\:bg-orange-500:hover, .hover\:bg-yellow-500:hover,
+.hover\:bg-amber-600:hover, .hover\:bg-lime-600:hover, .hover\:bg-orange-600:hover, .hover\:bg-yellow-600:hover {
   background: linear-gradient(135deg,
     #FFEE33 0%,
     #FFEA00 25%,
