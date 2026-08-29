@@ -9,8 +9,8 @@ function getSystem() {
 
 export function ThemeProvider({ children }) {
   const [theme, setThemeState] = useState(() => {
-    if (typeof window === "undefined") return "system";
-    return localStorage.getItem("theme") || "system";
+    if (typeof window === "undefined") return "light";
+    return localStorage.getItem("theme") || "light";
   });
 
   const resolved = theme === "system" ? getSystem() : theme;
