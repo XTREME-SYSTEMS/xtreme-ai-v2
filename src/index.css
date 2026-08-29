@@ -156,6 +156,20 @@
 :root:not(.dark) .hover\:bg-white\/10:hover { background-color: hsl(var(--muted)); }
 
 /* ============================================================
+   Dark mode — brighten all muted subheading/paragraph text to
+   near-full white. The components use text-white/30…/90 for
+   labels, subheadings, and body copy; in dark mode these now
+   read as bright white instead of dim gray.
+   ============================================================ */
+.dark .text-white\/30 { color: rgba(255, 255, 255, 0.95); }
+.dark .text-white\/40 { color: rgba(255, 255, 255, 0.95); }
+.dark .text-white\/50 { color: rgba(255, 255, 255, 1); }
+.dark .text-white\/60 { color: rgba(255, 255, 255, 1); }
+.dark .text-white\/70 { color: rgba(255, 255, 255, 1); }
+.dark .text-white\/80 { color: rgba(255, 255, 255, 1); }
+.dark .text-white\/90 { color: rgba(255, 255, 255, 1); }
+
+/* ============================================================
    Gold palette override — forces ALL lime/amber/orange/yellow
    Tailwind utility classes to metallic gold (#FFEA00) and darker
    goldenrod (#CCBB00). This is a CSS-level belt-and-suspenders

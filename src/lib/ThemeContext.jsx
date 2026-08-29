@@ -9,8 +9,8 @@ function getSystem() {
 
 export function ThemeProvider({ children }) {
   const [theme, setThemeState] = useState(() => {
-    if (typeof window === "undefined") return "system";
-    return localStorage.getItem("theme") || "system";
+    if (typeof window === "undefined") return "light";
+    return localStorage.getItem("theme") || "light";
   });
 
   const resolved = theme === "system" ? getSystem() : theme;
@@ -48,6 +48,6 @@ export function ThemeProvider({ children }) {
 
 export function useTheme() {
   const ctx = useContext(ThemeContext);
-  if (!ctx) return { theme: "system", resolved: "dark", setTheme: () => {}, toggle: () => {} };
+  if (!ctx) return { theme: "light", resolved: "light", setTheme: () => {}, toggle: () => {} };
   return ctx;
 }
