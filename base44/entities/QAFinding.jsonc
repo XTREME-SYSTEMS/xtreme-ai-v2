@@ -1,0 +1,138 @@
+{
+  "name": "QAFinding",
+  "type": "object",
+  "description": "An individual flaw, issue, or enhancement opportunity discovered by the QA Agent or Humanized Test Agent. Each finding has a severity, category, the page and element where it was found, an optional screenshot, a description, and a recommended fix. Findings are created during test runs and can be resolved or dismissed.",
+  "properties": {
+    "test_run_id": {
+      "type": "string",
+      "description": "ID of the QATestRun that discovered this finding"
+    },
+    "agent_type": {
+      "type": "string",
+      "enum": [
+        "qa_agent",
+        "humanized_test"
+      ],
+      "description": "Which agent found this finding"
+    },
+    "severity": {
+      "type": "string",
+      "enum": [
+        "critical",
+        "high",
+        "medium",
+        "low",
+        "info"
+      ],
+      "default": "medium"
+    },
+    "category": {
+      "type": "string",
+      "enum": [
+        "broken_button",
+        "broken_function",
+        "ux_issue",
+        "missing_feature",
+        "performance",
+        "visual_bug",
+        "console_error",
+        "navigation_error",
+        "enhancement_opportunity",
+        "form_error",
+        "broken_image",
+        "missing_seo"
+      ],
+      "description": "What kind of finding this is"
+    },
+    "target_system": {
+      "type": "string",
+      "enum": [
+        "admin",
+        "employee_portal",
+        "client_portal",
+        "public",
+        "full_system"
+      ],
+      "description": "Which system the finding is about"
+    },
+    "page_url": {
+      "type": "string",
+      "description": "URL of the page where the finding was discovered"
+    },
+    "page_name": {
+      "type": "string",
+      "description": "Human-readable page name (e.g. 'Admin Dashboard', 'Vision Step')"
+    },
+    "element_description": {
+      "type": "string",
+      "description": "Description of the element (button text, form field, function name) where the issue was found"
+    },
+    "screenshot_url": {
+      "type": "string",
+      "description": "URL to a screenshot of the page at the time the finding was discovered"
+    },
+    "description": {
+      "type": "string",
+      "description": "Full description of the flaw or issue"
+    },
+    "recommended_fix": {
+      "type": "string",
+      "description": "AI-recommended fix or enhancement for this finding"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "open",
+        "fixing",
+        "resolved",
+        "dismissed"
+      ],
+      "default": "open"
+    },
+    "resolved_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "resolution": {
+      "type": "string",
+      "description": "How the finding was resolved"
+    }
+  },
+  "required": [
+    "test_run_id",
+    "agent_type",
+    "category",
+    "description"
+  ],
+  "rls": {
+    "read": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "employee"
+          }
+        }
+      ]
+    },
+    "create": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}
