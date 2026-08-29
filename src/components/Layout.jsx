@@ -370,7 +370,6 @@ export default function Layout() {
         <header className="flex h-14 items-center gap-3 border-b border-amber-400/40 bg-black px-4 backdrop-blur">
           <button onClick={() => setOpen(true)} className="md:hidden text-white/50 hover:text-white"><Menu className="h-5 w-5" /></button>
           <div className="flex items-center gap-2 text-xs">
-            <span className="rounded-md border border-amber-400 bg-amber-400 px-2 py-1 font-mono text-black font-semibold">{user?.role === "admin" ? "XTREME AI PIPELINE" : "BUSINESS GENERATOR"}</span>
             <span className="hidden text-white/50 sm:inline">{user?.role === "admin" ? "Autonomous growth factory · AI-driven pipeline" : "AI-powered business generation workflow"}</span>
           </div>
           <div className="ml-auto flex items-center gap-3">
