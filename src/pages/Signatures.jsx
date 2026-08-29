@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { base44 } from "@/api/base44Client";
-import { FileSignature, Loader2, ShieldCheck, CheckCircle2, X, PenLine, Clock, ArrowRight, Calendar } from "lucide-react";
+import { FileSignature, Loader2, ShieldCheck, CheckCircle2, X, PenLine, Clock, ArrowRight, Calendar, CreditCard, Mail } from "lucide-react";
 import SignaturePad from "@/components/client/SignaturePad";
 import PreviewBanner from "@/components/client/PreviewBanner";
 import BackButton from "@/components/client/BackButton";
@@ -39,6 +39,10 @@ export default function Signatures() {
   const [kickoffDate, setKickoffDate] = useState("");
   const [savingKickoff, setSavingKickoff] = useState(false);
   const [kickoffSaved, setKickoffSaved] = useState(false);
+  const [paying, setPaying] = useState(false);
+  const [paid, setPaid] = useState(false);
+  const [emailing, setEmailing] = useState(false);
+  const [emailed, setEmailed] = useState(false);
   const { effectiveEmail, isPreviewing } = usePreviewEmail(user);
 
   useEffect(() => { document.title = "Signatures · Lead Gen Near You"; }, []);
@@ -130,6 +134,36 @@ export default function Signatures() {
       setError("Couldn't save. Please try again.");
     } finally {
       setSavingKickoff(false);
+    }
+  };
+
+  const chargeEnhancements = async () => {
+    const total = user?.enhancementsTotal || 0;
+    if (total < 0.5) { setPaid(true); return; }
+    setPaying(true); setError(null);
+    try {
+      const r = await base44.functions.invoke("create-checkout", { productId: "enhancements" });
+      if (r?.data?.redirectUrl) {
+        window.location.href = r.data.redirectUrl;
+      } else {
+        setError("Couldn't start checkout. Please try again.");
+      }
+    } catch (e) {
+      setError("Couldn't start checkout. Please try again.");
+    } finally {
+      setPaying(false);
+    }
+  };
+
+  const emailAssets = async () => {
+    setEmailing(true); setError(null);
+    try {
+      await base44.functions.invoke("emailClientAssets", {});
+      setEmailed(true);
+    } catch (e) {
+      setError("Couldn't send email. Please try again.");
+    } finally {
+      setEmailing(false);
     }
   };
 
@@ -281,6 +315,56 @@ export default function Signatures() {
               </div>
             )}
           </div>
+          {/* Enhancement payment — required before downloads if balance > 0 */}
+          {(user?.enhancementsTotal || 0) > 0 && !paid && (
+            <div className="rounded-xl border border-amber-400/40 bg-amber-400/5 p-5">
+              <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-amber-400">
+                <CreditCard className="h-4 w-4" /> Pay for Your Enhancements
+              </div>
+              <p className="mt-1 text-sm text-white/60">
+                You selected ${(user?.enhancementsTotal || 0)} in enhancements. Pay the balance to unlock your downloads.
+              </p>
+              <button
+                type="button"
+                onClick={chargeEnhancements}
+                disabled={paying}
+                className="mt-3 inline-flex w-full items-center justify-center gap-2 rounded-lg bg-amber-400 px-4 py-3 text-sm font-semibold text-black transition-colors hover:bg-amber-300 disabled:opacity-50"
+              >
+                {paying ? <><Loader2 className="h-4 w-4 animate-spin" /> Starting checkout…</> : <><CreditCard className="h-4 w-4" /> Pay ${(user?.enhancementsTotal || 0)} for Enhancements</>}
+              </button>
+            </div>
+          )}
+
+          {paid && (
+            <div className="flex items-center gap-2 rounded-lg border border-lime-400/50 bg-lime-400/10 px-3 py-2.5 text-sm text-lime-300">
+              <CheckCircle2 className="h-4 w-4" /> Enhancements paid — your downloads are unlocked.
+            </div>
+          )}
+
+          {/* Email all assets — polished thank-you with setup instructions */}
+          <div className="rounded-xl border border-white/10 bg-zinc-950 p-5">
+            <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-lime-400">
+              <Mail className="h-4 w-4" /> Email Me My Assets
+            </div>
+            <p className="mt-1 text-sm text-white/60">
+              Get a polished email with all your assets (logo, brand, website, social, video), setup instructions, and an offer for professional setup via Vercel, Supabase & Drive.
+            </p>
+            {emailed ? (
+              <div className="mt-3 flex items-center gap-2 rounded-lg border border-lime-400/50 bg-lime-400/10 px-3 py-2.5 text-sm text-lime-300">
+                <CheckCircle2 className="h-4 w-4" /> Sent — check your inbox!
+              </div>
+            ) : (
+              <button
+                type="button"
+                onClick={emailAssets}
+                disabled={emailing}
+                className="mt-3 inline-flex w-full items-center justify-center gap-2 rounded-lg border border-lime-400/40 bg-lime-400/10 px-4 py-2.5 text-sm font-semibold text-lime-300 transition-colors hover:bg-lime-400/20 disabled:opacity-50"
+              >
+                {emailing ? <><Loader2 className="h-4 w-4 animate-spin" /> Sending…</> : <><Mail className="h-4 w-4" /> Email My Assets</>}
+              </button>
+            )}
+          </div>
+
           <button
             type="button"
             onClick={() => navigate("/approvals")}

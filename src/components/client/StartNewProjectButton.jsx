@@ -19,7 +19,7 @@ export default function StartNewProjectButton({ user, project, className = "" })
     setError("");
     try {
       await archiveCurrentProject(user, project);
-      navigate("/business-name-studio");
+      navigate("/vision");
     } catch (e) {
       setError("Couldn't start a new project. Please try again.");
       setResetting(false);
@@ -54,7 +54,7 @@ export default function StartNewProjectButton({ user, project, className = "" })
             <p className="mt-3 text-sm text-white/70">
               Your current project will be <span className="font-semibold text-lime-300">saved</span> to your
               Projects page — you can pick up right where you left off anytime. We'll start a fresh
-              project from the Business Name step.
+              project from the Vision & Strategy step.
             </p>
             <p className="mt-2 text-xs text-white/50">
               Your account, plan, and purchases are not affected.
