@@ -11,14 +11,16 @@ import {
   Loader2, Search, Rocket, CheckCircle, ArrowRight,
   RefreshCw, Eye, AlertTriangle, TrendingUp, Zap,
 } from "lucide-react";
+import { getCategoryIcon } from "@/lib/categoryIcons";
 
 // Fallback categories shown immediately while the research function runs.
+// Icons are resolved via getCategoryIcon() — no emojis.
 const FALLBACK_CATEGORIES = [
-  { name: "Epoxy Flooring", icon: "🎨", description: "Garage floors, basement floors, metallic epoxy, flake systems, self-leveling epoxy", trending_score: 95, is_system_capability: true },
-  { name: "Epoxy Coatings", icon: "🛡️", description: "Concrete coatings, protective coatings, warehouse floors, anti-slip, food-grade epoxy", trending_score: 92, is_system_capability: true },
-  { name: "Epoxy Contractors", icon: "👷", description: "Full-service epoxy installation — residential, commercial, industrial, repair & resurfacing", trending_score: 90, is_system_capability: true },
-  { name: "Polished Concrete", icon: "✨", description: "Grind & seal, burnished concrete, stained concrete, densification — commercial & residential", trending_score: 88, is_system_capability: true },
-  { name: "Decorative Concrete", icon: "🏛️", description: "Stamped concrete, overlays, micro-toppings, stained concrete, resurfacing, exposed aggregate", trending_score: 87, is_system_capability: true },
+  { name: "Epoxy Flooring", icon: "paint-bucket", description: "Garage floors, basement floors, metallic epoxy, flake systems, self-leveling epoxy", trending_score: 95, is_system_capability: true },
+  { name: "Epoxy Coatings", icon: "shield-check", description: "Concrete coatings, protective coatings, warehouse floors, anti-slip, food-grade epoxy", trending_score: 92, is_system_capability: true },
+  { name: "Epoxy Contractors", icon: "hard-hat", description: "Full-service epoxy installation — residential, commercial, industrial, repair & resurfacing", trending_score: 90, is_system_capability: true },
+  { name: "Polished Concrete", icon: "sparkles", description: "Grind & seal, burnished concrete, stained concrete, densification — commercial & residential", trending_score: 88, is_system_capability: true },
+  { name: "Decorative Concrete", icon: "building-2", description: "Stamped concrete, overlays, micro-toppings, stained concrete, resurfacing, exposed aggregate", trending_score: 87, is_system_capability: true },
 ];
 
 // The Vision Generator — an AI-assisted, discovery-driven vision builder.
@@ -312,7 +314,7 @@ export default function VisionGeneratorPanel() {
                       : "border-white/10 bg-black/30 text-white/60 hover:border-lime-400/30 hover:text-lime-400"
                   }`}
                 >
-                  <span className="text-sm">{cat.icon || "📌"}</span>
+                  {(() => { const Icon = getCategoryIcon(cat.name, cat.icon); return <Icon className="h-3.5 w-3.5 text-amber-400" />; })()}
                   {cat.name}
                   {cat.is_system_capability && <span className="text-[9px] uppercase text-lime-400/50">SYS</span>}
                 </button>

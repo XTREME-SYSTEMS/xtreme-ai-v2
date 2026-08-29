@@ -170,6 +170,26 @@
 .dark .text-white\/90 { color: rgba(255, 255, 255, 1); }
 
 /* ============================================================
+   Dark mode — thin black borders on all cards and buttons.
+   Border utilities are overridden to solid black; buttons get a
+   1px black outline (inset, so it never shifts layout or fights
+   existing box-shadows/gradients).
+   ============================================================ */
+.dark .border-white\/5,
+.dark .border-white\/10,
+.dark .border-white\/15,
+.dark .border-white\/20,
+.dark .border-white\/25 { border-color: #000; }
+.dark .border-zinc-800,
+.dark .border-zinc-700,
+.dark .border-zinc-600 { border-color: #000; }
+
+.dark button[class*="rounded"] {
+  outline: 1px solid #000;
+  outline-offset: -1px;
+}
+
+/* ============================================================
    Gold palette override — forces ALL lime/amber/orange/yellow
    Tailwind utility classes to metallic gold (#FFEA00) and darker
    goldenrod (#CCBB00). This is a CSS-level belt-and-suspenders

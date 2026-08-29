@@ -13,35 +13,35 @@ import { createClientFromRequest } from "npm:@base44/sdk@0.8.40";
 const EPOXY_CONCRETE_CATEGORIES = [
   {
     name: "Epoxy Flooring",
-    icon: "🎨",
+    icon: "paint-bucket",
     description: "Garage floors, basement floors, metallic epoxy, flake systems, self-leveling epoxy for residential & commercial",
     market_size: "$9.4B global (2025) → $16.4B (2033), 7.2% CAGR",
     profitability: "High — $3-$15/SF, 1-2 day installs, strong recurring maintenance",
   },
   {
     name: "Epoxy Coatings",
-    icon: "🛡️",
+    icon: "shield-check",
     description: "Concrete coatings, protective coatings, warehouse floors, anti-slip, food-grade, chemical-resistant epoxy",
     market_size: "$45B global coating market, epoxy is 40%+ share",
     profitability: "Very High — commercial/industrial contracts, large SF projects",
   },
   {
     name: "Epoxy Contractors",
-    icon: "👷",
+    icon: "hard-hat",
     description: "Full-service epoxy installation — residential, commercial, industrial, repair & resurfacing",
     market_size: "$3B US market (2024) → $5.4B (2033)",
     profitability: "High — diversified residential + commercial + industrial revenue",
   },
   {
     name: "Polished Concrete",
-    icon: "✨",
+    icon: "sparkles",
     description: "Grind & seal, burnished concrete, stained concrete, densification — commercial & residential",
     market_size: "$3.7B floor coatings (2025), polished is fastest growing segment",
     profitability: "High — $4-$15/SF, low material cost, high labor margin",
   },
   {
     name: "Decorative Concrete",
-    icon: "🏛️",
+    icon: "building-2",
     description: "Stamped concrete, overlays, micro-toppings, stained concrete, resurfacing, exposed aggregate",
     market_size: "$4-$25/SF, growing with outdoor living & patio trends",
     profitability: "Very High — premium decorative finishes, high per-SF margin",
@@ -84,7 +84,7 @@ export default async function(req: Request): Promise<Response> {
     // Research trending sub-categories within the epoxy & concrete industry
     const year = new Date().getFullYear();
     const llmRes = await base44.asServiceRole.integrations.Core.InvokeLLM({
-      prompt: `Research the top trending sub-categories and emerging opportunities WITHIN the epoxy flooring, epoxy coatings, polished concrete, and decorative concrete contracting industry in ${year}. For each sub-category provide: name (short, 2-4 words), description (1 sentence about what it is and why it's trending), icon (a single emoji), subcategories (3-5 specific services or niches within it), trending_score (0-100, higher = more trending right now), market_size (brief), and profitability (brief). Focus on: metallic epoxy floors, garage floor coatings, commercial epoxy, industrial coatings, polished concrete, stamped concrete, concrete overlays, micro-toppings, 3D epoxy, food-safe epoxy, warehouse floors, anti-slip coatings, decorative resurfacing, and other emerging epoxy/concrete trends. Return as JSON.`,
+      prompt: `Research the top trending sub-categories and emerging opportunities WITHIN the epoxy flooring, epoxy coatings, polished concrete, and decorative concrete contracting industry in ${year}. For each sub-category provide: name (short, 2-4 words), description (1 sentence about what it is and why it's trending), icon (a lucide icon name in kebab-case, e.g. "paint-bucket", "shield-check", "hard-hat", "sparkles", "building-2", "layers", "factory", "zap" — NOT an emoji), subcategories (3-5 specific services or niches within it), trending_score (0-100, higher = more trending right now), market_size (brief), and profitability (brief). Focus on: metallic epoxy floors, garage floor coatings, commercial epoxy, industrial coatings, polished concrete, stamped concrete, concrete overlays, micro-toppings, 3D epoxy, food-safe epoxy, warehouse floors, anti-slip coatings, decorative resurfacing, and other emerging epoxy/concrete trends. Return as JSON.`,
       add_context_from_internet: true,
       model: "gemini_3_flash",
       response_json_schema: {
