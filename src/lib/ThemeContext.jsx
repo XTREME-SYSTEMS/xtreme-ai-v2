@@ -3,8 +3,9 @@ import { createContext, useContext, useEffect, useState, useCallback } from "rea
 const ThemeContext = createContext(null);
 
 function getSystem() {
-  if (typeof window === "undefined") return "dark";
-  return window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+  // Light mode is the primary/default theme — "system" resolves to light
+  // unless the user has explicitly opted into following their OS preference.
+  return "light";
 }
 
 export function ThemeProvider({ children }) {
