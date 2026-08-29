@@ -40,19 +40,19 @@ export default function MarketingNav() {
   return (
     <header className="fixed top-0 z-50 w-full">
       <AnnouncementBar />
-      <nav className={cn("w-full bg-white transition-all duration-300", scrolled ? "border-b border-black/10 shadow-sm" : "border-b border-black/5")}>
+      <nav className={cn("w-full bg-black transition-all duration-300", scrolled ? "border-b border-white/10 shadow-sm" : "border-b border-white/5")}>
         <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6">
           <Link to="/" className="flex items-center gap-2">
             <Image src={LOGO_ICON} alt="Xtreme AI" className="h-10 w-10" fittingType="fit" />
             <div className="leading-tight">
-              <div className="text-sm font-bold text-black">Xtreme AI</div>
-              <div className="text-[10px] font-semibold uppercase tracking-wider text-amber-600">Growth Factory</div>
+              <div className="text-sm font-bold text-white">Xtreme AI</div>
+              <div className="text-[10px] font-semibold uppercase tracking-wider text-amber-400">Growth Factory</div>
             </div>
           </Link>
 
           <div className="hidden items-center gap-7 md:flex">
             {LINKS.map((l) => (
-              <a key={l.label} href={l.to} className="text-sm font-medium text-black/70 transition-colors hover:text-amber-600">{l.label}</a>
+              <a key={l.label} href={l.to} className="text-sm font-medium text-white/70 transition-colors hover:text-amber-400">{l.label}</a>
             ))}
           </div>
 
@@ -61,33 +61,33 @@ export default function MarketingNav() {
             <div className="relative" ref={dropdownRef}>
               <button
                 onClick={() => setPortalOpen(!portalOpen)}
-                className="flex items-center gap-1.5 rounded-lg border border-black/10 px-3 py-2 text-sm font-medium text-black/70 transition-colors hover:border-amber-400 hover:text-amber-600"
+                className="flex items-center gap-1.5 rounded-lg border border-white/10 px-3 py-2 text-sm font-medium text-white/70 transition-colors hover:border-amber-400 hover:text-amber-400"
               >
                 <Menu className="h-5 w-5" />
                 <span className="hidden sm:inline">Portal</span>
               </button>
               {portalOpen && (
-                <div className="absolute right-0 mt-2 w-56 overflow-hidden rounded-xl border border-black/10 bg-white shadow-xl">
+                <div className="absolute right-0 mt-2 w-56 overflow-hidden rounded-xl border border-white/10 bg-zinc-900 shadow-xl">
                   <Link
                     to="/login"
                     onClick={() => setPortalOpen(false)}
-                    className="flex items-center gap-2.5 px-4 py-3 text-sm font-medium text-black/80 transition-colors hover:bg-amber-400/10 hover:text-amber-600"
+                    className="flex items-center gap-2.5 px-4 py-3 text-sm font-medium text-white/80 transition-colors hover:bg-amber-400/10 hover:text-amber-400"
                   >
-                    <LayoutDashboard className="h-4 w-4 text-amber-600" />
+                    <LayoutDashboard className="h-4 w-4 text-amber-400" />
                     <div>
                       <div className="font-semibold">Client Portal</div>
-                      <div className="text-[11px] text-black/40">Sign in to your portal</div>
+                      <div className="text-[11px] text-white/40">Sign in to your portal</div>
                     </div>
                   </Link>
                   <Link
                     to="/login"
                     onClick={() => setPortalOpen(false)}
-                    className="flex items-center gap-2.5 border-t border-black/5 px-4 py-3 text-sm font-medium text-black/80 transition-colors hover:bg-amber-400/10 hover:text-amber-600"
+                    className="flex items-center gap-2.5 border-t border-white/5 px-4 py-3 text-sm font-medium text-white/80 transition-colors hover:bg-amber-400/10 hover:text-amber-400"
                   >
-                    <LogIn className="h-4 w-4 text-amber-600" />
+                    <LogIn className="h-4 w-4 text-amber-400" />
                     <div>
                       <div className="font-semibold">Sign In</div>
-                      <div className="text-[11px] text-black/40">Employee & admin access</div>
+                      <div className="text-[11px] text-white/40">Employee & admin access</div>
                     </div>
                   </Link>
                 </div>
@@ -97,30 +97,30 @@ export default function MarketingNav() {
             <Link to="/pricing" className="hidden rounded-lg bg-amber-400 px-4 py-2 text-sm font-semibold text-black transition-all hover:bg-amber-300 hover:shadow-lg hover:shadow-amber-400/40 sm:inline-block">Get Started</Link>
 
             {/* Mobile hamburger */}
-            <button onClick={() => setOpen(!open)} className="md:hidden text-black"><Menu className="h-6 w-6" /></button>
+            <button onClick={() => setOpen(!open)} className="md:hidden text-white"><Menu className="h-6 w-6" /></button>
           </div>
         </div>
       </nav>
 
       {open && (
-        <div className="fixed inset-0 z-50 bg-white md:hidden">
+        <div className="fixed inset-0 z-50 bg-black md:hidden">
           <div className="flex h-16 items-center justify-between px-4">
             <Link to="/" className="flex items-center gap-2">
               <Image src={LOGO_ICON} alt="Xtreme AI" className="h-10 w-10" fittingType="fit" />
               <div className="leading-tight">
-                <div className="text-sm font-bold text-black">Xtreme AI</div>
-                <div className="text-[10px] font-semibold uppercase tracking-wider text-amber-600">Growth Factory</div>
+                <div className="text-sm font-bold text-white">Xtreme AI</div>
+                <div className="text-[10px] font-semibold uppercase tracking-wider text-amber-400">Growth Factory</div>
               </div>
             </Link>
-            <button onClick={() => setOpen(false)} className="text-black"><X className="h-6 w-6" /></button>
+            <button onClick={() => setOpen(false)} className="text-white"><X className="h-6 w-6" /></button>
           </div>
           <div className="flex flex-col gap-1 px-4 py-6">
-            {LINKS.map((l) => <a key={l.label} href={l.to} onClick={() => setOpen(false)} className="rounded-lg px-3 py-3 text-base font-medium text-black/80 hover:bg-amber-400/10 hover:text-amber-600">{l.label}</a>)}
-            <Link to="/login" onClick={() => setOpen(false)} className="flex items-center gap-2 rounded-lg px-3 py-3 text-base font-medium text-black/80 hover:bg-amber-400/10">
-              <LayoutDashboard className="h-5 w-5 text-amber-600" /> Client Portal
+            {LINKS.map((l) => <a key={l.label} href={l.to} onClick={() => setOpen(false)} className="rounded-lg px-3 py-3 text-base font-medium text-white/80 hover:bg-amber-400/10 hover:text-amber-400">{l.label}</a>)}
+            <Link to="/login" onClick={() => setOpen(false)} className="flex items-center gap-2 rounded-lg px-3 py-3 text-base font-medium text-white/80 hover:bg-amber-400/10">
+              <LayoutDashboard className="h-5 w-5 text-amber-400" /> Client Portal
             </Link>
-            <Link to="/login" onClick={() => setOpen(false)} className="flex items-center gap-2 rounded-lg px-3 py-3 text-base font-medium text-black/80 hover:bg-amber-400/10">
-              <LogIn className="h-5 w-5 text-amber-600" /> Sign In
+            <Link to="/login" onClick={() => setOpen(false)} className="flex items-center gap-2 rounded-lg px-3 py-3 text-base font-medium text-white/80 hover:bg-amber-400/10">
+              <LogIn className="h-5 w-5 text-amber-400" /> Sign In
             </Link>
             <Link to="/pricing" onClick={() => setOpen(false)} className="mt-2 rounded-lg bg-amber-400 px-3 py-3 text-center text-base font-semibold text-black">Get Started</Link>
           </div>
