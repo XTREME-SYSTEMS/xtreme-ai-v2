@@ -134,6 +134,8 @@
 :root:not(.dark) .bg-zinc-950 { background-color: hsl(var(--card)); }
 
 :root:not(.dark) .text-white,
+:root:not(.dark) .text-white\/10,
+:root:not(.dark) .text-white\/20,
 :root:not(.dark) .text-white\/30,
 :root:not(.dark) .text-white\/40,
 :root:not(.dark) .text-white\/50,
@@ -141,6 +143,28 @@
 :root:not(.dark) .text-white\/70,
 :root:not(.dark) .text-white\/80,
 :root:not(.dark) .text-white\/90 { color: hsl(var(--foreground)); }
+
+/* Muted zinc/gray text → full black for readability on white */
+:root:not(.dark) .text-zinc-100,
+:root:not(.dark) .text-zinc-200,
+:root:not(.dark) .text-zinc-300,
+:root:not(.dark) .text-zinc-400,
+:root:not(.dark) .text-zinc-500,
+:root:not(.dark) .text-zinc-600,
+:root:not(.dark) .text-gray-100,
+:root:not(.dark) .text-gray-200,
+:root:not(.dark) .text-gray-300,
+:root:not(.dark) .text-gray-400,
+:root:not(.dark) .text-gray-500,
+:root:not(.dark) .text-gray-600,
+:root:not(.dark) .text-slate-300,
+:root:not(.dark) .text-slate-400,
+:root:not(.dark) .text-slate-500,
+:root:not(.dark) .text-slate-600,
+:root:not(.dark) .text-neutral-300,
+:root:not(.dark) .text-neutral-400,
+:root:not(.dark) .text-neutral-500,
+:root:not(.dark) .text-neutral-600 { color: hsl(var(--foreground)); }
 
 :root:not(.dark) .border-white\/5,
 :root:not(.dark) .border-white\/10,
@@ -154,16 +178,6 @@
 :root:not(.dark) .border-zinc-700,
 :root:not(.dark) .border-zinc-600 { border-color: #000; }
 :root:not(.dark) .border { border-color: #000; }
-
-/* Muted zinc/gray text → full black for readability on white */
-:root:not(.dark) .text-zinc-300,
-:root:not(.dark) .text-zinc-400,
-:root:not(.dark) .text-zinc-500,
-:root:not(.dark) .text-zinc-600,
-:root:not(.dark) .text-gray-300,
-:root:not(.dark) .text-gray-400,
-:root:not(.dark) .text-gray-500,
-:root:not(.dark) .text-gray-600 { color: hsl(var(--foreground)); }
 
 :root:not(.dark) .bg-white\/5,
 :root:not(.dark) .bg-white\/10 { background-color: hsl(var(--muted)); }
