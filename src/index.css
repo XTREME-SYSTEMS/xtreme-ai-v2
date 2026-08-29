@@ -20,8 +20,8 @@
     --accent-foreground: 0 0% 0%;
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 98%;
-    --border: 240 6% 90%;
-    --input: 240 6% 90%;
+    --border: 0 0% 0%;
+    --input: 0 0% 0%;
     --ring: 55 100% 50%;
     --vx-accent: 55 100% 50%;
     --vx-accent-2: 55 100% 40%;
@@ -146,9 +146,14 @@
 :root:not(.dark) .border-white\/10,
 :root:not(.dark) .border-white\/15,
 :root:not(.dark) .border-white\/20,
-:root:not(.dark) .border-white\/25 { border-color: hsl(var(--border)); }
+:root:not(.dark) .border-white\/25,
+:root:not(.dark) .border-white\/30,
+:root:not(.dark) .border-white\/40,
+:root:not(.dark) .border-white\/50 { border-color: #000; }
 :root:not(.dark) .border-zinc-800,
-:root:not(.dark) .border-zinc-700 { border-color: hsl(var(--border)); }
+:root:not(.dark) .border-zinc-700,
+:root:not(.dark) .border-zinc-600 { border-color: #000; }
+:root:not(.dark) .border { border-color: #000; }
 
 /* Muted zinc/gray text → full black for readability on white */
 :root:not(.dark) .text-zinc-300,
@@ -164,6 +169,17 @@
 :root:not(.dark) .bg-white\/10 { background-color: hsl(var(--muted)); }
 :root:not(.dark) .hover\:bg-white\/5:hover,
 :root:not(.dark) .hover\:bg-white\/10:hover { background-color: hsl(var(--muted)); }
+
+/* Primary buttons → metallic gold gradient in light mode */
+:root:not(.dark) .bg-primary {
+  background: linear-gradient(135deg, #FFF7B3 0%, #FFEA00 20%, #E6D400 45%, #FFEE33 65%, #FFEA00 80%, #CCBB00 100%) !important;
+  color: #000 !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.4), inset 0 -1px 0 rgba(140, 110, 0, 0.25), 0 1px 3px rgba(0, 0, 0, 0.15);
+}
+:root:not(.dark) .hover\:bg-primary\/90:hover {
+  background: linear-gradient(135deg, #FFEE33 0%, #FFEA00 25%, #E6D400 55%, #FFF7B3 75%, #CCBB00 100%) !important;
+  filter: brightness(1.06);
+}
 
 /* ============================================================
    Gold palette override — forces ALL lime/amber/orange/yellow
