@@ -367,19 +367,19 @@ export default function Layout() {
 
       {/* Main */}
       <div className="flex flex-1 flex-col overflow-hidden">
-        <header className="flex h-14 items-center gap-3 border-b border-amber-400/40 bg-white px-4 backdrop-blur">
-          <button onClick={() => setOpen(true)} className="md:hidden text-black/50 hover:text-black"><Menu className="h-5 w-5" /></button>
+        <header className="flex h-14 items-center gap-3 border-b border-amber-400/40 bg-black px-4 backdrop-blur">
+          <button onClick={() => setOpen(true)} className="md:hidden text-white/50 hover:text-white"><Menu className="h-5 w-5" /></button>
           <div className="flex items-center gap-2 text-xs">
             <span className="rounded-md border border-amber-400 bg-amber-400 px-2 py-1 font-mono text-black font-semibold">{user?.role === "admin" ? "XTREME AI PIPELINE" : "BUSINESS GENERATOR"}</span>
-            <span className="hidden text-black/50 sm:inline">{user?.role === "admin" ? "Autonomous growth factory · AI-driven pipeline" : "AI-powered business generation workflow"}</span>
+            <span className="hidden text-white/50 sm:inline">{user?.role === "admin" ? "Autonomous growth factory · AI-driven pipeline" : "AI-powered business generation workflow"}</span>
           </div>
           <div className="ml-auto flex items-center gap-3">
-            <span className="hidden text-xs text-black/60 sm:inline">{user?.email || ""}</span>
-            <button onClick={() => setShowPreviewModal(true)} className="flex items-center gap-1.5 rounded-lg border border-amber-400 px-2.5 py-1.5 text-xs text-black font-medium hover:bg-amber-400/10">
+            <span className="hidden text-xs text-white/60 sm:inline">{user?.email || ""}</span>
+            <button onClick={() => setShowPreviewModal(true)} className="flex items-center gap-1.5 rounded-lg border border-amber-400 px-2.5 py-1.5 text-xs text-white font-medium hover:bg-amber-400/10">
               <Eye className="h-3.5 w-3.5" /> Preview as Client
             </button>
-            <ThemeToggle className="flex items-center gap-1.5 rounded-lg border border-amber-400 px-2.5 py-1.5 text-xs text-black font-medium hover:bg-amber-400/10" />
-            <button onClick={logout} className="flex items-center gap-1.5 rounded-lg border border-amber-400 px-2.5 py-1.5 text-xs text-black font-medium hover:bg-amber-400/10">
+            <ThemeToggle className="flex items-center gap-1.5 rounded-lg border border-amber-400 px-2.5 py-1.5 text-xs text-white font-medium hover:bg-amber-400/10" />
+            <button onClick={logout} className="flex items-center gap-1.5 rounded-lg border border-amber-400 px-2.5 py-1.5 text-xs text-white font-medium hover:bg-amber-400/10">
               <LogOut className="h-3.5 w-3.5" /> Sign out
             </button>
           </div>
