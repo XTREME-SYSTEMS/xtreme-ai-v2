@@ -6,7 +6,7 @@
   :root {
     --background: 0 0% 100%;
     --foreground: 0 0% 0%;
-    --card: 240 5% 98%;
+    --card: 0 0% 100%;
     --card-foreground: 0 0% 0%;
     --popover: 0 0% 100%;
     --popover-foreground: 0 0% 0%;
@@ -20,8 +20,8 @@
     --accent-foreground: 0 0% 0%;
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 98%;
-    --border: 0 0% 0%;
-    --input: 0 0% 0%;
+    --border: 220 13% 91%;
+    --input: 220 13% 91%;
     --ring: 55 100% 50%;
     --vx-accent: 55 100% 50%;
     --vx-accent-2: 55 100% 40%;
@@ -173,11 +173,10 @@
 :root:not(.dark) .border-white\/25,
 :root:not(.dark) .border-white\/30,
 :root:not(.dark) .border-white\/40,
-:root:not(.dark) .border-white\/50 { border-color: #000; }
+:root:not(.dark) .border-white\/50 { border-color: #111; }
 :root:not(.dark) .border-zinc-800,
 :root:not(.dark) .border-zinc-700,
-:root:not(.dark) .border-zinc-600 { border-color: #000; }
-:root:not(.dark) .border { border-color: #000; }
+:root:not(.dark) .border-zinc-600 { border-color: #111; }
 
 :root:not(.dark) .bg-white\/5,
 :root:not(.dark) .bg-white\/10 { background-color: hsl(var(--muted)); }
