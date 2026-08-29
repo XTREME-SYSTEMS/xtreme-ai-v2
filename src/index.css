@@ -133,13 +133,13 @@
 :root:not(.dark) .bg-zinc-900,
 :root:not(.dark) .bg-zinc-950 { background-color: hsl(var(--card)); }
 
-:root:not(.dark) .text-white { color: hsl(var(--foreground)); }
-:root:not(.dark) .text-white\/30 { color: hsl(var(--foreground) / 0.4); }
-:root:not(.dark) .text-white\/40 { color: hsl(var(--foreground) / 0.5); }
-:root:not(.dark) .text-white\/50 { color: hsl(var(--foreground) / 0.6); }
-:root:not(.dark) .text-white\/60 { color: hsl(var(--foreground) / 0.7); }
-:root:not(.dark) .text-white\/70 { color: hsl(var(--foreground) / 0.8); }
-:root:not(.dark) .text-white\/80 { color: hsl(var(--foreground) / 0.9); }
+:root:not(.dark) .text-white,
+:root:not(.dark) .text-white\/30,
+:root:not(.dark) .text-white\/40,
+:root:not(.dark) .text-white\/50,
+:root:not(.dark) .text-white\/60,
+:root:not(.dark) .text-white\/70,
+:root:not(.dark) .text-white\/80,
 :root:not(.dark) .text-white\/90 { color: hsl(var(--foreground)); }
 
 :root:not(.dark) .border-white\/5,
@@ -149,6 +149,16 @@
 :root:not(.dark) .border-white\/25 { border-color: hsl(var(--border)); }
 :root:not(.dark) .border-zinc-800,
 :root:not(.dark) .border-zinc-700 { border-color: hsl(var(--border)); }
+
+/* Muted zinc/gray text → full black for readability on white */
+:root:not(.dark) .text-zinc-300,
+:root:not(.dark) .text-zinc-400,
+:root:not(.dark) .text-zinc-500,
+:root:not(.dark) .text-zinc-600,
+:root:not(.dark) .text-gray-300,
+:root:not(.dark) .text-gray-400,
+:root:not(.dark) .text-gray-500,
+:root:not(.dark) .text-gray-600 { color: hsl(var(--foreground)); }
 
 :root:not(.dark) .bg-white\/5,
 :root:not(.dark) .bg-white\/10 { background-color: hsl(var(--muted)); }
