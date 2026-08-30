@@ -36,12 +36,20 @@ const PIPELINE_CATALOG = { to: "/pipeline-catalog", label: "Pipeline Catalog", i
 const PRODUCT_CATALOG = { to: "/product-catalog", label: "Product Catalog", icon: Package, end: true };
 const EMPLOYEE_PORTAL = { to: "/employee-portal", label: "Employee Portal", icon: Users, end: true };
 
+// Each step gets its own brand color so the pipeline reads as a creative
+// spectrum (violet → cyan → emerald → gold → rose) instead of all-yellow.
+// All class strings are literals so Tailwind preserves them.
 const PIPELINE_STEPS = [
-  { to: "/architect",        label: "AI Chief Architect", icon: Brain,  step: 1, desc: "AI chat that operates the system" },
-  { to: "/vision-cortex",    label: "Vision Cortex",      icon: Eye,    step: 2, desc: "Finds ideas for websites & systems" },
-  { to: "/pipeline-catalog", label: "Pipeline Catalog",   icon: Layers, step: 3, desc: "Browse packages, templates & tools" },
-  { to: "/build-queue",      label: "Queue System",       icon: Boxes,  step: 4, desc: "Ideas queued for building" },
-  { to: "/auto-builder",     label: "Auto Builder",       icon: Rocket, step: 5, desc: "Full builder pipeline" },
+  { to: "/architect",        label: "AI Chief Architect", icon: Brain,  step: 1, desc: "AI chat that operates the system",
+    color: { ring: "border-violet-400 bg-violet-400 text-black shadow-[0_0_14px_3px_rgba(167,139,250,0.45)]", text: "text-violet-400", icon: "text-violet-400", idle: "text-violet-400/40" } },
+  { to: "/vision-cortex",    label: "Vision Cortex",      icon: Eye,    step: 2, desc: "Finds ideas for websites & systems",
+    color: { ring: "border-cyan-400 bg-cyan-400 text-black shadow-[0_0_14px_3px_rgba(34,211,238,0.45)]", text: "text-cyan-400", icon: "text-cyan-400", idle: "text-cyan-400/40" } },
+  { to: "/pipeline-catalog", label: "Pipeline Catalog",   icon: Layers, step: 3, desc: "Browse packages, templates & tools",
+    color: { ring: "border-emerald-400 bg-emerald-400 text-black shadow-[0_0_14px_3px_rgba(52,211,153,0.45)]", text: "text-emerald-400", icon: "text-emerald-400", idle: "text-emerald-400/40" } },
+  { to: "/build-queue",      label: "Queue System",       icon: Boxes,  step: 4, desc: "Ideas queued for building",
+    color: { ring: "border-amber-400 bg-amber-400 text-black shadow-[0_0_14px_3px_rgba(255,234,0,0.45)]", text: "text-amber-400", icon: "text-amber-400", idle: "text-amber-400/40" } },
+  { to: "/auto-builder",     label: "Auto Builder",       icon: Rocket, step: 5, desc: "Full builder pipeline",
+    color: { ring: "border-rose-400 bg-rose-400 text-black shadow-[0_0_14px_3px_rgba(251,113,133,0.45)]", text: "text-rose-400", icon: "text-rose-400", idle: "text-rose-400/40" } },
 ];
 
 // Auto Builder sub-steps — the builder's own pipeline, shown as a nested
@@ -239,15 +247,16 @@ export default function Layout() {
             {EMPLOYEE_PORTAL.label}
           </NavLink>
 
-          {/* Timeline header */}
-          <div className="mt-5 mb-1 px-2 text-[10px] font-bold uppercase tracking-wider text-amber-400">
-            Autonomous Pipeline
+          {/* Timeline header — prominent, with a gradient accent rule */}
+          <div className="mt-5 mb-2 flex items-center gap-2 px-1">
+            <span className="text-xs font-bold uppercase tracking-[0.22em] text-amber-400">Autonomous Pipeline</span>
+            <div className="h-px flex-1 bg-gradient-to-r from-amber-400/40 via-white/10 to-transparent" />
           </div>
 
           {/* Vertical step-by-step timeline */}
           <div className="relative mt-2">
-            {/* Thin connecting line */}
-            <div className="absolute left-[26px] top-6 bottom-6 w-px bg-white/10" />
+            {/* Connecting line — gradient tying the step colors together */}
+            <div className="absolute left-[28px] top-7 bottom-7 w-0.5 rounded-full bg-gradient-to-b from-violet-400/30 via-white/10 to-rose-400/30" />
             {filterNav(PIPELINE_STEPS).map((step) => {
               const Icon = step.icon;
               const isAutoBuilder = step.to === "/auto-builder";
@@ -262,28 +271,30 @@ export default function Layout() {
                       isActive ? "" : "hover:bg-white/5"
                     )}
                   >
-                    {({ isActive }) => (
+                    {({ isActive }) => {
+                      const active = isActive || (isAutoBuilder && showAutoBuilderSub);
+                      const c = step.color;
+                      return (
                       <>
                         <div className={cn(
-                          "relative z-10 flex h-11 w-11 shrink-0 items-center justify-center rounded-full border-2 text-sm font-bold transition-all duration-200",
-                          isActive || (isAutoBuilder && showAutoBuilderSub)
-                            ? "border-amber-400 bg-amber-400 text-black shadow-[0_0_12px_2px_rgba(255,234,0,0.5)]"
-                            : "border-white/15 bg-zinc-900 text-white/50"
+                          "relative z-10 flex h-12 w-12 shrink-0 items-center justify-center rounded-full border-2 text-base font-bold transition-all duration-200",
+                          active ? c.ring : cn("border-white/15 bg-zinc-900", c.idle)
                         )}>
                           {step.step}
                         </div>
                         <div>
                           <div className={cn(
-                            "flex items-center gap-1.5 text-sm font-medium transition-colors",
-                            isActive || (isAutoBuilder && showAutoBuilderSub) ? "text-amber-400" : "text-white"
+                            "flex items-center gap-2 text-sm font-semibold transition-colors",
+                            active ? c.text : "text-white"
                           )}>
-                            <Icon className="h-3.5 w-3.5 shrink-0" />
+                            <Icon className={cn("h-5 w-5 shrink-0 transition-colors", active ? c.icon : "text-white/50")} />
                             {step.label}
                           </div>
                           <div className="text-[11px] leading-tight text-white/40">{step.desc}</div>
                         </div>
                       </>
-                    )}
+                      );
+                    }}
                   </NavLink>
                   {/* Auto Builder sub-timeline — expands when active */}
                   {isAutoBuilder && showAutoBuilderSub && (
@@ -310,7 +321,7 @@ export default function Layout() {
                               "flex items-center gap-1.5 text-[13px] font-medium",
                               subActive ? "text-amber-400" : "text-white/60"
                             )}>
-                              <SubIcon className="h-3 w-3 shrink-0" />
+                              <SubIcon className={cn("h-4 w-4 shrink-0", subActive ? "text-amber-400" : "text-white/50")} />
                               {sub.label}
                             </span>
                           </NavLink>
