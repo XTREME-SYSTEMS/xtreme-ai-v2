@@ -19,6 +19,7 @@ import {
   AlertCircle, Trash2, Zap,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import OrchestratorChat from "@/components/leadengine/OrchestratorChat";
 
 const SOURCE_TYPES = [
   { value: "facebook_group", label: "Facebook Group", icon: Facebook, color: "text-blue-400" },
@@ -42,6 +43,8 @@ export default function LeadEngine() {
   const [sending, setSending] = useState(false);
   const [showAddSource, setShowAddSource] = useState(false);
   const [filter, setFilter] = useState("all");
+  const [discovering, setDiscovering] = useState(false);
+  const [enriching, setEnriching] = useState(false);
   const [stats, setStats] = useState({ total: 0, new: 0, contacted: 0, companies: 0, serviceRequests: 0 });
 
   const loadData = useCallback(async () => {
@@ -104,6 +107,40 @@ export default function LeadEngine() {
     }
   };
 
+  const handleDiscoverSources = async () => {
+    try {
+      setDiscovering(true);
+      const res = await base44.functions.invoke("discoverSourcesRecursive", {
+        max_sources: 20,
+        max_depth: 2,
+        verify_urls: true,
+      });
+      await loadData();
+      alert(`Discovery complete: ${res?.sources_discovered || 0} new sources found.`);
+    } catch (err) {
+      console.error("Discovery failed:", err);
+      alert("Discovery failed: " + (err?.response?.data?.error || err?.message || "unknown error"));
+    } finally {
+      setDiscovering(false);
+    }
+  };
+
+  const handleEnrichLeads = async () => {
+    try {
+      setEnriching(true);
+      const res = await base44.functions.invoke("enrichHotLead", {
+        triggered_by: "manual",
+      });
+      await loadData();
+      alert(`Enrichment complete: ${res?.nodes_created || 0} graph nodes created.`);
+    } catch (err) {
+      console.error("Enrichment failed:", err);
+      alert("Enrichment failed: " + (err?.response?.data?.error || err?.message || "unknown error"));
+    } finally {
+      setEnriching(false);
+    }
+  };
+
   const filteredLeads = filter === "all" ? leads :
     filter === "service_request" ? leads.filter(l => l.lead_type === "service_request") :
     filter === "company" ? leads.filter(l => l.lead_type === "company") :
@@ -132,6 +169,24 @@ export default function LeadEngine() {
           >
             {scraping ? <RefreshCw className="h-4 w-4 mr-2 animate-spin" /> : <Search className="h-4 w-4 mr-2" />}
             {scraping ? "Scraping..." : "Scrape All Sources"}
+          </Button>
+          <Button
+            onClick={handleDiscoverSources}
+            disabled={discovering}
+            variant="outline"
+            className="border-violet-400/50 text-violet-400 hover:bg-violet-400/10"
+          >
+            {discovering ? <RefreshCw className="h-4 w-4 mr-2 animate-spin" /> : <Search className="h-4 w-4 mr-2" />}
+            {discovering ? "Discovering..." : "Discover Sources"}
+          </Button>
+          <Button
+            onClick={handleEnrichLeads}
+            disabled={enriching}
+            variant="outline"
+            className="border-cyan-400/50 text-cyan-400 hover:bg-cyan-400/10"
+          >
+            {enriching ? <RefreshCw className="h-4 w-4 mr-2 animate-spin" /> : <Target className="h-4 w-4 mr-2" />}
+            {enriching ? "Enriching..." : "Enrich Hot Leads"}
           </Button>
           <Button
             onClick={() => handleSendOutreach(null, false)}
@@ -237,6 +292,9 @@ export default function LeadEngine() {
 
       {/* Add Source Dialog */}
       <AddSourceDialog open={showAddSource} onOpenChange={setShowAddSource} onAdded={loadData} />
+
+      {/* ORCHESTRATOR chat — ask "what's hot today?" */}
+      <OrchestratorChat />
     </div>
   );
 }
@@ -275,6 +333,30 @@ function LeadCard({ lead, onSendOutreach, sending }) {
             <span className={cn("rounded px-2 py-0.5 text-[10px] font-medium uppercase", statusColor)}>
               {lead.status?.replace(/_/g, " ")}
             </span>
+            {lead.intent_tier && lead.intent_tier !== "warm" && (
+              <span className={cn(
+                "rounded px-2 py-0.5 text-[10px] font-bold uppercase",
+                lead.intent_tier === "very_hot" ? "bg-red-400/20 text-red-400" :
+                lead.intent_tier === "hot" ? "bg-orange-400/20 text-orange-400" :
+                lead.intent_tier === "partner" ? "bg-violet-400/20 text-violet-400" :
+                lead.intent_tier === "project" ? "bg-cyan-400/20 text-cyan-400" :
+                lead.intent_tier === "property" ? "bg-blue-400/20 text-blue-400" :
+                "bg-white/5 text-white/40"
+              )}>
+                {lead.intent_tier.replace(/_/g, " ")}
+              </span>
+            )}
+            {lead.opportunity_type && lead.opportunity_type !== "direct_demand" && (
+              <span className="rounded bg-amber-400/10 px-1.5 py-0.5 text-[9px] text-amber-400/80">
+                {lead.opportunity_type.replace(/_/g, " ")}
+              </span>
+            )}
+            {lead.review_status === "flagged" && (
+              <span className="rounded bg-yellow-400/20 px-1.5 py-0.5 text-[9px] text-yellow-400">⚠ Review</span>
+            )}
+            {lead.enrichment_status === "enriched" && (
+              <span className="rounded bg-emerald-400/10 px-1.5 py-0.5 text-[9px] text-emerald-400">Graph</span>
+            )}
           </div>
           {lead.description && (
             <p className={cn("text-sm text-white/60", !expanded && "line-clamp-2")}>

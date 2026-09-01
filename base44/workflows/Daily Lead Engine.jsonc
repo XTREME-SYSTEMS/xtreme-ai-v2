@@ -4,7 +4,7 @@
     "document": {
       "dsl": "1.0.0",
       "name": "daily_lead_engine",
-      "version": "1.1",
+      "version": "1.2",
       "namespace": "base44"
     },
     "do": [
@@ -34,10 +34,27 @@
               "triggered_by": "workflow"
             }
           },
+          "then": "enrich_hot_leads",
+          "x-base44": {
+            "title": "Validate leads \u2014 spam detection + intent tier + opportunity type classification",
+            "description": "Validator agent classifies each lead (HOT/WARM/PARTNER/PROJECT/SIGNAL), assigns opportunity type (DIRECT_DEMAND/PROBLEM_DEMAND/PROJECT_DEMAND/BID_DEMAND/PARTNER_DEMAND/PROPERTY_SIGNAL), flags spam, sets review_status"
+          }
+        }
+      },
+      {
+        "enrich_hot_leads": {
+          "call": "invoke_backend_function",
+          "with": {
+            "function_name": "enrichHotLead",
+            "args": {
+              "triggered_by": "workflow",
+              "max_depth": 2
+            }
+          },
           "then": "send_initial_outreach",
           "x-base44": {
-            "title": "Validate leads \u2014 spam detection + intent tier classification",
-            "description": "Validator agent classifies each lead (HOT/WARM/PARTNER/PROJECT/SIGNAL), flags spam, sets review_status"
+            "title": "Enrich HOT leads \u2014 build lead graph",
+            "description": "Investigate HOT/VERY_HOT leads deeply: company \u2192 website \u2192 project \u2192 property \u2192 GC \u2192 architect \u2192 developer \u2192 permits \u2192 bid documents. Creates LeadRelationship nodes in the lead graph."
           }
         }
       },
@@ -94,7 +111,7 @@
       }
     ]
   },
-  "description": "Daily 5am ET lead engine: scrape all sources \u2192 validate (spam + intent tier) \u2192 send initial outreach \u2192 send follow-ups \u2192 email the morning digest. Tier-routed outreach: HOT/VERY_HOT same-day, WARM standard sequence, PARTNER subcontractor angle, PROJECT/PROPERTY nurture.",
+  "description": "Daily 5am ET lead engine: scrape all sources \u2192 validate (spam + intent tier + opportunity type) \u2192 enrich HOT leads (build lead graph) \u2192 send initial outreach \u2192 send follow-ups \u2192 email the morning digest. Tier-routed outreach: HOT/VERY_HOT same-day, WARM standard sequence, PARTNER subcontractor angle, PROJECT/PROPERTY nurture.",
   "trigger": {
     "condition": null,
     "config": {
