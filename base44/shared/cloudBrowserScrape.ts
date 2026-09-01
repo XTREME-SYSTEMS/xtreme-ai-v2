@@ -1,15 +1,24 @@
 // cloudBrowserScrape.ts — Client for the self-hosted cloud browser engine.
-// Connects to the Playwright-based browser API server (the user's
-// Browserbase replacement) using ENGINE_URL and ENGINE_API_KEY secrets.
+// Connects to the Playwright-based browser API server using ENGINE_URL and
+// ENGINE_API_KEY secrets.
 //
-// API surface (from the browser-engine server.js):
-//   POST /sessions            → { id, ... }
-//   POST /sessions/:id/action → action-specific result
-//   DELETE /sessions/:id      → close session
+// Engine API (v3.0.0):
+//   POST /sessions              → { sessionId, status, cdpUrl, ... }
+//   POST /sessions/:id/execute  → action-specific result
+//   GET  /sessions/:id          → session status
+//   DELETE /sessions/:id        → close session
 //
-// Actions: goto, click, type, extract_text, extract_html, extract_table,
-//          extract_json, ai_extract, crawl, paginate, screenshot,
-//          solve_captcha, wait_for_selector, wait_for_timeout, scroll, etc.
+// Execute body: { action_type: <action>, ...action-specific-fields }
+//   - goto:            { action_type: 'goto', value: <url> }
+//   - wait_for_timeout: { action_type: 'wait_for_timeout', value: <ms> }
+//   - scroll:          { action_type: 'scroll', value: 'down' | 'up' }
+//   - extract_text:    { action_type: 'extract_text', selector: <css> }
+//   - extract_html:    { action_type: 'extract_html', selector: <css> }
+//   - screenshot:       { action_type: 'screenshot', value: true }
+//   - import_cookies:  { action_type: 'import_cookies', cookies: [...] }
+//
+// Responses: extract_text/extract_html return content in `data` field;
+// screenshot returns `url` and `base64`.
 
 import { secrets } from 'base44:runtime';
 
@@ -52,13 +61,18 @@ async function engineFetch(path, options = {}) {
 }
 
 export async function createSession(opts = {}) {
-  return engineFetch('/sessions', {
+  const result = await engineFetch('/sessions', {
     method: 'POST',
     body: JSON.stringify({
       viewport: { width: 1280, height: 800 },
       ...opts,
     }),
   });
+  // Normalize: engine returns sessionId, we use id internally
+  if (result && result.sessionId && !result.id) {
+    result.id = result.sessionId;
+  }
+  return result;
 }
 
 export async function closeSession(sessionId) {
@@ -68,10 +82,10 @@ export async function closeSession(sessionId) {
   } catch { /* best-effort */ }
 }
 
-export async function executeAction(sessionId, action, params = {}) {
-  return engineFetch(`/sessions/${sessionId}/action`, {
+export async function executeAction(sessionId, actionType, params = {}) {
+  return engineFetch(`/sessions/${sessionId}/execute`, {
     method: 'POST',
-    body: JSON.stringify({ action, ...params }),
+    body: JSON.stringify({ action_type: actionType, ...params }),
   });
 }
 
@@ -81,37 +95,34 @@ export async function scrapePage(url, opts = {}) {
   const { timeout = 45000, waitMs = 3000, screenshot = false } = opts;
   const session = await createSession();
   try {
-    await executeAction(session.id, 'goto', { url, timeout, waitUntil: 'domcontentloaded' });
+    await executeAction(session.id, 'goto', { value: url });
     // Wait for dynamic content (JS-rendered pages like Facebook, Reddit)
     if (waitMs > 0) {
-      await executeAction(session.id, 'wait_for_timeout', { timeout: waitMs });
+      await executeAction(session.id, 'wait_for_timeout', { value: waitMs });
     }
     // Scroll down to load more content (infinite scroll pages)
     try {
-      await executeAction(session.id, 'scroll', { direction: 'down', amount: 2000 });
-      await executeAction(session.id, 'wait_for_timeout', { timeout: 1500 });
-      await executeAction(session.id, 'scroll', { direction: 'down', amount: 2000 });
-      await executeAction(session.id, 'wait_for_timeout', { timeout: 1500 });
+      await executeAction(session.id, 'scroll', { value: 'down' });
+      await executeAction(session.id, 'wait_for_timeout', { value: 1500 });
+      await executeAction(session.id, 'scroll', { value: 'down' });
+      await executeAction(session.id, 'wait_for_timeout', { value: 1500 });
     } catch { /* some pages may not support scroll */ }
 
-    const textResult = await executeAction(session.id, 'extract_text', {});
-    const htmlResult = await executeAction(session.id, 'extract_html', {});
+    const textResult = await executeAction(session.id, 'extract_text', { selector: 'body' });
+    const htmlResult = await executeAction(session.id, 'extract_html', { selector: 'body' });
 
     let screenshotUrl = null;
     if (screenshot) {
       try {
-        const ss = await executeAction(session.id, 'screenshot', { fullPage: true });
-        screenshotUrl = ss?.screenshot || ss?.url || ss?.data || null;
+        const ss = await executeAction(session.id, 'screenshot', { value: true });
+        screenshotUrl = ss?.url || null;
       } catch { /* screenshot optional */ }
     }
 
-    const text = textResult?.text || textResult?.data || textResult?.value || '';
-    const html = htmlResult?.html || htmlResult?.data || htmlResult?.value || '';
-
     return {
       url,
-      text: typeof text === 'string' ? text : JSON.stringify(text),
-      html: typeof html === 'string' ? html : JSON.stringify(html),
+      text: textResult?.data || '',
+      html: htmlResult?.data || '',
       screenshot_url: screenshotUrl,
       sessionId: session.id,
       method: 'cloud-browser',
@@ -133,25 +144,22 @@ export async function scrapePageWithCookies(url, cookies = [], opts = {}) {
         await executeAction(session.id, 'import_cookies', { cookies });
       } catch { /* cookies may fail on some engines */ }
     }
-    await executeAction(session.id, 'goto', { url, timeout, waitUntil: 'domcontentloaded' });
+    await executeAction(session.id, 'goto', { value: url });
     if (waitMs > 0) {
-      await executeAction(session.id, 'wait_for_timeout', { timeout: waitMs });
+      await executeAction(session.id, 'wait_for_timeout', { value: waitMs });
     }
     try {
-      await executeAction(session.id, 'scroll', { direction: 'down', amount: 2000 });
-      await executeAction(session.id, 'wait_for_timeout', { timeout: 1500 });
+      await executeAction(session.id, 'scroll', { value: 'down' });
+      await executeAction(session.id, 'wait_for_timeout', { value: 1500 });
     } catch {}
 
-    const textResult = await executeAction(session.id, 'extract_text', {});
-    const htmlResult = await executeAction(session.id, 'extract_html', {});
-
-    const text = textResult?.text || textResult?.data || textResult?.value || '';
-    const html = htmlResult?.html || htmlResult?.data || htmlResult?.value || '';
+    const textResult = await executeAction(session.id, 'extract_text', { selector: 'body' });
+    const htmlResult = await executeAction(session.id, 'extract_html', { selector: 'body' });
 
     return {
       url,
-      text: typeof text === 'string' ? text : JSON.stringify(text),
-      html: typeof html === 'string' ? html : JSON.stringify(html),
+      text: textResult?.data || '',
+      html: htmlResult?.data || '',
       sessionId: session.id,
       method: 'cloud-browser-auth',
     };
@@ -166,21 +174,21 @@ export async function scrapePaginated(url, maxPages = 3, opts = {}) {
   const session = await createSession();
   const pages = [];
   try {
-    await executeAction(session.id, 'goto', { url, timeout, waitUntil: 'domcontentloaded' });
-    if (waitMs > 0) await executeAction(session.id, 'wait_for_timeout', { timeout: waitMs });
+    await executeAction(session.id, 'goto', { value: url });
+    if (waitMs > 0) await executeAction(session.id, 'wait_for_timeout', { value: waitMs });
 
     for (let i = 0; i < maxPages; i++) {
-      const textResult = await executeAction(session.id, 'extract_text', {});
-      const htmlResult = await executeAction(session.id, 'extract_html', {});
+      const textResult = await executeAction(session.id, 'extract_text', { selector: 'body' });
+      const htmlResult = await executeAction(session.id, 'extract_html', { selector: 'body' });
       pages.push({
         page: i + 1,
-        text: textResult?.text || textResult?.data || '',
-        html: htmlResult?.html || htmlResult?.data || '',
+        text: textResult?.data || '',
+        html: htmlResult?.data || '',
       });
       if (i < maxPages - 1) {
         try {
-          await executeAction(session.id, 'paginate', {});
-          await executeAction(session.id, 'wait_for_timeout', { timeout: waitMs });
+          await executeAction(session.id, 'scroll', { value: 'down' });
+          await executeAction(session.id, 'wait_for_timeout', { value: waitMs });
         } catch {
           break; // no more pages
         }
