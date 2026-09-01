@@ -2,6 +2,7 @@ import { useState } from "react";
 import {
   TrendingUp, DollarSign, Flame, Megaphone, Cpu, ChevronDown, ChevronUp,
   CheckCircle, Target, Rocket, BarChart3, FileText, AlertTriangle,
+  Users, Share2, Filter, Bot, Repeat, Search,
 } from "lucide-react";
 
 // A single strategy card in the Vision Generator. Shows the 4 scores as
@@ -129,6 +130,20 @@ export default function StrategyCard({ strategy, rank, selected, onSelect, savin
           <DetailBlock icon={Target} label="Target Audience" text={strategy.target_audience} />
           <DetailBlock icon={Rocket} label="Long-Term Vision" text={strategy.long_term_vision} />
           <DetailBlock icon={CheckCircle} label="Differentiation" text={strategy.differentiation} />
+
+          {/* Factory-grade: monetization, lead gen, SEO/AEO, social, funnel, AI, retention */}
+          <div className="rounded-lg border border-lime-400/20 bg-lime-400/5 p-3">
+            <div className="flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-wider text-lime-400">
+              <DollarSign className="h-3 w-3" /> Monthly Monetization Model
+            </div>
+            <p className="mt-1.5 text-xs leading-relaxed text-white/70">{strategy.monetization_model}</p>
+          </div>
+          <DetailBlock icon={Users} label="Lead Generation Architecture" text={strategy.lead_generation_architecture} />
+          <DetailBlock icon={Search} label="SEO + AEO Roadmap" text={strategy.seo_aeo_roadmap} />
+          <DetailBlock icon={Share2} label="Social Media Automation" text={strategy.social_media_automation} />
+          <DetailBlock icon={Filter} label="Funnel System" text={strategy.funnel_system} />
+          <DetailBlock icon={Bot} label="Autonomous AI Enhancement" text={strategy.autonomous_enhancement_plan} />
+          <DetailBlock icon={Repeat} label="Retention Strategy" text={strategy.retention_strategy} />
         </div>
       )}
 

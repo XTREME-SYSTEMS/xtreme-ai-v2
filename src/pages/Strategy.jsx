@@ -3,7 +3,7 @@ import { base44 } from "@/api/base44Client";
 import {
   ClipboardList, Loader2, CheckCircle, RefreshCw, Target, TrendingUp,
   DollarSign, Sparkles, AlertTriangle, Rocket, Shield, Zap, Handshake,
-  Edit3,
+  Edit3, Users, Search, Share2, Filter, Bot,
 } from "lucide-react";
 import { useClientUser } from "@/hooks/useClientUser";
 import { useClientTrack } from "@/hooks/useClientTrack";
@@ -233,6 +233,15 @@ export default function Strategy() {
           <StrategySection icon={Shield} label="Resources Needed" text={strategy.resources} />
           <StrategySection icon={Shield} label="Differentiation / Moat" text={strategy.differentiation} />
           <StrategySection icon={Handshake} label="Key Partnerships" text={strategy.partnerships} />
+
+          {/* Factory-grade: monetization, lead gen, SEO/AEO, social, funnel, AI, retention */}
+          <StrategySection icon={DollarSign} label="Monthly Monetization Model" text={strategy.monetization_model} />
+          <StrategySection icon={Users} label="Lead Generation Architecture" text={strategy.lead_generation_architecture} />
+          <StrategySection icon={Search} label="SEO + AEO Roadmap" text={strategy.seo_aeo_roadmap} />
+          <StrategySection icon={Share2} label="Social Media Automation" text={strategy.social_media_automation} />
+          <StrategySection icon={Filter} label="Funnel System" text={strategy.funnel_system} />
+          <StrategySection icon={Bot} label="Autonomous AI Enhancement Plan" text={strategy.autonomous_enhancement_plan} />
+          <StrategySection icon={RefreshCw} label="Retention Strategy" text={strategy.retention_strategy} />
 
           {/* Actions */}
           <div className="flex flex-wrap items-center gap-2 border-t border-white/10 pt-4">

@@ -2,7 +2,7 @@ import { useState } from "react";
 import { base44 } from "@/api/base44Client";
 import {
   Eye, Loader2, CheckCircle, RefreshCw, Target, Users, TrendingUp,
-  Sparkles, DollarSign, AlertTriangle, Rocket, Lightbulb, Shield,
+  Sparkles, DollarSign, AlertTriangle, Rocket, Lightbulb, Shield, Bot,
 } from "lucide-react";
 import { useClientUser } from "@/hooks/useClientUser";
 import { useClientTrack } from "@/hooks/useClientTrack";
@@ -164,6 +164,12 @@ export default function Vision() {
 
           <VisionSection icon={DollarSign} label="Value Proposition" text={vision.value_proposition} />
           <VisionSection icon={Rocket} label="Market Opportunity" text={vision.market_opportunity} />
+
+          {/* Factory-grade value: monetization, lead gen, SEO/AEO, autonomous value */}
+          <VisionSection icon={DollarSign} label="Monetization Potential" text={vision.monetization_potential} />
+          <VisionSection icon={Users} label="Lead Generation Approach" text={vision.lead_generation_approach} />
+          <VisionSection icon={TrendingUp} label="SEO + AEO Opportunity" text={vision.seo_aeo_opportunity} />
+          <VisionSection icon={Bot} label="Autonomous Value Plan" text={vision.autonomous_value_plan} />
 
           {/* Actions */}
           <div className="flex flex-wrap items-center gap-2 border-t border-white/10 pt-4">

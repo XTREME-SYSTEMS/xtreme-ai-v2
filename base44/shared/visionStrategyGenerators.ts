@@ -41,8 +41,12 @@ Generate a VISION document with these exact fields. Be specific, inspiring, and 
 6. CORE_VALUES: 4-6 guiding principles that shape every decision. Short phrases, not sentences.
 7. VALUE_PROPOSITION: The single most compelling reason someone chooses this over alternatives. What's the unique angle?
 8. MARKET_OPPORTUNITY: The market reality — size, growth, trends, gaps. Why now? Why this? Be honest about the opportunity and the window.
+9. MONETIZATION_POTENTIAL: How the WEBSITE ITSELF generates recurring revenue — not just the business behind it. What mechanisms make this site worth paying for monthly? (lead-gen fees, subscription tiers, premium tools, ad revenue, affiliate, marketplace take rate, SaaS tools). Be specific about the monthly value.
+10. LEAD_GENERATION_APPROACH: How the site captures, qualifies, and manages leads. What lead magnets, free tools, calculators, quizzes, or chatbots turn visitors into qualified leads? Describe the specific conversion mechanism.
+11. SEO_AEO_OPPORTUNITY: The search and AI-visibility opportunity for this niche. What keywords are winnable? What questions do AI answer engines (ChatGPT, Perplexity, Google AI Overviews) get asked that this site should be the cited source for? Estimate traffic potential and a realistic ranking timeline.
+12. AUTONOMOUS_VALUE_PLAN: What a dedicated AI team should continuously enhance to keep this site valuable and ranking — content freshness, SEO optimization, AEO citation tracking, conversion tuning, social media automation. Why would a client keep paying monthly? What's the ongoing value they can't get from a static site?
 
-Return ONLY a JSON object with these exact keys: mission, problem, target_audience, long_term_vision, success_metrics (array of strings), core_values (array of strings), value_proposition, market_opportunity.`;
+Return ONLY a JSON object with these exact keys: mission, problem, target_audience, long_term_vision, success_metrics (array of strings), core_values (array of strings), value_proposition, market_opportunity, monetization_potential, lead_generation_approach, seo_aeo_opportunity, autonomous_value_plan.`;
 
   const res = await base44.asServiceRole.integrations.Core.InvokeLLM({
     prompt,
@@ -57,8 +61,12 @@ Return ONLY a JSON object with these exact keys: mission, problem, target_audien
         core_values: { type: "array", items: { type: "string" }, description: "4-6 guiding principles" },
         value_proposition: { type: "string", description: "The unique reason someone chooses this" },
         market_opportunity: { type: "string", description: "Market size, growth, trends, gaps — why now" },
+        monetization_potential: { type: "string", description: "How the website itself generates recurring monthly revenue" },
+        lead_generation_approach: { type: "string", description: "How the site captures, qualifies, and manages leads" },
+        seo_aeo_opportunity: { type: "string", description: "Search + AI answer-engine visibility opportunity and timeline" },
+        autonomous_value_plan: { type: "string", description: "What AI continuously enhances to justify monthly billing" },
       },
-      required: ["mission", "problem", "target_audience", "long_term_vision", "success_metrics", "core_values", "value_proposition", "market_opportunity"],
+      required: ["mission", "problem", "target_audience", "long_term_vision", "success_metrics", "core_values", "value_proposition", "market_opportunity", "monetization_potential", "lead_generation_approach", "seo_aeo_opportunity", "autonomous_value_plan"],
     },
   });
 
@@ -109,8 +117,15 @@ Generate a STRATEGY document with these exact fields. Be specific, practical, an
 8. RESOURCES: What's needed to execute — team, tools, budget, technology, partnerships. Be concrete.
 9. DIFFERENTIATION: The durable competitive moat. What makes this hard to copy? Why can't a well-funded competitor just replicate this?
 10. PARTNERSHIPS: Key partnerships or integrations that accelerate execution. Be specific about who and why.
+11. MONETIZATION_MODEL: Detailed monthly recurring revenue model. Include 3 pricing tiers with specific price points (in USD) and what's included in each, projected MRR range at 50/200/500 clients, LTV:CAC ratio estimate, and why clients pay monthly rather than one-time. This is the core of the "website factory" value.
+12. LEAD_GENERATION_ARCHITECTURE: The full lead system — funnel stages (awareness → capture → qualify → nurture → convert), specific lead magnets and free tools (calculators, quizzes, chatbots, free audits, instant quotes), how leads are captured/stored/routed, and the lead management workflow the client logs in to use.
+13. SEO_AEO_ROADMAP: Specific keyword targets (5 primary + 10 long-tail), realistic ranking timeline to page 1 of Google, technical SEO priorities, content production cadence (pages per month), and AEO strategy — how to get cited by AI answer engines (ChatGPT, Perplexity, Google AI Overviews) with structured data, FAQ schema, and authoritative topical coverage.
+14. SOCIAL_MEDIA_AUTOMATION: The automated social media system — content pillars (3-5 themes), posting cadence per platform (Facebook, Instagram, LinkedIn, etc.), AI-generated content types (before/after, educational, promotional, customer spotlights), and how it runs autonomously from the backend with the client able to review/approve.
+15. FUNNEL_SYSTEM: The complete conversion funnel — top (SEO + social + paid traffic), middle (lead capture + email/SMS nurture), bottom (conversion + retention). Include the key conversion actions at each stage, the tools that power them, and how each stage is continuously optimized.
+16. AUTONOMOUS_ENHANCEMENT_PLAN: What the dedicated AI team continuously optimizes — daily SEO tuning, weekly content refresh, AEO citation tracking, conversion rate optimization, rank monitoring, competitor cloning, and performance reporting. This is the ongoing value that justifies monthly billing and makes clients "beg for more."
+17. RETENTION_STRATEGY: How to keep clients paying monthly — ongoing deliverables (fresh content, rank reports, new lead sources), continuous improvements, new AI features, performance dashboards, and the "can't live without it" value that prevents churn. Include the monthly value delivery cadence.
 
-Return ONLY a JSON object with these exact keys: competitive_positioning, go_to_market, revenue_model, pricing_strategy, acquisition_channels (array of strings), roadmap (array of objects with phase, timeline, goals array, key_initiatives array), risks (array of objects with risk, severity, mitigation), resources, differentiation, partnerships.`;
+Return ONLY a JSON object with these exact keys: competitive_positioning, go_to_market, revenue_model, pricing_strategy, acquisition_channels (array of strings), roadmap (array of objects with phase, timeline, goals array, key_initiatives array), risks (array of objects with risk, severity, mitigation), resources, differentiation, partnerships, monetization_model, lead_generation_architecture, seo_aeo_roadmap, social_media_automation, funnel_system, autonomous_enhancement_plan, retention_strategy.`;
 
   const res = await base44.asServiceRole.integrations.Core.InvokeLLM({
     prompt,
@@ -148,8 +163,15 @@ Return ONLY a JSON object with these exact keys: competitive_positioning, go_to_
         resources: { type: "string" },
         differentiation: { type: "string" },
         partnerships: { type: "string" },
+        monetization_model: { type: "string", description: "MRR model with 3 pricing tiers, projected revenue, LTV:CAC" },
+        lead_generation_architecture: { type: "string", description: "Full lead funnel: stages, magnets, capture, management" },
+        seo_aeo_roadmap: { type: "string", description: "Keyword targets, ranking timeline, technical SEO, AEO strategy" },
+        social_media_automation: { type: "string", description: "Content pillars, cadence, AI-generated types, autonomous flow" },
+        funnel_system: { type: "string", description: "Complete conversion funnel: top/middle/bottom + optimization" },
+        autonomous_enhancement_plan: { type: "string", description: "What AI team continuously optimizes for monthly value" },
+        retention_strategy: { type: "string", description: "How to keep clients paying monthly — ongoing value delivery" },
       },
-      required: ["competitive_positioning", "go_to_market", "revenue_model", "pricing_strategy", "acquisition_channels", "roadmap", "risks", "resources", "differentiation", "partnerships"],
+      required: ["competitive_positioning", "go_to_market", "revenue_model", "pricing_strategy", "acquisition_channels", "roadmap", "risks", "resources", "differentiation", "partnerships", "monetization_model", "lead_generation_architecture", "seo_aeo_roadmap", "social_media_automation", "funnel_system", "autonomous_enhancement_plan", "retention_strategy"],
     },
   });
 

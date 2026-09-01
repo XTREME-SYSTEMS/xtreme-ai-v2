@@ -64,6 +64,13 @@ For EACH strategy provide ALL fields as JSON:
 - core_values: array of 3-5 values
 - value_proposition: 1 sentence
 - market_opportunity: 1 sentence
+- monetization_model: 2-3 sentences — MRR model with 3 pricing tiers (specific USD price points), projected monthly revenue at scale, and why clients pay monthly
+- lead_generation_architecture: 2-3 sentences — funnel stages, lead magnets/free tools, lead capture + management workflow
+- seo_aeo_roadmap: 2-3 sentences — target keywords, ranking timeline to page 1, content cadence, AEO strategy for AI answer engines
+- social_media_automation: 2-3 sentences — content pillars, posting cadence per platform, AI-generated content types, autonomous backend flow
+- funnel_system: 2-3 sentences — top/middle/bottom funnel stages, conversion actions, optimization approach
+- autonomous_enhancement_plan: 2-3 sentences — what the AI team continuously optimizes (SEO, AEO, content, conversions, rank) to justify monthly billing
+- retention_strategy: 2-3 sentences — ongoing value delivery, performance reporting, new features, why clients keep paying
 
 Keep each field concise. Return JSON with "strategies" array sorted by overall_score descending.`,
       add_context_from_internet: true,
@@ -104,6 +111,13 @@ Keep each field concise. Return JSON with "strategies" array sorted by overall_s
                 core_values: { type: "array", items: { type: "string" } },
                 value_proposition: { type: "string" },
                 market_opportunity: { type: "string" },
+                monetization_model: { type: "string" },
+                lead_generation_architecture: { type: "string" },
+                seo_aeo_roadmap: { type: "string" },
+                social_media_automation: { type: "string" },
+                funnel_system: { type: "string" },
+                autonomous_enhancement_plan: { type: "string" },
+                retention_strategy: { type: "string" },
               },
             },
           },
