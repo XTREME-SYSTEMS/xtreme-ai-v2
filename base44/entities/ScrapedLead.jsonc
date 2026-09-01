@@ -1,0 +1,173 @@
+{
+  "name": "ScrapedLead",
+  "type": "object",
+  "description": "A lead discovered by the lead engine's scraping system. Can be a person looking for concrete/epoxy services (service_request), a company to outreach to (company), or a building permit project (permit_project). Linked to the client and the source that found it.",
+  "properties": {
+    "client_email": {
+      "type": "string",
+      "description": "Email of the client who owns this lead. Used for row-level isolation."
+    },
+    "source_id": {
+      "type": "string",
+      "description": "LeadSource this lead came from"
+    },
+    "source_type": {
+      "type": "string",
+      "enum": [
+        "facebook_group",
+        "craigslist",
+        "reddit",
+        "building_dept",
+        "company_directory",
+        "google_maps",
+        "yelp",
+        "custom"
+      ]
+    },
+    "source_name": {
+      "type": "string"
+    },
+    "source_url": {
+      "type": "string",
+      "description": "URL where the lead was found"
+    },
+    "lead_type": {
+      "type": "string",
+      "enum": [
+        "service_request",
+        "company",
+        "permit_project"
+      ],
+      "default": "service_request",
+      "description": "service_request = person looking for service, company = business to outreach to, permit_project = building permit"
+    },
+    "title": {
+      "type": "string",
+      "description": "Post title, company name, or permit description"
+    },
+    "description": {
+      "type": "string",
+      "description": "Full post content, company description, or permit details"
+    },
+    "contact_name": {
+      "type": "string"
+    },
+    "contact_email": {
+      "type": "string"
+    },
+    "contact_phone": {
+      "type": "string"
+    },
+    "location": {
+      "type": "string"
+    },
+    "matched_keywords": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "intent_score": {
+      "type": "number",
+      "default": 0,
+      "description": "AI-scored buying intent (0-100)"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "new",
+        "contacted",
+        "qualified",
+        "won",
+        "lost",
+        "outreach_sent",
+        "follow_up_1",
+        "follow_up_2",
+        "follow_up_3",
+        "responded",
+        "bounced",
+        "unsubscribed"
+      ],
+      "default": "new"
+    },
+    "outreach_sent_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "follow_up_count": {
+      "type": "number",
+      "default": 0
+    },
+    "next_follow_up_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "last_response_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "screenshot_url": {
+      "type": "string",
+      "description": "Screenshot of the source page where lead was found"
+    },
+    "raw_data": {
+      "type": "string",
+      "description": "JSON of raw scraped data for debugging"
+    },
+    "notes": {
+      "type": "string"
+    },
+    "scraped_at": {
+      "type": "string",
+      "format": "date-time"
+    }
+  },
+  "required": [
+    "client_email",
+    "lead_type",
+    "title"
+  ],
+  "rls": {
+    "read": {
+      "$or": [
+        {
+          "data.client_email": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "create": {
+      "$or": [
+        {
+          "data.client_email": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "update": {
+      "$or": [
+        {
+          "data.client_email": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

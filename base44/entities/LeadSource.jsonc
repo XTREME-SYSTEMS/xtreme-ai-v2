@@ -1,0 +1,137 @@
+{
+  "name": "LeadSource",
+  "type": "object",
+  "description": "A configurable scraping source for the lead engine. Each source is a URL to scrape (Facebook group, Craigslist city, Reddit subreddit, building department portal, or company directory) with service keywords and location filtering. Sources are owned by a client and scraped on a schedule.",
+  "properties": {
+    "client_email": {
+      "type": "string",
+      "description": "Email of the client who owns this source. Used for row-level isolation."
+    },
+    "source_type": {
+      "type": "string",
+      "enum": [
+        "facebook_group",
+        "craigslist",
+        "reddit",
+        "building_dept",
+        "company_directory",
+        "google_maps",
+        "yelp",
+        "custom"
+      ],
+      "default": "facebook_group",
+      "description": "Type of source \u2014 determines the AI extraction prompt"
+    },
+    "source_name": {
+      "type": "string",
+      "description": "Human-readable name (e.g. 'DFW Epoxy Flooring Facebook Group')"
+    },
+    "source_url": {
+      "type": "string",
+      "description": "URL to scrape"
+    },
+    "service_keywords": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Keywords to search for (epoxy flooring, garage floor, polished concrete, etc.)"
+    },
+    "location": {
+      "type": "string",
+      "description": "Geographic area (city, state) for filtering leads"
+    },
+    "scrape_frequency": {
+      "type": "string",
+      "enum": [
+        "daily",
+        "weekly",
+        "monthly"
+      ],
+      "default": "daily"
+    },
+    "active": {
+      "type": "boolean",
+      "default": true
+    },
+    "last_scraped": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "last_result_count": {
+      "type": "number",
+      "default": 0
+    },
+    "last_error": {
+      "type": "string"
+    },
+    "auth_cookies": {
+      "type": "string",
+      "description": "JSON-stringified cookies for authenticated sources (e.g. Facebook group login)"
+    },
+    "config": {
+      "type": "object",
+      "description": "Source-specific config (selectors, pagination, etc.)",
+      "properties": {
+        "max_pages": {
+          "type": "number"
+        },
+        "wait_ms": {
+          "type": "number"
+        },
+        "extract_selector": {
+          "type": "string"
+        }
+      }
+    }
+  },
+  "required": [
+    "client_email",
+    "source_type",
+    "source_name",
+    "source_url"
+  ],
+  "rls": {
+    "read": {
+      "$or": [
+        {
+          "data.client_email": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "create": {
+      "$or": [
+        {
+          "data.client_email": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "update": {
+      "$or": [
+        {
+          "data.client_email": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

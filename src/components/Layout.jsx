@@ -34,6 +34,7 @@ const PIPELINE_OVERVIEW = { to: "/autonomous-system", label: "Pipeline Overview"
 
 const PIPELINE_CATALOG = { to: "/pipeline-catalog", label: "Pipeline Catalog", icon: Layers, end: true };
 const PRODUCT_CATALOG = { to: "/product-catalog", label: "Product Catalog", icon: Package, end: true };
+const LEAD_ENGINE = { to: "/lead-engine", label: "Lead Engine", icon: Radar, end: true };
 const EMPLOYEE_PORTAL = { to: "/employee-portal", label: "Employee Portal", icon: Users, end: true };
 
 // Each step gets its own brand color so the pipeline reads as a creative
@@ -230,6 +231,22 @@ export default function Layout() {
           >
             <Package className="h-4 w-4 shrink-0" />
             {PRODUCT_CATALOG.label}
+          </NavLink>
+          )}
+
+          {/* Lead Engine — autonomous scraping + outreach system */}
+          {(hasFullAccess || hasAccessToPage(userCaps, LEAD_ENGINE.to)) && (
+          <NavLink
+            to={LEAD_ENGINE.to}
+            end={LEAD_ENGINE.end}
+            onClick={() => setOpen(false)}
+            className={({ isActive }) => cn(
+              "flex items-center gap-2.5 rounded-lg px-2.5 py-2 text-sm transition-colors",
+              isActive ? "bg-amber-400/10 text-amber-400 font-semibold" : "text-white hover:bg-white/5"
+            )}
+          >
+            <Radar className="h-4 w-4 shrink-0" />
+            {LEAD_ENGINE.label}
           </NavLink>
           )}
 

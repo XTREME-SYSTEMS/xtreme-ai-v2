@@ -1,0 +1,83 @@
+{
+  "name": "Daily Lead Engine",
+  "definition": {
+    "document": {
+      "dsl": "1.0.0",
+      "name": "daily_lead_engine",
+      "version": "1.0",
+      "namespace": "base44"
+    },
+    "do": [
+      {
+        "scrape_sources": {
+          "call": "invoke_backend_function",
+          "with": {
+            "function_name": "scrapeLeadSources",
+            "args": {
+              "max_sources": 10,
+              "triggered_by": "workflow"
+            }
+          },
+          "then": "send_initial_outreach",
+          "x-base44": {
+            "title": "Scrape all lead sources",
+            "description": "Facebook, Craigslist, Reddit, building depts, company directories"
+          }
+        }
+      },
+      {
+        "send_initial_outreach": {
+          "call": "invoke_backend_function",
+          "with": {
+            "function_name": "sendLeadOutreach",
+            "args": {
+              "template_type": "hello",
+              "max_sends": 15,
+              "follow_up_only": false
+            }
+          },
+          "then": "send_follow_ups",
+          "x-base44": {
+            "title": "Send initial outreach emails",
+            "description": "Hello + brochure + 10% off coupon to new company leads"
+          }
+        }
+      },
+      {
+        "send_follow_ups": {
+          "call": "invoke_backend_function",
+          "with": {
+            "function_name": "sendLeadOutreach",
+            "args": {
+              "follow_up_only": true,
+              "max_sends": 10
+            }
+          },
+          "then": "end",
+          "x-base44": {
+            "title": "Send follow-up emails",
+            "description": "Follow-ups to leads in the outreach sequence"
+          }
+        }
+      }
+    ]
+  },
+  "description": "Scrapes all active lead sources (Facebook groups, Craigslist, Reddit, building departments, company directories) for concrete/epoxy leads, sends initial outreach emails to new company leads, and sends follow-ups to leads in the sequence.",
+  "trigger": {
+    "condition": null,
+    "config": {
+      "trigger_type": "scheduled",
+      "events": [],
+      "schedule_mode": "recurring",
+      "cron_expression": "0 9 * * *",
+      "one_time_date": null,
+      "timezone": "America/New_York",
+      "interval_value": null,
+      "interval_unit": null,
+      "interval_anchor": null,
+      "ends_type": "never",
+      "ends_on_date": null,
+      "ends_after_count": null
+    }
+  }
+}
