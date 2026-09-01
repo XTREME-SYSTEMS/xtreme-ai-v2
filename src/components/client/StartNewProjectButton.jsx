@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
 import { Plus, Loader2, Archive, X } from "lucide-react";
 import { archiveCurrentProject } from "@/lib/projectReset";
 
@@ -12,14 +11,16 @@ export default function StartNewProjectButton({ user, project, className = "" })
   const [open, setOpen] = useState(false);
   const [resetting, setResetting] = useState(false);
   const [error, setError] = useState("");
-  const navigate = useNavigate();
 
   const doReset = async () => {
     setResetting(true);
     setError("");
     try {
       await archiveCurrentProject(user, project);
-      navigate("/business-generator");
+      // Force a full reload (not a router navigate) — the user is already on
+      // /business-generator, so navigate() is a no-op and the modal would stay
+      // stuck on "Saving…". A reload re-fetches the wiped user/project state.
+      window.location.href = "/business-generator";
     } catch (e) {
       setError("Couldn't start a new project. Please try again.");
       setResetting(false);
