@@ -4,7 +4,7 @@
     "document": {
       "dsl": "1.0.0",
       "name": "daily_lead_engine",
-      "version": "1.0",
+      "version": "1.1",
       "namespace": "base44"
     },
     "do": [
@@ -18,10 +18,26 @@
               "triggered_by": "workflow"
             }
           },
-          "then": "send_initial_outreach",
+          "then": "validate_leads",
           "x-base44": {
             "title": "Scrape all lead sources",
-            "description": "Facebook, Craigslist, Reddit, building depts, company directories"
+            "description": "Facebook, Craigslist, Reddit, building depts, company directories \u2014 captures screenshots + uses cookie auth"
+          }
+        }
+      },
+      {
+        "validate_leads": {
+          "call": "invoke_backend_function",
+          "with": {
+            "function_name": "validateLeads",
+            "args": {
+              "triggered_by": "workflow"
+            }
+          },
+          "then": "send_initial_outreach",
+          "x-base44": {
+            "title": "Validate leads \u2014 spam detection + intent tier classification",
+            "description": "Validator agent classifies each lead (HOT/WARM/PARTNER/PROJECT/SIGNAL), flags spam, sets review_status"
           }
         }
       },
@@ -39,7 +55,7 @@
           "then": "send_follow_ups",
           "x-base44": {
             "title": "Send initial outreach emails",
-            "description": "Hello + brochure + 10% off coupon to new company leads"
+            "description": "Hello + brochure + 10% off coupon to new company leads (tier-routed by Diplomat)"
           }
         }
       },
@@ -53,23 +69,39 @@
               "max_sends": 10
             }
           },
-          "then": "end",
+          "then": "send_digest",
           "x-base44": {
             "title": "Send follow-up emails",
             "description": "Follow-ups to leads in the outreach sequence"
           }
         }
+      },
+      {
+        "send_digest": {
+          "call": "invoke_backend_function",
+          "with": {
+            "function_name": "sendLeadDigest",
+            "args": {
+              "triggered_by": "workflow"
+            }
+          },
+          "then": "end",
+          "x-base44": {
+            "title": "Send 5am morning digest",
+            "description": "Analyst agent generates the morning briefing \u2014 HOT/VERY_HOT leads, source performance, action items"
+          }
+        }
       }
     ]
   },
-  "description": "Scrapes all active lead sources (Facebook groups, Craigslist, Reddit, building departments, company directories) for concrete/epoxy leads, sends initial outreach emails to new company leads, and sends follow-ups to leads in the sequence.",
+  "description": "Daily 5am ET lead engine: scrape all sources \u2192 validate (spam + intent tier) \u2192 send initial outreach \u2192 send follow-ups \u2192 email the morning digest. Tier-routed outreach: HOT/VERY_HOT same-day, WARM standard sequence, PARTNER subcontractor angle, PROJECT/PROPERTY nurture.",
   "trigger": {
     "condition": null,
     "config": {
       "trigger_type": "scheduled",
       "events": [],
       "schedule_mode": "recurring",
-      "cron_expression": "0 9 * * *",
+      "cron_expression": "0 5 * * *",
       "one_time_date": null,
       "timezone": "America/New_York",
       "interval_value": null,

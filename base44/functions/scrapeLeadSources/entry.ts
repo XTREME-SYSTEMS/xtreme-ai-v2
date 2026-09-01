@@ -6,7 +6,8 @@
 // InvokeLLM analyzes the HTML and extracts leads as JSON → saves ScrapedLead records.
 
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.44';
-import { scrapePage, isEngineConfigured } from '../../shared/cloudBrowserScrape.ts';
+import { scrapePage, scrapePageWithCookies, isEngineConfigured } from '../../shared/cloudBrowserScrape.ts';
+import { DIRECT_KEYWORDS, INDIRECT_KEYWORDS } from '../../shared/leadKeywords.ts';
 
 const DEFAULT_SERVICE_KEYWORDS = [
   'epoxy flooring', 'garage floor', 'garage floor coating', 'decorative concrete',
@@ -56,14 +57,25 @@ export default async function(req: Request): Promise<Response> {
       try {
         // Scrape the source URL using the cloud browser
         const config = source.config || {};
-        const scraped = await scrapePage(source.source_url, {
-          timeout: 45000,
-          waitMs: config.wait_ms || 3000,
-          screenshot: false,
-        });
+        // Use cookie-authenticated scrape for sources that require login (FB groups)
+        let cookies = [];
+        if (source.auth_cookies) {
+          try { cookies = JSON.parse(source.auth_cookies); } catch { cookies = []; }
+        }
+        const scraped = cookies.length > 0
+          ? await scrapePageWithCookies(source.source_url, cookies, {
+              timeout: 45000,
+              waitMs: config.wait_ms || 3000,
+            })
+          : await scrapePage(source.source_url, {
+              timeout: 45000,
+              waitMs: config.wait_ms || 3000,
+              screenshot: true,  // capture evidence of where the lead was found
+            });
 
         // Build AI extraction prompt based on source type
-        const keywords = source.service_keywords?.length ? source.service_keywords : DEFAULT_SERVICE_KEYWORDS;
+        const sourceKeywords = source.service_keywords?.length ? source.service_keywords : [];
+        const keywords = [...new Set([...sourceKeywords, ...DIRECT_KEYWORDS, ...INDIRECT_KEYWORDS])];
         const extractionPrompt = buildExtractionPrompt(source, keywords);
 
         // Use AI to extract structured leads from the scraped content
@@ -116,6 +128,8 @@ export default async function(req: Request): Promise<Response> {
               source_name: source.source_name,
               source_url: source.source_url,
               lead_type: lead.lead_type || (source.source_type === 'company_directory' || source.source_type === 'google_maps' ? 'company' : source.source_type === 'building_dept' ? 'permit_project' : 'service_request'),
+              intent_tier: 'warm',  // Validator agent will reclassify
+              review_status: 'pending',  // Validator agent will set auto_approved/flagged
               title: lead.title,
               description: lead.description || '',
               contact_name: lead.contact_name || '',
@@ -124,6 +138,7 @@ export default async function(req: Request): Promise<Response> {
               location: lead.location || source.location || '',
               matched_keywords: lead.matched_keywords || [],
               intent_score: lead.intent_score || 50,
+              screenshot_url: scraped.screenshot_url || '',
               status: 'new',
               scraped_at: new Date().toISOString(),
             });

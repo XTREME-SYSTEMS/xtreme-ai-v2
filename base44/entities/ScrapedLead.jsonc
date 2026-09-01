@@ -1,7 +1,7 @@
 {
   "name": "ScrapedLead",
   "type": "object",
-  "description": "A lead discovered by the lead engine's scraping system. Can be a person looking for concrete/epoxy services (service_request), a company to outreach to (company), or a building permit project (permit_project). Linked to the client and the source that found it.",
+  "description": "A lead discovered by the lead engine's scraping system. Can be a person looking for concrete/epoxy services (service_request), a company to outreach to (company), or a building permit project (permit_project). Linked to the client and the source that found it. Classified by intent tier and validation status by the Validator agent.",
   "properties": {
     "client_email": {
       "type": "string",
@@ -40,6 +40,36 @@
       ],
       "default": "service_request",
       "description": "service_request = person looking for service, company = business to outreach to, permit_project = building permit"
+    },
+    "intent_tier": {
+      "type": "string",
+      "enum": [
+        "hot",
+        "very_hot",
+        "warm",
+        "partner",
+        "project",
+        "property",
+        "signal"
+      ],
+      "default": "warm",
+      "description": "Intent tier classified by the Validator agent. hot/very_hot = immediate outreach, warm = standard sequence, partner = subcontractor angle, project/property = long-term nurture, signal = market intelligence only."
+    },
+    "review_status": {
+      "type": "string",
+      "enum": [
+        "pending",
+        "auto_approved",
+        "flagged",
+        "approved",
+        "rejected"
+      ],
+      "default": "pending",
+      "description": "Validation state. pending = not yet validated, auto_approved = validator confidence >= 70, flagged = needs human review, approved/rejected = human decision."
+    },
+    "validation_notes": {
+      "type": "string",
+      "description": "Notes from the Validator agent \u2014 spam detection reasoning, intent classification rationale, flags."
     },
     "title": {
       "type": "string",
