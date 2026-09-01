@@ -1,0 +1,199 @@
+{
+  "name": "SourceNode",
+  "type": "object",
+  "description": "A node in the recursive source graph \u2014 every website, directory, forum, bid board, permit portal, or community discovered during recursive source discovery. Tracks the category, geographic coverage, discovery depth, parent source, lead yield, and relationships to other sources. The source graph grows autonomously as the Scout/Hunter agents discover new sources from existing ones.",
+  "properties": {
+    "client_email": {
+      "type": "string",
+      "description": "Client who owns this source node. RLS isolation."
+    },
+    "source_type": {
+      "type": "string",
+      "enum": [
+        "facebook_group",
+        "craigslist",
+        "reddit",
+        "building_dept",
+        "company_directory",
+        "google_maps",
+        "yelp",
+        "google_search",
+        "bing_search",
+        "nextdoor",
+        "linkedin",
+        "x_twitter",
+        "instagram",
+        "tiktok",
+        "youtube",
+        "pinterest",
+        "quora",
+        "discord",
+        "meetup",
+        "alignable",
+        "forum",
+        "bid_board",
+        "plan_room",
+        "procurement_portal",
+        "property_record",
+        "permit_portal",
+        "zoning_portal",
+        "public_notice",
+        "cre_listing",
+        "foreclosure",
+        "news",
+        "association",
+        "chamber",
+        "custom"
+      ]
+    },
+    "category": {
+      "type": "string",
+      "enum": [
+        "social",
+        "marketplace",
+        "forum",
+        "directory",
+        "search_engine",
+        "map",
+        "review",
+        "bid_board",
+        "plan_room",
+        "procurement",
+        "permit",
+        "property",
+        "zoning",
+        "public_notice",
+        "cre",
+        "foreclosure",
+        "news",
+        "association",
+        "video",
+        "qa"
+      ],
+      "description": "High-level category for grouping and scoring"
+    },
+    "name": {
+      "type": "string"
+    },
+    "url": {
+      "type": "string"
+    },
+    "geo_coverage": {
+      "type": "string",
+      "description": "Geographic coverage: city, state, region, national, or global"
+    },
+    "service_relevance": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Which services this source is relevant to (epoxy, polished concrete, etc.)"
+    },
+    "parent_source_id": {
+      "type": "string",
+      "description": "SourceNode this was discovered FROM (recursive depth)"
+    },
+    "discovery_depth": {
+      "type": "number",
+      "default": 0,
+      "description": "0 = seed, 1+ = recursively discovered"
+    },
+    "discovered_via": {
+      "type": "string",
+      "description": "How discovered: seed, web_search, link_follow, directory_listing, association_member"
+    },
+    "lead_yield_30d": {
+      "type": "number",
+      "default": 0,
+      "description": "Leads found from this source in last 30 days"
+    },
+    "hot_yield_30d": {
+      "type": "number",
+      "default": 0,
+      "description": "HOT/VERY_HOT leads from this source in last 30 days"
+    },
+    "conversion_rate": {
+      "type": "number",
+      "default": 0,
+      "description": "Leads \u2192 responded/won conversion rate"
+    },
+    "quality_score": {
+      "type": "number",
+      "default": 50,
+      "description": "0-100 composite score (yield + conversion + hot rate)"
+    },
+    "active": {
+      "type": "boolean",
+      "default": true
+    },
+    "verified": {
+      "type": "boolean",
+      "default": false,
+      "description": "Whether the URL was verified accessible by the cloud browser"
+    },
+    "related_source_ids": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Other source nodes linked to this one (subdirectories, local chapters, member directories)"
+    },
+    "discovered_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "last_crawled": {
+      "type": "string",
+      "format": "date-time"
+    }
+  },
+  "required": [
+    "client_email",
+    "source_type",
+    "name",
+    "url"
+  ],
+  "rls": {
+    "read": {
+      "$or": [
+        {
+          "data.client_email": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "create": {
+      "$or": [
+        {
+          "data.client_email": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "update": {
+      "$or": [
+        {
+          "data.client_email": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

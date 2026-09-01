@@ -1,0 +1,69 @@
+{
+  "name": "Weekly Source Discovery",
+  "definition": {
+    "document": {
+      "dsl": "1.0.0",
+      "name": "weekly_source_discovery",
+      "version": "1.0",
+      "namespace": "base44"
+    },
+    "do": [
+      {
+        "discover_sources": {
+          "call": "invoke_backend_function",
+          "with": {
+            "function_name": "discoverSourcesRecursive",
+            "args": {
+              "max_sources": 30,
+              "max_depth": 2,
+              "verify_urls": true,
+              "seed_queries": true,
+              "triggered_by": "workflow"
+            }
+          },
+          "then": "score_sources",
+          "x-base44": {
+            "title": "Recursive source discovery",
+            "description": "Hunter agent discovers new sources via web search + recursive link-following. Adds to SourceNode graph with depth, category, and yield estimates."
+          }
+        }
+      },
+      {
+        "score_sources": {
+          "call": "invoke_backend_function",
+          "with": {
+            "function_name": "scoreSourceQuality",
+            "args": {
+              "triggered_by": "workflow",
+              "demote_threshold": 5,
+              "min_leads": 5
+            }
+          },
+          "then": "end",
+          "x-base44": {
+            "title": "Score + demote underperforming sources",
+            "description": "Analyst agent reviews 30-day conversion by source, demotes sources with < 5% conversion"
+          }
+        }
+      }
+    ]
+  },
+  "description": "Weekly recursive source discovery: web search for new sources \u2192 verify URLs \u2192 add to source graph \u2192 score source quality + demote underperformers. Expands the source universe autonomously.",
+  "trigger": {
+    "condition": null,
+    "config": {
+      "trigger_type": "scheduled",
+      "events": [],
+      "schedule_mode": "recurring",
+      "cron_expression": "0 6 * * 1",
+      "one_time_date": null,
+      "timezone": "America/New_York",
+      "interval_value": null,
+      "interval_unit": null,
+      "interval_anchor": null,
+      "ends_type": "never",
+      "ends_on_date": null,
+      "ends_after_count": null
+    }
+  }
+}

@@ -1,7 +1,7 @@
 {
   "name": "ScrapedLead",
   "type": "object",
-  "description": "A lead discovered by the lead engine's scraping system. Can be a person looking for concrete/epoxy services (service_request), a company to outreach to (company), or a building permit project (permit_project). Linked to the client and the source that found it. Classified by intent tier and validation status by the Validator agent.",
+  "description": "A lead discovered by the lead engine's autonomous demand-intelligence system. Classified by structural type (service_request/company/permit_project), opportunity type (DIRECT_DEMAND/PROBLEM_DEMAND/PROJECT_DEMAND/BID_DEMAND/PARTNER_DEMAND/PROPERTY_SIGNAL/MARKET_SIGNAL/COMPETITOR_SIGNAL/CONTENT_OPPORTUNITY/SEO_OPPORTUNITY/REFERRAL_OPPORTUNITY), and intent tier (hot/very_hot/warm/partner/project/property/signal). Enriched with company/project/property/GC/architect/developer relationships for hot leads.",
   "properties": {
     "client_email": {
       "type": "string",
@@ -10,6 +10,10 @@
     "source_id": {
       "type": "string",
       "description": "LeadSource this lead came from"
+    },
+    "source_node_id": {
+      "type": "string",
+      "description": "SourceNode in the recursive source graph (if discovered via recursive discovery)"
     },
     "source_type": {
       "type": "string",
@@ -21,6 +25,32 @@
         "company_directory",
         "google_maps",
         "yelp",
+        "google_search",
+        "bing_search",
+        "nextdoor",
+        "linkedin",
+        "x_twitter",
+        "instagram",
+        "tiktok",
+        "youtube",
+        "pinterest",
+        "quora",
+        "discord",
+        "meetup",
+        "alignable",
+        "forum",
+        "bid_board",
+        "plan_room",
+        "procurement_portal",
+        "property_record",
+        "permit_portal",
+        "zoning_portal",
+        "public_notice",
+        "cre_listing",
+        "foreclosure",
+        "news",
+        "association",
+        "chamber",
         "custom"
       ]
     },
@@ -39,7 +69,25 @@
         "permit_project"
       ],
       "default": "service_request",
-      "description": "service_request = person looking for service, company = business to outreach to, permit_project = building permit"
+      "description": "Structural type: service_request = person looking for service, company = business to outreach to, permit_project = building permit"
+    },
+    "opportunity_type": {
+      "type": "string",
+      "enum": [
+        "direct_demand",
+        "problem_demand",
+        "project_demand",
+        "bid_demand",
+        "partner_demand",
+        "property_signal",
+        "market_signal",
+        "competitor_signal",
+        "content_opportunity",
+        "seo_opportunity",
+        "referral_opportunity"
+      ],
+      "default": "direct_demand",
+      "description": "Demand-intelligence classification: direct_demand = explicitly asking for service, problem_demand = has a problem we solve, project_demand = a construction project, bid_demand = RFP/RFQ/ITB, partner_demand = referral partner, property_signal = property acquired/leased/sold, market_signal = market trend, competitor_signal = competitor activity, content_opportunity = FAQ/content idea, seo_opportunity = search gap, referral_opportunity = someone referring others"
     },
     "intent_tier": {
       "type": "string",
@@ -53,7 +101,7 @@
         "signal"
       ],
       "default": "warm",
-      "description": "Intent tier classified by the Validator agent. hot/very_hot = immediate outreach, warm = standard sequence, partner = subcontractor angle, project/property = long-term nurture, signal = market intelligence only."
+      "description": "Intent tier classified by the Validator agent."
     },
     "review_status": {
       "type": "string",
@@ -64,20 +112,16 @@
         "approved",
         "rejected"
       ],
-      "default": "pending",
-      "description": "Validation state. pending = not yet validated, auto_approved = validator confidence >= 70, flagged = needs human review, approved/rejected = human decision."
+      "default": "pending"
     },
     "validation_notes": {
-      "type": "string",
-      "description": "Notes from the Validator agent \u2014 spam detection reasoning, intent classification rationale, flags."
+      "type": "string"
     },
     "title": {
-      "type": "string",
-      "description": "Post title, company name, or permit description"
+      "type": "string"
     },
     "description": {
-      "type": "string",
-      "description": "Full post content, company description, or permit details"
+      "type": "string"
     },
     "contact_name": {
       "type": "string"
@@ -99,8 +143,7 @@
     },
     "intent_score": {
       "type": "number",
-      "default": 0,
-      "description": "AI-scored buying intent (0-100)"
+      "default": 0
     },
     "status": {
       "type": "string",
@@ -137,12 +180,10 @@
       "format": "date-time"
     },
     "screenshot_url": {
-      "type": "string",
-      "description": "Screenshot of the source page where lead was found"
+      "type": "string"
     },
     "raw_data": {
-      "type": "string",
-      "description": "JSON of raw scraped data for debugging"
+      "type": "string"
     },
     "notes": {
       "type": "string"
@@ -150,6 +191,79 @@
     "scraped_at": {
       "type": "string",
       "format": "date-time"
+    },
+    "lead_graph_id": {
+      "type": "string",
+      "description": "ID of the LeadRelationship graph this lead belongs to (for hot-lead investigation)"
+    },
+    "enrichment_status": {
+      "type": "string",
+      "enum": [
+        "not_enriched",
+        "enriching",
+        "enriched",
+        "failed"
+      ],
+      "default": "not_enriched"
+    },
+    "enriched_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "company_website": {
+      "type": "string",
+      "description": "Company website discovered during enrichment"
+    },
+    "project_name": {
+      "type": "string",
+      "description": "Project name discovered during enrichment"
+    },
+    "project_stage": {
+      "type": "string",
+      "description": "planning, permitting, bidding, construction, renovation, completion"
+    },
+    "gc_name": {
+      "type": "string",
+      "description": "General contractor on the project (if known)"
+    },
+    "architect_name": {
+      "type": "string"
+    },
+    "developer_name": {
+      "type": "string"
+    },
+    "property_address": {
+      "type": "string"
+    },
+    "permit_number": {
+      "type": "string"
+    },
+    "bid_url": {
+      "type": "string",
+      "description": "URL to the bid/RFP/RFQ document"
+    },
+    "bid_deadline": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "estimated_value": {
+      "type": "number",
+      "description": "Estimated project value in USD"
+    },
+    "related_entities": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "IDs of related LeadRelationship nodes (companies, properties, projects, people)"
+    },
+    "recommended_next_action": {
+      "type": "string"
+    },
+    "discovery_depth": {
+      "type": "number",
+      "default": 0,
+      "description": "How deep in the recursive discovery this lead was found (0 = seed source, 1+ = recursively discovered)"
     }
   },
   "required": [

@@ -7,7 +7,7 @@
 
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.44';
 import { scrapePage, scrapePageWithCookies, isEngineConfigured } from '../../shared/cloudBrowserScrape.ts';
-import { DIRECT_KEYWORDS, INDIRECT_KEYWORDS } from '../../shared/leadKeywords.ts';
+import { SERVICE_UNIVERSE, INTENT_PHRASES, PROBLEM_SIGNALS, ADJACENT_TRADES } from '../../shared/leadKeywords.ts';
 
 const DEFAULT_SERVICE_KEYWORDS = [
   'epoxy flooring', 'garage floor', 'garage floor coating', 'decorative concrete',
@@ -75,7 +75,7 @@ export default async function(req: Request): Promise<Response> {
 
         // Build AI extraction prompt based on source type
         const sourceKeywords = source.service_keywords?.length ? source.service_keywords : [];
-        const keywords = [...new Set([...sourceKeywords, ...DIRECT_KEYWORDS, ...INDIRECT_KEYWORDS])];
+        const keywords = [...new Set([...sourceKeywords, ...SERVICE_UNIVERSE, ...INTENT_PHRASES, ...PROBLEM_SIGNALS, ...ADJACENT_TRADES])];
         const extractionPrompt = buildExtractionPrompt(source, keywords);
 
         // Use AI to extract structured leads from the scraped content

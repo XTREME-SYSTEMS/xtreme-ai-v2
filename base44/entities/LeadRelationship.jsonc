@@ -1,0 +1,137 @@
+{
+  "name": "LeadRelationship",
+  "type": "object",
+  "description": "A node in the lead graph \u2014 a person, company, property, project, GC, architect, developer, or flooring scope discovered during hot-lead investigation. Nodes connect to each other (PERSON \u2192 COMPANY \u2192 PROPERTY \u2192 PROJECT \u2192 GC \u2192 ARCHITECT \u2192 DEVELOPER \u2192 FLOORING SCOPE \u2192 EPOXY OPPORTUNITY) to build a relationship graph that reveals who knows about a project before the contractor does.",
+  "properties": {
+    "client_email": {
+      "type": "string",
+      "description": "Client who owns this graph node. RLS isolation."
+    },
+    "lead_id": {
+      "type": "string",
+      "description": "ScrapedLead this graph node belongs to"
+    },
+    "node_type": {
+      "type": "string",
+      "enum": [
+        "person",
+        "company",
+        "property",
+        "project",
+        "gc",
+        "architect",
+        "developer",
+        "flooring_scope",
+        "epoxy_opportunity",
+        "permit",
+        "bid",
+        "adjacent_trade"
+      ],
+      "description": "What kind of entity this node represents"
+    },
+    "name": {
+      "type": "string",
+      "description": "Name of the person, company, property, or project"
+    },
+    "role": {
+      "type": "string",
+      "description": "Role if a person (homeowner, contractor, architect, property manager, etc.)"
+    },
+    "website": {
+      "type": "string"
+    },
+    "email": {
+      "type": "string"
+    },
+    "phone": {
+      "type": "string"
+    },
+    "address": {
+      "type": "string"
+    },
+    "location": {
+      "type": "string"
+    },
+    "url": {
+      "type": "string",
+      "description": "Source URL where this entity was found"
+    },
+    "parent_node_id": {
+      "type": "string",
+      "description": "Parent node in the graph (e.g. company \u2192 property)"
+    },
+    "related_node_ids": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Other graph nodes this entity connects to"
+    },
+    "evidence": {
+      "type": "string",
+      "description": "Original public evidence \u2014 the text/snippet that proves this entity exists and is relevant"
+    },
+    "confidence": {
+      "type": "number",
+      "default": 50,
+      "description": "0-100 confidence in this entity's relevance"
+    },
+    "investigated": {
+      "type": "boolean",
+      "default": false,
+      "description": "Whether this node has been investigated (website visited, contacts found)"
+    },
+    "discovered_at": {
+      "type": "string",
+      "format": "date-time"
+    }
+  },
+  "required": [
+    "client_email",
+    "node_type",
+    "name"
+  ],
+  "rls": {
+    "read": {
+      "$or": [
+        {
+          "data.client_email": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "create": {
+      "$or": [
+        {
+          "data.client_email": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "update": {
+      "$or": [
+        {
+          "data.client_email": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}
