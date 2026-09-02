@@ -26,10 +26,9 @@ import { useAutoBuild } from "@/lib/AutoBuildContext";
 // nav array used by the admin sidebar.
 
 // The focused autonomous pipeline — the only primary navigation.
-// Step 1: AI Chief Architect  → AI chat that operates the entire system
-// Step 2: Vision Cortex        → Finds ideas for websites & systems
-// Step 3: Queue System         → Ideas queued for building
-// Step 4: Auto Builder         → Full builder pipeline
+// Step 1: Pipeline Catalog → Browse packages, templates & tools
+// Step 2: Queue System     → Ideas queued for building (received from Vision Cortex)
+// Step 3: Auto Builder     → Full builder pipeline
 const PIPELINE_OVERVIEW = { to: "/autonomous-system", label: "Pipeline Overview", icon: Bot, end: true };
 
 const PIPELINE_CATALOG = { to: "/pipeline-catalog", label: "Pipeline Catalog", icon: Layers, end: true };
@@ -42,15 +41,11 @@ const EMPLOYEE_PORTAL = { to: "/employee-portal", label: "Employee Portal", icon
 // spectrum (violet → cyan → emerald → gold → rose) instead of all-yellow.
 // All class strings are literals so Tailwind preserves them.
 const PIPELINE_STEPS = [
-  { to: "/architect",        label: "AI Chief Architect", icon: Brain,  step: 1, desc: "AI chat that operates the system",
-    color: { ring: "border-violet-400 bg-violet-400 text-black shadow-[0_0_14px_3px_rgba(167,139,250,0.45)]", text: "text-violet-400", icon: "text-violet-400", idle: "text-violet-400/40" } },
-  { to: "/vision-cortex",    label: "Vision Cortex",      icon: Eye,    step: 2, desc: "Finds ideas for websites & systems",
-    color: { ring: "border-cyan-400 bg-cyan-400 text-black shadow-[0_0_14px_3px_rgba(34,211,238,0.45)]", text: "text-cyan-400", icon: "text-cyan-400", idle: "text-cyan-400/40" } },
-  { to: "/pipeline-catalog", label: "Pipeline Catalog",   icon: Layers, step: 3, desc: "Browse packages, templates & tools",
+  { to: "/pipeline-catalog", label: "Pipeline Catalog",   icon: Layers, step: 1, desc: "Browse packages, templates & tools",
     color: { ring: "border-emerald-400 bg-emerald-400 text-black shadow-[0_0_14px_3px_rgba(52,211,153,0.45)]", text: "text-emerald-400", icon: "text-emerald-400", idle: "text-emerald-400/40" } },
-  { to: "/build-queue",      label: "Queue System",       icon: Boxes,  step: 4, desc: "Ideas queued for building",
+  { to: "/build-queue",      label: "Queue System",       icon: Boxes,  step: 2, desc: "Ideas queued for building",
     color: { ring: "border-amber-400 bg-amber-400 text-black shadow-[0_0_14px_3px_rgba(255,234,0,0.45)]", text: "text-amber-400", icon: "text-amber-400", idle: "text-amber-400/40" } },
-  { to: "/auto-builder",     label: "Auto Builder",       icon: Rocket, step: 5, desc: "Full builder pipeline",
+  { to: "/auto-builder",     label: "Auto Builder",       icon: Rocket, step: 3, desc: "Full builder pipeline",
     color: { ring: "border-rose-400 bg-rose-400 text-black shadow-[0_0_14px_3px_rgba(251,113,133,0.45)]", text: "text-rose-400", icon: "text-rose-400", idle: "text-rose-400/40" } },
 ];
 
@@ -97,6 +92,8 @@ const ARCHIVE_ITEMS = [
   { to: "/pipeline", label: "Sales Pipeline", icon: TrendingUp },
   { to: "/experiments", label: "Experiments", icon: FlaskConical },
   { section: "Intelligence" },
+  { to: "/vision-cortex", label: "Vision Cortex (legacy)", icon: Eye },
+  { to: "/architect", label: "AI Chief Architect (legacy)", icon: Brain },
   { to: "/industry-dna", label: "Industry DNA", icon: Dna },
   { to: "/website-genomes", label: "Website Genome", icon: Network },
   { to: "/playbooks", label: "Playbooks", icon: BookMarked },
