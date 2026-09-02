@@ -1,0 +1,185 @@
+{
+  "name": "CouncilDecision",
+  "type": "object",
+  "description": "A decision debated by the Vision Cortex Council \u2014 a non-hierarchical AI council of specialized intelligence archetypes. Each decision runs through an 11-round protocol (independent reasoning \u2192 evidence \u2192 cross-examination \u2192 contrarian challenge \u2192 risk/economic/engineering/security review \u2192 simulation \u2192 decision \u2192 confidence). Dissent is preserved. Confidence is scored. No agent has authority merely because it is called 'Chief'.",
+  "properties": {
+    "question": {
+      "type": "string",
+      "description": "The decision question debated by the council"
+    },
+    "context": {
+      "type": "string",
+      "description": "Background context, data, and constraints provided to all archetypes"
+    },
+    "decision_type": {
+      "type": "string",
+      "enum": [
+        "strategic",
+        "architectural",
+        "build",
+        "investment",
+        "product",
+        "market",
+        "technical",
+        "operational",
+        "research"
+      ],
+      "default": "strategic",
+      "description": "What kind of decision this is \u2014 determines which archetypes weigh in heaviest"
+    },
+    "rounds": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "round_number": {
+            "type": "number"
+          },
+          "round_name": {
+            "type": "string"
+          },
+          "archetype": {
+            "type": "string",
+            "description": "Which archetype led this round"
+          },
+          "analysis": {
+            "type": "string",
+            "description": "The archetype's reasoning for this round"
+          },
+          "evidence": {
+            "type": "string",
+            "description": "Evidence cited"
+          },
+          "confidence": {
+            "type": "number",
+            "description": "0-100 confidence in this round's analysis"
+          },
+          "dissent": {
+            "type": "string",
+            "description": "Any dissenting view preserved from this round"
+          }
+        }
+      },
+      "description": "The 11 rounds of debate, each with its analysis, evidence, confidence, and preserved dissent"
+    },
+    "archetype_positions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "archetype": {
+            "type": "string"
+          },
+          "position": {
+            "type": "string",
+            "description": "This archetype's independent position on the question"
+          },
+          "confidence": {
+            "type": "number"
+          },
+          "key_argument": {
+            "type": "string"
+          },
+          "risks_identified": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "description": "Each archetype's independent position \u2014 preserved even if overruled by consensus"
+    },
+    "contrarian_challenge": {
+      "type": "string",
+      "description": "The Contrarian's active attack on the emerging consensus \u2014 preserved even if the council proceeds"
+    },
+    "epistemic_audit": {
+      "type": "string",
+      "description": "The Epistemic Auditor's classification of what is fact vs inference vs hypothesis vs assumption"
+    },
+    "simulation_summary": {
+      "type": "string",
+      "description": "Summary of the simulation round's projected outcomes"
+    },
+    "final_decision": {
+      "type": "string",
+      "description": "The council's final decision"
+    },
+    "decision_confidence": {
+      "type": "number",
+      "default": 0,
+      "description": "0-100 \u2014 the council's confidence in the decision, weighted by archetype performance"
+    },
+    "dissent_preserved": {
+      "type": "string",
+      "description": "Any minority report or dissent that was NOT overruled \u2014 preserved for future reference"
+    },
+    "expected_value": {
+      "type": "number",
+      "description": "Calculated expected value: (P(success) \u00d7 upside) - (P(failure) \u00d7 downside) - capital cost - opportunity cost"
+    },
+    "failure_modes": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Identified failure modes for the chosen decision"
+    },
+    "recommended_next_action": {
+      "type": "string"
+    },
+    "approval_required": {
+      "type": "boolean",
+      "default": false,
+      "description": "Whether this decision requires human approval before execution (red-tier)"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "pending",
+        "debating",
+        "decided",
+        "approved",
+        "rejected",
+        "executed",
+        "failed"
+      ],
+      "default": "pending"
+    },
+    "triggered_by": {
+      "type": "string",
+      "description": "manual | workflow | architect | autonomous"
+    },
+    "scan_id": {
+      "type": "string",
+      "description": "Groups decisions by scan run"
+    }
+  },
+  "required": [
+    "question",
+    "decision_type"
+  ],
+  "rls": {
+    "read": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "create": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

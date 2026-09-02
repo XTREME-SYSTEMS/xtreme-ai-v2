@@ -128,6 +128,7 @@ import EmployeePortal from '@/pages/EmployeePortal';
 import EmployeeManagement from '@/pages/EmployeeManagement';
 import ProductCatalog from '@/pages/ProductCatalog';
 import LeadEngine from '@/pages/LeadEngine';
+import CouncilChamber from '@/pages/CouncilChamber';
 import { PortalStudioProvider } from '@/lib/PortalStudioContext';
 import XtremeShell from '@/components/xtremeai/XtremeShell';
 import PortalStudio from '@/pages/portalstudio/PortalStudio';
@@ -272,6 +273,7 @@ const AuthenticatedApp = () => {
       <Route path="/employee-management" element={<EmployeeManagement />} />
       <Route path="/product-catalog" element={<ProductCatalog />} />
       <Route path="/lead-engine" element={<LeadEngine />} />
+      <Route path="/council-chamber" element={<CouncilChamber />} />
         </Route>
       </Route>
       {/* Xtreme AI — mobile device shell with bottom tab bar. Isolated

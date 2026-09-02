@@ -35,6 +35,7 @@ const PIPELINE_OVERVIEW = { to: "/autonomous-system", label: "Pipeline Overview"
 const PIPELINE_CATALOG = { to: "/pipeline-catalog", label: "Pipeline Catalog", icon: Layers, end: true };
 const PRODUCT_CATALOG = { to: "/product-catalog", label: "Product Catalog", icon: Package, end: true };
 const LEAD_ENGINE = { to: "/lead-engine", label: "Lead Engine", icon: Radar, end: true };
+const COUNCIL_CHAMBER = { to: "/council-chamber", label: "Council Chamber", icon: Brain, end: true };
 const EMPLOYEE_PORTAL = { to: "/employee-portal", label: "Employee Portal", icon: Users, end: true };
 
 // Each step gets its own brand color so the pipeline reads as a creative
@@ -249,6 +250,20 @@ export default function Layout() {
             {LEAD_ENGINE.label}
           </NavLink>
           )}
+
+          {/* Council Chamber — multi-agent council debate + simulation lab */}
+          <NavLink
+            to={COUNCIL_CHAMBER.to}
+            end={COUNCIL_CHAMBER.end}
+            onClick={() => setOpen(false)}
+            className={({ isActive }) => cn(
+              "flex items-center gap-2.5 rounded-lg px-2.5 py-2 text-sm transition-colors",
+              isActive ? "bg-amber-400/10 text-amber-400 font-semibold" : "text-white hover:bg-white/5"
+            )}
+          >
+            <Brain className="h-4 w-4 shrink-0" />
+            {COUNCIL_CHAMBER.label}
+          </NavLink>
 
           {/* Employee Portal — for employees; admins see it too for oversight */}
           <NavLink

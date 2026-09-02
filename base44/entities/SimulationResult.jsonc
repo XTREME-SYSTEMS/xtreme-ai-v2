@@ -1,0 +1,268 @@
+{
+  "name": "SimulationResult",
+  "type": "object",
+  "description": "A Monte Carlo simulation result for a business model, strategy, or decision. The simulator is a laboratory, not a fortune teller \u2014 it runs probabilistic projections across time horizons (1 week to 15 years) and scenarios (baseline, conservative, expected, optimistic, adverse, black-swan). Every projection shows uncertainty. Every variable is editable. When a variable changes, prior results are preserved for comparison.",
+  "properties": {
+    "simulation_name": {
+      "type": "string",
+      "description": "Human-readable name for this simulation"
+    },
+    "simulation_type": {
+      "type": "string",
+      "enum": [
+        "business_model",
+        "strategy",
+        "decision",
+        "revenue",
+        "market_entry",
+        "product_launch",
+        "cost_optimization",
+        "growth"
+      ],
+      "default": "business_model"
+    },
+    "subject_id": {
+      "type": "string",
+      "description": "ID of the entity being simulated (AutoBuild, VisionCortexIdea, Market, etc.)"
+    },
+    "subject_type": {
+      "type": "string",
+      "description": "Entity type of the subject"
+    },
+    "input_variables": {
+      "type": "object",
+      "description": "The input variables used for this simulation run \u2014 customers, price, conversion, churn, CAC, LTV, margin, costs, etc.",
+      "properties": {
+        "customers": {
+          "type": "number"
+        },
+        "price": {
+          "type": "number"
+        },
+        "conversion_rate": {
+          "type": "number"
+        },
+        "churn_rate": {
+          "type": "number"
+        },
+        "cac": {
+          "type": "number"
+        },
+        "gross_margin": {
+          "type": "number"
+        },
+        "monthly_cost": {
+          "type": "number"
+        },
+        "ai_cost": {
+          "type": "number"
+        },
+        "growth_rate": {
+          "type": "number"
+        }
+      }
+    },
+    "scenario": {
+      "type": "string",
+      "enum": [
+        "baseline",
+        "conservative",
+        "expected",
+        "optimistic",
+        "adverse",
+        "black_swan"
+      ],
+      "default": "expected",
+      "description": "Which scenario assumption set was used"
+    },
+    "time_horizon": {
+      "type": "string",
+      "enum": [
+        "1_week",
+        "1_month",
+        "3_months",
+        "6_months",
+        "12_months",
+        "2_years",
+        "3_years",
+        "5_years",
+        "10_years",
+        "15_years"
+      ],
+      "default": "12_months"
+    },
+    "iterations": {
+      "type": "number",
+      "default": 1000,
+      "description": "Number of Monte Carlo iterations run"
+    },
+    "projections": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "period": {
+            "type": "string",
+            "description": "e.g. 'month_1', 'year_1'"
+          },
+          "revenue_p50": {
+            "type": "number",
+            "description": "Median projected revenue"
+          },
+          "revenue_p10": {
+            "type": "number",
+            "description": "10th percentile (adverse)"
+          },
+          "revenue_p90": {
+            "type": "number",
+            "description": "90th percentile (optimistic)"
+          },
+          "customers_p50": {
+            "type": "number"
+          },
+          "customers_p10": {
+            "type": "number"
+          },
+          "customers_p90": {
+            "type": "number"
+          },
+          "cost_p50": {
+            "type": "number"
+          },
+          "profit_p50": {
+            "type": "number"
+          },
+          "profit_p10": {
+            "type": "number"
+          },
+          "profit_p90": {
+            "type": "number"
+          }
+        }
+      },
+      "description": "Probabilistic projections per period \u2014 p10/p50/p90 percentiles from the Monte Carlo distribution"
+    },
+    "summary": {
+      "type": "object",
+      "description": "Headline results",
+      "properties": {
+        "break_even_months": {
+          "type": "number",
+          "description": "Months until break-even (p50)"
+        },
+        "expected_revenue_12m": {
+          "type": "number"
+        },
+        "expected_profit_12m": {
+          "type": "number"
+        },
+        "probability_of_success": {
+          "type": "number",
+          "description": "0-100 \u2014 P(profitable at horizon end)"
+        },
+        "worst_case_loss": {
+          "type": "number",
+          "description": "Maximum projected loss (p10)"
+        },
+        "best_case_gain": {
+          "type": "number",
+          "description": "Maximum projected gain (p90)"
+        },
+        "expected_value": {
+          "type": "number",
+          "description": "EV = P(success) \u00d7 upside - P(failure) \u00d7 downside"
+        }
+      }
+    },
+    "sensitivity_analysis": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "variable": {
+            "type": "string"
+          },
+          "impact": {
+            "type": "number",
+            "description": "How much this variable affects the outcome (0-100)"
+          },
+          "direction": {
+            "type": "string",
+            "description": "positive or negative"
+          }
+        }
+      },
+      "description": "Which input variables have the biggest impact on the outcome \u2014 for interactive what-if analysis"
+    },
+    "assumptions": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Key assumptions made \u2014 labeled explicitly so they can be challenged"
+    },
+    "uncertainty_notes": {
+      "type": "string",
+      "description": "Explicit statement of what is uncertain and why \u2014 never present simulation as certainty"
+    },
+    "prior_result_id": {
+      "type": "string",
+      "description": "If this is a re-run with changed variables, the prior SimulationResult ID for comparison"
+    },
+    "comparison_delta": {
+      "type": "object",
+      "description": "If re-run, the delta from the prior result",
+      "properties": {
+        "revenue_delta": {
+          "type": "number"
+        },
+        "profit_delta": {
+          "type": "number"
+        },
+        "changed_variables": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "running",
+        "complete",
+        "failed"
+      ],
+      "default": "running"
+    }
+  },
+  "required": [
+    "simulation_name",
+    "simulation_type",
+    "scenario",
+    "time_horizon"
+  ],
+  "rls": {
+    "read": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "create": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}
