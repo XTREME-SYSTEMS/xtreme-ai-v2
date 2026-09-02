@@ -2,6 +2,7 @@ import { Heart, ArrowRight, HardHat, GraduationCap, Layers } from "lucide-react"
 import { Link } from "react-router-dom";
 import MarketingNav from "@/components/marketing/MarketingNav";
 import MarketingFooter from "@/components/marketing/MarketingFooter";
+import { Image } from "@/components/ui/image";
 
 const STATS = [
   { value: "18+", label: "Years in the industry" },
@@ -17,7 +18,7 @@ const VALUES = [
   { icon: Heart, title: "Contractor-obsessed", desc: "Real humans, fast support, and a community of flooring pros that builds the roadmap with us." },
 ];
 
-const TEAM_IMG = "https://images.unsplash.com/photo-1581094288338-2314dddb7ece?auto=format&fit=crop&w=1000&q=80";
+const TEAM_IMG = "https://media.base44.com/images/public/6a79444e821211169a147eee/bf28f9b6b_121725747_3705443039488227_8851277793604007373_n.jpg";
 
 export default function About() {
   return (
@@ -33,7 +34,7 @@ export default function About() {
 
         {/* Team image */}
         <div className="mt-12 overflow-hidden rounded-2xl border border-black/10">
-          <img src={TEAM_IMG} alt="Concrete flooring professionals at work" className="h-64 w-full object-cover sm:h-80" />
+          <Image src={TEAM_IMG} alt="Polished Concrete University training session at Xtreme Polishing Systems" className="h-64 w-full object-cover sm:h-80" fittingType="fill" />
         </div>
 
         {/* Story — focused on epoxy, decorative concrete, and polished concrete industry */}
