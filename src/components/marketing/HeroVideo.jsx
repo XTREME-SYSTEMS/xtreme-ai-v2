@@ -128,7 +128,7 @@ export default function HeroVideo() {
   };
 
   return (
-    <section className="relative min-h-[88vh] overflow-hidden bg-black">
+    <section className="relative min-h-screen overflow-hidden bg-black">
       {/* Sequenced video background */}
       <video
         ref={videoRef}
@@ -172,8 +172,8 @@ export default function HeroVideo() {
         </div>
       </div>
 
-      {/* Headline + subtext — positioned at the TOP so it never covers the avatar's face */}
-      <div className="absolute left-0 right-0 top-14 z-10 px-4 text-center sm:top-16">
+      {/* Headline + subtext — positioned below the nav bar so it's visible and clear of the avatar's face */}
+      <div className="absolute left-0 right-0 top-28 z-10 px-4 text-center sm:top-32">
         <AnimatePresence mode="wait">
           <motion.div
             key={clip.phase}
@@ -210,7 +210,7 @@ export default function HeroVideo() {
       {/* Captions — what the avatar is "saying", spelled out word by word.
           Positioned in the lower-middle so it doesn't cover her face or lips. */}
       {captions.length > 0 && (
-        <div className="absolute bottom-32 left-0 right-0 z-10 flex justify-center px-4 sm:bottom-36">
+        <div className="absolute bottom-40 left-0 right-0 z-10 flex justify-center px-4 sm:bottom-44">
           <AnimatePresence mode="wait">
             <motion.div
               key={captionIdx}
@@ -236,7 +236,7 @@ export default function HeroVideo() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3, duration: 0.6 }}
-            className="absolute bottom-20 left-0 right-0 z-10 flex justify-center px-4 sm:bottom-24"
+            className="absolute bottom-28 left-0 right-0 z-10 flex justify-center px-4 sm:bottom-28"
           >
             <div className="flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
               <Link
