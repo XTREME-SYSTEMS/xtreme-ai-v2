@@ -482,6 +482,40 @@
       "default": [],
       "description": "Steps that have been completed (server-persisted step paths)"
     },
+    "source_vision_cortex_idea_id": {
+      "type": "string",
+      "description": "If this build was created from an idea submitted by the external Vision Cortex app via the receiveVisionCortexIdea webhook, this is Vision Cortex's idea ID. Used for dedup \u2014 if the same idea is submitted twice, the webhook returns the existing build instead of creating a duplicate."
+    },
+    "vision_cortex_scores": {
+      "type": "object",
+      "description": "Scores from the external Vision Cortex app (overall, profitability, scalability, niche_strength, usability, competition, trend_momentum, technical_feasibility) \u2014 preserved so the builder can see why Vision Cortex approved this idea.",
+      "properties": {
+        "overall": {
+          "type": "number"
+        },
+        "profitability": {
+          "type": "number"
+        },
+        "scalability": {
+          "type": "number"
+        },
+        "niche_strength": {
+          "type": "number"
+        },
+        "usability": {
+          "type": "number"
+        },
+        "competition": {
+          "type": "number"
+        },
+        "trend_momentum": {
+          "type": "number"
+        },
+        "technical_feasibility": {
+          "type": "number"
+        }
+      }
+    },
     "error": {
       "type": "string"
     },
