@@ -187,13 +187,13 @@ export default function HeroInteractive() {
               transition={{ duration: 30, repeat: Infinity, ease: "linear" }}
             />
 
-            {/* Logo icon */}
+            {/* Central AI core — no logo (nav already has it) */}
             <motion.div
-              className="relative z-10 flex h-28 w-28 items-center justify-center rounded-full border-2 border-amber-400 bg-white shadow-lg shadow-amber-400/30 sm:h-36 sm:w-36"
+              className="relative z-10 flex h-24 w-24 items-center justify-center rounded-full border-2 border-amber-400/60 bg-gradient-to-br from-amber-400/10 to-transparent shadow-lg shadow-amber-400/20 sm:h-32 sm:w-32"
               animate={{ y: [0, -8, 0] }}
               transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
             >
-              <img src={LOGO_ICON} alt="Xtreme AI" className="h-16 w-16 object-contain sm:h-24 sm:w-24" />
+              <Brain className="h-10 w-10 text-amber-500 sm:h-14 sm:w-14" />
             </motion.div>
 
             {/* Floating tech badges (desktop) */}
