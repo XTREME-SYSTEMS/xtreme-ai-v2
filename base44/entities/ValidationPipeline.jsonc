@@ -3,6 +3,11 @@
   "type": "object",
   "description": "Orchestrates the auto-audit \u2192 auto-fix \u2192 auto-heal \u2192 auto-harden \u2192 auto-optimize validation loop for a single AutoBuild. Created when a build enters the sandbox. Runs recursively until the build passes the quality gate (\u226575% score) or exhausts retries. Tracks each phase, the checks performed, the score, and the retry count.",
   "properties": {
+    "description": {
+      "type": "string",
+      "description": "Optional description (up to 1000 characters)",
+      "maxLength": 1000
+    },
     "build_id": {
       "type": "string",
       "description": "AutoBuild ID being validated"

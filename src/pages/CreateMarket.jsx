@@ -9,7 +9,7 @@ function slugify(s) { return String(s || "").toLowerCase().replace(/[^a-z0-9]+/g
 
 const US_STATES = ["AL","AK","AZ","AR","CA","CO","CT","DE","FL","GA","HI","ID","IL","IN","IA","KS","KY","LA","ME","MD","MA","MI","MN","MS","MO","MT","NE","NV","NH","NJ","NM","NY","NC","ND","OH","OK","OR","PA","RI","SC","SD","TN","TX","UT","VT","VA","WA","WV","WI","WY"];
 
-export default function NewMarket() {
+export default function CreateMarket() {
   const navigate = useNavigate();
   const { toast } = useToast();
   const [saving, setSaving] = useState(false);
@@ -48,7 +48,7 @@ export default function NewMarket() {
 
   return (
     <div>
-      <PageHeader title="New Market" subtitle="Enter a market + brand — AI generates the full SEO + content kit on create." />
+      <PageHeader title="Create Market" subtitle="Enter a market + brand — AI generates the full SEO + content kit on create." />
       <form onSubmit={submit}>
         <Panel title="Market & Brand">
           <div className="grid gap-3 sm:grid-cols-2">

@@ -3,6 +3,11 @@
   "type": "object",
   "description": "A snapshot of a record archived from another entity. Holds the original entity name, original record ID, and the full record data as a JSON string so it can be restored if needed. Created by the archiveAllData backend function when the operator wants to clean the pipeline without losing data.",
   "properties": {
+    "description": {
+      "type": "string",
+      "description": "Optional description (up to 1000 characters)",
+      "maxLength": 1000
+    },
     "source_entity": {
       "type": "string",
       "description": "Name of the entity this record was archived from"

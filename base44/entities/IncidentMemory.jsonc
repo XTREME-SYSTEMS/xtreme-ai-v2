@@ -3,6 +3,11 @@
   "type": "object",
   "description": "The learning loop's memory store \u2014 records every failure episode (symptoms \u2192 diagnosis \u2192 action \u2192 outcome) so future incidents with the same error signature can be resolved deterministically without an LLM call. The deterministic policy engine queries this before invoking the LLM audit.",
   "properties": {
+    "description": {
+      "type": "string",
+      "description": "Optional description (up to 1000 characters)",
+      "maxLength": 1000
+    },
     "error_signature": {
       "type": "string",
       "description": "Normalized hash/key of the error message + step \u2014 used for deterministic matching. e.g. 'architecture:missing_tech_stack'"

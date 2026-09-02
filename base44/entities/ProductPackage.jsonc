@@ -3,6 +3,11 @@
   "type": "object",
   "description": "A finalized, validated, shelved product \u2014 the output of the autonomous build factory. Created when an AutoBuild passes the full validation pipeline and is packaged as a finished, deployable product. Each package contains the complete code manifest, deployment config, validation score, and is ready to be deployed to a real client domain.",
   "properties": {
+    "description": {
+      "type": "string",
+      "description": "Optional description (up to 1000 characters)",
+      "maxLength": 1000
+    },
     "build_id": {
       "type": "string",
       "description": "Source AutoBuild ID"

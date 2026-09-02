@@ -18,11 +18,11 @@ const COLS = [
   {
     title: "Company",
     links: [
-      { label: "About", to: "/#about" },
+      { label: "About", to: "/about" },
       { label: "Solutions", to: "/#solutions" },
       { label: "Pricing", to: "/pricing" },
       { label: "FAQ", to: "/#faq" },
-      { label: "Contact", to: "/#contact" },
+      { label: "Contact", to: "/contact" },
     ],
   },
   {

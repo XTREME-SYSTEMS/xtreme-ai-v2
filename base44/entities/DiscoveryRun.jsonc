@@ -3,6 +3,11 @@
   "type": "object",
   "description": "A single execution of the autonomous discovery engine \u2014 tracks what was searched, how many ideas/leads were found, and the outcome. Created by scheduled workflows or manual triggers.",
   "properties": {
+    "description": {
+      "type": "string",
+      "description": "Optional description (up to 1000 characters)",
+      "maxLength": 1000
+    },
     "run_type": {
       "type": "string",
       "enum": [

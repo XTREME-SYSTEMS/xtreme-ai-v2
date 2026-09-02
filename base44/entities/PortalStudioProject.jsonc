@@ -3,6 +3,11 @@
   "type": "object",
   "description": "Sandbox project for the Portal Studio \u2014 an isolated clone of the client portal where admins refine, harden, and brand the portal experience without touching real client data. Each project is a self-contained build with its own profile, content, logo, brand, website, social, and video assets. Admin-only.",
   "properties": {
+    "description": {
+      "type": "string",
+      "description": "Optional description (up to 1000 characters)",
+      "maxLength": 1000
+    },
     "name": {
       "type": "string",
       "description": "Project name (e.g. 'Acme Roofing \u2014 Refinement Build')"

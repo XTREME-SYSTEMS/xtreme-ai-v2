@@ -3,6 +3,11 @@
   "type": "object",
   "description": "A node in the lead graph \u2014 a person, company, property, project, GC, architect, developer, or flooring scope discovered during hot-lead investigation. Nodes connect to each other (PERSON \u2192 COMPANY \u2192 PROPERTY \u2192 PROJECT \u2192 GC \u2192 ARCHITECT \u2192 DEVELOPER \u2192 FLOORING SCOPE \u2192 EPOXY OPPORTUNITY) to build a relationship graph that reveals who knows about a project before the contractor does.",
   "properties": {
+    "description": {
+      "type": "string",
+      "description": "Optional description (up to 1000 characters)",
+      "maxLength": 1000
+    },
     "client_email": {
       "type": "string",
       "description": "Client who owns this graph node. RLS isolation."

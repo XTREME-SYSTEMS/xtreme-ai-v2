@@ -35,7 +35,9 @@ import QARepair from '@/pages/QARepair';
 import ProposalFactory from '@/pages/ProposalFactory';
 import TestLab from '@/pages/TestLab';
 import Markets from '@/pages/Markets';
-import NewMarket from '@/pages/NewMarket';
+import CreateMarket from '@/pages/CreateMarket';
+import About from '@/pages/About';
+import Contact from '@/pages/Contact';
 import MarketDetail from '@/pages/MarketDetail';
 import SeoLaunchPad from '@/pages/SeoLaunchPad';
 import SalesPipeline from '@/pages/SalesPipeline';
@@ -163,6 +165,8 @@ const AuthenticatedApp = () => {
       <Route path="/coupon" element={<CouponPage />} />
       <Route path="/free-audit" element={<FreeAuditPage />} />
       <Route path="/free-tools" element={<FreeTools />} />
+      <Route path="/about" element={<About />} />
+      <Route path="/contact" element={<Contact />} />
       <Route path="/sign/:token" element={<SignPortal />} />
       <Route path="/walkthrough/:token" element={<WalkthroughView />} />
       <Route path="/login" element={<Login />} />
@@ -211,7 +215,7 @@ const AuthenticatedApp = () => {
           <Route path="/proposals" element={<ProposalFactory />} />
           <Route path="/test-lab" element={<TestLab />} />
           <Route path="/markets" element={<Markets />} />
-          <Route path="/markets/new" element={<NewMarket />} />
+          <Route path="/markets/new" element={<CreateMarket />} />
           <Route path="/markets/:id" element={<MarketDetail />} />
           <Route path="/seo-launch-pad" element={<SeoLaunchPad />} />
           <Route path="/pipeline" element={<SalesPipeline />} />

@@ -2,6 +2,11 @@
   "name": "ExperimentMetric",
   "type": "object",
   "properties": {
+    "description": {
+      "type": "string",
+      "description": "Optional description (up to 1000 characters)",
+      "maxLength": 1000
+    },
     "experiment_id": {
       "type": "string"
     },

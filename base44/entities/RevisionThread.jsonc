@@ -3,6 +3,11 @@
   "type": "object",
   "description": "Two-way messaging thread between client and admin for revision requests. Each message has a sender role (client/admin), body, and timestamp. Threads are linked to a step or approval.",
   "properties": {
+    "description": {
+      "type": "string",
+      "description": "Optional description (up to 1000 characters)",
+      "maxLength": 1000
+    },
     "client_email": {
       "type": "string",
       "description": "Email of the client who owns this thread. Used for row-level isolation."

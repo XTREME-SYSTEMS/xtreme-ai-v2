@@ -3,6 +3,11 @@
   "type": "object",
   "description": "Curated, allowlisted remediation steps \u2014 the only actions the self-healing loop is permitted to execute. Each playbook maps an error class + step to a specific function call with bounded retries and a risk level. The heal phase selects ONLY from this library.",
   "properties": {
+    "description": {
+      "type": "string",
+      "description": "Optional description (up to 1000 characters)",
+      "maxLength": 1000
+    },
     "name": {
       "type": "string",
       "description": "Human-readable playbook name (e.g. 'Regenerate Architecture on Schema Failure')"

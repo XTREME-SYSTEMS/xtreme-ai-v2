@@ -2,6 +2,11 @@
   "name": "IndustryDNA",
   "type": "object",
   "properties": {
+    "description": {
+      "type": "string",
+      "description": "Optional description (up to 1000 characters)",
+      "maxLength": 1000
+    },
     "industry": {
       "type": "string"
     },

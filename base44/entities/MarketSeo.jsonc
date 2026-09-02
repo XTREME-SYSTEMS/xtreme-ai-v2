@@ -2,6 +2,11 @@
   "name": "MarketSeo",
   "type": "object",
   "properties": {
+    "description": {
+      "type": "string",
+      "description": "Optional description (up to 1000 characters)",
+      "maxLength": 1000
+    },
     "market_id": {
       "type": "string"
     },

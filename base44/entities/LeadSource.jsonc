@@ -3,6 +3,11 @@
   "type": "object",
   "description": "A configurable scraping source for the lead engine. Each source is a URL to scrape (Facebook group, Craigslist city, Reddit subreddit, building department portal, or company directory) with service keywords and location filtering. Sources are owned by a client and scraped on a schedule.",
   "properties": {
+    "description": {
+      "type": "string",
+      "description": "Optional description (up to 1000 characters)",
+      "maxLength": 1000
+    },
     "client_email": {
       "type": "string",
       "description": "Email of the client who owns this source. Used for row-level isolation."

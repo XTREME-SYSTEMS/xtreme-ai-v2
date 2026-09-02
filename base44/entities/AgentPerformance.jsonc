@@ -3,6 +3,11 @@
   "type": "object",
   "description": "Tracks the demonstrated performance of each AI agent archetype in the Vision Cortex Council and autonomous system. Agents are scored on accuracy, usefulness, reasoning quality, source quality, prediction quality, implementation success, validation success, cost efficiency, reliability, collaboration, and failure recovery. Calibration is maintained \u2014 confidence is not rewarded, useful correct outcomes are. Used to weight council decisions by demonstrated performance, not personality.",
   "properties": {
+    "description": {
+      "type": "string",
+      "description": "Optional description (up to 1000 characters)",
+      "maxLength": 1000
+    },
     "agent_name": {
       "type": "string",
       "description": "The agent/archetype name (e.g. 'chief_architect', 'contrarian', 'epistemic_auditor', 'systems_architect')"

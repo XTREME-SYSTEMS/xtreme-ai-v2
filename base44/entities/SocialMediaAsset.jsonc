@@ -3,6 +3,11 @@
   "type": "object",
   "description": "Media library item for a client's social media \u2014 a user-uploaded image/video or an AI-generated template image \u2014 that can be assigned to content calendar posts.",
   "properties": {
+    "description": {
+      "type": "string",
+      "description": "Optional description (up to 1000 characters)",
+      "maxLength": 1000
+    },
     "client_email": {
       "type": "string",
       "description": "Email of the client who owns this asset. Used for row-level isolation."

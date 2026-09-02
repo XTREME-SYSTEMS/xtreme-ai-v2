@@ -3,6 +3,11 @@
   "type": "object",
   "description": "A decision debated by the Vision Cortex Council \u2014 a non-hierarchical AI council of specialized intelligence archetypes. Each decision runs through an 11-round protocol (independent reasoning \u2192 evidence \u2192 cross-examination \u2192 contrarian challenge \u2192 risk/economic/engineering/security review \u2192 simulation \u2192 decision \u2192 confidence). Dissent is preserved. Confidence is scored. No agent has authority merely because it is called 'Chief'.",
   "properties": {
+    "description": {
+      "type": "string",
+      "description": "Optional description (up to 1000 characters)",
+      "maxLength": 1000
+    },
     "question": {
       "type": "string",
       "description": "The decision question debated by the council"

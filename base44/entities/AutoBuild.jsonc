@@ -3,6 +3,11 @@
   "type": "object",
   "description": "Admin-driven Auto Builder queue \u2014 supports multiple product types (marketing site, web app, e-commerce, platform). Each product type has its own dedicated pipeline of steps. The admin creates a build, picks a product type, then walks through the exact same client portal experience (timeline, StepCoach, generators) against that build. All client portal hooks transparently read/write the AutoBuild record via AutoBuildContext.",
   "properties": {
+    "description": {
+      "type": "string",
+      "description": "Optional description (up to 1000 characters)",
+      "maxLength": 1000
+    },
     "business_name": {
       "type": "string",
       "description": "Business name or product name for this build"

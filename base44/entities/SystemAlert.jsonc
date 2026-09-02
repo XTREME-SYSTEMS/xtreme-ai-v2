@@ -3,6 +3,11 @@
   "type": "object",
   "description": "Alerts raised by the autonomous self-healing loop when a build step fails repeatedly, a circuit breaker trips, or a post-deployment verification check fails. Tracks the alert class, severity, affected build, and resolution status so the autonomous system can escalate to an operator when it can't self-heal.",
   "properties": {
+    "description": {
+      "type": "string",
+      "description": "Optional description (up to 1000 characters)",
+      "maxLength": 1000
+    },
     "alert_type": {
       "type": "string",
       "enum": [

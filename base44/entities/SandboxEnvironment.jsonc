@@ -3,6 +3,11 @@
   "type": "object",
   "description": "An isolated preview environment for an AutoBuild. Each build gets its own sandbox with a unique preview URL, allocated resources, and a lifecycle from provisioning through validation to destruction. The sandbox is where the Auto Builder generates, deploys, and tests the product before it gets packaged as a finished product.",
   "properties": {
+    "description": {
+      "type": "string",
+      "description": "Optional description (up to 1000 characters)",
+      "maxLength": 1000
+    },
     "build_id": {
       "type": "string",
       "description": "AutoBuild ID this sandbox environment belongs to"

@@ -3,6 +3,11 @@
   "type": "object",
   "description": "A node in the recursive source graph \u2014 every website, directory, forum, bid board, permit portal, or community discovered during recursive source discovery. Tracks the category, geographic coverage, discovery depth, parent source, lead yield, and relationships to other sources. The source graph grows autonomously as the Scout/Hunter agents discover new sources from existing ones.",
   "properties": {
+    "description": {
+      "type": "string",
+      "description": "Optional description (up to 1000 characters)",
+      "maxLength": 1000
+    },
     "client_email": {
       "type": "string",
       "description": "Client who owns this source node. RLS isolation."

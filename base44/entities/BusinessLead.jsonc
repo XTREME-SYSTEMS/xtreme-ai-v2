@@ -3,6 +3,11 @@
   "type": "object",
   "description": "A business discovered by the autonomous engine that has a bad website, poor online presence, technical failures, or missing enhancements. Queued for outreach and potential conversion to a client project or AutoBuild.",
   "properties": {
+    "description": {
+      "type": "string",
+      "description": "Optional description (up to 1000 characters)",
+      "maxLength": 1000
+    },
     "business_name": {
       "type": "string",
       "description": "Name of the business"

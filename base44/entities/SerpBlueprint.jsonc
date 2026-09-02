@@ -2,6 +2,11 @@
   "name": "SerpBlueprint",
   "type": "object",
   "properties": {
+    "description": {
+      "type": "string",
+      "description": "Optional description (up to 1000 characters)",
+      "maxLength": 1000
+    },
     "keyword": {
       "type": "string",
       "description": "The target keyword searched"

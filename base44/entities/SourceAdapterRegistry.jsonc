@@ -2,6 +2,11 @@
   "name": "SourceAdapterRegistry",
   "type": "object",
   "properties": {
+    "description": {
+      "type": "string",
+      "description": "Optional description (up to 1000 characters)",
+      "maxLength": 1000
+    },
     "source_name": {
       "type": "string"
     },

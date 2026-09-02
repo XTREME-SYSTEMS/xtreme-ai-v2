@@ -2,6 +2,11 @@
   "name": "Receipt",
   "type": "object",
   "properties": {
+    "description": {
+      "type": "string",
+      "description": "Optional description (up to 1000 characters)",
+      "maxLength": 1000
+    },
     "agent_or_workflow": {
       "type": "string"
     },

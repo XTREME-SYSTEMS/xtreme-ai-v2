@@ -3,6 +3,11 @@
   "type": "object",
   "description": "Offloads creative work from the User record \u2014 stores all generated assets (vision, strategy, content, logo, brand, website, social, video) for a client's project, keyed by client email. Supports multiple projects per client: one active at a time, others archived (with a user_pipeline_snapshot) so they can be resumed from the Projects page.",
   "properties": {
+    "description": {
+      "type": "string",
+      "description": "Optional description (up to 1000 characters)",
+      "maxLength": 1000
+    },
     "client_email": {
       "type": "string",
       "description": "Email of the client who owns this project. Used for row-level isolation."
