@@ -1,11 +1,92 @@
 import { useEffect, useState } from "react";
 import { base44 } from "@/api/base44Client";
-import { Tag, Plus, Trash2, Loader2, Check, X, Edit3, Power, Copy } from "lucide-react";
+import { Tag, Plus, Trash2, Loader2, Check, X, Edit3, Power, Copy, Sparkles, Zap, Calendar, Gift, Clock, Star } from "lucide-react";
 import { SERVICE_CATALOG } from "@/lib/serviceCatalog";
 
+// Pre-designed access pass templates — quick-select buttons that pre-fill the
+// form. The admin can still customize everything after selecting a template.
+const PASS_TEMPLATES = [
+  {
+    id: "weekly_deal",
+    label: "Weekly Deal",
+    icon: Calendar,
+    passType: "weekly_deal",
+    discountType: "percentage",
+    discountValue: 25,
+    durationDays: 7,
+    capabilities: ["weekly_deal"],
+    description: "Weekly deal — 25% off, valid 7 days",
+  },
+  {
+    id: "free_day_pass",
+    label: "Free 1-Day Pass",
+    icon: Clock,
+    passType: "day_pass",
+    discountType: "percentage",
+    discountValue: 100,
+    durationDays: 1,
+    capabilities: ["free_usage", "1_day_pass"],
+    description: "Free 1-day pass — 100% off, 1 day access",
+  },
+  {
+    id: "free_usage",
+    label: "Free Usage",
+    icon: Gift,
+    passType: "free_usage",
+    discountType: "percentage",
+    discountValue: 100,
+    durationDays: 0,
+    capabilities: ["free_usage"],
+    description: "Free usage — 100% off, no time limit",
+  },
+  {
+    id: "weekend_special",
+    label: "Weekend Special",
+    icon: Star,
+    passType: "access_pass",
+    discountType: "percentage",
+    discountValue: 50,
+    durationDays: 3,
+    capabilities: ["weekend_special"],
+    description: "Weekend special — 50% off, 3 day access",
+  },
+  {
+    id: "first_month",
+    label: "First Month Free",
+    icon: Zap,
+    passType: "access_pass",
+    discountType: "percentage",
+    discountValue: 100,
+    durationDays: 30,
+    capabilities: ["first_month_free", "full_access"],
+    description: "First month free — 100% off, 30 days",
+  },
+  {
+    id: "custom",
+    label: "Custom",
+    icon: Sparkles,
+    passType: "custom",
+    discountType: "percentage",
+    discountValue: 0,
+    durationDays: 0,
+    capabilities: [],
+    description: "Build your own — fully customizable",
+  },
+];
+
+// Common capability chips the admin can quick-add. These are free-form
+// strings — the admin can also type custom ones. Not tied to any external system.
+const COMMON_CAPABILITIES = [
+  "full_access", "lead_engine", "brand_generator", "website_builder",
+  "seo_tools", "free_audit", "free_consultation", "1_day_pass", "1_week",
+  "30_day_access", "weekly_deal", "weekend_special", "first_month_free",
+  "unlimited_usage", "single_use", "stackable",
+];
+
 // Admin dashboard for managing promo codes. Create, edit, toggle, and delete
-// codes. Each code has a discount type (percentage/fixed), value, optional
-// usage limit, date range, and product restrictions.
+// codes. Each code has a pass type, stackable capabilities, discount, optional
+// usage limit, date range, duration, and product restrictions. Pre-designed
+// templates let the admin quick-start; the custom builder allows full control.
 export default function AdminPromoCodes() {
   const [codes, setCodes] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -14,13 +95,18 @@ export default function AdminPromoCodes() {
   const [form, setForm] = useState(emptyForm());
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState(null);
+  const [customCapability, setCustomCapability] = useState("");
 
   function emptyForm() {
     return {
       code: "",
+      label: "",
       description: "",
+      passType: "discount",
+      capabilities: [],
       discountType: "percentage",
       discountValue: "",
+      durationDays: 0,
       active: true,
       maxUses: 0,
       validFrom: "",
@@ -44,6 +130,19 @@ export default function AdminPromoCodes() {
 
   useEffect(() => { loadCodes(); }, []);
 
+  const applyTemplate = (template) => {
+    setForm((f) => ({
+      ...f,
+      label: template.label,
+      passType: template.passType,
+      discountType: template.discountType,
+      discountValue: String(template.discountValue),
+      durationDays: template.durationDays,
+      capabilities: template.capabilities,
+      description: template.description,
+    }));
+  };
+
   const startCreate = () => {
     setEditing(null);
     setForm(emptyForm());
@@ -54,9 +153,13 @@ export default function AdminPromoCodes() {
     setEditing(code);
     setForm({
       code: code.code || "",
+      label: code.label || "",
       description: code.description || "",
+      passType: code.passType || "discount",
+      capabilities: code.capabilities || [],
       discountType: code.discountType || "percentage",
       discountValue: String(code.discountValue ?? ""),
+      durationDays: code.durationDays || 0,
       active: code.active !== false,
       maxUses: code.maxUses || 0,
       validFrom: code.validFrom ? code.validFrom.slice(0, 16) : "",
@@ -69,7 +172,7 @@ export default function AdminPromoCodes() {
 
   const handleSave = async (e) => {
     e.preventDefault();
-    if (!form.code.trim() || !form.discountValue) {
+    if (!form.code.trim() || form.discountValue === "") {
       setError("Code and discount value are required");
       return;
     }
@@ -78,9 +181,13 @@ export default function AdminPromoCodes() {
     try {
       const payload = {
         code: form.code.trim().toUpperCase(),
+        label: form.label.trim(),
         description: form.description.trim(),
+        passType: form.passType,
+        capabilities: form.capabilities,
         discountType: form.discountType,
         discountValue: Number(form.discountValue),
+        durationDays: Number(form.durationDays) || 0,
         active: form.active,
         maxUses: Number(form.maxUses) || 0,
         validFrom: form.validFrom ? new Date(form.validFrom).toISOString() : null,
@@ -130,6 +237,40 @@ export default function AdminPromoCodes() {
     });
   };
 
+  const toggleCapability = (cap) => {
+    setForm((f) => {
+      const caps = f.capabilities.includes(cap)
+        ? f.capabilities.filter((c) => c !== cap)
+        : [...f.capabilities, cap];
+      return { ...f, capabilities: caps };
+    });
+  };
+
+  const addCustomCapability = () => {
+    const cap = customCapability.trim().toLowerCase().replace(/\s+/g, "_");
+    if (!cap) return;
+    if (!form.capabilities.includes(cap)) {
+      setForm((f) => ({ ...f, capabilities: [...f.capabilities, cap] }));
+    }
+    setCustomCapability("");
+  };
+
+  const removeCapability = (cap) => {
+    setForm((f) => ({ ...f, capabilities: f.capabilities.filter((c) => c !== cap) }));
+  };
+
+  const passTypeLabel = (pt) => {
+    const labels = {
+      discount: "Discount",
+      access_pass: "Access Pass",
+      free_usage: "Free Usage",
+      day_pass: "Day Pass",
+      weekly_deal: "Weekly Deal",
+      custom: "Custom",
+    };
+    return labels[pt] || pt;
+  };
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -139,7 +280,7 @@ export default function AdminPromoCodes() {
         </div>
         <div className="flex-1">
           <h1 className="text-xl font-semibold text-white">Promo Codes</h1>
-          <p className="text-sm text-white/50">Create and manage discount codes for checkout.</p>
+          <p className="text-sm text-white/50">Create and manage fully customizable promo codes — weekly deals, free passes, discounts, or anything you want.</p>
         </div>
         <button
           onClick={startCreate}
@@ -158,9 +299,9 @@ export default function AdminPromoCodes() {
         </div>
       )}
 
-      {/* Form modal */}
+      {/* Form */}
       {showForm && (
-        <form onSubmit={handleSave} className="rounded-xl border border-lime-400/30 bg-zinc-950 p-5 space-y-4">
+        <form onSubmit={handleSave} className="rounded-xl border border-lime-400/30 bg-zinc-950 p-5 space-y-5">
           <div className="flex items-center justify-between">
             <h3 className="text-sm font-semibold text-white">{editing ? "Edit Promo Code" : "New Promo Code"}</h3>
             <button type="button" onClick={() => setShowForm(false)} className="text-white/40 hover:text-white">
@@ -168,6 +309,34 @@ export default function AdminPromoCodes() {
             </button>
           </div>
 
+          {/* Pre-designed templates */}
+          {!editing && (
+            <div>
+              <label className="mb-2 block text-xs font-medium text-white/60">Quick-Start Templates</label>
+              <div className="flex flex-wrap gap-2">
+                {PASS_TEMPLATES.map((t) => {
+                  const Icon = t.icon;
+                  const isActive = form.passType === t.passType && form.label === t.label;
+                  return (
+                    <button
+                      key={t.id}
+                      type="button"
+                      onClick={() => applyTemplate(t)}
+                      className={`inline-flex items-center gap-1.5 rounded-lg border px-3 py-2 text-xs font-medium transition-colors ${
+                        isActive
+                          ? "border-lime-400 bg-lime-400/20 text-lime-300"
+                          : "border-white/15 text-white/50 hover:border-lime-400/40 hover:text-lime-300"
+                      }`}
+                    >
+                      <Icon className="h-3.5 w-3.5" /> {t.label}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+
+          {/* Basic fields */}
           <div className="grid gap-4 sm:grid-cols-2">
             <div>
               <label className="mb-1 block text-xs font-medium text-white/60">Code</label>
@@ -179,6 +348,31 @@ export default function AdminPromoCodes() {
                 placeholder="SUMMER25"
                 className="w-full rounded-lg border border-white/15 bg-black px-3 py-2 text-sm text-white placeholder:text-white/30 focus:border-lime-400 focus:outline-none"
               />
+            </div>
+            <div>
+              <label className="mb-1 block text-xs font-medium text-white/60">Label (display name)</label>
+              <input
+                type="text"
+                value={form.label}
+                onChange={(e) => setForm({ ...form, label: e.target.value })}
+                placeholder="Weekly Deal"
+                className="w-full rounded-lg border border-white/15 bg-black px-3 py-2 text-sm text-white placeholder:text-white/30 focus:border-lime-400 focus:outline-none"
+              />
+            </div>
+            <div>
+              <label className="mb-1 block text-xs font-medium text-white/60">Pass Type</label>
+              <select
+                value={form.passType}
+                onChange={(e) => setForm({ ...form, passType: e.target.value })}
+                className="w-full rounded-lg border border-white/15 bg-black px-3 py-2 text-sm text-white focus:border-lime-400 focus:outline-none"
+              >
+                <option value="discount">Discount</option>
+                <option value="access_pass">Access Pass</option>
+                <option value="free_usage">Free Usage</option>
+                <option value="day_pass">Day Pass</option>
+                <option value="weekly_deal">Weekly Deal</option>
+                <option value="custom">Custom</option>
+              </select>
             </div>
             <div>
               <label className="mb-1 block text-xs font-medium text-white/60">Description (internal)</label>
@@ -213,6 +407,17 @@ export default function AdminPromoCodes() {
                 value={form.discountValue}
                 onChange={(e) => setForm({ ...form, discountValue: e.target.value })}
                 placeholder={form.discountType === "percentage" ? "25" : "50"}
+                className="w-full rounded-lg border border-white/15 bg-black px-3 py-2 text-sm text-white placeholder:text-white/30 focus:border-lime-400 focus:outline-none"
+              />
+            </div>
+            <div>
+              <label className="mb-1 block text-xs font-medium text-white/60">Duration (days, 0 = no limit)</label>
+              <input
+                type="number"
+                min="0"
+                value={form.durationDays}
+                onChange={(e) => setForm({ ...form, durationDays: e.target.value })}
+                placeholder="7"
                 className="w-full rounded-lg border border-white/15 bg-black px-3 py-2 text-sm text-white placeholder:text-white/30 focus:border-lime-400 focus:outline-none"
               />
             </div>
@@ -254,6 +459,71 @@ export default function AdminPromoCodes() {
                 onChange={(e) => setForm({ ...form, validUntil: e.target.value })}
                 className="w-full rounded-lg border border-white/15 bg-black px-3 py-2 text-sm text-white focus:border-lime-400 focus:outline-none"
               />
+            </div>
+          </div>
+
+          {/* Capabilities builder — stackable checkboxes */}
+          <div>
+            <label className="mb-1.5 block text-xs font-medium text-white/60">
+              Access Capabilities (stackable — check all that apply)
+            </label>
+            {/* Selected capabilities */}
+            {form.capabilities.length > 0 && (
+              <div className="mb-2 flex flex-wrap gap-1.5">
+                {form.capabilities.map((cap) => (
+                  <span
+                    key={cap}
+                    className="inline-flex items-center gap-1 rounded-md border border-lime-400/40 bg-lime-400/15 px-2 py-1 text-[11px] font-medium text-lime-300"
+                  >
+                    {cap}
+                    <button
+                      type="button"
+                      onClick={() => removeCapability(cap)}
+                      className="text-lime-400/60 hover:text-lime-300"
+                    >
+                      <X className="h-3 w-3" />
+                    </button>
+                  </span>
+                ))}
+              </div>
+            )}
+            {/* Common capability chips */}
+            <div className="flex flex-wrap gap-1.5">
+              {COMMON_CAPABILITIES.map((cap) => {
+                const selected = form.capabilities.includes(cap);
+                return (
+                  <button
+                    key={cap}
+                    type="button"
+                    onClick={() => toggleCapability(cap)}
+                    className={`rounded-md border px-2 py-1 text-[11px] font-medium transition-colors ${
+                      selected
+                        ? "border-lime-400 bg-lime-400/20 text-lime-300"
+                        : "border-white/15 text-white/50 hover:border-lime-400/40 hover:text-lime-300"
+                    }`}
+                  >
+                    {selected ? "✓ " : ""}{cap}
+                  </button>
+                );
+              })}
+            </div>
+            {/* Custom capability input */}
+            <div className="mt-2 flex gap-2">
+              <input
+                type="text"
+                value={customCapability}
+                onChange={(e) => setCustomCapability(e.target.value)}
+                onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); addCustomCapability(); } }}
+                placeholder="Add custom capability (e.g. vip_access)"
+                className="flex-1 rounded-lg border border-white/15 bg-black px-3 py-2 text-sm text-white placeholder:text-white/30 focus:border-lime-400 focus:outline-none"
+              />
+              <button
+                type="button"
+                onClick={addCustomCapability}
+                className="rounded-lg border border-lime-400/40 px-3 py-2 text-sm font-medium text-lime-300 hover:bg-lime-400/10"
+              >
+                <Plus className="h-4 w-4" />
+              </button>
             </div>
           </div>
 
@@ -344,14 +614,35 @@ export default function AdminPromoCodes() {
                     }`}>
                       {c.active ? "Active" : "Inactive"}
                     </span>
+                    {c.passType && c.passType !== "discount" && (
+                      <span className="rounded-full bg-amber-400/15 px-2 py-0.5 text-[10px] font-bold text-amber-400">
+                        {passTypeLabel(c.passType)}
+                      </span>
+                    )}
                   </div>
+                  {c.label && (
+                    <div className="mt-0.5 text-xs font-medium text-lime-400/80">{c.label}</div>
+                  )}
                   {c.description && (
                     <p className="mt-0.5 text-xs text-white/50">{c.description}</p>
+                  )}
+                  {/* Capabilities */}
+                  {c.capabilities?.length > 0 && (
+                    <div className="mt-2 flex flex-wrap gap-1">
+                      {c.capabilities.map((cap) => (
+                        <span key={cap} className="rounded border border-lime-400/20 bg-lime-400/5 px-1.5 py-0.5 text-[10px] text-lime-400/70">
+                          {cap}
+                        </span>
+                      ))}
+                    </div>
                   )}
                   <div className="mt-2 flex flex-wrap gap-3 text-xs text-white/60">
                     <span>
                       {c.discountType === "percentage" ? `${c.discountValue}% off` : `$${c.discountValue} off`}
                     </span>
+                    {c.durationDays > 0 && (
+                      <span>{c.durationDays} day pass</span>
+                    )}
                     <span>
                       Uses: {c.usedCount || 0}{c.maxUses > 0 ? ` / ${c.maxUses}` : " / ∞"}
                     </span>

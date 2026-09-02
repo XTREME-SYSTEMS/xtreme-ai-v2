@@ -55,11 +55,8 @@ export default function Login() {
       footer={
         <>
           Don't have an account?{" "}
-          <Link
-            to={"/register" + (returnTo !== "/" ? "?returnTo=" + encodeURIComponent(returnTo) : "")}
-            className="text-primary font-medium hover:underline"
-          >
-            Create one
+          <Link to="/pricing" className="text-primary font-medium hover:underline">
+            Get Started
           </Link>
         </>
       }
@@ -138,6 +135,19 @@ export default function Login() {
           )}
         </Button>
       </form>
+
+      <div className="relative my-6">
+        <div className="absolute inset-0 flex items-center">
+          <div className="w-full border-t border-border" />
+        </div>
+        <div className="relative flex justify-center text-xs uppercase">
+          <span className="bg-card px-3 text-muted-foreground">or</span>
+        </div>
+      </div>
+
+      <Link to="/pricing" className="flex w-full h-12 items-center justify-center rounded-lg border-2 border-primary text-primary font-medium text-sm transition-colors hover:bg-primary/10">
+        Get Started — Purchase a Package
+      </Link>
     </AuthLayout>
   );
 }

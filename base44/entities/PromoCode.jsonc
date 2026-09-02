@@ -1,15 +1,40 @@
 {
   "name": "PromoCode",
   "type": "object",
-  "description": "Discount codes that can be applied at checkout for a percentage or fixed amount off. Managed by admins.",
+  "description": "Fully customizable promo codes for weekly deals, free usages, 1-day passes, discounts, or anything the admin wants to create. Each code can stack multiple capabilities. Managed by admins only.",
   "properties": {
+    "description": {
+      "type": "string",
+      "description": "Optional description (up to 1000 characters)",
+      "maxLength": 1000
+    },
     "code": {
       "type": "string",
       "description": "The promo code string (stored uppercase, matched case-insensitively)"
     },
-    "description": {
+    "label": {
       "type": "string",
-      "description": "Internal note about what this code is for"
+      "description": "Display name for this pass (e.g. 'Weekly Deal', 'Free 1-Day Pass', 'Weekend Special')"
+    },
+    "passType": {
+      "type": "string",
+      "enum": [
+        "discount",
+        "access_pass",
+        "free_usage",
+        "day_pass",
+        "weekly_deal",
+        "custom"
+      ],
+      "default": "discount",
+      "description": "What kind of pass this is \u2014 fully customizable, not tied to any external system"
+    },
+    "capabilities": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Stackable access capabilities bundled into this code (free-form, admin-defined \u2014 e.g. 'full_access', 'lead_engine', '1_week', 'free_audit')"
     },
     "discountType": {
       "type": "string",
@@ -23,6 +48,11 @@
     "discountValue": {
       "type": "number",
       "description": "Percentage (0-100) or fixed amount in USD"
+    },
+    "durationDays": {
+      "type": "number",
+      "default": 0,
+      "description": "How many days this pass grants access (0 = no time limit). Used for 1-day passes, weekly deals, etc."
     },
     "active": {
       "type": "boolean",

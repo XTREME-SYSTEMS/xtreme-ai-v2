@@ -3,6 +3,7 @@ import { motion } from "framer-motion";
 import MarketingNav from "@/components/marketing/MarketingNav";
 import HeroInteractive from "@/components/marketing/HeroInteractive";
 import PricingSection from "@/components/marketing/PricingSection";
+import PromoCodeInput from "@/components/marketing/PromoCodeInput";
 import ConsultBooking from "@/components/marketing/ConsultBooking";
 import MarketingFooter from "@/components/marketing/MarketingFooter";
 import ExpandableServiceCard from "@/components/marketing/ExpandableServiceCard";
@@ -21,6 +22,9 @@ export default function Pricing() {
 
         {/* Subscription plans */}
         <PricingSection showHeader={false} />
+
+        {/* Promo code input */}
+        <PromoCodeInput />
 
         {/* À la carte — all services with expandable cards */}
         <section className="bg-zinc-50 py-20 sm:py-28">

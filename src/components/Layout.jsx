@@ -414,6 +414,9 @@ export default function Layout() {
           </div>
           <div className="ml-auto flex items-center gap-3">
             <span className="hidden text-xs text-black/60 sm:inline">{user?.email || ""}</span>
+            <a href="/?view=site" target="_blank" rel="noopener noreferrer" className="flex items-center gap-1.5 rounded-lg border border-amber-400 px-2.5 py-1.5 text-xs text-black font-medium hover:bg-amber-400/10">
+              <Globe className="h-3.5 w-3.5" /> View Public Site
+            </a>
             <button onClick={() => setShowPreviewModal(true)} className="flex items-center gap-1.5 rounded-lg border border-amber-400 px-2.5 py-1.5 text-xs text-black font-medium hover:bg-amber-400/10">
               <Eye className="h-3.5 w-3.5" /> Preview as Client
             </button>
