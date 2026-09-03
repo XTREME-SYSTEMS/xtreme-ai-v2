@@ -29,26 +29,32 @@ export default async function(req: Request): Promise<Response> {
     await svc.entities.WebPack.update(webpack_id, { status: 'analyzing', error: null, logs: [...(pack.logs || []), ...logs] });
     logs.push(`[${new Date().toISOString()}] Sending design image to vision AI for pixel-perfect HTML generation...`);
 
-    const prompt = `You are a pixel-perfect senior frontend engineer. Analyze the provided design mockup image and generate a complete, self-contained HTML file with inline CSS that reproduces the design EXACTLY as shown — pixel-perfect.
+    const prompt = `You are an expert frontend developer. Your job is to recreate the provided website design mockup as a single, complete HTML file with inline CSS that looks EXACTLY like the image. This is a pixel-perfect reproduction task.
 
-Critical requirements:
-1. Output a SINGLE complete HTML document. All CSS must be inline inside a <style> tag. No external files, no JavaScript frameworks.
-2. Match the design PIXEL-PERFECT — extract and use the exact colors (hex), font sizes, font weights, spacing, padding, margins, border radii, shadows, and layout from the image.
-3. Use CSS Grid and Flexbox for layout. Match the exact grid structure and alignment.
-4. Make it fully responsive — use media queries so it looks great on mobile, tablet, and desktop while preserving the design's intent.
-5. Use system fonts (system-ui, -apple-system, "Segoe UI", Roboto, sans-serif) unless the design clearly uses a specific recognizable font.
-6. Include ALL text content exactly as shown in the design — headings, paragraphs, buttons, labels, navigation items, footer text. Do not paraphrase or skip anything.
-7. For any images shown in the design, use high-quality placeholder images from Unsplash with relevant keywords (format: https://images.unsplash.com/photo-XXXXX?w=800&q=80). For icons, use inline SVG.
-8. Include proper SEO meta tags: <title>, <meta name="description">, Open Graph tags, and viewport.
-9. If the design has a navigation bar, make the nav links functional anchor links to sections on the same page.
-10. If the design has buttons, style them exactly as shown and link them to relevant sections.
+Analyze the image carefully, section by section, top to bottom. Then write the HTML/CSS.
 
-Return ONLY the raw HTML code. Start with <!DOCTYPE html> and end with </html>. Do NOT include any explanation, markdown formatting, or code fences around the output.`;
+CRITICAL RULES:
+1. SINGLE HTML FILE: All CSS goes in a <style> tag. No external CSS, no JS frameworks, no build tools.
+2. EXACT COLORS: Extract every color precisely. Use the exact hex codes you see in the image. Do NOT guess or approximate — if a button looks like a muted gold, find the exact hex (e.g. #c19b6e, not #FFD700).
+3. EXACT TYPOGRAPHY: Match font sizes, weights, letter-spacing, text-transform (uppercase/lowercase), and line-heights precisely. If text is bold uppercase with wide letter spacing, reproduce that exactly.
+4. EXACT LAYOUT: Reproduce the exact spatial arrangement — where elements sit, their alignment (left/center/right), the grid structure, column counts, gaps, and spacing. Use CSS Grid and Flexbox.
+5. EXACT TEXT: Copy ALL text verbatim from the image. Every heading, subheading, paragraph, button label, nav item, phone number, and footer text must match exactly. Do not paraphrase, abbreviate, or skip anything.
+6. EXACT BACKGROUNDS: If there's a background image, use a relevant Unsplash photo (https://images.unsplash.com/photo-XXXX?w=1920&q=80) that matches the subject. If the background is darkened, apply the same dark overlay.
+7. EXACT BUTTONS & COMPONENTS: Match button shapes (border-radius), borders, backgrounds, hover states, padding, and icon placement precisely. If a button has a ">" arrow, include it.
+8. EXACT ICONS: For icons in the design, use inline SVG that matches the icon style (line icons, filled, etc.). Match icon size and color.
+9. NAVIGATION: Reproduce the nav bar exactly — logo, menu items, dropdown indicators, phone number, CTA button. Make nav links anchor links to page sections.
+10. RESPONSIVE: Add media queries for mobile/tablet so it adapts but preserves the design intent.
+11. SEO: Include <title>, <meta name="description">, Open Graph tags, viewport.
+12. FONTS: Use system fonts (system-ui, -apple-system, "Segoe UI", Roboto, sans-serif) unless a specific Google Font is clearly identifiable.
+
+Before writing the HTML, mentally break the design into sections (e.g. navbar, hero, features, gallery, about, contact, footer) and reproduce each one faithfully.
+
+Return ONLY the raw HTML starting with <!DOCTYPE html> and ending with </html>. No markdown fences, no explanations, no comments outside the HTML.`;
 
     const llmRes = await base44.integrations.Core.InvokeLLM({
       prompt,
       file_urls: [pack.image_url],
-      model: 'gemini_3_flash',
+      model: 'gpt_5_4',
     });
 
     let html = typeof llmRes === 'string' ? llmRes : (llmRes as any)?.output || (llmRes as any)?.text || '';
