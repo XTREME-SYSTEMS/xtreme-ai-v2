@@ -2,7 +2,7 @@ import React, { useState, useMemo, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
 import { Sparkles, Ruler, DollarSign, Image as ImageIcon, CheckCircle } from "lucide-react";
 import { FLOOR_SYSTEMS, getFloorSystem } from "@/lib/floorSystems";
-import { getSystemRepresentative } from "@/lib/colorChartData";
+import { getSystemRepresentative, getColorsBySystem } from "@/lib/colorChartData";
 import { computeBids, buildPrepSummary, SYSTEM_RATES } from "@/lib/bidEngine";
 import { generateSpecs, specsToText } from "@/lib/floorSpecs";
 import VisualizerPhotoUpload from "@/components/visualizer/VisualizerPhotoUpload";
@@ -37,11 +37,19 @@ export default function FloorVisualizer() {
 
   const floorSystem = getFloorSystem(systemName);
 
-  // Auto-select default color when system changes
+  // Auto-select default color when the color palette (system key) changes.
+  // Uses the floor system's defined default_color when available, falling
+  // back to the first in-stock color. Only resets when the palette actually
+  // changes — switching between systems that share a palette keeps your
+  // selection unless the new system has a different default_color.
   useEffect(() => {
-    if (floorSystem?.color_system_key && floorSystem.color_system_key !== "none") {
-      const rep = getSystemRepresentative(floorSystem.color_system_key);
-      setColor(rep);
+    const key = floorSystem?.color_system_key;
+    if (key && key !== "none") {
+      const palette = getColorsBySystem(key);
+      const match = floorSystem.default_color
+        ? palette.find(c => c.color_name === floorSystem.default_color)
+        : null;
+      setColor(match || getSystemRepresentative(key));
     } else {
       setColor(null);
     }
