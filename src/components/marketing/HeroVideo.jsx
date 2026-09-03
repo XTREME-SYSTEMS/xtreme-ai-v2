@@ -65,10 +65,11 @@ const STATS = [
   { value: "$5.2B+", label: "SALES FACILITATED IN 2025" },
 ];
 
-// Thin black outline + drop shadow for all hero text so it reads on any frame.
+// White text with a thin black outline + drop shadow so it reads on any frame.
 const textOutline = {
+  color: "#fff",
   WebkitTextStroke: "1px #000",
-  textShadow: "0 2px 6px rgba(0,0,0,0.95), 0 0 3px rgba(0,0,0,0.8)",
+  textShadow: "0 0 2px #000, 0 2px 6px rgba(0,0,0,0.95)",
 };
 
 // Typewriter hook — spells out text one character at a time.
@@ -189,7 +190,7 @@ export default function HeroVideo() {
               {clip.phase === "transition" || clip.phase === "reveal" || clip.phase === "loop" ? (
                 <>
                   {clip.headline.split(" ").slice(0, -1).join(" ")}{" "}
-                  <span className="text-amber-400" style={textOutline}>
+                  <span className="text-amber-400" style={{ WebkitTextStroke: "1px #000", textShadow: "0 0 2px #000, 0 2px 6px rgba(0,0,0,0.95)" }}>
                     {clip.headline.split(" ").slice(-1)}
                   </span>
                 </>
