@@ -1,0 +1,169 @@
+{
+  "name": "MassBuildProject",
+  "type": "object",
+  "description": "A mass website production project. The admin configures cities, website names, colors, tones, template, and count \u2014 then the system generates every auto-builder step in bulk (logos, content, brand, website) for each city+name combination. Sites are reviewed, approved, and deployed to Vercel in mass.",
+  "properties": {
+    "description": {
+      "type": "string",
+      "description": "Optional description (up to 1000 characters)",
+      "maxLength": 1000
+    },
+    "name": {
+      "type": "string",
+      "description": "Project name (e.g. 'Arizona Epoxy Rollout Q4')"
+    },
+    "industry": {
+      "type": "string",
+      "description": "Industry/niche for all sites in this batch (epoxy, roofing, hvac, plumbing, landscaping, etc.)"
+    },
+    "template_id": {
+      "type": "string",
+      "description": "ID of the website template from the template library to use for all sites"
+    },
+    "cities": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "List of cities to create websites for"
+    },
+    "website_names": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "List of business/website names to use (paired with cities, or cycled)"
+    },
+    "name_strategy": {
+      "type": "string",
+      "enum": [
+        "paired",
+        "cartesian",
+        "cycle_names"
+      ],
+      "default": "cartesian",
+      "description": "How to combine cities + names. paired = zip city[i]+name[i]; cartesian = every city \u00d7 every name; cycle_names = cycle names across cities"
+    },
+    "background_color": {
+      "type": "string",
+      "description": "Default background color (hex) for all sites"
+    },
+    "accent_color": {
+      "type": "string",
+      "description": "Default accent color (hex) for all sites"
+    },
+    "color_strategy": {
+      "type": "string",
+      "enum": [
+        "fixed",
+        "per_city",
+        "per_site"
+      ],
+      "default": "fixed",
+      "description": "fixed = all sites use the same colors; per_city = vary accent per city; per_site = unique colors per site"
+    },
+    "tones": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Content tones to use (professional, friendly, luxury, bold, minimal, etc.) \u2014 cycled across sites"
+    },
+    "logo_count": {
+      "type": "number",
+      "default": 1,
+      "description": "How many logo options to generate per site"
+    },
+    "site_count_target": {
+      "type": "number",
+      "default": 1,
+      "description": "How many websites to create in this batch (overrides city\u00d7name combinations if set)"
+    },
+    "auto_provision_vercel": {
+      "type": "boolean",
+      "default": false,
+      "description": "If true, automatically deploy approved sites to Vercel"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "configuring",
+        "queued",
+        "generating",
+        "reviewing",
+        "deploying",
+        "complete",
+        "failed"
+      ],
+      "default": "configuring"
+    },
+    "total_sites": {
+      "type": "number",
+      "default": 0,
+      "description": "Total number of sites in this batch (computed from cities \u00d7 names or site_count_target)"
+    },
+    "generated_count": {
+      "type": "number",
+      "default": 0
+    },
+    "approved_count": {
+      "type": "number",
+      "default": 0
+    },
+    "rejected_count": {
+      "type": "number",
+      "default": 0
+    },
+    "deployed_count": {
+      "type": "number",
+      "default": 0
+    },
+    "current_step": {
+      "type": "string",
+      "enum": [
+        "logos",
+        "content",
+        "brand",
+        "website",
+        "review",
+        "deploy"
+      ],
+      "default": "logos"
+    },
+    "error": {
+      "type": "string"
+    },
+    "logs": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Execution log entries"
+    }
+  },
+  "required": [
+    "name"
+  ],
+  "rls": {
+    "read": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "create": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

@@ -1,0 +1,153 @@
+{
+  "name": "MassBuildSite",
+  "type": "object",
+  "description": "A single website within a MassBuildProject batch. Each site has its own city, name, colors, tone, logo, content, generated HTML, and Vercel deployment. Sites flow through: pending \u2192 generating \u2192 generated \u2192 approved/rejected \u2192 deploying \u2192 deployed.",
+  "properties": {
+    "description": {
+      "type": "string",
+      "description": "Optional description (up to 1000 characters)",
+      "maxLength": 1000
+    },
+    "mass_build_id": {
+      "type": "string",
+      "description": "The MassBuildProject this site belongs to"
+    },
+    "city": {
+      "type": "string"
+    },
+    "website_name": {
+      "type": "string"
+    },
+    "template_id": {
+      "type": "string"
+    },
+    "industry": {
+      "type": "string"
+    },
+    "background_color": {
+      "type": "string"
+    },
+    "accent_color": {
+      "type": "string"
+    },
+    "tone": {
+      "type": "string"
+    },
+    "logo_url": {
+      "type": "string",
+      "description": "Generated logo image URL"
+    },
+    "logo_options": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Multiple generated logo URLs to choose from"
+    },
+    "content": {
+      "type": "object",
+      "description": "Generated website content (hero, about, services, faq, etc.)",
+      "properties": {
+        "hero_headline": {
+          "type": "string"
+        },
+        "hero_subtext": {
+          "type": "string"
+        },
+        "about": {
+          "type": "string"
+        },
+        "services": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        },
+        "faq": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        },
+        "cta_text": {
+          "type": "string"
+        }
+      }
+    },
+    "generated_html_url": {
+      "type": "string",
+      "description": "URL to the generated HTML file (stored as file, not in entity)"
+    },
+    "vercel_url": {
+      "type": "string"
+    },
+    "vercel_project_id": {
+      "type": "string"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "pending",
+        "generating",
+        "generated",
+        "approved",
+        "rejected",
+        "deploying",
+        "deployed",
+        "failed"
+      ],
+      "default": "pending"
+    },
+    "step": {
+      "type": "string",
+      "enum": [
+        "logo",
+        "content",
+        "website",
+        "review",
+        "deploy"
+      ],
+      "default": "logo"
+    },
+    "review_notes": {
+      "type": "string",
+      "description": "Admin notes during review"
+    },
+    "error": {
+      "type": "string"
+    },
+    "logs": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    }
+  },
+  "required": [
+    "mass_build_id",
+    "city",
+    "website_name"
+  ],
+  "rls": {
+    "read": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "create": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

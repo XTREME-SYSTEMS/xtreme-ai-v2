@@ -45,7 +45,9 @@ const PIPELINE_STEPS = [
     color: { ring: "border-emerald-400 bg-emerald-400 text-black shadow-[0_0_14px_3px_rgba(52,211,153,0.45)]", text: "text-emerald-400", icon: "text-emerald-400", idle: "text-emerald-400/40" } },
   { to: "/build-queue",      label: "Queue System",       icon: Boxes,  step: 2, desc: "Ideas queued for building",
     color: { ring: "border-amber-400 bg-amber-400 text-black shadow-[0_0_14px_3px_rgba(255,234,0,0.45)]", text: "text-amber-400", icon: "text-amber-400", idle: "text-amber-400/40" } },
-  { to: "/auto-builder",     label: "Auto Builder",       icon: Rocket, step: 3, desc: "Full builder pipeline",
+  { to: "/mass-website-factory", label: "Mass Website Factory", icon: Factory, step: 3, desc: "Bulk produce websites from templates",
+    color: { ring: "border-cyan-400 bg-cyan-400 text-black shadow-[0_0_14px_3px_rgba(34,211,238,0.45)]", text: "text-cyan-400", icon: "text-cyan-400", idle: "text-cyan-400/40" } },
+  { to: "/auto-builder",     label: "Auto Builder",       icon: Rocket, step: 4, desc: "Full builder pipeline",
     color: { ring: "border-rose-400 bg-rose-400 text-black shadow-[0_0_14px_3px_rgba(251,113,133,0.45)]", text: "text-rose-400", icon: "text-rose-400", idle: "text-rose-400/40" } },
 ];
 
