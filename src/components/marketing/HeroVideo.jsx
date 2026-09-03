@@ -172,8 +172,8 @@ export default function HeroVideo() {
         </div>
       </div>
 
-      {/* Headline + subtext — positioned below the nav bar so it's visible and clear of the avatar's face */}
-      <div className="absolute left-0 right-0 top-28 z-10 px-4 text-center sm:top-32">
+      {/* Headline + subtext — positioned well below the nav bar so it's visible and clear of the avatar's face */}
+      <div className="absolute left-0 right-0 top-48 z-10 px-4 text-center sm:top-56">
         <AnimatePresence mode="wait">
           <motion.div
             key={clip.phase}
