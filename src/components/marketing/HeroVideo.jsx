@@ -208,28 +208,6 @@ export default function HeroVideo() {
         </AnimatePresence>
       </div>
 
-      {/* Captions — what the avatar is "saying", spelled out word by word.
-          Positioned in the lower-middle so it doesn't cover her face or lips. */}
-      {captions.length > 0 && (
-        <div className="absolute bottom-40 left-0 right-0 z-10 flex justify-center px-4 sm:bottom-44">
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={captionIdx}
-              initial={{ opacity: 0, y: 12 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -12 }}
-              transition={{ duration: 0.4 }}
-              className="max-w-2xl rounded-xl border border-amber-400/30 bg-black/70 px-6 py-3 backdrop-blur-md"
-            >
-              <p className="text-lg font-medium text-white sm:text-2xl" style={textOutline}>
-                {typedCaption}
-                <span className="animate-pulse text-amber-400">_</span>
-              </p>
-            </motion.div>
-          </AnimatePresence>
-        </div>
-      )}
-
       {/* CTA — positioned near the bottom, above the stats bar */}
       <AnimatePresence>
         {clip.showCta && (
