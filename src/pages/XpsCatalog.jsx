@@ -14,6 +14,16 @@ const CATEGORIES = [
   { key: "logo", label: "Logos", icon: Palette },
 ];
 
+const COLOR_SUBFILTERS = [
+  { key: "all", label: "All Colors" },
+  { key: "metallic", label: "Metallic" },
+  { key: "flake", label: "Flake" },
+  { key: "quartz", label: "Quartz" },
+  { key: "solid", label: "Solid Color" },
+  { key: "dye_stain", label: "Stained Concrete" },
+  { key: "polyurea", label: "Polyurea" },
+];
+
 const PAGE_SIZE = 60;
 
 export default function XpsCatalog() {
@@ -23,6 +33,7 @@ export default function XpsCatalog() {
   const [ingestResult, setIngestResult] = useState(null);
   const [error, setError] = useState("");
   const [activeCategory, setActiveCategory] = useState("product");
+  const [colorSubFilter, setColorSubFilter] = useState("all");
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
 
   useEffect(() => { document.title = "XPS Asset Catalog · Xtreme AI"; }, []);
@@ -56,14 +67,26 @@ export default function XpsCatalog() {
     }
   };
 
-  useEffect(() => { setVisibleCount(PAGE_SIZE); }, [activeCategory]);
+  useEffect(() => { setVisibleCount(PAGE_SIZE); }, [activeCategory, colorSubFilter]);
 
   const counts = CATEGORIES.reduce((acc, c) => {
     acc[c.key] = assets.filter(a => a.category === c.key).length;
     return acc;
   }, {});
 
-  const filtered = activeCategory === "all" ? assets : assets.filter(a => a.category === activeCategory);
+  const colorCounts = COLOR_SUBFILTERS.reduce((acc, s) => {
+    if (s.key === "all") {
+      acc[s.key] = assets.filter(a => a.category === "color_chart").length;
+    } else {
+      acc[s.key] = assets.filter(a => a.category === "color_chart" && a.product_type === s.key).length;
+    }
+    return acc;
+  }, {});
+
+  let filtered = activeCategory === "all" ? assets : assets.filter(a => a.category === activeCategory);
+  if (activeCategory === "color_chart" && colorSubFilter !== "all") {
+    filtered = filtered.filter(a => a.product_type === colorSubFilter);
+  }
   const visible = filtered.slice(0, visibleCount);
 
   return (
@@ -136,6 +159,28 @@ export default function XpsCatalog() {
             );
           })}
         </div>
+
+        {/* Color chart sub-filters */}
+        {activeCategory === "color_chart" && (
+          <div className="mt-4 flex flex-wrap gap-2">
+            {COLOR_SUBFILTERS.map((s) => {
+              const active = colorSubFilter === s.key;
+              return (
+                <button
+                  key={s.key}
+                  onClick={() => setColorSubFilter(s.key)}
+                  className={cn(
+                    "inline-flex items-center gap-1.5 rounded-lg border px-3 py-1.5 text-xs font-medium transition-all",
+                    active ? "border-lime-400 bg-lime-400/15 text-lime-300" : "border-white/10 text-white/60 hover:border-white/25 hover:text-white/80"
+                  )}
+                >
+                  {s.label}
+                  <span className={cn("text-[10px] font-bold", active ? "text-lime-400" : "text-white/30")}>{colorCounts[s.key] || 0}</span>
+                </button>
+              );
+            })}
+          </div>
+        )}
       </div>
 
       {/* Asset grid */}
