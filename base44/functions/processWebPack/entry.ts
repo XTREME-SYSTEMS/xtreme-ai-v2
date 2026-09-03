@@ -29,32 +29,42 @@ export default async function(req: Request): Promise<Response> {
     await svc.entities.WebPack.update(webpack_id, { status: 'analyzing', error: null, logs: [...(pack.logs || []), ...logs] });
     logs.push(`[${new Date().toISOString()}] Sending design image to vision AI for pixel-perfect HTML generation...`);
 
-    const prompt = `You are an expert frontend developer. Your job is to recreate the provided website design mockup as a single, complete HTML file with inline CSS that looks EXACTLY like the image. This is a pixel-perfect reproduction task.
+    const prompt = `Recreate this website design mockup as a single, complete, production-quality HTML file with inline CSS. It must look EXACTLY like the image but function as a REAL desktop-optimized, PWA-ready website — not a static copy.
 
-Analyze the image carefully, section by section, top to bottom. Then write the HTML/CSS.
+RULES:
+1. Single HTML file, all CSS in <style>, no external CSS/JS. Minimal vanilla JS for nav toggle only.
+2. EXACT colors, typography, layout, spacing, text — copy everything verbatim from the image.
+3. HERO BACKGROUND: Use this EXACT URL as the hero's CSS background-image: "${pack.image_url}"
+   Apply: background-image: linear-gradient(rgba(0,0,0,0.45),rgba(0,0,0,0.45)), url("${pack.image_url}");
+   Hero MUST be min-height:100vh, background-size:cover, background-position:center, content vertically centered via flexbox.
+4. For other images use these verified Unsplash URLs:
+   Construction: https://images.unsplash.com/photo-1587582423116-ec07293f0395?w=1920&q=80
+   Garage: https://images.unsplash.com/photo-1558618666-fcd25c85f82e?w=1920&q=80
+5. Icons: inline SVG matching the design's style.
+6. Nav: horizontal on desktop, logo left, links center, CTA right. Hamburger on mobile.
 
-CRITICAL RULES:
-1. SINGLE HTML FILE: All CSS goes in a <style> tag. No external CSS, no JS frameworks, no build tools.
-2. EXACT COLORS: Extract every color precisely. Use the exact hex codes you see in the image. Do NOT guess or approximate — if a button looks like a muted gold, find the exact hex (e.g. #c19b6e, not #FFD700).
-3. EXACT TYPOGRAPHY: Match font sizes, weights, letter-spacing, text-transform (uppercase/lowercase), and line-heights precisely. If text is bold uppercase with wide letter spacing, reproduce that exactly.
-4. EXACT LAYOUT: Reproduce the exact spatial arrangement — where elements sit, their alignment (left/center/right), the grid structure, column counts, gaps, and spacing. Use CSS Grid and Flexbox.
-5. EXACT TEXT: Copy ALL text verbatim from the image. Every heading, subheading, paragraph, button label, nav item, phone number, and footer text must match exactly. Do not paraphrase, abbreviate, or skip anything.
-6. EXACT BACKGROUNDS: If there's a background image, use a relevant Unsplash photo (https://images.unsplash.com/photo-XXXX?w=1920&q=80) that matches the subject. If the background is darkened, apply the same dark overlay.
-7. EXACT BUTTONS & COMPONENTS: Match button shapes (border-radius), borders, backgrounds, hover states, padding, and icon placement precisely. If a button has a ">" arrow, include it.
-8. EXACT ICONS: For icons in the design, use inline SVG that matches the icon style (line icons, filled, etc.). Match icon size and color.
-9. NAVIGATION: Reproduce the nav bar exactly — logo, menu items, dropdown indicators, phone number, CTA button. Make nav links anchor links to page sections.
-10. RESPONSIVE: Add media queries for mobile/tablet so it adapts but preserves the design intent.
-11. SEO: Include <title>, <meta name="description">, Open Graph tags, viewport.
-12. FONTS: Use system fonts (system-ui, -apple-system, "Segoe UI", Roboto, sans-serif) unless a specific Google Font is clearly identifiable.
+DESKTOP OPTIMIZATION (critical):
+- max-width:1200px container centered for content sections. Hero spans full width/100vh.
+- Sections: 80-120px vertical padding. No dead space, no gray where images should be.
+- Multi-column grids on desktop (don't stack). Hover states on nav/buttons. scroll-behavior:smooth.
 
-Before writing the HTML, mentally break the design into sections (e.g. navbar, hero, features, gallery, about, contact, footer) and reproduce each one faithfully.
+RESPONSIVE: Desktop 1024px+ full layout. Tablet 768-1023px fewer columns. Mobile <768px single column + hamburger.
 
-Return ONLY the raw HTML starting with <!DOCTYPE html> and ending with </html>. No markdown fences, no explanations, no comments outside the HTML.`;
+PWA META (in <head>):
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#000000">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<link rel="manifest" href="manifest.json">
+Plus <title>, <meta name="description">, Open Graph tags.
+
+SEO: Semantic HTML5 (header/nav/main/section/footer), h1 for hero, h2 for sections, alt text on images, JSON-LD LocalBusiness schema.
+
+Return ONLY raw HTML from <!DOCTYPE html> to </html>. No markdown fences, no explanations.`;
 
     const llmRes = await base44.integrations.Core.InvokeLLM({
       prompt,
       file_urls: [pack.image_url],
-      model: 'gpt_5_4',
+      model: 'gemini_3_flash',
     });
 
     let html = typeof llmRes === 'string' ? llmRes : (llmRes as any)?.output || (llmRes as any)?.text || '';
@@ -121,9 +131,33 @@ Return ONLY the raw HTML starting with <!DOCTYPE html> and ending with </html>. 
       } catch { /* fall back */ }
     }
 
-    // Direct file upload — static HTML, no build step needed
+    // Direct file upload — static HTML + PWA manifest + service worker
     function b64(s: string): string { return btoa(unescape(encodeURIComponent(String(s)))); }
-    const fileList = [{ file: 'index.html', data: b64(html), encoding: 'base64' }];
+
+    // Derive site name + theme color for PWA manifest
+    const siteName = (pack.name || 'Web Pack').slice(0, 50);
+    const themeColor = '#000000';
+    const manifest = JSON.stringify({
+      name: siteName,
+      short_name: siteName.slice(0, 12),
+      description: siteName,
+      start_url: '/',
+      display: 'standalone',
+      background_color: themeColor,
+      theme_color: themeColor,
+      icons: [
+        { src: 'icon-192.png', sizes: '192x192', type: 'image/png' },
+        { src: 'icon-512.png', sizes: '512x512', type: 'image/png' },
+      ],
+    });
+    // Minimal service worker — offline caching for the static shell
+    const sw = `const CACHE='webpack-v1';self.addEventListener('install',e=>{e.waitUntil(caches.open(CACHE).then(c=>c.addAll(['/'])));self.skipWaiting();});self.addEventListener('activate',e=>{e.waitUntil(caches.keys().then(ks=>Promise.all(ks.filter(k=>k!==CACHE).map(k=>caches.delete(k)))));self.clients.claim();});self.addEventListener('fetch',e=>{e.respondWith(caches.match(e.request).then(r=>r||fetch(e.request).then(res=>{const copy=res.clone();caches.open(CACHE).then(c=>c.put(e.request,copy));return res;}).catch(()=>caches.match('/'))));});`;
+
+    const fileList = [
+      { file: 'index.html', data: b64(html), encoding: 'base64' },
+      { file: 'manifest.json', data: b64(manifest), encoding: 'base64' },
+      { file: 'sw.js', data: b64(sw), encoding: 'base64' },
+    ];
     const deployRes = await fetch(`https://api.vercel.com/v13/deployments${qs}`, {
       method: 'POST',
       headers: { Authorization: `Bearer ${vercelToken}`, 'Content-Type': 'application/json' },
