@@ -107,7 +107,7 @@ export default function ContentGenerator() {
   // Auto-pick: pre-select and persist the recommended tone so the step is
   // already done — the user just clicks "Continue" to proceed.
   useEffect(() => {
-    if (data && !selectedId && !saved) {
+    if (data?.templates?.length && !selectedId && !saved) {
       const rec = data.templates[data.recommendedIndex];
       if (rec) {
         setSelectedId(rec.id);
@@ -127,7 +127,7 @@ export default function ContentGenerator() {
     if (!selectedId) { setError("Pick a content tone to continue."); return; }
     setSaving(true); setError("");
     try {
-      const chosen = data.templates.find((t) => t.id === selectedId);
+      const chosen = data?.templates?.find((t) => t.id === selectedId);
       await update({
         chosenContentTemplate: selectedId,
         chosenContentTone: chosen?.tone || "",
