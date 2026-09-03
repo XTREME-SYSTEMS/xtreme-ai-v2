@@ -29,35 +29,38 @@ export default async function(req: Request): Promise<Response> {
     await svc.entities.WebPack.update(webpack_id, { status: 'analyzing', error: null, logs: [...(pack.logs || []), ...logs] });
     logs.push(`[${new Date().toISOString()}] Sending design image to vision AI for pixel-perfect HTML generation...`);
 
-    const prompt = `Recreate this website design mockup as a single, complete, production-quality HTML file with inline CSS. It must look EXACTLY like the image but function as a REAL desktop-optimized, PWA-ready website — not a static copy.
+    const prompt = `Recreate this website design mockup as a single, complete, production-quality HTML file with inline CSS. It must look EXACTLY like the image — same colors, fonts, layout, spacing, text — but as a REAL desktop-optimized, PWA-ready website.
+
+The design image IS a screenshot of the whole page. DO NOT use it as a background image. Use the real photo URLs listed below for all background images.
+
+VERIFIED IMAGE URLs (use these EXACT URLs — do NOT invent or modify them):
+- HERO background (epoxy garage floor): https://images.unsplash.com/photo-1766801075605-8c036a5c4ec3?w=1920&q=80
+- BEFORE image (dark concrete room): https://images.unsplash.com/photo-1780362507424-a624df756101?w=1920&q=80
+- AFTER image (shiny polished floor): https://images.unsplash.com/photo-1771531072574-af6ed6b954c0?w=1920&q=80
+- CTA background (desert sunset): https://images.unsplash.com/photo-1479470226080-e1b5c1e4a2a1?w=1920&q=80
+- Color swatch thumbnails: https://images.unsplash.com/photo-1487754336554-9809144112a6?w=400&q=80
 
 RULES:
 1. Single HTML file, all CSS in <style>, no external CSS/JS. Minimal vanilla JS for nav toggle only.
 2. EXACT colors, typography, layout, spacing, text — copy everything verbatim from the image.
-3. HERO BACKGROUND: Use this EXACT URL as the hero's CSS background-image: "${pack.image_url}"
-   Apply: background-image: linear-gradient(rgba(0,0,0,0.45),rgba(0,0,0,0.45)), url("${pack.image_url}");
-   Hero MUST be min-height:100vh, background-size:cover, background-position:center, content vertically centered via flexbox.
-4. For other images use these verified Unsplash URLs:
-   Construction: https://images.unsplash.com/photo-1587582423116-ec07293f0395?w=1920&q=80
-   Garage: https://images.unsplash.com/photo-1558618666-fcd25c85f82e?w=1920&q=80
-5. Icons: inline SVG matching the design's style.
+3. HERO: min-height:100vh, background-image: linear-gradient(rgba(0,0,0,0.5),rgba(0,0,0,0.5)), url("HERO_URL"); background-size:cover; background-position:center; content vertically centered via flexbox.
+4. SECTION ORDER (top to bottom — match the design exactly):
+   a. Sticky header with logo, nav, phone, CTA button
+   b. HERO (full viewport, garage floor bg, headline, subtext, 2 buttons, 4 badge icons at bottom)
+   c. SERVICES section (5-column grid with icons)
+   d. TRANSFORMATION section (before/after carousel, "REAL RESULTS" heading)
+   e. VALUE PROP strip (4 icons) + CTA panel (desert bg, "GET YOUR FREE QUOTE TODAY")
+   f. COLOR OPTIONS (8 swatches) + CUSTOMER REVIEWS (testimonial carousel)
+   g. SERVICE AREA (city list + map placeholder) + FINANCING panel
+   h. FOOTER (4 columns: logo+tagline, quick links, services, contact+social, licensing)
+5. Icons: inline SVG matching the design's style (thin gold line icons).
 6. Nav: horizontal on desktop, logo left, links center, CTA right. Hamburger on mobile.
 
-DESKTOP OPTIMIZATION (critical):
-- max-width:1200px container centered for content sections. Hero spans full width/100vh.
-- Sections: 80-120px vertical padding. No dead space, no gray where images should be.
-- Multi-column grids on desktop (don't stack). Hover states on nav/buttons. scroll-behavior:smooth.
-
+DESKTOP: max-width:1200px container. Sections 80-120px padding. Multi-column grids. Hover states. scroll-behavior:smooth.
 RESPONSIVE: Desktop 1024px+ full layout. Tablet 768-1023px fewer columns. Mobile <768px single column + hamburger.
 
-PWA META (in <head>):
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#000000">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<link rel="manifest" href="manifest.json">
-Plus <title>, <meta name="description">, Open Graph tags.
-
-SEO: Semantic HTML5 (header/nav/main/section/footer), h1 for hero, h2 for sections, alt text on images, JSON-LD LocalBusiness schema.
+PWA META: <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">, <meta name="theme-color" content="#000000">, <meta name="apple-mobile-web-app-capable" content="yes">, <link rel="manifest" href="manifest.json">, <title>, <meta name="description">, Open Graph tags.
+SEO: Semantic HTML5, h1 for hero, h2 for sections, alt text, JSON-LD LocalBusiness.
 
 Return ONLY raw HTML from <!DOCTYPE html> to </html>. No markdown fences, no explanations.`;
 
