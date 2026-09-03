@@ -1,0 +1,150 @@
+// ============================================================
+// Floor System Definitions
+// ============================================================
+// Maps floor system names to their visualizer properties:
+// color system key, base rates, descriptions, and icons.
+// Used by the Floor Visualizer to show system options.
+// ============================================================
+
+export const FLOOR_SYSTEMS = [
+  {
+    name: "Metallic Epoxy",
+    category: "epoxy",
+    color_system_key: "metallic",
+    short_description: "3D shimmering metallic effect",
+    long_description: "Metallic epoxy creates a stunning 3D shimmering effect with depth and movement. Perfect for showrooms, garages, and modern interiors.",
+    base_rate_low: 8.0,
+    base_rate_high: 15.0,
+    default_color: "Metallic Silver",
+    icon: "Sparkles",
+    sort_order: 1,
+  },
+  {
+    name: "Multi-Color Metallic Epoxy",
+    category: "epoxy",
+    color_system_key: "metallic",
+    short_description: "Blended multi-tone metallic",
+    long_description: "Multi-color metallic epoxy blends two or more metallic pigments for a unique river, cloud, or gradient effect.",
+    base_rate_low: 9.0,
+    base_rate_high: 16.0,
+    default_color: "Copper",
+    icon: "Palette",
+    sort_order: 2,
+  },
+  {
+    name: "Flake Epoxy",
+    category: "epoxy",
+    color_system_key: "flake",
+    short_description: "Textured vinyl flake broadcast",
+    long_description: "Flake epoxy broadcasts colored vinyl flakes into the epoxy for a textured, terrazzo-like finish. Great for garages and commercial spaces.",
+    base_rate_low: 5.0,
+    base_rate_high: 10.0,
+    default_color: "Tidal Wave",
+    icon: "Layers",
+    sort_order: 3,
+  },
+  {
+    name: "Quartz System",
+    category: "epoxy",
+    color_system_key: "quartz",
+    short_description: "Durable colored quartz broadcast",
+    long_description: "Quartz system broadcasts colored quartz granules for a highly durable, slip-resistant finish. Ideal for commercial and industrial spaces.",
+    base_rate_low: 9.0,
+    base_rate_high: 15.0,
+    default_color: "Crystal",
+    icon: "Gem",
+    sort_order: 4,
+  },
+  {
+    name: "Solid Epoxy",
+    category: "epoxy",
+    color_system_key: "solid",
+    short_description: "Uniform solid color finish",
+    long_description: "Solid color epoxy provides a uniform, clean finish in a single color. The most economical epoxy option.",
+    base_rate_low: 4.0,
+    base_rate_high: 8.0,
+    default_color: "Medium Gray",
+    icon: "Square",
+    sort_order: 5,
+  },
+  {
+    name: "Glitter Epoxy",
+    category: "epoxy",
+    color_system_key: "glitter",
+    short_description: "Sparkling reflective finish",
+    long_description: "Glitter epoxy adds sparkling reflective particles for a dazzling, eye-catching finish.",
+    base_rate_low: 7.0,
+    base_rate_high: 12.0,
+    default_color: "Silver Sparkle",
+    icon: "Star",
+    sort_order: 6,
+  },
+  {
+    name: "Polished Concrete",
+    category: "polished_concrete",
+    color_system_key: "dye_stain",
+    short_description: "Ground and polished to a gloss",
+    long_description: "Polished concrete is mechanically ground and polished to a smooth, glossy finish. Durable, low-maintenance, and modern.",
+    base_rate_low: 3.0,
+    base_rate_high: 8.0,
+    default_color: "Gray",
+    icon: "CircleDot",
+    sort_order: 7,
+  },
+  {
+    name: "Stained Concrete",
+    category: "stained_concrete",
+    color_system_key: "dye_stain",
+    short_description: "Acid or dye-stained color",
+    long_description: "Stained concrete uses acid-based or dye stains to permanently color the concrete surface. Unique, mottled, and artistic.",
+    base_rate_low: 3.5,
+    base_rate_high: 7.0,
+    default_color: "Brown",
+    icon: "Droplet",
+    sort_order: 8,
+  },
+  {
+    name: "Joint Fill & Repair",
+    category: "repair",
+    color_system_key: "none",
+    short_description: "Crack and joint repair only",
+    long_description: "Joint fill and repair addresses cracks, control joints, and surface defects with polyurea or epoxy fillers.",
+    base_rate_low: 6.0,
+    base_rate_high: 10.0,
+    default_color: null,
+    icon: "Wrench",
+    sort_order: 9,
+  },
+  {
+    name: "Concrete Overlayment",
+    category: "overlayment",
+    color_system_key: "dye_stain",
+    short_description: "Thin cementitious overlay",
+    long_description: "Concrete overlayment applies a thin cementitious or polymer-modified layer to resurface damaged or worn concrete.",
+    base_rate_low: 6.0,
+    base_rate_high: 12.0,
+    default_color: "Tan",
+    icon: "Layers3",
+    sort_order: 10,
+  },
+  {
+    name: "Sealed Concrete",
+    category: "polished_concrete",
+    color_system_key: "none",
+    short_description: "Cleaned and sealed",
+    long_description: "Sealed concrete is cleaned and protected with a high-performance sealer. The most economical option.",
+    base_rate_low: 3.0,
+    base_rate_high: 6.0,
+    default_color: null,
+    icon: "Shield",
+    sort_order: 11,
+  },
+];
+
+export function getFloorSystem(name) {
+  return FLOOR_SYSTEMS.find(s => s.name === name);
+}
+
+export function getFloorSystemsByCategory(category) {
+  return FLOOR_SYSTEMS.filter(s => s.category === category);
+}

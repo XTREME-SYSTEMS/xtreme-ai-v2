@@ -133,6 +133,8 @@ import EmployeeManagement from '@/pages/EmployeeManagement';
 import ProductCatalog from '@/pages/ProductCatalog';
 import LeadEngine from '@/pages/LeadEngine';
 import CouncilChamber from '@/pages/CouncilChamber';
+import FloorVisualizer from '@/pages/FloorVisualizer';
+import VisualizerInbox from '@/pages/VisualizerInbox';
 import { PortalStudioProvider } from '@/lib/PortalStudioContext';
 import XtremeShell from '@/components/xtremeai/XtremeShell';
 import PortalStudio from '@/pages/portalstudio/PortalStudio';
@@ -167,6 +169,7 @@ const AuthenticatedApp = () => {
       <Route path="/coupon" element={<CouponPage />} />
       <Route path="/free-audit" element={<FreeAuditPage />} />
       <Route path="/free-tools" element={<FreeTools />} />
+      <Route path="/visualizer" element={<FloorVisualizer />} />
       <Route path="/about" element={<About />} />
       <Route path="/contact" element={<Contact />} />
       <Route path="/sign/:token" element={<SignPortal />} />
@@ -281,6 +284,7 @@ const AuthenticatedApp = () => {
       <Route path="/employee-management" element={<EmployeeManagement />} />
       <Route path="/product-catalog" element={<ProductCatalog />} />
       <Route path="/lead-engine" element={<LeadEngine />} />
+      <Route path="/visualizer-inbox" element={<VisualizerInbox />} />
       <Route path="/council-chamber" element={<CouncilChamber />} />
         </Route>
       </Route>

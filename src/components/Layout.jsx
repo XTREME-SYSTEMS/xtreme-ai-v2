@@ -34,6 +34,7 @@ const PIPELINE_OVERVIEW = { to: "/autonomous-system", label: "Pipeline Overview"
 const PIPELINE_CATALOG = { to: "/pipeline-catalog", label: "Pipeline Catalog", icon: Layers, end: true };
 const PRODUCT_CATALOG = { to: "/product-catalog", label: "Product Catalog", icon: Package, end: true };
 const LEAD_ENGINE = { to: "/lead-engine", label: "Lead Engine", icon: Radar, end: true };
+const VISUALIZER_INBOX = { to: "/visualizer-inbox", label: "Visualizer Inbox", icon: Eye, end: true };
 const COUNCIL_CHAMBER = { to: "/council-chamber", label: "Council Chamber", icon: Brain, end: true };
 const EMPLOYEE_PORTAL = { to: "/employee-portal", label: "Employee Portal", icon: Users, end: true };
 
@@ -249,6 +250,20 @@ export default function Layout() {
             {LEAD_ENGINE.label}
           </NavLink>
           )}
+
+          {/* Visualizer Inbox — customer floor visualizer sessions & estimates */}
+          <NavLink
+            to={VISUALIZER_INBOX.to}
+            end={VISUALIZER_INBOX.end}
+            onClick={() => setOpen(false)}
+            className={({ isActive }) => cn(
+              "flex items-center gap-2.5 rounded-lg px-2.5 py-2 text-sm transition-colors",
+              isActive ? "bg-amber-400/10 text-amber-400 font-semibold" : "text-white hover:bg-white/5"
+            )}
+          >
+            <Eye className="h-4 w-4 shrink-0" />
+            {VISUALIZER_INBOX.label}
+          </NavLink>
 
           {/* Council Chamber — multi-agent council debate + simulation lab */}
           <NavLink

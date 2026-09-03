@@ -1,0 +1,214 @@
+{
+  "name": "VisualizerSession",
+  "type": "object",
+  "description": "A customer floor visualizer session \u2014 the core lead-capture funnel. A visitor uploads a photo of their floor, selects a floor system and color, enters measurements and condition, and gets an instant 3-tier bid (Essential / Recommended / Premier). The session captures all inputs, the generated bid, and optional contact info. Admins see all sessions in the visualizer inbox; sessions with contact info become leads.",
+  "properties": {
+    "description": {
+      "type": "string",
+      "description": "Optional description (up to 1000 characters)",
+      "maxLength": 1000
+    },
+    "customer_name": {
+      "type": "string",
+      "description": "Customer name (optional \u2014 captured at bid save)"
+    },
+    "customer_email": {
+      "type": "string",
+      "description": "Customer email (optional \u2014 captured at bid save, used to email the proposal)"
+    },
+    "customer_phone": {
+      "type": "string",
+      "description": "Customer phone (optional)"
+    },
+    "project_address": {
+      "type": "string",
+      "description": "Project address or city (optional)"
+    },
+    "photo_url": {
+      "type": "string",
+      "description": "URL of the uploaded floor photo"
+    },
+    "system_name": {
+      "type": "string",
+      "description": "Selected floor system name (e.g. 'Metallic Epoxy')"
+    },
+    "color_name": {
+      "type": "string",
+      "description": "Selected color name from the color chart"
+    },
+    "color_code": {
+      "type": "string",
+      "description": "Selected color manufacturer code"
+    },
+    "color_hex": {
+      "type": "string",
+      "description": "Selected color hex value"
+    },
+    "square_feet": {
+      "type": "number",
+      "default": 0,
+      "description": "Floor area in square feet"
+    },
+    "condition": {
+      "type": "string",
+      "enum": [
+        "good",
+        "fair",
+        "poor"
+      ],
+      "default": "fair",
+      "description": "Floor condition \u2014 affects pricing multiplier"
+    },
+    "needs_grinding": {
+      "type": "boolean",
+      "default": true
+    },
+    "needs_moisture_mitigation": {
+      "type": "boolean",
+      "default": false
+    },
+    "linear_feet_cracks": {
+      "type": "number",
+      "default": 0
+    },
+    "linear_feet_coving": {
+      "type": "number",
+      "default": 0
+    },
+    "linear_feet_joints": {
+      "type": "number",
+      "default": 0
+    },
+    "patch_count": {
+      "type": "number",
+      "default": 0
+    },
+    "excessive_patch_count": {
+      "type": "number",
+      "default": 0
+    },
+    "large_patch_count": {
+      "type": "number",
+      "default": 0
+    },
+    "demolition_sqft": {
+      "type": "number",
+      "default": 0
+    },
+    "extra_prep": {
+      "type": "boolean",
+      "default": false
+    },
+    "bid_tier": {
+      "type": "string",
+      "enum": [
+        "essential",
+        "recommended",
+        "premier"
+      ],
+      "default": "recommended",
+      "description": "Which bid tier the customer selected"
+    },
+    "finish": {
+      "type": "string",
+      "enum": [
+        "Matte",
+        "Satin",
+        "High Gloss"
+      ],
+      "default": "High Gloss"
+    },
+    "bid_low": {
+      "type": "number",
+      "default": 0,
+      "description": "Low end of the selected bid tier"
+    },
+    "bid_high": {
+      "type": "number",
+      "default": 0,
+      "description": "High end of the selected bid tier"
+    },
+    "bid_mid": {
+      "type": "number",
+      "default": 0,
+      "description": "Midpoint of the selected bid tier"
+    },
+    "per_sqft": {
+      "type": "number",
+      "default": 0,
+      "description": "Price per sqft (mid / sqft)"
+    },
+    "prep_summary": {
+      "type": "string",
+      "description": "Human-readable prep work summary"
+    },
+    "specifications": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "label": {
+            "type": "string"
+          },
+          "detail": {
+            "type": "string"
+          }
+        }
+      },
+      "description": "Generated scope-of-work spec items for this system"
+    },
+    "proposal_text": {
+      "type": "string",
+      "description": "Full proposal text (bid + specs + terms + warranty)"
+    },
+    "proposal_url": {
+      "type": "string",
+      "description": "URL to a generated PDF proposal (if created)"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "draft",
+        "bid_generated",
+        "contact_captured",
+        "proposal_sent",
+        "won",
+        "lost",
+        "archived"
+      ],
+      "default": "draft",
+      "description": "Session lifecycle status"
+    },
+    "source": {
+      "type": "string",
+      "default": "visualizer",
+      "description": "Where this session originated (visualizer, admin, etc.)"
+    },
+    "notes": {
+      "type": "string",
+      "description": "Admin notes"
+    }
+  },
+  "required": [
+    "system_name",
+    "square_feet"
+  ],
+  "rls": {
+    "read": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "create": {},
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

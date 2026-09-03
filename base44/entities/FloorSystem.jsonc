@@ -1,0 +1,118 @@
+{
+  "name": "FloorSystem",
+  "type": "object",
+  "description": "Floor system definitions for the visualizer and bid engine. Each system (Metallic Epoxy, Flake Epoxy, Quartz System, Solid Epoxy, Glitter Epoxy, Polished Concrete, Stained Concrete, Joint Fill & Repair) has a base price range per sqft, category, description, default color, prep requirements, warranty period, and representative image. Pricing is calibrated to 2025 national averages from HomeAdvisor, Angi, Fixr, and contractor aggregators.",
+  "properties": {
+    "description": {
+      "type": "string",
+      "description": "Optional description (up to 1000 characters)",
+      "maxLength": 1000
+    },
+    "name": {
+      "type": "string",
+      "description": "System display name (e.g. 'Metallic Epoxy', 'Flake Epoxy', 'Polished Concrete')"
+    },
+    "category": {
+      "type": "string",
+      "enum": [
+        "epoxy",
+        "polished_concrete",
+        "stained_concrete",
+        "repair",
+        "overlayment"
+      ],
+      "description": "System category for grouping"
+    },
+    "short_description": {
+      "type": "string",
+      "description": "One-line description shown in the visualizer selector"
+    },
+    "long_description": {
+      "type": "string",
+      "description": "Full description of the system, its benefits, and ideal use cases"
+    },
+    "base_rate_low": {
+      "type": "number",
+      "description": "Low end of base price per sqft (installed, standard prep included)"
+    },
+    "base_rate_high": {
+      "type": "number",
+      "description": "High end of base price per sqft (installed, standard prep included)"
+    },
+    "color_system_key": {
+      "type": "string",
+      "enum": [
+        "metallic",
+        "flake",
+        "quartz",
+        "solid",
+        "glitter",
+        "dye_stain",
+        "none"
+      ],
+      "description": "Which ColorChart system key to use for this floor system's color options"
+    },
+    "default_color": {
+      "type": "string",
+      "description": "Default color name to pre-select"
+    },
+    "needs_grinding_default": {
+      "type": "boolean",
+      "default": true,
+      "description": "Whether grinding is typically required for this system"
+    },
+    "needs_moisture_default": {
+      "type": "boolean",
+      "default": false,
+      "description": "Whether moisture mitigation is typically required"
+    },
+    "warranty_years": {
+      "type": "number",
+      "default": 2,
+      "description": "Standard workmanship warranty in years"
+    },
+    "image_url": {
+      "type": "string",
+      "description": "Representative image URL for this system"
+    },
+    "icon": {
+      "type": "string",
+      "description": "Icon identifier for UI display"
+    },
+    "sort_order": {
+      "type": "number",
+      "default": 50,
+      "description": "Display sort order (lower = first)"
+    },
+    "active": {
+      "type": "boolean",
+      "default": true,
+      "description": "Whether this system is available in the visualizer"
+    }
+  },
+  "required": [
+    "name",
+    "category",
+    "base_rate_low",
+    "base_rate_high",
+    "color_system_key"
+  ],
+  "rls": {
+    "read": {},
+    "create": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}
