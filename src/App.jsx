@@ -30,6 +30,7 @@ import GeneratorRegistry from '@/pages/GeneratorRegistry';
 import SourceRegistry from '@/pages/SourceRegistry';
 import VisualizerHub from '@/pages/VisualizerHub';
 import BuildQueue from '@/pages/BuildQueue';
+import WebPackQueue from '@/pages/WebPackQueue';
 import PreviewFactory from '@/pages/PreviewFactory';
 import QARepair from '@/pages/QARepair';
 import ProposalFactory from '@/pages/ProposalFactory';
@@ -210,6 +211,7 @@ const AuthenticatedApp = () => {
           <Route path="/sources" element={<SourceRegistry />} />
           <Route path="/visualizer-hub" element={<VisualizerHub />} />
           <Route path="/build-queue" element={<BuildQueue />} />
+          <Route path="/web-pack-queue" element={<WebPackQueue />} />
           <Route path="/preview-factory" element={<PreviewFactory />} />
           <Route path="/qa-repair" element={<QARepair />} />
           <Route path="/proposals" element={<ProposalFactory />} />

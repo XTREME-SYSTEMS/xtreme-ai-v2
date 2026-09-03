@@ -1,0 +1,82 @@
+{
+  "name": "WebPack",
+  "type": "object",
+  "description": "A design mockup image uploaded to the Web Pack Queue. The auto builder ingests the image, uses vision AI to generate pixel-perfect HTML/CSS that reproduces the design exactly, then deploys it as a static site to Vercel. The result is a live website that looks exactly like the uploaded design image.",
+  "properties": {
+    "description": {
+      "type": "string",
+      "description": "Optional description (up to 1000 characters)",
+      "maxLength": 1000
+    },
+    "name": {
+      "type": "string",
+      "description": "Name/label for this web pack design"
+    },
+    "image_url": {
+      "type": "string",
+      "description": "URL of the uploaded design mockup image"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "queued",
+        "analyzing",
+        "generating",
+        "deploying",
+        "deployed",
+        "failed"
+      ],
+      "default": "queued",
+      "description": "Build status \u2014 queued = uploaded waiting to build, analyzing = vision AI reading the design, generating = HTML being generated, deploying = pushing to Vercel, deployed = live, failed = errored"
+    },
+    "generated_html": {
+      "type": "string",
+      "description": "The pixel-perfect HTML generated from the design image by the vision AI"
+    },
+    "vercel_url": {
+      "type": "string",
+      "description": "Live Vercel URL after deployment"
+    },
+    "vercel_project_id": {
+      "type": "string",
+      "description": "Vercel project ID for the deployed site"
+    },
+    "error": {
+      "type": "string",
+      "description": "Error message if the build failed"
+    },
+    "logs": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Execution log entries for debugging and auditability"
+    }
+  },
+  "required": [
+    "name",
+    "image_url"
+  ],
+  "rls": {
+    "read": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "create": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}
