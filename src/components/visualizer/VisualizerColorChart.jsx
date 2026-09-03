@@ -1,11 +1,11 @@
 import React, { useState } from "react";
-import { Image } from "@/components/ui/image";
 import { getColorsBySystem } from "@/lib/colorChartData";
 import { cn } from "@/lib/utils";
 import { Check } from "lucide-react";
 
 export default function VisualizerColorChart({ systemKey, selected, onSelect }) {
   const [expanded, setExpanded] = useState(false);
+  const [broken, setBroken] = useState({});
   const colors = getColorsBySystem(systemKey);
   if (!colors.length) return null;
 
@@ -16,6 +16,7 @@ export default function VisualizerColorChart({ systemKey, selected, onSelect }) 
       <div className="grid grid-cols-4 gap-2 sm:grid-cols-6 lg:grid-cols-8">
         {visible.map((color) => {
           const active = selected === color.color_name;
+          const showImage = color.image_url && !broken[color.code];
           return (
             <button
               key={color.code}
@@ -26,11 +27,18 @@ export default function VisualizerColorChart({ systemKey, selected, onSelect }) 
               )}
               title={`${color.color_name} (${color.code})`}
             >
-              <div className="aspect-square w-full overflow-hidden bg-white/5">
-                {color.image_url ? (
-                  <Image src={color.image_url} alt={color.color_name} className="h-full w-full object-cover" fittingType="fill" />
-                ) : (
-                  <div className="h-full w-full" style={{ backgroundColor: color.hex }} />
+              <div
+                className="aspect-square w-full overflow-hidden"
+                style={{ backgroundColor: color.hex || "#333" }}
+              >
+                {showImage && (
+                  <img
+                    src={color.image_url}
+                    alt={color.color_name}
+                    loading="lazy"
+                    className="h-full w-full object-cover"
+                    onError={() => setBroken((prev) => ({ ...prev, [color.code]: true }))}
+                  />
                 )}
               </div>
               {active && (
