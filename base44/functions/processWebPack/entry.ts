@@ -48,7 +48,7 @@ Return ONLY the raw HTML code. Start with <!DOCTYPE html> and end with </html>. 
     const llmRes = await base44.integrations.Core.InvokeLLM({
       prompt,
       file_urls: [pack.image_url],
-      model: 'claude_sonnet_4_6',
+      model: 'gemini_3_flash',
     });
 
     let html = typeof llmRes === 'string' ? llmRes : (llmRes as any)?.output || (llmRes as any)?.text || '';
@@ -60,7 +60,18 @@ Return ONLY the raw HTML code. Start with <!DOCTYPE html> and end with </html>. 
     }
 
     logs.push(`[${new Date().toISOString()}] Generated ${html.length} chars of pixel-perfect HTML`);
-    await svc.entities.WebPack.update(webpack_id, { status: 'generating', generated_html: html, logs: [...(pack.logs || []), ...logs] });
+
+    // Upload the HTML as a file (entity fields can't hold large content)
+    let html_file_url = '';
+    try {
+      const htmlBlob = new Blob([html], { type: 'text/html' });
+      const htmlFile = new File([htmlBlob], 'index.html', { type: 'text/html' });
+      const upRes = await base44.integrations.Core.UploadFile({ file: htmlFile });
+      html_file_url = (upRes as any)?.file_url || '';
+      logs.push(`[${new Date().toISOString()}] Uploaded HTML to ${html_file_url}`);
+    } catch (e) { logs.push(`[${new Date().toISOString()}] HTML file upload skipped: ${(e as any)?.message}`); }
+
+    await svc.entities.WebPack.update(webpack_id, { status: 'generating', generated_html: html_file_url, logs: [...(pack.logs || []), ...logs] });
 
     // ── Phase 2: Deploy to Vercel as static HTML (direct upload, no build) ──
     logs.push(`[${new Date().toISOString()}] Deploying to Vercel as static site...`);
