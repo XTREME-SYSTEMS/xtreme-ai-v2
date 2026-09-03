@@ -11,6 +11,28 @@
 
 import { compileBrief, briefText, photoStyleSuffix } from "./generatorBrief.ts";
 import { researchBusinessNamesDeep } from "./businessNameResearcher.ts";
+import { formatLibraryForPrompt } from "./xpsAssetLibrary.ts";
+
+// Check if the industry is flooring-related (epoxy, concrete, polishing, coating).
+// If so, the auto builder injects real XPS product/equipment/marketing data into
+// every LLM prompt so generated content references real products instead of
+// generic placeholders.
+function isFlooringIndustry(industry: string): boolean {
+  const ind = (industry || "").toLowerCase();
+  return ind.includes("epoxy") || ind.includes("concrete") || ind.includes("floor") || ind.includes("polish") || ind.includes("coating") || ind.includes("surface");
+}
+
+// Load real XPS asset data for flooring-industry builds. Returns a formatted
+// string for prompt injection, or empty string if not a flooring build.
+async function getXpsContext(base44: any, industry: string): Promise<string> {
+  if (!isFlooringIndustry(industry)) return "";
+  try {
+    return await formatLibraryForPrompt(base44, { maxProducts: 20, maxEquipment: 10, maxImages: 8, maxVideos: 5 });
+  } catch (e) {
+    console.log("XPS library load error:", e.message);
+    return "";
+  }
+}
 
 // ── Names (from recommendBusinessNames) ─────────────────────────────────
 // Uses the optimized research pipeline (businessNameResearcher.ts): AI
@@ -164,12 +186,14 @@ export async function generateContent(base44: any, params: Record<string, any>) 
     if (parts.length) finContext = `\n\nFINANCIAL INTELLIGENCE:\n${parts.join("\n")}`;
   }
 
+  const xpsContext = await getXpsContext(base44, ind);
+
   const prompt = `You are a senior brand strategist and viral-marketing copywriter for local service businesses. A client needs website messaging for their ${ind} business.
 
 CLIENT BRIEF:
 ${briefBlock}
 EXISTING WEBSITE: ${site || "none"}${finContext}
-
+${xpsContext ? `\nREAL XPS PRODUCT & EQUIPMENT DATA (use these exact product names, SKUs, and terminology — do NOT use generic epoxy/flooring terms):\n${xpsContext}\n` : ""}
 IMPORTANT: The CLIENT BRIEF above includes the approved VISION, STRATEGY, chosen business name, tagline, and content tone. ALIGN every tone and message with that foundation — it is the source of truth for positioning and brand voice. Do not contradict the vision or strategy.
 
 STEP 1 — Research the market. Use real web data about ${loc}: the local ${ind} competition, typical pricing, what customers there care about, and what messaging the top competitors use. Note 3-5 key findings.
@@ -265,11 +289,13 @@ export async function generateWebsite(base44: any, params: Record<string, any>) 
     if (parts.length) finContext = `\n\nFINANCIAL INTELLIGENCE:\n${parts.join("\n")}`;
   }
 
+  const xpsContext = await getXpsContext(base44, ind);
+
   const prompt = `You are writing the website copy for a local ${ind} business. Make it specific, high-converting, and locally relevant — no generic filler.
 
 CLIENT BRIEF:
 ${briefBlock}${finContext}
-
+${xpsContext ? `\nREAL XPS PRODUCT & EQUIPMENT DATA (use these exact product names, SKUs, and terminology — do NOT use generic epoxy/flooring terms):\n${xpsContext}\n` : ""}
 INSTRUCTIONS:
 - ALIGN all copy with the approved VISION, STRATEGY, chosen name, tagline, and content tone in the brief above — they are the source of truth for positioning and voice.
 - Weave the client's DIFFERENTIATORS and SIGNATURE WORK into the hero and about sections.
@@ -344,12 +370,14 @@ export async function generateSocial(base44: any, params: Record<string, any>) {
   );
   const templates = imgResults.map((r) => r.value).filter(Boolean);
 
+  const xpsContext = await getXpsContext(base44, ind);
+
   const calRes = await base44.asServiceRole.integrations.Core.InvokeLLM({
     prompt: `Create a 30-day social media content calendar for ${ind} "${biz}" in ${loc}.
 
 CLIENT BRIEF:
 ${briefBlock}
-
+${xpsContext ? `\nREAL XPS DATA (reference real XPS products, equipment, and marketing content — do NOT use generic epoxy/flooring terms):\n${xpsContext}\n` : ""}
 ALIGN every caption with the approved VISION, STRATEGY, chosen name, tagline, and content tone in the brief above — they are the source of truth for brand voice and positioning.
 Services: ${svc}. Mix post types: before/after, tips, testimonials, behind-the-scenes, promotions, educational. Make every caption specific to the ${ind} industry and weave in the client's DIFFERENTIATORS, SIGNATURE WORK, and BRAND PERSONALITY. Address the CUSTOMER PAIN POINTS in educational/tips posts. Return exactly 30 posts, one per day, each with a day number (1-30), platform (Instagram, Facebook, or Google Business), a caption (2-3 sentences with hashtags), and a post type category.`,
     model: "claude_opus_4_8",
@@ -413,12 +441,14 @@ export async function generateVideo(base44: any, params: Record<string, any>) {
   );
   const concepts = imgResults.map((r) => r.value).filter(Boolean);
 
+  const xpsContext = await getXpsContext(base44, ind);
+
   const scriptRes = await base44.asServiceRole.integrations.Core.InvokeLLM({
     prompt: `Write a compelling video script for each of these 10 video concepts for ${ind} "${biz}" in ${loc}.
 
 CLIENT BRIEF:
 ${briefBlock}
-
+${xpsContext ? `\nREAL XPS DATA (reference real XPS products, equipment, and video content — do NOT use generic epoxy/flooring terms):\n${xpsContext}\n` : ""}
 ALIGN every script with the approved VISION, STRATEGY, chosen name, tagline, and content tone in the brief above — they are the source of truth for messaging and positioning.
 Services: ${svc}. Tone: ${tone}. Make every script specific to the ${ind} industry. Weave in the client's DIFFERENTIATORS and SIGNATURE WORK. Speak directly to the CUSTOMER PAIN POINTS. Match the BRAND PERSONALITY. Each script should be punchy, 15-30 seconds spoken, with a clear hook in the first 3 seconds and a strong call-to-action at the end. Return one script per concept id.
 

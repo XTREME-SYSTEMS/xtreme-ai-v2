@@ -88,6 +88,7 @@ const ARCHIVE_ITEMS = [
   { to: "/generators", label: "Generator Registry", icon: Factory },
   { to: "/sources", label: "Scraper / Source Registry", icon: Database },
   { to: "/visualizer-hub", label: "Visualizer Hub", icon: Eye },
+  { to: "/xps-catalog", label: "XPS Asset Catalog", icon: Boxes },
   { section: "Build & QA" },
   { to: "/preview-factory", label: "Preview Factory", icon: Eye },
   { to: "/qa-repair", label: "QA & Repair", icon: ShieldCheck },
