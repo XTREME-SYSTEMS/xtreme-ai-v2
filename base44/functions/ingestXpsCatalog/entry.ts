@@ -85,13 +85,38 @@ export default async function(req) {
     // === 1. FETCH ALL XPS PRODUCTS VIA SHOPIFY JSON API ===
     // Shopify exposes /products.json?limit=250 — structured JSON with real
     // product names, SKUs, prices, descriptions, and CDN image URLs.
-    const [page1Res, page2Res] = await Promise.all([
-      fetch('https://xtremepolishingsystems.com/products.json?limit=250&page=1').then(r => r.json()).catch(() => ({ products: [] })),
-      fetch('https://xtremepolishingsystems.com/products.json?limit=250&page=2').then(r => r.json()).catch(() => ({ products: [] })),
+    // Requires a User-Agent header or Shopify may block the request.
+    const fetchHeaders = {
+      'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+      'Accept': 'application/json',
+      'Accept-Language': 'en-US,en;q=0.9',
+    };
+
+    async function fetchShopifyPage(pageNum: number): Promise<any[]> {
+      try {
+        const url = `https://xtremepolishingsystems.com/products.json?limit=250&page=${pageNum}`;
+        const res = await fetch(url, { headers: fetchHeaders });
+        if (!res.ok) {
+          console.log(`Shopify page ${pageNum} HTTP ${res.status}`);
+          return [];
+        }
+        const data = await res.json();
+        const prods = data.products || [];
+        console.log(`Shopify page ${pageNum}: ${prods.length} products`);
+        return prods;
+      } catch (e) {
+        console.log(`Shopify page ${pageNum} error: ${e.message}`);
+        return [];
+      }
+    }
+
+    const [page1Products, page2Products] = await Promise.all([
+      fetchShopifyPage(1),
+      fetchShopifyPage(2),
     ]);
 
-    const shopifyProducts = [...(page1Res.products || []), ...(page2Res.products || [])];
-    console.log(`Fetched ${shopifyProducts.length} products from Shopify API`);
+    const shopifyProducts = [...page1Products, ...page2Products];
+    console.log(`Total fetched from Shopify: ${shopifyProducts.length} products`);
 
     for (const p of shopifyProducts) {
       const equip = isEquipment(p);
@@ -99,7 +124,9 @@ export default async function(req) {
       const image = p.images?.[0]?.src || "";
       const price = p.variants?.[0]?.price ? `$${p.variants[0].price}` : "";
       const sku = p.variants?.[0]?.sku || "";
-      const tags = p.tags ? p.tags.split(",").map((t: string) => t.trim()).filter(Boolean) : [];
+      const tags = typeof p.tags === "string" && p.tags
+        ? p.tags.split(",").map((t: string) => t.trim()).filter(Boolean)
+        : Array.isArray(p.tags) ? p.tags : [];
 
       allRecords.push({
         category: equip ? "equipment" : "product",

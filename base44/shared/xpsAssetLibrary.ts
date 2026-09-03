@@ -19,6 +19,7 @@ export async function loadXpsLibrary(base44) {
   const library = {
     products: [],
     equipment: [],
+    colorCharts: [],
     logos: [],
     brand: [],
     marketingImages: [],
@@ -35,6 +36,7 @@ export async function loadXpsLibrary(base44) {
     switch (asset.category) {
       case "product": library.products.push(asset); break;
       case "equipment": library.equipment.push(asset); break;
+      case "color_chart": library.colorCharts.push(asset); break;
       case "logo": library.logos.push(asset); break;
       case "brand": library.brand.push(asset); break;
       case "marketing_image": library.marketingImages.push(asset); break;
@@ -164,6 +166,21 @@ export async function formatLibraryForPrompt(base44, opts = {}) {
       if (v.video_url) parts.push(`URL: ${v.video_url}`);
       if (v.thumbnail_url) parts.push(`Thumb: ${v.thumbnail_url}`);
       sections.push(`- ${parts.join(" | ")}`);
+    }
+  }
+
+  // Color charts
+  if (lib.colorCharts.length > 0) {
+    const bySystem: Record<string, any[]> = {};
+    for (const c of lib.colorCharts) {
+      const sys = c.product_type || "other";
+      if (!bySystem[sys]) bySystem[sys] = [];
+      bySystem[sys].push(c);
+    }
+    sections.push("\n=== REAL XPS COLOR CHARTS (use these exact color names and codes) ===");
+    for (const [sys, colors] of Object.entries(bySystem)) {
+      const sample = colors.slice(0, 8);
+      sections.push(`- ${sys.toUpperCase()}: ${colors.length} colors available. Examples: ${sample.map(c => `${c.name} (${c.sku})`).join(", ")}`);
     }
   }
 
