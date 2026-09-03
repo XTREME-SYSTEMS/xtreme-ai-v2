@@ -1,12 +1,66 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.44';
+import { COLOR_DATA } from "../../shared/xpsColorData.ts";
 
-// Ingest Xtreme Polishing Systems catalog — scrapes products, equipment,
-// branding, marketing images, and social media content (Instagram, YouTube)
-// from xtremepolishingsystems.com and stores them as XpsAsset records.
-// The auto builder then uses these real assets instead of generic placeholders.
-//
-// Admin-only. Uses InvokeLLM with web search (gemini_3_flash) to research and
-// structure the data, then bulkCreates XpsAsset records.
+// Ingest Xtreme Polishing Systems catalog — directly scrapes the Shopify
+// products.json API for ALL 445 products with real image URLs, ingests all
+// 150+ color charts from the shared color data, researches Polished Concrete
+// University training content, and scrapes XPS social media (Instagram/YouTube).
+// Stores everything as XpsAsset records for the auto builder to use.
+
+const EQUIPMENT_TAGS = ["dust collector", "grinder", "polisher", "vacuum", "buffer", "floor machine", "saw", "mixer", "sprayer", "equipment", "machine", "tool", "blower", "extractor", "scrubber"];
+const SYSTEM_KEYWORDS: Record<string, string[]> = {
+  metallic: ["metallic", "cm-", "xps-0", "xps-6", "xps-7", "metallic pigment"],
+  flake: ["flake", "fb-", "paint chip", "vinyl flake"],
+  quartz: ["quartz", "qb-", "quartz sand"],
+  solid: ["solid", "pigment", "standard color", "safety color", "epoxy color"],
+  glitter: ["glitter", "gl-", "sparkle"],
+  dye_stain: ["dye", "stain", "ameripolish", "acid stain", "concrete dye"],
+  polished: ["densifier", "polishing", "polished", "grit", "pad", "resin"],
+  repair: ["repair", "joint fill", "crack", "patch", "sealer", "caulk"],
+};
+
+function stripHtml(html: string): string {
+  return html.replace(/<[^>]+>/g, "").replace(/&[^;]+;/g, " ").replace(/\s{2,}/g, " ").trim();
+}
+
+function isEquipment(product: any): boolean {
+  const text = `${product.title} ${product.tags || ""} ${product.product_type || ""}`.toLowerCase();
+  return EQUIPMENT_TAGS.some(t => text.includes(t));
+}
+
+function getSystemRelevance(product: any): string[] {
+  const text = `${product.title} ${product.tags || ""} ${product.body_html || ""}`.toLowerCase();
+  const systems: string[] = [];
+  for (const [system, keywords] of Object.entries(SYSTEM_KEYWORDS)) {
+    if (keywords.some(k => text.includes(k))) systems.push(system);
+  }
+  return systems;
+}
+
+function getProductType(product: any, isEquip: boolean): string {
+  if (isEquip) {
+    const text = `${product.title} ${product.tags || ""}`.toLowerCase();
+    if (text.includes("vacuum") || text.includes("dust") || text.includes("extractor")) return "dust_extractor";
+    if (text.includes("grinder")) return "grinder";
+    if (text.includes("polisher") || text.includes("polishing")) return "polisher";
+    if (text.includes("buffer") || text.includes("scrubber")) return "buffer";
+    if (text.includes("saw")) return "saw";
+    if (text.includes("mixer")) return "mixer";
+    return "equipment";
+  }
+  const text = `${product.title} ${product.tags || ""}`.toLowerCase();
+  if (text.includes("primer")) return "primer";
+  if (text.includes("sealer")) return "sealer";
+  if (text.includes("densifier")) return "densifier";
+  if (text.includes("flake")) return "flake";
+  if (text.includes("quartz")) return "quartz";
+  if (text.includes("metallic") || text.includes("pigment")) return "pigment";
+  if (text.includes("polyurea") || text.includes("polyaspartic")) return "polyaspartic";
+  if (text.includes("epoxy") || text.includes("coating")) return "epoxy_coating";
+  if (text.includes("joint") || text.includes("repair") || text.includes("patch")) return "repair";
+  if (text.includes("tool") || text.includes("trowel") || text.includes("roller") || text.includes("squeegee")) return "tool";
+  return "accessory";
+}
 
 export default async function(req) {
   try {
@@ -16,80 +70,122 @@ export default async function(req) {
     if (user.role !== 'admin') return Response.json({ error: 'Admin only' }, { status: 403 });
 
     const body = await req.json().catch(() => ({}));
-    const refresh = body?.refresh !== false; // default true
+    const refresh = body?.refresh !== false;
 
-    // Clear existing records if refreshing
+    // Clear existing records
     if (refresh) {
-      try {
-        await base44.asServiceRole.entities.XpsAsset.deleteMany({});
-      } catch (e) {
-        console.log('Clear existing (may be empty):', e.message);
+      try { await base44.asServiceRole.entities.XpsAsset.deleteMany({}); } catch (e) {
+        console.log('Clear existing:', e.message);
       }
     }
 
     const ingestedAt = new Date().toISOString();
-    const allRecords = [];
+    const allRecords: any[] = [];
 
-    // === PARALLEL RESEARCH ===
-    // 4 InvokeLLM calls with web search, all running concurrently
-    const [productsRes, equipmentRes, socialRes, brandRes] = await Promise.all([
-      researchProducts(base44),
-      researchEquipment(base44),
-      researchSocialMedia(base44),
-      researchBranding(base44),
+    // === 1. FETCH ALL XPS PRODUCTS VIA SHOPIFY JSON API ===
+    // Shopify exposes /products.json?limit=250 — structured JSON with real
+    // product names, SKUs, prices, descriptions, and CDN image URLs.
+    const [page1Res, page2Res] = await Promise.all([
+      fetch('https://xtremepolishingsystems.com/products.json?limit=250&page=1').then(r => r.json()).catch(() => ({ products: [] })),
+      fetch('https://xtremepolishingsystems.com/products.json?limit=250&page=2').then(r => r.json()).catch(() => ({ products: [] })),
     ]);
 
-    // === PRODUCTS ===
-    if (productsRes?.products) {
-      for (const p of productsRes.products) {
+    const shopifyProducts = [...(page1Res.products || []), ...(page2Res.products || [])];
+    console.log(`Fetched ${shopifyProducts.length} products from Shopify API`);
+
+    for (const p of shopifyProducts) {
+      const equip = isEquipment(p);
+      const description = stripHtml(p.body_html || "").substring(0, 500);
+      const image = p.images?.[0]?.src || "";
+      const price = p.variants?.[0]?.price ? `$${p.variants[0].price}` : "";
+      const sku = p.variants?.[0]?.sku || "";
+      const tags = p.tags ? p.tags.split(",").map((t: string) => t.trim()).filter(Boolean) : [];
+
+      allRecords.push({
+        category: equip ? "equipment" : "product",
+        name: p.title || "Unknown Product",
+        sku,
+        price,
+        description,
+        image_url: image,
+        source_url: `https://xtremepolishingsystems.com/products/${p.handle}`,
+        source_platform: "website",
+        brand: p.vendor || "Xtreme Polishing Systems",
+        product_type: getProductType(p, equip),
+        tags,
+        system_relevance: getSystemRelevance(p),
+        use_cases: [],
+        active: p.variants?.[0]?.available !== false,
+        ingested_at: ingestedAt,
+      });
+    }
+
+    // === 2. INGEST ALL COLOR CHARTS ===
+    for (const color of COLOR_DATA) {
+      allRecords.push({
+        category: "color_chart",
+        name: `${color.color_name} (${color.system})`,
+        sku: color.code,
+        description: `${color.system.charAt(0).toUpperCase() + color.system.slice(1)} color from the ${color.collection}. Sheen: ${color.sheen}. ${color.in_stock ? "In stock." : "Special order."}`,
+        image_url: color.image_url || "",
+        source_url: "https://xtremepolishingsystems.com/pages/color-charts",
+        source_platform: "website",
+        brand: color.system === "dye_stain" ? "Ameripolish" : "Xtreme Polishing Systems",
+        product_type: color.system,
+        tags: [color.system, color.collection, color.sheen, color.in_stock ? "in_stock" : "special_order"],
+        system_relevance: [color.system],
+        specifications: { hex: color.hex, sheen: color.sheen, collection: color.collection, in_stock: color.in_stock, rank: color.rank },
+        active: true,
+        ingested_at: ingestedAt,
+      });
+    }
+
+    // === 3. RESEARCH POLISHED CONCRETE UNIVERSITY + SOCIAL MEDIA IN PARALLEL ===
+    const [pcuRes, socialRes] = await Promise.all([
+      researchPCU(base44),
+      researchSocialMedia(base44),
+    ]);
+
+    // PCU training courses
+    if (pcuRes?.courses) {
+      for (const course of pcuRes.courses) {
         allRecords.push({
-          category: "product",
-          name: p.name || "Unknown Product",
-          sku: p.sku || "",
-          price: p.price || "",
-          description: p.description || "",
-          image_url: p.image_url || "",
-          source_url: p.product_url || "https://xtremepolishingsystems.com/collections/all",
+          category: "training_video",
+          name: course.title,
+          description: course.description,
+          source_url: "https://www.polishedconcreteuniversity.com/class-information/",
           source_platform: "website",
-          brand: p.brand || "Xtreme Polishing Systems",
-          product_type: p.category || p.product_type || "",
-          tags: p.tags || [],
-          system_relevance: p.system_relevance || [],
-          use_cases: p.use_cases || [],
-          specifications: p.specifications || {},
+          brand: "Polished Concrete University",
+          tags: ["training", "certification", "education", ...course.topics],
+          use_cases: course.topics,
           active: true,
           ingested_at: ingestedAt,
         });
       }
     }
 
-    // === EQUIPMENT ===
-    if (equipmentRes?.equipment) {
-      for (const e of equipmentRes.equipment) {
-        allRecords.push({
-          category: "equipment",
-          name: e.name || "Unknown Equipment",
-          description: e.description || "",
-          image_url: e.image_url || "",
-          source_url: e.source_url || "https://xtremepolishingsystems.com/pages/industry-brands-for-professionals",
-          source_platform: "website",
-          brand: e.brand || "",
-          product_type: e.category || e.product_type || "",
-          tags: e.tags || [],
-          use_cases: e.use_cases || [],
-          active: true,
-          ingested_at: ingestedAt,
-        });
-      }
+    // PCU marketing content / company info
+    if (pcuRes?.marketing_content) {
+      allRecords.push({
+        category: "brand",
+        name: "Polished Concrete University — Company Info",
+        description: pcuRes.marketing_content,
+        source_url: "https://www.polishedconcreteuniversity.com",
+        source_platform: "website",
+        brand: "Polished Concrete University",
+        tags: ["training", "education", "certification", "marketing"],
+        active: true,
+        ingested_at: ingestedAt,
+      });
     }
 
-    // === SOCIAL MEDIA (Instagram + YouTube) ===
+    // Social media content
     if (socialRes?.posts) {
       for (const s of socialRes.posts) {
-        const isVideo = s.video_url || s.platform === "youtube" || s.platform === "instagram";
+        const isVideo = s.platform === "youtube" || (s.platform === "instagram" && s.is_reel);
         allRecords.push({
-          category: s.platform === "youtube" ? "marketing_video" : (s.platform === "instagram" && s.is_reel ? "marketing_video" : "social_post"),
-          name: s.title || s.description?.substring(0, 80) || "Social Post",
+          category: isVideo ? "marketing_video" : "social_post",
+          name: s.title || "Social Post",
           description: s.description || "",
           image_url: s.thumbnail_url || "",
           video_url: s.video_url || "",
@@ -104,24 +200,7 @@ export default async function(req) {
       }
     }
 
-    // === BRANDING ===
-    if (brandRes?.assets) {
-      for (const b of brandRes.assets) {
-        allRecords.push({
-          category: b.type === "logo" ? "logo" : (b.type === "marketing_image" ? "marketing_image" : "brand"),
-          name: b.name || "Brand Asset",
-          description: b.description || "",
-          image_url: b.image_url || "",
-          source_url: b.source_url || "https://xtremepolishingsystems.com",
-          source_platform: "website",
-          tags: b.tags || [],
-          active: true,
-          ingested_at: ingestedAt,
-        });
-      }
-    }
-
-    // === TRAINING / PODCAST VIDEOS ===
+    // Training/educational videos
     if (socialRes?.training_videos) {
       for (const t of socialRes.training_videos) {
         allRecords.push({
@@ -141,7 +220,7 @@ export default async function(req) {
       }
     }
 
-    // Bulk create in batches of 200
+    // === 4. BULK CREATE IN BATCHES ===
     let created = 0;
     for (let i = 0; i < allRecords.length; i += 200) {
       const batch = allRecords.slice(i, i + 200);
@@ -149,20 +228,24 @@ export default async function(req) {
         await base44.asServiceRole.entities.XpsAsset.bulkCreate(batch);
         created += batch.length;
       } catch (e) {
-        console.log(`Batch ${i} create error:`, e.message);
+        console.log(`Batch ${i} error:`, e.message);
       }
     }
+
+    const breakdown = {
+      products: allRecords.filter(r => r.category === "product").length,
+      equipment: allRecords.filter(r => r.category === "equipment").length,
+      colorCharts: allRecords.filter(r => r.category === "color_chart").length,
+      socialPosts: allRecords.filter(r => r.category === "social_post").length,
+      marketingVideos: allRecords.filter(r => r.category === "marketing_video").length,
+      trainingVideos: allRecords.filter(r => r.category === "training_video").length,
+      brandAssets: allRecords.filter(r => r.category === "brand").length,
+    };
 
     return Response.json({
       status: "success",
       totalIngested: created,
-      breakdown: {
-        products: productsRes?.products?.length || 0,
-        equipment: equipmentRes?.equipment?.length || 0,
-        socialPosts: socialRes?.posts?.length || 0,
-        trainingVideos: socialRes?.training_videos?.length || 0,
-        brandAssets: brandRes?.assets?.length || 0,
-      },
+      breakdown,
     });
   } catch (error) {
     console.error('ingestXpsCatalog error:', error.message);
@@ -170,135 +253,56 @@ export default async function(req) {
   }
 }
 
-// === RESEARCH FUNCTIONS ===
-// Each uses InvokeLLM with web search (gemini_3_flash) to research and structure
-// real XPS data from their website and social media.
+// Research Polished Concrete University — training courses, curriculum, marketing content
+async function researchPCU(base44: any) {
+  return await base44.asServiceRole.integrations.Core.InvokeLLM({
+    prompt: `Research polishedconcreteuniversity.com — the training/certification subsidiary of Xtreme Polishing Systems.
 
-async function researchProducts(base44) {
-  const res = await base44.asServiceRole.integrations.Core.InvokeLLM({
-    prompt: `Research the product catalog at xtremepolishingsystems.com (specifically https://xtremepolishingsystems.com/collections/all and its sub-collections). 
+They offer two 5-day certification courses in Pompano Beach, FL ($1750 each):
+1. Concrete Polishing Certification: Repair (holes, cracks, expansion joints, structural), Finish, Maintenance, Concrete Stain Logos + Images, Tool/equipment selection, Hands-on training, Marketing/Lead Generation, Bidding, Lifetime Phone Support
+2. Epoxy Resin Certification: Moisture Testing, Cove Bases, Surface Preparation, Mixing/Ratios/Pouring, Embedding/Clear Coats, Coating types (Epoxy, Urethane, Polyaspartic, Water Based), Finishes (Glitter, Paint Chip, Vinyl Flake, Quartz, Metallic), Countertops/Floors/Decals, Tool selection, Hands-on training, Marketing, Bidding, Lifetime Support
 
-Extract as many real products as you can find (aim for 40-60). For each product, provide:
-- name: The exact product name as shown on the site
-- sku: The product SKU or model number if available
-- price: The sale price as shown (e.g. "$375.00", "From $93.05")
-- description: A 1-2 sentence product description
-- image_url: The full CDN image URL from xtremepolishingsystems.com/cdn/shop/...
-- product_url: The full product page URL
-- category: Product type (epoxy_coating, primer, sealer, densifier, flake, quartz, glitter, dye_stain, tooling, accessory, machine, etc.)
-- brand: Brand name (Xtreme Polishing Systems, Ameripolish, Husqvarna, Metabo, etc.)
-- tags: Relevant tags (metallic, flake, garage, commercial, residential, etc.)
-- system_relevance: Which floor systems this is for (metallic, flake, quartz, solid, glitter, dye_stain, polished, repair)
-- use_cases: Typical applications (garage floor, commercial kitchen, showroom, warehouse, etc.)
+They also have a YouTube playlist of student testimonials: https://youtube.com/playlist?list=PLfOIJH0IxLS-2wxIIVh5phOowITQGnO7y
 
-Focus on their main product lines: epoxy coatings (Rockhard, Polyaspartic, Polyurea), primers, sealers, densifiers, color pigments, flake systems, quartz systems, joint fillers, tools, and accessories. Include the XPS brand products and the brands they carry.
-
-Return real, accurate data from the actual website. Do not invent products.`,
+Return JSON with:
+- courses: array of { title, description, topics[] } — one per certification course
+- marketing_content: a 2-3 paragraph company description suitable for marketing copy, mentioning their parent company XPS, 30 years of experience, hands-on training, and lifetime support`,
     add_context_from_internet: true,
     model: "gemini_3_flash",
     response_json_schema: {
       type: "object",
       properties: {
-        products: {
+        courses: {
           type: "array",
           items: {
             type: "object",
             properties: {
-              name: { type: "string" },
-              sku: { type: "string" },
-              price: { type: "string" },
+              title: { type: "string" },
               description: { type: "string" },
-              image_url: { type: "string" },
-              product_url: { type: "string" },
-              category: { type: "string" },
-              brand: { type: "string" },
-              tags: { type: "array", items: { type: "string" } },
-              system_relevance: { type: "array", items: { type: "string" } },
-              use_cases: { type: "array", items: { type: "string" } },
-              specifications: { type: "object" }
+              topics: { type: "array", items: { type: "string" } }
             }
           }
-        }
+        },
+        marketing_content: { type: "string" }
       }
     }
   });
-  return res;
 }
 
-async function researchEquipment(base44) {
-  const res = await base44.asServiceRole.integrations.Core.InvokeLLM({
-    prompt: `Research the equipment and machine catalog at xtremepolishingsystems.com, specifically the page https://xtremepolishingsystems.com/pages/industry-brands-for-professionals and their equipment collections.
-
-XPS carries equipment from brands like: Husqvarna, Metabo, Makita, Dewalt, Scanmaskin, Bartell Global, Aztec Products, NSS Enterprises, Pioneer Eclipse, Terrco, Onyx (Xtreme Machines), Racatac, U.S. Saws, Portamix, Collomix.
-
-Extract 20-30 real equipment items. For each, provide:
-- name: Equipment name (e.g. "Husqvarna PG 280 Floor Grinder", "Metabo W24-180 Dust Extractor")
-- description: What it does, key specs
-- image_url: CDN image URL from the site
-- source_url: Product or collection page URL
-- brand: Manufacturer brand
-- category: Equipment type (grinder, polisher, vacuum, dust_extractor, buffer, saw, mixer, coving_tool, etc.)
-- tags: Relevant tags
-- use_cases: What jobs this equipment is used for
-
-Focus on the main equipment categories: floor grinders, concrete polishers, dust extractors/vacuums, floor buffers/scrubbers, hand grinders, mixing equipment, coving tools, and surface prep machines.
-
-Return real, accurate data. Do not invent equipment.`,
-    add_context_from_internet: true,
-    model: "gemini_3_flash",
-    response_json_schema: {
-      type: "object",
-      properties: {
-        equipment: {
-          type: "array",
-          items: {
-            type: "object",
-            properties: {
-              name: { type: "string" },
-              description: { type: "string" },
-              image_url: { type: "string" },
-              source_url: { type: "string" },
-              brand: { type: "string" },
-              category: { type: "string" },
-              product_type: { type: "string" },
-              tags: { type: "array", items: { type: "string" } },
-              use_cases: { type: "array", items: { type: "string" } }
-            }
-          }
-        }
-      }
-    }
-  });
-  return res;
-}
-
-async function researchSocialMedia(base44) {
-  const res = await base44.asServiceRole.integrations.Core.InvokeLLM({
-    prompt: `Research the social media content of Xtreme Polishing Systems (XPS). Their channels are:
-- Instagram: https://www.instagram.com/xtremepolishingsystems/
-- YouTube: https://www.youtube.com/c/XtremePolishingSystems (66.8K subscribers, 546 videos)
+// Research XPS social media — Instagram, YouTube, podcast
+async function researchSocialMedia(base44: any) {
+  return await base44.asServiceRole.integrations.Core.InvokeLLM({
+    prompt: `Research the social media content of Xtreme Polishing Systems (XPS). Their channels:
+- Instagram: https://www.instagram.com/xtremepolishingsystems/ (industry-leading products, equipment, training & tools)
+- YouTube: https://www.youtube.com/c/XtremePolishingSystems (66.8K subscribers, 546 videos — epoxy techniques, concrete polishing tutorials, product demos, "Epoxy Will Change Your Life" podcast)
 - Facebook: Xtreme Polishing Systems
-- TikTok: @xps_uk (UK branch)
+- TikTok: @xps_uk
 
-Find 15-20 of their most popular and recent social media posts and videos. For each:
-- title: Post or video title
-- description: Caption or description
-- platform: "instagram", "youtube", "facebook", or "tiktok"
-- post_url: Full URL to the post/video
-- video_url: Direct video URL if available (YouTube watch URL)
-- thumbnail_url: Thumbnail image URL
-- is_reel: true if Instagram reel
-- tags: Relevant tags (epoxy, garage, metallic, before_after, tutorial, etc.)
-- duration_seconds: Video duration if known
+Find 15-20 of their most popular social posts and videos. For each: title, description, platform, post_url, video_url (YouTube watch URL), thumbnail_url, is_reel (for Instagram), tags, duration_seconds.
 
-Also find 10-15 of their best training/educational YouTube videos (they have 546 videos covering epoxy techniques, concrete polishing tutorials, product demos, and their "Epoxy Will Change Your Life" podcast). For training videos, include:
-- title: Video title
-- description: What it teaches
-- video_url: YouTube URL
-- thumbnail_url: Thumbnail image URL
-- tags: Topics covered (metallic epoxy, flake system, polishing, joint fill, etc.)
+Also find 10-15 of their best training/educational YouTube videos (546 total covering epoxy techniques, concrete polishing, product demos, podcast episodes). For each: title, description, video_url, thumbnail_url, tags, duration_seconds.
 
-Return real content from their actual channels. Do not invent posts or videos.`,
+Return real content from their actual channels. Do not invent posts.`,
     add_context_from_internet: true,
     model: "gemini_3_flash",
     response_json_schema: {
@@ -338,51 +342,4 @@ Return real content from their actual channels. Do not invent posts or videos.`,
       }
     }
   });
-  return res;
-}
-
-async function researchBranding(base44) {
-  const res = await base44.asServiceRole.integrations.Core.InvokeLLM({
-    prompt: `Research the branding and marketing assets of Xtreme Polishing Systems (xtremepolishingsystems.com). 
-
-Find:
-1. Their logo image URL(s) — check their website header, footer, and about pages
-2. Their brand colors (primary, secondary, accent colors with hex codes if visible)
-3. Their tagline or slogan
-4. Marketing/banner images from their homepage and collection pages (CDN image URLs from xtremepolishingsystems.com/cdn/shop/...)
-5. Their "About Us" company description and mission
-6. Their brand voice description (professional, contractor-focused, etc.)
-
-For each asset, provide:
-- name: Asset name (e.g. "XPS Logo", "Homepage Hero Banner", "Brand Color - Primary")
-- type: "logo", "marketing_image", or "brand"
-- description: Description or context
-- image_url: CDN image URL if applicable
-- source_url: Page where found
-- tags: Relevant tags
-
-Return real data from their actual website. Do not invent assets.`,
-    add_context_from_internet: true,
-    model: "gemini_3_flash",
-    response_json_schema: {
-      type: "object",
-      properties: {
-        assets: {
-          type: "array",
-          items: {
-            type: "object",
-            properties: {
-              name: { type: "string" },
-              type: { type: "string" },
-              description: { type: "string" },
-              image_url: { type: "string" },
-              source_url: { type: "string" },
-              tags: { type: "array", items: { type: "string" } }
-            }
-          }
-        }
-      }
-    }
-  });
-  return res;
 }
