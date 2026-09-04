@@ -136,6 +136,7 @@ import CouncilChamber from '@/pages/CouncilChamber';
 import FloorVisualizer from '@/pages/FloorVisualizer';
 import VisualizerInbox from '@/pages/VisualizerInbox';
 import XpsCatalog from '@/pages/XpsCatalog';
+import Preflight from '@/pages/Preflight';
 import { PortalStudioProvider } from '@/lib/PortalStudioContext';
 import XtremeShell from '@/components/xtremeai/XtremeShell';
 import PortalStudio from '@/pages/portalstudio/PortalStudio';
@@ -287,6 +288,7 @@ const AuthenticatedApp = () => {
       <Route path="/lead-engine" element={<LeadEngine />} />
       <Route path="/visualizer-inbox" element={<VisualizerInbox />} />
       <Route path="/xps-catalog" element={<XpsCatalog />} />
+      <Route path="/preflight" element={<Preflight />} />
       <Route path="/council-chamber" element={<CouncilChamber />} />
         </Route>
       </Route>

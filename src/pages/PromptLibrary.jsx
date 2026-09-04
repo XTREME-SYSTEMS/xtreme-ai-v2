@@ -1,131 +1,220 @@
 import { useEffect, useState } from "react";
 import { base44 } from "@/api/base44Client";
-import { PageHeader, Panel, EmptyState, LoadingButton } from "@/components/ui";
-import StatusBadge from "@/components/StatusBadge";
-import { BookOpen, Loader2, Plus, X, Sparkles } from "lucide-react";
+import {
+  BookOpen, Loader2, RefreshCw, Search, Brain, Wrench, ShieldCheck,
+  Rocket, Activity, Zap, Eye, ChevronDown, ChevronUp, Copy, Check
+} from "lucide-react";
+import { cn } from "@/lib/utils";
 
-const STEPS = ["name", "url", "brand", "logo", "content", "images", "seo_aeo"];
+const CATEGORIES = [
+  { key: "audit", label: "Audit", icon: Eye, color: "text-blue-400" },
+  { key: "heal", label: "Heal", icon: Wrench, color: "text-emerald-400" },
+  { key: "harden", label: "Harden", icon: ShieldCheck, color: "text-amber-400" },
+  { key: "optimize", label: "Optimize", icon: Zap, color: "text-lime-400" },
+  { key: "manage", label: "Manage", icon: Activity, color: "text-cyan-400" },
+  { key: "launch", label: "Launch", icon: Rocket, color: "text-rose-400" },
+  { key: "preflight", label: "Preflight", icon: Brain, color: "text-violet-400" },
+  { key: "daily_ops", label: "Daily Ops", icon: Activity, color: "text-orange-400" },
+];
 
-export default function PromptLibraryPage() {
-  const [items, setItems] = useState([]);
+const PRIORITY_COLORS = {
+  critical: "text-red-400 border-red-400/40 bg-red-400/10",
+  high: "text-amber-400 border-amber-400/40 bg-amber-400/10",
+  medium: "text-blue-400 border-blue-400/40 bg-blue-400/10",
+  low: "text-white/40 border-white/10 bg-white/5",
+};
+
+export default function PromptLibrary() {
+  const [prompts, setPrompts] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [seeding, setSeeding] = useState(false);
-  const [editing, setEditing] = useState(null);
+  const [activeCategory, setActiveCategory] = useState("all");
+  const [expanded, setExpanded] = useState(null);
+  const [copied, setCopied] = useState(null);
+  const [search, setSearch] = useState("");
 
-  const load = async () => {
-    const list = await base44.entities.PromptLibrary.list("-created_date", 100);
-    setItems(list);
-    setLoading(false);
-  };
-  useEffect(() => { load(); }, []);
+  useEffect(() => { document.title = "Prompt Library · Xtreme AI"; loadPrompts(); }, []);
 
-  const seed = async () => {
-    setSeeding(true);
-    try { await base44.functions.invoke("seedTemplateAndPromptLibrary", {}); await load(); } catch (e) {}
-    setSeeding(false);
-  };
-
-  const save = async () => {
-    if (!editing.name || !editing.step || !editing.prompt_text) return;
-    if (editing.id) {
-      await base44.entities.PromptLibrary.update(editing.id, { ...editing });
-    } else {
-      await base44.entities.PromptLibrary.create({ ...editing, status: "active", niche: editing.niche || "general", quality_tier: editing.quality_tier || "ultra" });
+  const loadPrompts = async () => {
+    setLoading(true);
+    try {
+      const res = await base44.entities.SystemPrompt.list("sort_order", 500);
+      setPrompts(res || []);
+    } catch (err) {
+      // If no prompts yet, show empty state
+      setPrompts([]);
+    } finally {
+      setLoading(false);
     }
-    setEditing(null);
-    await load();
   };
 
-  if (loading) return <div className="flex justify-center py-20"><Loader2 className="h-6 w-6 animate-spin text-lime-400" /></div>;
+  const seedPrompts = async () => {
+    setLoading(true);
+    try {
+      await base44.functions.invoke("seedPromptLibrary", {});
+      await loadPrompts();
+    } catch (err) {
+      console.error("Seed failed:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const copyPrompt = async (id, text) => {
+    await navigator.clipboard.writeText(text);
+    setCopied(id);
+    setTimeout(() => setCopied(null), 2000);
+  };
+
+  const filtered = prompts.filter(p => {
+    const matchCat = activeCategory === "all" || p.category === activeCategory;
+    const matchSearch = !search || p.title?.toLowerCase().includes(search.toLowerCase()) || p.prompt_text?.toLowerCase().includes(search.toLowerCase()) || p.tags?.some(t => t.toLowerCase().includes(search.toLowerCase()));
+    return matchCat && matchSearch;
+  });
+
+  const counts = CATEGORIES.reduce((acc, c) => {
+    acc[c.key] = prompts.filter(p => p.category === c.key).length;
+    return acc;
+  }, {});
 
   return (
-    <div>
-      <PageHeader title="Prompt Library" subtitle="Ultra-quality prompts that drive every generator step in the Website Factory. Use curly-brace variables for interpolation.">
-        <LoadingButton onClick={seed} loading={seeding}><Sparkles className="h-4 w-4" /> Seed Defaults</LoadingButton>
-        <LoadingButton onClick={() => setEditing({ name: "", step: "name", niche: "general", prompt_text: "", quality_tier: "ultra", model_hint: "claude_sonnet_4_6", notes: "" })}><Plus className="h-4 w-4" /> New Prompt</LoadingButton>
-      </PageHeader>
+    <div className="mx-auto max-w-5xl">
+      <div className="rounded-xl border border-lime-400/40 bg-lime-400/5 p-5 sm:p-6">
+        <div className="flex items-center justify-between">
+          <div>
+            <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-lime-400">
+              <Brain className="h-4 w-4" /> System Optimization Prompt Library
+            </div>
+            <h1 className="mt-2 text-xl font-semibold text-white sm:text-2xl">Self-Healing · Self-Hardening · Self-Optimizing Prompts</h1>
+            <p className="mt-1 text-sm text-white/60">
+              Curated prompts designed to make the system fully operational, self-managing, and launch-ready.
+              Used by the System Operator agent and daily management workflows.
+            </p>
+          </div>
+          <button
+            onClick={seedPrompts}
+            disabled={loading}
+            className="inline-flex items-center gap-2 rounded-lg bg-lime-400 px-4 py-2.5 text-sm font-semibold text-black transition-colors hover:bg-lime-300 disabled:opacity-50"
+          >
+            {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <RefreshCw className="h-4 w-4" />}
+            {prompts.length === 0 ? "Seed Library" : "Re-seed"}
+          </button>
+        </div>
 
-      {items.length === 0 && !editing ? (
-        <EmptyState icon={BookOpen} title="No prompts yet" subtitle="Seed the default ultra-quality prompt set or create your own.">
-          <LoadingButton onClick={seed} loading={seeding}><Sparkles className="h-4 w-4" /> Seed Defaults</LoadingButton>
-        </EmptyState>
-      ) : (
-        <div className="grid gap-4 md:grid-cols-2">
-          {STEPS.map((step) => {
-            const stepItems = items.filter((i) => i.step === step);
-            if (!stepItems.length) return null;
+        {/* Search */}
+        <div className="mt-4 relative">
+          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-white/30" />
+          <input
+            type="text"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder="Search prompts by title, text, or tags…"
+            className="w-full rounded-lg border border-white/10 bg-zinc-950 py-2 pl-10 pr-4 text-sm text-white placeholder:text-white/30 focus:border-lime-400/50 focus:outline-none"
+          />
+        </div>
+
+        {/* Category filters */}
+        <div className="mt-4 flex flex-wrap gap-2">
+          <button
+            onClick={() => setActiveCategory("all")}
+            className={cn(
+              "inline-flex items-center gap-1.5 rounded-lg border px-3 py-1.5 text-xs font-medium transition-all",
+              activeCategory === "all" ? "border-lime-400 bg-lime-400/15 text-lime-300" : "border-white/10 text-white/60 hover:border-white/25"
+            )}
+          >
+            All ({prompts.length})
+          </button>
+          {CATEGORIES.map((c) => {
+            const Icon = c.icon;
             return (
-              <Panel key={step} title={`Step · ${step}`}>
-                <div className="space-y-2">
-                  {stepItems.map((p) => (
-                    <div key={p.id} className="rounded-lg border border-white/10 bg-zinc-950 p-3">
-                      <div className="flex items-center justify-between gap-2">
-                        <div className="text-sm font-medium text-white">{p.name}</div>
-                        <StatusBadge status={p.status} />
-                      </div>
-                      <div className="mt-1 flex items-center gap-2 text-[10px]">
-                        <span className="rounded border border-lime-400/30 bg-lime-400/10 px-1.5 py-0.5 text-lime-300">{p.niche || "general"}</span>
-                        <span className="rounded border border-white/15 px-1.5 py-0.5 text-white/50">{p.quality_tier}</span>
-                        {p.model_hint && <span className="text-white/30">{p.model_hint}</span>}
-                      </div>
-                      <pre className="mt-2 max-h-32 overflow-y-auto whitespace-pre-wrap rounded bg-black/40 p-2 text-[11px] text-white/50">{p.prompt_text}</pre>
-                      <button onClick={() => setEditing({ ...p })} className="mt-2 text-xs font-medium text-lime-400 hover:text-lime-300">Edit →</button>
-                    </div>
-                  ))}
-                </div>
-              </Panel>
+              <button
+                key={c.key}
+                onClick={() => setActiveCategory(c.key)}
+                className={cn(
+                  "inline-flex items-center gap-1.5 rounded-lg border px-3 py-1.5 text-xs font-medium transition-all",
+                  activeCategory === c.key ? "border-lime-400 bg-lime-400/15 text-lime-300" : "border-white/10 text-white/60 hover:border-white/25"
+                )}
+              >
+                <Icon className={cn("h-3.5 w-3.5", c.color)} />
+                {c.label} ({counts[c.key] || 0})
+              </button>
             );
           })}
         </div>
-      )}
+      </div>
 
-      {editing && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4" onClick={() => setEditing(null)}>
-          <div className="max-h-[85vh] w-full max-w-lg overflow-y-auto rounded-xl border border-white/15 bg-zinc-950 p-5" onClick={(e) => e.stopPropagation()}>
-            <div className="mb-4 flex items-center justify-between">
-              <h3 className="text-base font-semibold text-white">{editing.id ? "Edit Prompt" : "New Prompt"}</h3>
-              <button onClick={() => setEditing(null)} className="text-white/50 hover:text-white"><X className="h-5 w-5" /></button>
-            </div>
-            <div className="space-y-3 text-sm">
-              <LabeledInput label="Name" value={editing.name} onChange={(v) => setEditing({ ...editing, name: v })} />
-              <div>
-                <div className="mb-1 text-[10px] font-semibold uppercase tracking-wider text-white/40">Step</div>
-                <select value={editing.step} onChange={(e) => setEditing({ ...editing, step: e.target.value })} className="w-full rounded-lg border border-white/15 bg-black px-3 py-2 text-sm text-white">
-                  {STEPS.map((s) => <option key={s} value={s}>{s}</option>)}
-                </select>
-              </div>
-              <LabeledInput label="Niche ('general' = universal)" value={editing.niche} onChange={(v) => setEditing({ ...editing, niche: v })} />
-              <div>
-                <div className="mb-1 text-[10px] font-semibold uppercase tracking-wider text-white/40">Prompt text — use double-curly variables</div>
-                <textarea value={editing.prompt_text} onChange={(e) => setEditing({ ...editing, prompt_text: e.target.value })} rows={8} className="w-full rounded-lg border border-white/15 bg-black px-3 py-2 font-mono text-xs text-white" />
-              </div>
-              <div>
-                <div className="mb-1 text-[10px] font-semibold uppercase tracking-wider text-white/40">Quality tier</div>
-                <select value={editing.quality_tier} onChange={(e) => setEditing({ ...editing, quality_tier: e.target.value })} className="w-full rounded-lg border border-white/15 bg-black px-3 py-2 text-sm text-white">
-                  <option value="ultra">ultra</option>
-                  <option value="premium">premium</option>
-                  <option value="standard">standard</option>
-                </select>
-              </div>
-              <LabeledInput label="Model hint" value={editing.model_hint || ""} onChange={(v) => setEditing({ ...editing, model_hint: v })} />
-              <LabeledInput label="Notes" value={editing.notes || ""} onChange={(v) => setEditing({ ...editing, notes: v })} />
-            </div>
-            <div className="mt-5 flex justify-end gap-2">
-              <LoadingButton onClick={() => setEditing(null)} variant="ghost">Cancel</LoadingButton>
-              <LoadingButton onClick={save}>Save Prompt</LoadingButton>
-            </div>
+      {/* Prompt cards */}
+      <div className="mt-4 space-y-2">
+        {loading ? (
+          <div className="flex items-center justify-center py-16">
+            <Loader2 className="h-8 w-8 animate-spin text-lime-400" />
           </div>
-        </div>
-      )}
-    </div>
-  );
-}
-
-function LabeledInput({ label, value, onChange }) {
-  return (
-    <div>
-      <div className="mb-1 text-[10px] font-semibold uppercase tracking-wider text-white/40">{label}</div>
-      <input value={value} onChange={(e) => onChange(e.target.value)} className="w-full rounded-lg border border-white/15 bg-black px-3 py-2 text-sm text-white" />
+        ) : filtered.length === 0 ? (
+          <div className="rounded-xl border border-white/10 bg-zinc-950 py-16 text-center">
+            <BookOpen className="mx-auto h-10 w-10 text-white/20" />
+            <p className="mt-3 text-sm text-white/50">No prompts yet. Click "Seed Library" to populate.</p>
+          </div>
+        ) : (
+          filtered.map((prompt) => {
+            const cat = CATEGORIES.find(c => c.key === prompt.category);
+            const CatIcon = cat?.icon || BookOpen;
+            const isExpanded = expanded === prompt.id;
+            return (
+              <div key={prompt.id} className="overflow-hidden rounded-lg border border-white/10 bg-zinc-950">
+                <button
+                  onClick={() => setExpanded(isExpanded ? null : prompt.id)}
+                  className="flex w-full items-center gap-3 px-4 py-3 text-left transition-colors hover:bg-white/5"
+                >
+                  <CatIcon className={cn("h-5 w-5 shrink-0", cat?.color || "text-white/50")} />
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm font-semibold text-white">{prompt.title}</span>
+                      {prompt.priority && (
+                        <span className={cn("rounded border px-1.5 py-0.5 text-[9px] font-bold uppercase", PRIORITY_COLORS[prompt.priority] || PRIORITY_COLORS.low)}>
+                          {prompt.priority}
+                        </span>
+                      )}
+                    </div>
+                    {prompt.target_system && (
+                      <div className="mt-0.5 text-xs text-white/40">Target: {prompt.target_system}</div>
+                    )}
+                  </div>
+                  {isExpanded ? <ChevronUp className="h-4 w-4 text-white/40" /> : <ChevronDown className="h-4 w-4 text-white/40" />}
+                </button>
+                {isExpanded && (
+                  <div className="border-t border-white/10 px-4 py-3">
+                    {prompt.description && (
+                      <p className="mb-2 text-xs text-white/60">{prompt.description}</p>
+                    )}
+                    <div className="relative">
+                      <pre className="max-h-80 overflow-auto whitespace-pre-wrap rounded-lg border border-white/10 bg-black p-3 text-xs text-white/70">
+                        {prompt.prompt_text}
+                      </pre>
+                      <button
+                        onClick={() => copyPrompt(prompt.id, prompt.prompt_text)}
+                        className="absolute right-2 top-2 rounded-lg border border-white/10 bg-zinc-900 px-2 py-1 text-xs text-white/60 hover:border-lime-400/50 hover:text-lime-400"
+                      >
+                        {copied === prompt.id ? <><Check className="h-3 w-3" /> Copied</> : <><Copy className="h-3 w-3" /> Copy</>}
+                      </button>
+                    </div>
+                    {prompt.expected_output && (
+                      <div className="mt-2 text-xs text-white/40">
+                        <span className="font-semibold text-white/60">Expected output:</span> {prompt.expected_output}
+                      </div>
+                    )}
+                    {prompt.tags && prompt.tags.length > 0 && (
+                      <div className="mt-2 flex flex-wrap gap-1">
+                        {prompt.tags.map((tag) => (
+                          <span key={tag} className="rounded bg-white/5 px-1.5 py-0.5 text-[10px] text-white/40">#{tag}</span>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+            );
+          })
+        )}
+      </div>
     </div>
   );
 }

@@ -1,0 +1,89 @@
+{
+  "name": "PreflightCheck",
+  "type": "object",
+  "description": "A preflight system readiness check result. Each record captures a single check category (auth, payments, database, connectors, functions, visualizer, auto-builder, lead-engine, xps-catalog, marketing) with its pass/fail status, score, details, and remediation steps. Used by the Preflight page to score overall launch readiness.",
+  "properties": {
+    "description": {
+      "type": "string",
+      "description": "Optional description (up to 1000 characters)",
+      "maxLength": 1000
+    },
+    "category": {
+      "type": "string",
+      "enum": [
+        "auth",
+        "payments",
+        "database",
+        "connectors",
+        "functions",
+        "visualizer",
+        "auto_builder",
+        "lead_engine",
+        "xps_catalog",
+        "marketing",
+        "user_flow",
+        "security"
+      ],
+      "description": "Which system area this check covers"
+    },
+    "check_name": {
+      "type": "string",
+      "description": "Specific check name (e.g. 'Auth login flow', 'Payment checkout creation')"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "pass",
+        "warn",
+        "fail",
+        "pending"
+      ],
+      "default": "pending",
+      "description": "Check result status"
+    },
+    "score": {
+      "type": "number",
+      "default": 0,
+      "description": "0-100 score for this individual check"
+    },
+    "details": {
+      "type": "string",
+      "description": "What was checked and what was found"
+    },
+    "remediation": {
+      "type": "string",
+      "description": "If fail/warn, what to do to fix it"
+    },
+    "checked_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When this check was last run"
+    }
+  },
+  "required": [
+    "category",
+    "check_name"
+  ],
+  "rls": {
+    "read": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "create": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

@@ -250,6 +250,34 @@ export default function Layout() {
             XPS Products &amp; Inventory
           </NavLink>
 
+          {/* Preflight — launch readiness check & score */}
+          <NavLink
+            to="/preflight"
+            end
+            onClick={() => setOpen(false)}
+            className={({ isActive }) => cn(
+              "flex items-center gap-2.5 rounded-lg px-2.5 py-2 text-sm transition-colors",
+              isActive ? "bg-amber-400/10 text-amber-400 font-semibold" : "text-white hover:bg-white/5"
+            )}
+          >
+            <ShieldCheck className="h-4 w-4 shrink-0" />
+            Preflight Launch Check
+          </NavLink>
+
+          {/* Prompt Library — self-optimization prompts */}
+          <NavLink
+            to="/prompt-library"
+            end
+            onClick={() => setOpen(false)}
+            className={({ isActive }) => cn(
+              "flex items-center gap-2.5 rounded-lg px-2.5 py-2 text-sm transition-colors",
+              isActive ? "bg-amber-400/10 text-amber-400 font-semibold" : "text-white hover:bg-white/5"
+            )}
+          >
+            <Brain className="h-4 w-4 shrink-0" />
+            Prompt Library
+          </NavLink>
+
           {/* Lead Engine — autonomous scraping + outreach system */}
           {(hasFullAccess || hasAccessToPage(userCaps, LEAD_ENGINE.to)) && (
           <NavLink
