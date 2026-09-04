@@ -20,8 +20,8 @@ const COLOR_SUBFILTERS = [
   { key: "flake", label: "Flake" },
   { key: "quartz", label: "Quartz" },
   { key: "solid", label: "Solid Color" },
+  { key: "glitter", label: "Glitter" },
   { key: "dye_stain", label: "Stained Concrete" },
-  { key: "polyurea", label: "Polyurea" },
 ];
 
 const PAGE_SIZE = 60;
