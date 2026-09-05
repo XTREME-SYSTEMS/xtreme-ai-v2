@@ -308,6 +308,20 @@ export default function Layout() {
             {VISUALIZER_INBOX.label}
           </NavLink>
 
+          {/* Bid Engine — XPS-powered professional quote generator */}
+          <NavLink
+            to="/bid-engine"
+            end
+            onClick={() => setOpen(false)}
+            className={({ isActive }) => cn(
+              "flex items-center gap-2.5 rounded-lg px-2.5 py-2 text-sm transition-colors",
+              isActive ? "bg-amber-400/10 text-amber-400 font-semibold" : "text-white hover:bg-white/5"
+            )}
+          >
+            <ClipboardList className="h-4 w-4 shrink-0" />
+            Bid Engine
+          </NavLink>
+
           {/* Council Chamber — multi-agent council debate + simulation lab */}
           <NavLink
             to={COUNCIL_CHAMBER.to}

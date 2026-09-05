@@ -1,0 +1,44 @@
+{
+  "name": "Self-Healing Loop",
+  "description": "Continuously monitors the platform for performance issues and automatically applies fixes every hour. Checks for stuck builds, failed builds, XPS catalog health, floor systems, pipeline health, and lead engine status. Auto-heals issues and records results in PreflightCheck.",
+  "definition": {
+    "document": {
+      "dsl": "1.0.0",
+      "name": "self_healing_loop",
+      "version": "1.0",
+      "namespace": "base44"
+    },
+    "do": [
+      {
+        "run_optimization": {
+          "call": "invoke_backend_function",
+          "with": {
+            "function_name": "runSelfOptimization"
+          },
+          "then": "end",
+          "x-base44": {
+            "title": "Run Self-Optimization",
+            "description": "Monitor, detect, and auto-heal system issues"
+          }
+        }
+      }
+    ]
+  },
+  "trigger": {
+    "condition": null,
+    "config": {
+      "trigger_type": "scheduled",
+      "events": [],
+      "schedule_mode": "recurring",
+      "cron_expression": "0 * * * *",
+      "one_time_date": null,
+      "timezone": "America/New_York",
+      "interval_value": null,
+      "interval_unit": null,
+      "interval_anchor": null,
+      "ends_type": "never",
+      "ends_on_date": null,
+      "ends_after_count": null
+    }
+  }
+}
