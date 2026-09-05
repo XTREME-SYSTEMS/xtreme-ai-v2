@@ -1,0 +1,47 @@
+{
+  "name": "XPS Inventory Sync",
+  "description": "Automated sync system that keeps the platform always aware of product quantities from xtremepolishingsystems.com. Uses the Shopify products.json API for fast bulk stock status updates, then enhances with cloud browser (Browserbase) scraping for detailed inventory quantities on a rotating batch of products. Runs every 6 hours.",
+  "definition": {
+    "document": {
+      "dsl": "1.0.0",
+      "name": "xps_inventory_sync",
+      "version": "1.0",
+      "namespace": "base44"
+    },
+    "do": [
+      {
+        "sync_inventory": {
+          "call": "invoke_backend_function",
+          "with": {
+            "function_name": "syncXpsInventory",
+            "args": {
+              "cloud_browser": true
+            }
+          },
+          "then": "end",
+          "x-base44": {
+            "title": "Sync XPS Inventory",
+            "description": "Fetch product quantities from Shopify + cloud browser"
+          }
+        }
+      }
+    ]
+  },
+  "trigger": {
+    "condition": null,
+    "config": {
+      "trigger_type": "scheduled",
+      "events": [],
+      "schedule_mode": "recurring",
+      "cron_expression": "0 */6 * * *",
+      "one_time_date": null,
+      "timezone": "America/New_York",
+      "interval_value": null,
+      "interval_unit": null,
+      "interval_anchor": null,
+      "ends_type": "never",
+      "ends_on_date": null,
+      "ends_after_count": null
+    }
+  }
+}

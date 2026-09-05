@@ -1,7 +1,7 @@
 {
   "name": "XpsAsset",
   "type": "object",
-  "description": "Real Xtreme Polishing Systems (XPS) assets scraped from xtremepolishingsystems.com (Shopify API), polishedconcreteuniversity.com, and their social media channels (Instagram, YouTube, Facebook, TikTok). Categories include products (epoxy, coatings, tools), equipment (grinders, polishers, vacuums), color charts (metallic, flake, quartz, solid, glitter, dye stain), brand assets, marketing images, marketing videos, social posts, training videos, and testimonials. Used by the auto builder to generate authentic, brand-specific content instead of generic placeholders. Ingested by the ingestXpsCatalog backend function.",
+  "description": "Real Xtreme Polishing Systems (XPS) assets scraped from xtremepolishingsystems.com (Shopify API), polishedconcreteuniversity.com, and their social media channels (Instagram, YouTube, Facebook, TikTok). Categories include products (epoxy, coatings, tools), equipment (grinders, polishers, vacuums), color charts (metallic, flake, quartz, solid, glitter, dye stain), brand assets, marketing images, marketing videos, social posts, training videos, and testimonials. Used by the auto builder to generate authentic, brand-specific content instead of generic placeholders. Ingested by the ingestXpsCatalog backend function and kept in sync by the syncXpsInventory function.",
   "properties": {
     "description": {
       "type": "string",
@@ -131,6 +131,25 @@
           "type": "string"
         }
       }
+    },
+    "inventory_quantity": {
+      "type": "number",
+      "description": "Live stock quantity from Shopify API or cloud browser scrape. Null if not tracked."
+    },
+    "inventory_status": {
+      "type": "string",
+      "enum": [
+        "in_stock",
+        "out_of_stock",
+        "low_stock",
+        "unknown"
+      ],
+      "description": "Stock status derived from inventory sync"
+    },
+    "last_synced": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When this asset's inventory was last synced with the source"
     },
     "duration_seconds": {
       "type": "number",
