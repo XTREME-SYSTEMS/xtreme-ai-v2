@@ -1,0 +1,105 @@
+{
+  "name": "ApiKey",
+  "type": "object",
+  "description": "API keys for external access to the Xtreme AI platform. Each key has a type (admin, user, vision_cortex) that determines its permissions. Vision Cortex keys have full diagnostic, healing, hardening, and optimization capabilities \u2014 they are the system's autonomous brain. Admin keys have full read/write access to all entities and functions. User keys have read access to public data only.",
+  "properties": {
+    "description": {
+      "type": "string",
+      "description": "Optional description (up to 1000 characters)",
+      "maxLength": 1000
+    },
+    "key_name": {
+      "type": "string",
+      "description": "Human-readable name for this API key (e.g. 'Vision Cortex Production', 'External Integrations')"
+    },
+    "key_type": {
+      "type": "string",
+      "enum": [
+        "admin",
+        "user",
+        "vision_cortex"
+      ],
+      "description": "Type of API key \u2014 determines permissions. admin = full access, user = read-only public data, vision_cortex = full diagnostic/heal/harden/optimize autonomy"
+    },
+    "key_value": {
+      "type": "string",
+      "description": "The actual API key string (prefixed with xa_admin_, xa_user_, or xa_vision_)"
+    },
+    "key_prefix": {
+      "type": "string",
+      "description": "First 12 characters of the key for display without exposing the full key"
+    },
+    "permissions": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "List of permissions granted to this key (e.g. 'xps_catalog', 'prompt_library', 'lead_engine', 'bid_engine', 'diagnostics', 'heal', 'harden', 'optimize', 'all')"
+    },
+    "active": {
+      "type": "boolean",
+      "default": true,
+      "description": "Whether this key is currently active"
+    },
+    "last_used": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When this key was last used to authenticate a request"
+    },
+    "expires_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When this key expires (null = never expires)"
+    },
+    "created_by_email": {
+      "type": "string",
+      "description": "Email of the admin who created this key"
+    },
+    "last_diagnostic_report": {
+      "type": "object",
+      "description": "Last diagnostic report produced by this key (vision_cortex keys only)",
+      "properties": {
+        "overall_score": {
+          "type": "number"
+        },
+        "issues_found": {
+          "type": "number"
+        },
+        "critical_issues": {
+          "type": "number"
+        },
+        "run_at": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    }
+  },
+  "required": [
+    "key_name",
+    "key_type",
+    "key_value"
+  ],
+  "rls": {
+    "read": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "create": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}
