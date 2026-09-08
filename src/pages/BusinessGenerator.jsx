@@ -132,14 +132,14 @@ export default function BusinessGenerator() {
       {isPreviewing && <PreviewBanner />}
 
       {/* ── Current project header — auto-named for organization ── */}
-      <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-white/10 bg-zinc-950 p-4">
+      <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-black/10 bg-white p-4">
         <div className="min-w-0">
-          <div className="text-[10px] font-semibold uppercase tracking-wider text-white/40">Current Project</div>
-          <h2 className="truncate text-base font-semibold text-white">
+          <div className="text-[10px] font-semibold uppercase tracking-wider text-black/40">Current Project</div>
+          <h2 className="truncate text-base font-semibold text-black">
             {project?.project_name || project?.business_name || "Untitled Project"}
           </h2>
           {project?.created_date && (
-            <div className="mt-0.5 text-xs text-white/40">
+            <div className="mt-0.5 text-xs text-black/40">
               Started {fmtDate(project.created_date)}
             </div>
           )}
@@ -148,7 +148,7 @@ export default function BusinessGenerator() {
           <button
             type="button"
             onClick={() => navigate("/projects")}
-            className="inline-flex items-center gap-1.5 rounded-lg border border-white/15 px-3 py-2 text-xs font-medium text-white/70 transition-colors hover:border-lime-400/50 hover:text-lime-300"
+            className="inline-flex items-center gap-1.5 rounded-lg border border-black/15 px-3 py-2 text-xs font-medium text-black/70 transition-colors hover:bg-black/5"
           >
             <FolderOpen className="h-3.5 w-3.5" /> My Projects
           </button>
@@ -163,13 +163,13 @@ export default function BusinessGenerator() {
       <SystemActivities />
 
       {/* What you paid for — the source of truth the whole system keys off */}
-      <div className="rounded-xl border border-lime-400/40 bg-lime-400/5 p-5">
-        <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-lime-400">
+      <div className="rounded-xl border border-black/10 bg-white p-5">
+        <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-black">
           <Package className="h-4 w-4" /> What You Paid For
         </div>
         {loading ? (
-          <div className="mt-4 flex items-center gap-2 text-sm text-white/50">
-            <div className="h-5 w-5 animate-spin rounded-full border-2 border-white/20 border-t-lime-400" /> Loading your purchase…
+          <div className="mt-4 flex items-center gap-2 text-sm text-black/50">
+            <div className="h-5 w-5 animate-spin rounded-full border-2 border-black/20 border-t-black" /> Loading your purchase…
           </div>
         ) : purchases.length === 0 ? null : (
           <div className="mt-3 space-y-4">
@@ -177,49 +177,49 @@ export default function BusinessGenerator() {
               const detail = getProductDetails(p.productId);
               const Icon = detail.icon;
               return (
-                <div key={p.id} className="overflow-hidden rounded-lg border border-white/10 bg-zinc-950">
-                  <div className="flex items-center gap-4 border-b border-white/10 p-4">
-                    <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-lime-400/40 text-sm font-semibold text-lime-400">
+                <div key={p.id} className="overflow-hidden rounded-lg border border-black/10 bg-white">
+                  <div className="flex items-center gap-4 border-b border-black/10 p-4">
+                    <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-black/15 text-sm font-semibold text-black">
                       {idx + 1}
                     </div>
                     <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br ${detail.accent}`}>
-                      <Icon className="h-5 w-5 text-lime-400" />
+                      <Icon className="h-5 w-5 text-black" />
                     </div>
                     <div className="min-w-0 flex-1">
                       <div className="flex items-center gap-2">
-                        <h3 className="truncate text-base font-semibold text-white">{p.productName || p.productId}</h3>
-                        <span className="rounded bg-lime-400/15 px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-lime-400">Active</span>
+                        <h3 className="truncate text-base font-semibold text-black">{p.productName || p.productId}</h3>
+                        <span className="rounded bg-black/10 px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-black">Active</span>
                       </div>
-                      <p className="mt-0.5 truncate text-xs text-white/50">{detail.tagline}</p>
+                      <p className="mt-0.5 truncate text-xs text-black/50">{detail.tagline}</p>
                     </div>
                     <div className="shrink-0 text-right">
-                      {p.amount && <div className="text-lg font-bold text-lime-400">{fmtMoney(p)}</div>}
-                      {p.quantity > 1 && <div className="text-xs text-white/40">Qty {p.quantity}</div>}
+                      {p.amount && <div className="text-lg font-bold text-black">{fmtMoney(p)}</div>}
+                      {p.quantity > 1 && <div className="text-xs text-black/40">Qty {p.quantity}</div>}
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-2 gap-2 border-b border-white/10 bg-black/30 p-3 text-xs sm:grid-cols-4">
-                    <Fact label="Status" value="Active" valueClass="text-lime-400" />
+                  <div className="grid grid-cols-2 gap-2 border-b border-black/10 bg-black/5 p-3 text-xs sm:grid-cols-4">
+                    <Fact label="Status" value="Active" valueClass="text-black" />
                     <Fact label="Paid on" value={fmtDate(p.paidAt) || "—"} />
                     <Fact label="Order" value={`#${String(idx + 1).padStart(3, "0")}`} />
                     <Fact label="Buyer" value={p.buyerEmail || "—"} />
                   </div>
 
                   <div className="p-4">
-                    <p className="text-sm text-white/70">{detail.description}</p>
+                    <p className="text-sm text-black/70">{detail.description}</p>
                     <div className="mt-4 grid gap-4 lg:grid-cols-2">
                       {detail.features.length > 0 && (
                         <ExpandableLineItems features={detail.features} productId={p.productId} />
                       )}
                       {detail.deliverables.length > 0 && (
-                        <div className="rounded-lg border border-white/10 bg-black/20 p-4">
-                          <h4 className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-lime-400">
-                            <span className="h-1 w-4 rounded-full bg-lime-400" /> Deliverables
+                        <div className="rounded-lg border border-black/10 bg-black/5 p-4">
+                          <h4 className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-black">
+                            <span className="h-1 w-4 rounded-full bg-black" /> Deliverables
                           </h4>
                           <ol className="mt-3 space-y-2">
                             {detail.deliverables.map((d, i) => (
-                              <li key={i} className="flex items-start gap-2.5 text-sm text-white/80">
-                                <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full border border-lime-400/30 bg-lime-400/10 text-[10px] font-bold text-lime-400">
+                              <li key={i} className="flex items-start gap-2.5 text-sm text-black/80">
+                                <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full border border-black/15 bg-black/5 text-[10px] font-bold text-black">
                                   {i + 1}
                                 </span>
                                 <span className="pt-0.5">{d}</span>
@@ -237,10 +237,10 @@ export default function BusinessGenerator() {
         )}
 
         {purchases.length > 0 && (
-          <div className="mt-5 space-y-2 border-t border-white/10 pt-4">
+          <div className="mt-5 space-y-2 border-t border-black/10 pt-4">
             {reviseSent && threads.length > 0 ? (
               <div className="space-y-3">
-                <div className="flex items-center gap-2 rounded-lg border border-lime-400/50 bg-lime-400/10 px-3 py-2.5 text-sm text-lime-300">
+                <div className="flex items-center gap-2 rounded-lg border border-black/15 bg-black/5 px-3 py-2.5 text-sm text-black">
                   <CheckCircle className="h-4 w-4" /> Your revision request was sent. Chat with our team below.
                 </div>
                 <RevisionThreadPanel
@@ -250,39 +250,39 @@ export default function BusinessGenerator() {
                 <button
                   type="button"
                   onClick={() => setRevising(true)}
-                  className="inline-flex items-center gap-1.5 rounded-lg border border-white/15 px-3 py-2 text-xs font-medium text-white/70 hover:border-lime-400/50 hover:text-lime-300"
+                  className="inline-flex items-center gap-1.5 rounded-lg border border-black/15 px-3 py-2 text-xs font-medium text-black/70 hover:bg-black/5"
                 >
                   <MessageSquare className="h-3.5 w-3.5" /> Request Another Revision
                 </button>
               </div>
             ) : reviseSent ? (
-              <div className="flex items-center gap-2 rounded-lg border border-lime-400/50 bg-lime-400/10 px-3 py-2.5 text-sm text-lime-300">
+              <div className="flex items-center gap-2 rounded-lg border border-black/15 bg-black/5 px-3 py-2.5 text-sm text-black">
                 <CheckCircle className="h-4 w-4" /> Your revision request was sent to our team — we'll be in touch shortly.
               </div>
             ) : revising ? (
               <div className="space-y-2">
-                <label className="text-xs font-semibold uppercase tracking-wider text-lime-400">What needs to change?</label>
+                <label className="text-xs font-semibold uppercase tracking-wider text-black">What needs to change?</label>
                 <textarea
                   value={reviseComment}
                   onChange={(e) => setReviseComment(e.target.value)}
                   rows={3}
                   placeholder="Tell our team what you'd like revised about your package…"
-                  className="w-full resize-none rounded-lg border border-white/15 bg-zinc-950 px-3 py-2 text-sm text-white placeholder-white/30 focus:border-lime-400 focus:outline-none"
+                  className="w-full resize-none rounded-lg border border-black/15 bg-white px-3 py-2 text-sm text-black placeholder-black/30 focus:border-black focus:outline-none"
                 />
-                {reviseError && <p className="text-xs text-red-400">{reviseError}</p>}
+                {reviseError && <p className="text-xs text-red-500">{reviseError}</p>}
                 <div className="flex items-center gap-2">
                   <button
                     type="button"
                     onClick={requestRevision}
                     disabled={sendingRevise}
-                    className="inline-flex items-center gap-1.5 rounded-lg bg-lime-400 px-3 py-2 text-xs font-semibold text-black hover:bg-lime-300 disabled:opacity-50"
+                    className="inline-flex items-center gap-1.5 rounded-lg bg-black px-3 py-2 text-xs font-semibold text-white hover:bg-black/80 disabled:opacity-50"
                   >
                     {sendingRevise ? <><Loader2 className="h-3.5 w-3.5 animate-spin" /> Sending…</> : <><Send className="h-3.5 w-3.5" /> Send to admin</>}
                   </button>
                   <button
                     type="button"
                     onClick={() => { setRevising(false); setReviseError(""); setReviseComment(""); }}
-                    className="inline-flex items-center gap-1.5 rounded-lg border border-white/15 px-3 py-2 text-xs font-medium text-white/70 hover:border-white/30"
+                    className="inline-flex items-center gap-1.5 rounded-lg border border-black/15 px-3 py-2 text-xs font-medium text-black/70 hover:bg-black/5"
                   >
                     <X className="h-3.5 w-3.5" /> Cancel
                   </button>
@@ -292,7 +292,7 @@ export default function BusinessGenerator() {
               <button
                 type="button"
                 onClick={() => setRevising(true)}
-                className="inline-flex items-center gap-1.5 rounded-lg border border-white/15 px-3 py-2 text-xs font-medium text-white/70 hover:border-lime-400/50 hover:text-lime-300"
+                className="inline-flex items-center gap-1.5 rounded-lg border border-black/15 px-3 py-2 text-xs font-medium text-black/70 hover:bg-black/5"
               >
                 <MessageSquare className="h-3.5 w-3.5" /> Request Revision
               </button>
@@ -304,10 +304,10 @@ export default function BusinessGenerator() {
 
 
       {/* ── Continue to Build — only after Vision + Strategy approved ── */}
-      <div className="rounded-xl border border-white/10 bg-zinc-950 p-5">
+      <div className="rounded-xl border border-black/10 bg-white p-5">
         {bothApproved ? (
           <>
-            <div className="flex items-center gap-2 text-sm text-lime-300">
+            <div className="flex items-center gap-2 text-sm text-black">
               <CheckCircle className="h-4 w-4" /> Your foundation is set. You're ready to start building!
             </div>
             <div className="mt-4">
@@ -317,8 +317,8 @@ export default function BusinessGenerator() {
             </div>
           </>
         ) : (
-          <div className="flex items-center gap-2 text-sm text-white/50">
-            <CheckCircle className="h-4 w-4 text-white/30" />
+          <div className="flex items-center gap-2 text-sm text-black/50">
+            <CheckCircle className="h-4 w-4 text-black/30" />
             Complete your Vision and Strategy above to unlock the build pipeline.
           </div>
         )}
@@ -334,10 +334,10 @@ export default function BusinessGenerator() {
   );
 }
 
-function Fact({ label, value, valueClass = "text-white" }) {
+function Fact({ label, value, valueClass = "text-black" }) {
   return (
     <div className="min-w-0">
-      <div className="text-white/40">{label}</div>
+      <div className="text-black/40">{label}</div>
       <div className={`truncate font-medium ${valueClass}`}>{value}</div>
     </div>
   );
