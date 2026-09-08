@@ -107,17 +107,17 @@ export default function AiOnboardingChat({
   const canSend = !!input.trim() || !!attachment;
 
   return (
-    <div className="rounded-xl border border-white/10 bg-zinc-900 p-4">
+    <div className="rounded-xl border border-black/10 bg-white p-4 shadow-sm">
       <div className="mb-3 flex items-center gap-2">
         <Sparkles className="h-4 w-4 text-lime-400" />
-        <h2 className="text-sm font-semibold text-white">{title}</h2>
-        <span className="text-xs text-white/40">· {subtitle}</span>
+        <h2 className="text-sm font-semibold text-black">{title}</h2>
+        <span className="text-xs text-black/50">· {subtitle}</span>
       </div>
 
       <div ref={scrollRef} className="h-80 space-y-3 overflow-y-auto pr-1">
         {messages.map((m, i) => (
           <div key={i} className={`flex ${m.role === "user" ? "justify-end" : "justify-start"}`}>
-            <div className={`max-w-[80%] rounded-2xl px-4 py-2 text-sm ${m.role === "user" ? "bg-lime-400 text-black" : "bg-zinc-800 text-white"}`}>
+            <div className={`max-w-[80%] rounded-2xl px-4 py-2 text-sm ${m.role === "user" ? "bg-lime-400 text-black" : "bg-black/5 text-black border border-black/10"}`}>
               {m.image && <Image src={m.image} alt="attachment" fittingType="fill" className="mb-1 h-28 w-28 rounded-lg" />}
               <div className="whitespace-pre-wrap">{m.text}</div>
             </div>
@@ -125,19 +125,19 @@ export default function AiOnboardingChat({
         ))}
         {thinking && (
           <div className="flex justify-start">
-            <div className="rounded-2xl bg-zinc-800 px-4 py-2.5"><Loader2 className="h-4 w-4 animate-spin text-white/60" /></div>
+            <div className="rounded-2xl bg-black/5 px-4 py-2.5 border border-black/10"><Loader2 className="h-4 w-4 animate-spin text-black/40" /></div>
           </div>
         )}
         <div />
       </div>
 
-      {error && <div className="mt-3 rounded-lg bg-rose-500/10 p-2 text-xs text-rose-300">{error}</div>}
+      {error && <div className="mt-3 rounded-lg bg-rose-500/10 p-2 text-xs text-rose-600">{error}</div>}
 
       {attachment && (
-        <div className="mt-2 inline-flex items-center gap-2 rounded-lg border border-white/15 bg-zinc-950 px-2 py-1">
+        <div className="mt-2 inline-flex items-center gap-2 rounded-lg border border-black/15 bg-black/5 px-2 py-1">
           <img src={attachment.preview} alt="preview" className="h-8 w-8 rounded object-cover" />
-          <span className="max-w-[140px] truncate text-xs text-white/60">{attachment.name}</span>
-          <button onClick={() => setAttachment(null)} className="text-white/40 hover:text-white"><X className="h-3.5 w-3.5" /></button>
+          <span className="max-w-[140px] truncate text-xs text-black/60">{attachment.name}</span>
+          <button onClick={() => setAttachment(null)} className="text-black/40 hover:text-black"><X className="h-3.5 w-3.5" /></button>
         </div>
       )}
 
@@ -147,13 +147,13 @@ export default function AiOnboardingChat({
           onChange={(e) => setInput(e.target.value)}
           onKeyDown={(e) => e.key === "Enter" && send()}
           placeholder={allAnswered ? "All set — finish up below" : "Type your answer…"}
-          className="flex-1 rounded-lg border border-white/15 bg-zinc-950 px-3 py-2 text-sm text-white placeholder:text-white/30 focus:border-lime-400 focus:outline-none"
+          className="flex-1 rounded-lg border border-black/15 bg-white px-3 py-2 text-sm text-black placeholder:text-black/30 focus:border-lime-400 focus:outline-none"
         />
         <Button
           onClick={() => fileRef.current?.click()}
           disabled={thinking || uploading}
           variant="outline"
-          className="h-10 shrink-0 border-white/15 text-white/70 hover:bg-white/5 hover:text-white"
+          className="h-10 shrink-0 border-black/15 text-black/70 hover:bg-black/5 hover:text-black"
           title="Attach an inspiration image"
         >
           {uploading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Paperclip className="h-4 w-4" />}

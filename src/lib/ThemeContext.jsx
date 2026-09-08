@@ -8,39 +8,21 @@ function getSystem() {
 }
 
 export function ThemeProvider({ children }) {
-  const [theme, setThemeState] = useState(() => {
-    if (typeof window === "undefined") return "light";
-    return localStorage.getItem("theme") || "light";
-  });
+  // System is permanently locked to light mode — white background, black text.
+  const resolved = "light";
 
-  const resolved = theme === "system" ? getSystem() : theme;
-
-  // Apply the resolved theme to <html>.
+  // Always force light mode on <html>, never apply .dark.
   useEffect(() => {
-    document.documentElement.classList.toggle("dark", resolved === "dark");
-  }, [resolved]);
-
-  // When following the system, react to OS changes live.
-  useEffect(() => {
-    if (theme !== "system") return;
-    const mq = window.matchMedia("(prefers-color-scheme: dark)");
-    const handler = () => document.documentElement.classList.toggle("dark", mq.matches);
-    mq.addEventListener("change", handler);
-    return () => mq.removeEventListener("change", handler);
-  }, [theme]);
-
-  const setTheme = useCallback((t) => {
-    localStorage.setItem("theme", t);
-    setThemeState(t);
+    document.documentElement.classList.remove("dark");
+    if (typeof window !== "undefined") localStorage.setItem("theme", "light");
   }, []);
 
-  // Manual toggle: flip to the opposite of what's currently resolved and persist it.
-  const toggle = useCallback(() => {
-    setTheme(resolved === "dark" ? "light" : "dark");
-  }, [resolved, setTheme]);
+  // setTheme and toggle are no-ops — system stays light.
+  const setTheme = useCallback(() => {}, []);
+  const toggle = useCallback(() => {}, []);
 
   return (
-    <ThemeContext.Provider value={{ theme, resolved, setTheme, toggle }}>
+    <ThemeContext.Provider value={{ theme: "light", resolved: "light", setTheme, toggle }}>
       {children}
     </ThemeContext.Provider>
   );

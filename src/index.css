@@ -133,6 +133,15 @@
 :root:not(.dark) .bg-zinc-900,
 :root:not(.dark) .bg-zinc-950 { background-color: hsl(var(--card)); }
 
+/* Zinc opacity variants — map to light card/muted backgrounds */
+:root:not(.dark) .bg-zinc-800\/50, :root:not(.dark) .bg-zinc-900\/50, :root:not(.dark) .bg-zinc-950\/50,
+:root:not(.dark) .bg-zinc-800\/80, :root:not(.dark) .bg-zinc-900\/80, :root:not(.dark) .bg-zinc-950\/80,
+:root:not(.dark) .bg-zinc-800\/20, :root:not(.dark) .bg-zinc-900\/20, :root:not(.dark) .bg-zinc-950\/20,
+:root:not(.dark) .bg-zinc-800\/30, :root:not(.dark) .bg-zinc-900\/30, :root:not(.dark) .bg-zinc-950\/30,
+:root:not(.dark) .bg-zinc-800\/40, :root:not(.dark) .bg-zinc-900\/40, :root:not(.dark) .bg-zinc-950\/40,
+:root:not(.dark) .bg-zinc-800\/60, :root:not(.dark) .bg-zinc-900\/60, :root:not(.dark) .bg-zinc-950\/60,
+:root:not(.dark) .bg-zinc-800\/90, :root:not(.dark) .bg-zinc-900\/90, :root:not(.dark) .bg-zinc-950\/90 { background-color: hsl(var(--card)); }
+
 :root:not(.dark) .text-white { color: hsl(var(--foreground)); }
 :root:not(.dark) .text-white\/30 { color: hsl(var(--foreground) / 0.4); }
 :root:not(.dark) .text-white\/40 { color: hsl(var(--foreground) / 0.5); }

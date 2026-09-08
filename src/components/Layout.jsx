@@ -19,7 +19,6 @@ import BrandLoader from "@/components/BrandLoader";
 import { usePreview } from "@/lib/PreviewContext";
 import ClientLayout from "@/components/client/ClientLayout";
 import PreviewAsClientModal from "@/components/admin/PreviewAsClientModal";
-import ThemeToggle from "@/components/ThemeToggle";
 import { useAutoBuild } from "@/lib/AutoBuildContext";
 
 // Client portal navigation lives in ClientLayout; this admin NAV is the only
@@ -508,7 +507,6 @@ export default function Layout() {
             <button onClick={() => setShowPreviewModal(true)} className="flex items-center gap-1.5 rounded-lg border border-amber-400 px-2.5 py-1.5 text-xs text-black font-medium hover:bg-amber-400/10">
               <Eye className="h-3.5 w-3.5" /> Preview as Client
             </button>
-            <ThemeToggle className="flex items-center gap-1.5 rounded-lg border border-amber-400 px-2.5 py-1.5 text-xs text-black font-medium hover:bg-amber-400/10" />
             <button onClick={logout} className="flex items-center gap-1.5 rounded-lg border border-amber-400 px-2.5 py-1.5 text-xs text-black font-medium hover:bg-amber-400/10">
               <LogOut className="h-3.5 w-3.5" /> Sign out
             </button>

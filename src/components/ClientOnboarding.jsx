@@ -43,9 +43,9 @@ export default function ClientOnboarding({ user }) {
       <div className="rounded-xl border border-lime-400/30 bg-lime-400/5 p-4">
         <div className="flex items-center gap-2">
           <CheckCircle2 className="h-5 w-5 text-lime-400" />
-          <h2 className="text-sm font-semibold text-white">Onboarding complete</h2>
+          <h2 className="text-sm font-semibold text-black">Onboarding complete</h2>
         </div>
-        <p className="mt-1 text-sm text-white/70">
+        <p className="mt-1 text-sm text-black/70">
           Thanks{user?.onboarding?.business_name ? `, ${user.onboarding.business_name}` : ""}! Your team has your info. {track.subtitle}
         </p>
         <Link to={cta.to} className="mt-3 inline-flex items-center gap-1.5 rounded-md bg-lime-400 px-3 py-1.5 text-xs font-semibold text-black hover:bg-lime-300">

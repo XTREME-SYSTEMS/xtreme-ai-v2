@@ -3,7 +3,6 @@ import { base44 } from "@/api/base44Client";
 import { LogOut, ArrowLeft, Hammer } from "lucide-react";
 import { Image } from "@/components/ui/image";
 import { LOGO_ICON } from "@/lib/brandAssets";
-import ThemeToggle from "@/components/ThemeToggle";
 import { usePreview } from "@/lib/PreviewContext";
 import { useAutoBuild } from "@/lib/AutoBuildContext";
 import StepCoach from "@/components/client/StepCoach";
@@ -54,8 +53,7 @@ export default function ClientLayout({ user }) {
             <ArrowLeft className="h-3.5 w-3.5" /> Exit Preview
           </button>
         )}
-        <ThemeToggle className="ml-auto flex items-center gap-1.5 rounded-md border border-white/15 px-2.5 py-1.5 text-xs text-white/70 hover:bg-white/5" />
-        <span className="hidden text-xs text-white/50 sm:inline">{user?.email || ""}</span>
+        <span className="ml-auto hidden text-xs text-black/50 sm:inline">{user?.email || ""}</span>
         <button onClick={logout} className="flex items-center gap-1.5 rounded-md border border-white/15 px-2.5 py-1.5 text-xs text-white/70 hover:bg-white/5">
           <LogOut className="h-3.5 w-3.5" /> Sign out
         </button>

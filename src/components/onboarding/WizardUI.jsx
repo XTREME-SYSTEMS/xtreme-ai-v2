@@ -4,15 +4,15 @@ import { CheckCircle2, ChevronLeft, ChevronRight, Loader2 } from "lucide-react";
 // main page stays lean and every step gets consistent styling.
 
 export const inputCls =
-  "w-full rounded-lg border border-white/15 bg-zinc-950 px-3 py-2.5 text-sm text-white placeholder:text-white/30 focus:border-lime-400 focus:outline-none focus:ring-1 focus:ring-lime-400";
+  "w-full rounded-lg border border-black/15 bg-white px-3 py-2.5 text-sm text-black placeholder:text-black/30 focus:border-lime-400 focus:outline-none focus:ring-1 focus:ring-lime-400";
 
 export function Section({ title, hint, icon: Icon, children }) {
   return (
-    <div className="rounded-lg border border-white/10 bg-zinc-950/50 p-4">
+    <div className="rounded-lg border border-black/10 bg-black/[0.02] p-4">
       <div className="mb-3 flex items-center gap-2">
         {Icon && <Icon className="h-4 w-4 text-lime-400" />}
-        <h3 className="text-sm font-semibold text-white">{title}</h3>
-        {hint && <span className="text-xs text-white/40">· {hint}</span>}
+        <h3 className="text-sm font-semibold text-black">{title}</h3>
+        {hint && <span className="text-xs text-black/40">· {hint}</span>}
       </div>
       <div className="space-y-3">{children}</div>
     </div>
@@ -22,11 +22,11 @@ export function Section({ title, hint, icon: Icon, children }) {
 export function Field({ label, hint, required, children }) {
   return (
     <div>
-      <label className="mb-1.5 block text-sm font-medium text-white">
+      <label className="mb-1.5 block text-sm font-medium text-black">
         {label} {required && <span className="text-lime-400">*</span>}
       </label>
       {children}
-      {hint && <p className="mt-1 text-xs text-white/40">{hint}</p>}
+      {hint && <p className="mt-1 text-xs text-black/40">{hint}</p>}
     </div>
   );
 }
@@ -45,8 +45,8 @@ export function Chips({ options, selected, onToggle, single }) {
             className={
               "rounded-lg border px-3 py-1.5 text-xs font-medium transition-colors " +
               (on
-                ? "border-lime-400 bg-lime-400/15 text-lime-300"
-                : "border-white/15 bg-zinc-950 text-white/60 hover:border-white/30")
+                ? "border-lime-400 bg-lime-400/15 text-lime-600"
+                : "border-black/15 bg-white text-black/60 hover:border-black/30")
             }
           >
             {opt}
@@ -67,20 +67,20 @@ export function OptionCard({ label, desc, icon: Icon, selected, onClick }) {
         "flex w-full items-start gap-3 rounded-xl border p-4 text-left transition-all " +
         (selected
           ? "border-lime-400 bg-lime-400/10"
-          : "border-white/10 bg-zinc-950 hover:border-white/25")
+          : "border-black/10 bg-white hover:border-black/25")
       }
     >
       {Icon && (
         <div className={
           "flex h-10 w-10 shrink-0 items-center justify-center rounded-lg text-xl " +
-          (selected ? "bg-lime-400/20" : "bg-white/5")
+          (selected ? "bg-lime-400/20" : "bg-black/5")
         }>
           {typeof Icon === "string" ? Icon : <Icon className="h-5 w-5 text-lime-400" />}
         </div>
       )}
       <div className="min-w-0 flex-1">
-        <div className={"text-sm font-semibold " + (selected ? "text-lime-300" : "text-white")}>{label}</div>
-        {desc && <div className="mt-0.5 text-xs text-white/50">{desc}</div>}
+        <div className={"text-sm font-semibold " + (selected ? "text-lime-600" : "text-black")}>{label}</div>
+        {desc && <div className="mt-0.5 text-xs text-black/50">{desc}</div>}
       </div>
       {selected && <CheckCircle2 className="h-5 w-5 shrink-0 text-lime-400" />}
     </button>
@@ -98,17 +98,17 @@ export function ProgressDots({ steps, current }) {
               "flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-xs font-bold transition-colors " +
               (i < current ? "bg-lime-400 text-black" :
                i === current ? "border-2 border-lime-400 bg-lime-400/10 text-lime-400" :
-               "border border-white/15 bg-zinc-950 text-white/30")
+               "border border-black/15 bg-white text-black/30")
             }>
               {i < current ? <CheckCircle2 className="h-4 w-4" /> : i + 1}
             </div>
             <span className={
               "hidden text-xs font-medium sm:inline " +
-              (i <= current ? "text-white" : "text-white/30")
+              (i <= current ? "text-black" : "text-black/30")
             }>{s.title}</span>
           </div>
           {i < steps.length - 1 && (
-            <div className={"h-0.5 flex-1 rounded " + (i < current ? "bg-lime-400" : "bg-white/10")} />
+            <div className={"h-0.5 flex-1 rounded " + (i < current ? "bg-lime-400" : "bg-black/10")} />
           )}
         </div>
       ))}
@@ -124,7 +124,7 @@ export function NavButtons({ step, total, onBack, onNext, onSubmit, nextLabel, c
         <button
           type="button"
           onClick={onBack}
-          className="inline-flex items-center gap-1.5 rounded-lg border border-white/15 px-4 py-2.5 text-sm font-medium text-white/70 hover:border-white/30"
+          className="inline-flex items-center gap-1.5 rounded-lg border border-black/15 px-4 py-2.5 text-sm font-medium text-black/70 hover:border-black/30"
         >
           <ChevronLeft className="h-4 w-4" /> Back
         </button>
@@ -143,7 +143,7 @@ export function NavButtons({ step, total, onBack, onNext, onSubmit, nextLabel, c
           type="button"
           onClick={onNext}
           disabled={!canNext}
-          className="inline-flex flex-1 items-center justify-center gap-2 rounded-lg bg-lime-400 px-4 py-2.5 text-sm font-semibold text-black transition-colors hover:bg-lime-300 disabled:cursor-not-allowed disabled:bg-white/10 disabled:text-white/40"
+          className="inline-flex flex-1 items-center justify-center gap-2 rounded-lg bg-lime-400 px-4 py-2.5 text-sm font-semibold text-black transition-colors hover:bg-lime-300 disabled:cursor-not-allowed disabled:bg-black/10 disabled:text-black/40"
         >
           {nextLabel || "Continue"} <ChevronRight className="h-4 w-4" />
         </button>
