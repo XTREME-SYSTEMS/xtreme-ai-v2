@@ -8,7 +8,7 @@ import {
   BookMarked, CheckCircle, ScrollText, Plug, Settings, LogOut, Menu, X,
   MapPin, Plus, Rocket, Bot, LayoutTemplate, Copy, Wand2, Crosshair, Activity, Radar, Package, UserPlus, Tag, Box, ShieldAlert, Sparkles, Brain,
   Archive, ChevronDown, Compass, Building2, MessageSquareText, PenTool, Shirt, Share2, Video, Layers,
-  ClipboardList,
+  ClipboardList, Key,
 } from "lucide-react";
 import { Image } from "@/components/ui/image";
 import { cn } from "@/lib/utils";
@@ -320,6 +320,20 @@ export default function Layout() {
           >
             <ClipboardList className="h-4 w-4 shrink-0" />
             Bid Engine
+          </NavLink>
+
+          {/* API Key Generator — manage external access keys */}
+          <NavLink
+            to="/api-keys"
+            end
+            onClick={() => setOpen(false)}
+            className={({ isActive }) => cn(
+              "flex items-center gap-2.5 rounded-lg px-2.5 py-2 text-sm transition-colors",
+              isActive ? "bg-amber-400/10 text-amber-400 font-semibold" : "text-white hover:bg-white/5"
+            )}
+          >
+            <Key className="h-4 w-4 shrink-0" />
+            API Key Generator
           </NavLink>
 
           {/* Council Chamber — multi-agent council debate + simulation lab */}

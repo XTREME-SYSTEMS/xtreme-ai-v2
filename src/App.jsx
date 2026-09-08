@@ -138,6 +138,7 @@ import VisualizerInbox from '@/pages/VisualizerInbox';
 import XpsCatalog from '@/pages/XpsCatalog';
 import Preflight from '@/pages/Preflight';
 import BidEngine from '@/pages/BidEngine';
+import ApiKeyGenerator from '@/pages/ApiKeyGenerator';
 import { PortalStudioProvider } from '@/lib/PortalStudioContext';
 import XtremeShell from '@/components/xtremeai/XtremeShell';
 import PortalStudio from '@/pages/portalstudio/PortalStudio';
@@ -291,6 +292,7 @@ const AuthenticatedApp = () => {
       <Route path="/xps-catalog" element={<XpsCatalog />} />
       <Route path="/preflight" element={<Preflight />} />
       <Route path="/bid-engine" element={<BidEngine />} />
+      <Route path="/api-keys" element={<ApiKeyGenerator />} />
       <Route path="/council-chamber" element={<CouncilChamber />} />
         </Route>
       </Route>
