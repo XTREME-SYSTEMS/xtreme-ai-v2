@@ -22,7 +22,7 @@ export default function Community() {
         <div className="mt-14 grid gap-6 md:grid-cols-3">
           {CARDS.map((c, i) => (
             <motion.div key={c.title} initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.4, delay: i * 0.1 }}
-              className="rounded-2xl border border-black/10 bg-zinc-50 p-7">
+              className="rounded-2xl border border-black/10 bg-white p-7">
               <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-amber-400/15">
                 <c.icon className="h-6 w-6 text-amber-600" />
               </div>

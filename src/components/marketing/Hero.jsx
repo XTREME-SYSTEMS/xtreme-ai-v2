@@ -94,7 +94,7 @@ export default function Hero() {
         </motion.div>
       </div>
 
-      <div className="relative z-10 border-t border-black/10 bg-zinc-50 py-10">
+      <div className="relative z-10 border-t border-black/10 bg-white py-10">
         <div className="mx-auto max-w-7xl px-4 sm:px-6">
           <div className="grid grid-cols-2 gap-6 sm:grid-cols-4">
             {STATS.map((s) => <StatItem key={s.label} stat={s} />)}

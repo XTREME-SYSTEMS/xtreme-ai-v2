@@ -25,7 +25,7 @@ export default function AwardBadges() {
         <div className="mt-10 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
           {BADGES.map((b, i) => (
             <motion.div key={b.label} initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.4, delay: i * 0.06 }}
-              className="flex flex-col items-center gap-2 rounded-xl border border-black/10 bg-zinc-50 px-3 py-5 text-center">
+              className="flex flex-col items-center gap-2 rounded-xl border border-black/10 bg-white px-3 py-5 text-center">
               <b.icon className="h-6 w-6 text-amber-600" />
               <span className="text-[11px] font-semibold leading-tight text-black/60">{b.label}</span>
             </motion.div>

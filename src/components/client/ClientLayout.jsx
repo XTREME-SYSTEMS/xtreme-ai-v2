@@ -28,12 +28,12 @@ export default function ClientLayout({ user }) {
   };
 
   return (
-    <div className="flex h-screen flex-col bg-black text-white">
-      <header className="flex h-14 items-center gap-3 border-b border-white/10 bg-zinc-950 px-4">
+    <div className="flex h-screen flex-col bg-white text-black">
+      <header className="flex h-14 items-center gap-3 border-b border-black/10 bg-white px-4">
         <Image src={LOGO_ICON} alt="Xtreme AI" className="h-10 w-10" fittingType="fit" />
         <div className="leading-tight">
-          <div className="text-sm font-semibold text-white">Xtreme AI</div>
-          <div className="text-[10px] uppercase tracking-wider text-amber-400">
+          <div className="text-sm font-semibold text-black">Xtreme AI</div>
+          <div className="text-[10px] uppercase tracking-wider text-amber-600">
             {autoBuild.isActive ? "Auto Builder" : "Business Generator"}
           </div>
         </div>
@@ -54,7 +54,7 @@ export default function ClientLayout({ user }) {
           </button>
         )}
         <span className="ml-auto hidden text-xs text-black/50 sm:inline">{user?.email || ""}</span>
-        <button onClick={logout} className="flex items-center gap-1.5 rounded-md border border-white/15 px-2.5 py-1.5 text-xs text-white/70 hover:bg-white/5">
+        <button onClick={logout} className="flex items-center gap-1.5 rounded-md border border-black/15 px-2.5 py-1.5 text-xs text-black/70 hover:bg-black/5">
           <LogOut className="h-3.5 w-3.5" /> Sign out
         </button>
       </header>

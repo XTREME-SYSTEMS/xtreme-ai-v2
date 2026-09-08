@@ -3,7 +3,7 @@ import { Star } from "lucide-react";
 
 export default function Testimonial() {
   return (
-    <section className="bg-zinc-50 py-20 sm:py-28">
+    <section className="bg-white py-20 sm:py-28">
       <div className="mx-auto max-w-4xl px-4 sm:px-6">
         <motion.div initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.5 }}
           className="rounded-3xl border border-black/10 bg-white p-8 shadow-xl shadow-black/5 sm:p-12">

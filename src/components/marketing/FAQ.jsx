@@ -21,7 +21,7 @@ export default function FAQ() {
         <div className="mt-10 space-y-3">
           {FAQS.map((f, i) => (
             <motion.div key={f.q} initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.3, delay: i * 0.05 }}
-              className="rounded-xl border border-black/10 bg-zinc-50 overflow-hidden">
+              className="rounded-xl border border-black/10 bg-white overflow-hidden">
               <button onClick={() => setOpen(open === i ? -1 : i)} className="flex w-full items-center justify-between px-5 py-4 text-left">
                 <span className="text-base font-semibold text-black">{f.q}</span>
                 <ChevronDown className={`h-5 w-5 shrink-0 text-black/40 transition-transform ${open === i ? "rotate-180" : ""}`} />

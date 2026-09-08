@@ -59,31 +59,31 @@ export default function PWAInstallBar() {
 
   return (
     <>
-      <div className="fixed bottom-0 left-0 right-0 z-40 border-t border-amber-400/30 bg-black/95 backdrop-blur-md">
+      <div className="fixed bottom-0 left-0 right-0 z-40 border-t border-black/10 bg-white shadow-lg shadow-black/10 backdrop-blur-md">
         <div className="mx-auto flex max-w-7xl items-center justify-between gap-3 px-4 py-3">
           <div className="flex items-center gap-3">
-            <div className="flex h-11 w-11 items-center justify-center overflow-hidden rounded-xl bg-black shadow-lg shadow-amber-400/30 ring-1 ring-amber-400/40">
+            <div className="flex h-11 w-11 items-center justify-center overflow-hidden rounded-xl bg-white shadow-lg shadow-black/10 ring-1 ring-black/10">
               <Image src={LOGO_ICON} alt="Xtreme AI" fittingType="fit" className="h-11 w-11" />
             </div>
             <div className="leading-tight">
-              <div className="text-sm font-bold text-white">Xtreme AI</div>
-              <div className="text-[11px] text-white/50">
+              <div className="text-sm font-bold text-black">Xtreme AI</div>
+              <div className="text-[11px] text-black/50">
                 {isIOS ? "Tap Share, then \u201CAdd to Home Screen\u201D" : "Install our app \u2014 leads in your pocket"}
               </div>
             </div>
           </div>
           <div className="flex items-center gap-2">
             {isIOS ? (
-              <button onClick={() => setShowModal(true)} className="inline-flex items-center gap-2 rounded-lg border border-amber-400/40 px-4 py-2.5 text-sm font-bold text-amber-400 transition-colors hover:bg-amber-400/10">
+              <button onClick={() => setShowModal(true)} className="inline-flex items-center gap-2 rounded-lg border border-black/15 px-4 py-2.5 text-sm font-bold text-black transition-colors hover:bg-black/5">
                 <Share className="h-4 w-4" /> <span className="hidden sm:inline">Add to Home Screen</span><span className="sm:hidden">Add</span>
               </button>
             ) : (
-              <button onClick={handleInstall} className="inline-flex items-center gap-2 rounded-lg bg-amber-400 px-5 py-2.5 text-sm font-bold text-black transition-all hover:bg-amber-300 hover:shadow-lg hover:shadow-amber-400/40">
+              <button onClick={handleInstall} className="inline-flex items-center gap-2 rounded-lg bg-black px-5 py-2.5 text-sm font-bold text-white transition-all hover:bg-black/80 hover:shadow-lg">
                 <Download className="h-4 w-4" />
                 {canNativeInstall ? <><span className="hidden sm:inline">Download App</span><span className="sm:hidden">Install</span></> : <><span className="hidden sm:inline">How to Install</span><span className="sm:hidden">Install</span></>}
               </button>
             )}
-            <button onClick={() => setDismissed(true)} className="rounded-md p-1.5 text-white/40 hover:text-white" aria-label="Dismiss">
+            <button onClick={() => setDismissed(true)} className="rounded-md p-1.5 text-black/40 hover:text-black" aria-label="Dismiss">
               <X className="h-4 w-4" />
             </button>
           </div>
