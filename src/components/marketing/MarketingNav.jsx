@@ -75,7 +75,7 @@ export default function MarketingNav() {
             <div className="relative" ref={dropdownRef}>
               <button
                 onClick={() => setDropdownOpen(!dropdownOpen)}
-                className="flex items-center gap-1.5 rounded-lg bg-amber-400 px-4 py-2.5 text-sm font-semibold text-black transition-all hover:bg-amber-300 hover:shadow-lg hover:shadow-amber-400/40"
+                className="btn-gold-metallic flex items-center gap-1.5 rounded-lg px-4 py-2.5 text-sm font-semibold"
               >
                 Get Started
                 <ChevronDown className={cn("h-4 w-4 transition-transform", dropdownOpen && "rotate-180")} />
