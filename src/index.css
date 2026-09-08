@@ -206,106 +206,150 @@
 }
 
 /* ============================================================
-   Gold palette override — forces ALL lime/amber/orange/yellow
-   Tailwind utility classes to metallic gold (#FFEA00) and darker
-   goldenrod (#CCBB00). This is a CSS-level belt-and-suspenders
-   alongside the tailwind.config.js palette remap, ensuring the
-   gold brand colors render even if the Tailwind build doesn't
-   recompile the config.
+   Neutral palette override — maps ALL lime/amber/orange/yellow
+   Tailwind utility classes to black-on-white. No yellow/gold
+   cards: backgrounds become white or black/5, text becomes
+   black, borders become black/10. This gives the entire app
+   a clean, standard look: white boxes, black borders, black
+   text.
    ============================================================ */
 
-/* Solid backgrounds */
-.bg-lime-200, .bg-amber-200, .bg-orange-200, .bg-yellow-200 { background-color: #FFF299; }
-.bg-lime-300, .bg-amber-300, .bg-orange-300, .bg-yellow-300 { background-color: #FFEE33; }
-.bg-lime-400, .bg-amber-400, .bg-orange-400, .bg-yellow-400 { background-color: #FFEA00; }
-.bg-lime-500, .bg-amber-500, .bg-orange-500, .bg-yellow-500 { background-color: #E6D400; }
-.bg-lime-600, .bg-amber-600, .bg-orange-600, .bg-yellow-600 { background-color: #CCBB00; }
-.bg-lime-700, .bg-amber-700, .bg-orange-700, .bg-yellow-700 { background-color: #998800; }
+/* Solid backgrounds → white */
+.bg-lime-200, .bg-amber-200, .bg-orange-200, .bg-yellow-200 { background-color: #fff; }
+.bg-lime-300, .bg-amber-300, .bg-orange-300, .bg-yellow-300 { background-color: #fff; }
+.bg-lime-400, .bg-amber-400, .bg-orange-400, .bg-yellow-400 { background-color: #000; }
+.bg-lime-500, .bg-amber-500, .bg-orange-500, .bg-yellow-500 { background-color: #000; }
+.bg-lime-600, .bg-amber-600, .bg-orange-600, .bg-yellow-600 { background-color: #000; }
+.bg-lime-700, .bg-amber-700, .bg-orange-700, .bg-yellow-700 { background-color: #000; }
 
-/* Background opacity variants */
-.bg-lime-300\/10, .bg-amber-300\/10, .bg-orange-300\/10, .bg-yellow-300\/10 { background-color: rgba(255,238,51,0.1); }
-.bg-lime-400\/5, .bg-amber-400\/5, .bg-orange-400\/5, .bg-yellow-400\/5 { background-color: rgba(255,234,0,0.05); }
-.bg-lime-400\/10, .bg-amber-400\/10, .bg-orange-400\/10, .bg-yellow-400\/10 { background-color: rgba(255,234,0,0.1); }
-.bg-lime-400\/15, .bg-amber-400\/15, .bg-orange-400\/15, .bg-yellow-400\/15 { background-color: rgba(255,234,0,0.15); }
-.bg-lime-400\/20, .bg-amber-400\/20, .bg-orange-400\/20, .bg-yellow-400\/20 { background-color: rgba(255,234,0,0.2); }
-.bg-lime-400\/30, .bg-amber-400\/30, .bg-orange-400\/30, .bg-yellow-400\/30 { background-color: rgba(255,234,0,0.3); }
-.bg-lime-400\/40, .bg-amber-400\/40, .bg-orange-400\/40, .bg-yellow-400\/40 { background-color: rgba(255,234,0,0.4); }
-.bg-lime-500\/10, .bg-amber-500\/10, .bg-orange-500\/10, .bg-yellow-500\/10 { background-color: rgba(230,212,0,0.1); }
-.bg-lime-500\/15, .bg-amber-500\/15, .bg-orange-500\/15, .bg-yellow-500\/15 { background-color: rgba(230,212,0,0.15); }
-.bg-lime-500\/20, .bg-amber-500\/20, .bg-orange-500\/20, .bg-yellow-500\/20 { background-color: rgba(230,212,0,0.2); }
-.bg-lime-500\/30, .bg-amber-500\/30, .bg-orange-500\/30, .bg-yellow-500\/30 { background-color: rgba(230,212,0,0.3); }
-.bg-lime-600\/10, .bg-amber-600\/10, .bg-orange-600\/10, .bg-yellow-600\/10 { background-color: rgba(204,187,0,0.1); }
-.bg-lime-600\/20, .bg-amber-600\/20, .bg-orange-600\/20, .bg-yellow-600\/20 { background-color: rgba(204,187,0,0.2); }
+/* Background opacity variants → subtle black tint */
+.bg-lime-300\/10, .bg-amber-300\/10, .bg-orange-300\/10, .bg-yellow-300\/10 { background-color: rgba(0,0,0,0.03); }
+.bg-lime-400\/5, .bg-amber-400\/5, .bg-orange-400\/5, .bg-yellow-400\/5 { background-color: rgba(0,0,0,0.03); }
+.bg-lime-400\/10, .bg-amber-400\/10, .bg-orange-400\/10, .bg-yellow-400\/10 { background-color: rgba(0,0,0,0.05); }
+.bg-lime-400\/15, .bg-amber-400\/15, .bg-orange-400\/15, .bg-yellow-400\/15 { background-color: rgba(0,0,0,0.07); }
+.bg-lime-400\/20, .bg-amber-400\/20, .bg-orange-400\/20, .bg-yellow-400\/20 { background-color: rgba(0,0,0,0.08); }
+.bg-lime-400\/30, .bg-amber-400\/30, .bg-orange-400\/30, .bg-yellow-400\/30 { background-color: rgba(0,0,0,0.1); }
+.bg-lime-400\/40, .bg-amber-400\/40, .bg-orange-400\/40, .bg-yellow-400\/40 { background-color: rgba(0,0,0,0.12); }
+.bg-lime-500\/10, .bg-amber-500\/10, .bg-orange-500\/10, .bg-yellow-500\/10 { background-color: rgba(0,0,0,0.05); }
+.bg-lime-500\/15, .bg-amber-500\/15, .bg-orange-500\/15, .bg-yellow-500\/15 { background-color: rgba(0,0,0,0.07); }
+.bg-lime-500\/20, .bg-amber-500\/20, .bg-orange-500\/20, .bg-yellow-500\/20 { background-color: rgba(0,0,0,0.08); }
+.bg-lime-500\/30, .bg-amber-500\/30, .bg-orange-500\/30, .bg-yellow-500\/30 { background-color: rgba(0,0,0,0.1); }
+.bg-lime-600\/10, .bg-amber-600\/10, .bg-orange-600\/10, .bg-yellow-600\/10 { background-color: rgba(0,0,0,0.05); }
+.bg-lime-600\/20, .bg-amber-600\/20, .bg-orange-600\/20, .bg-yellow-600\/20 { background-color: rgba(0,0,0,0.08); }
 
-/* Text color */
-.text-lime-200, .text-amber-200, .text-orange-200, .text-yellow-200 { color: #FFF299; }
-.text-lime-300, .text-amber-300, .text-orange-300, .text-yellow-300 { color: #FFEE33; }
-.text-lime-400, .text-amber-400, .text-orange-400, .text-yellow-400 { color: #FFEA00; }
-.text-lime-500, .text-amber-500, .text-orange-500, .text-yellow-500 { color: #E6D400; }
-.text-lime-600, .text-amber-600, .text-orange-600, .text-yellow-600 { color: #CCBB00; }
-.text-lime-700, .text-amber-700, .text-orange-700, .text-yellow-700 { color: #998800; }
+/* Text color → black */
+.text-lime-200, .text-amber-200, .text-orange-200, .text-yellow-200 { color: #000; }
+.text-lime-300, .text-amber-300, .text-orange-300, .text-yellow-300 { color: #000; }
+.text-lime-400, .text-amber-400, .text-orange-400, .text-yellow-400 { color: #000; }
+.text-lime-500, .text-amber-500, .text-orange-500, .text-yellow-500 { color: #000; }
+.text-lime-600, .text-amber-600, .text-orange-600, .text-yellow-600 { color: #000; }
+.text-lime-700, .text-amber-700, .text-orange-700, .text-yellow-700 { color: #000; }
 
-/* Text opacity variants */
-.text-lime-300\/50, .text-amber-300\/50, .text-orange-300\/50, .text-yellow-300\/50 { color: rgba(255,238,51,0.5); }
-.text-lime-300\/70, .text-amber-300\/70, .text-orange-300\/70, .text-yellow-300\/70 { color: rgba(255,238,51,0.7); }
-.text-lime-400\/50, .text-amber-400\/50, .text-orange-400\/50, .text-yellow-400\/50 { color: rgba(255,234,0,0.5); }
-.text-lime-400\/60, .text-amber-400\/60, .text-orange-400\/60, .text-yellow-400\/60 { color: rgba(255,234,0,0.6); }
-.text-lime-400\/70, .text-amber-400\/70, .text-orange-400\/70, .text-yellow-400\/70 { color: rgba(255,234,0,0.7); }
-.text-lime-400\/80, .text-amber-400\/80, .text-orange-400\/80, .text-yellow-400\/80 { color: rgba(255,234,0,0.8); }
-.text-lime-400\/90, .text-amber-400\/90, .text-orange-400\/90, .text-yellow-400\/90 { color: rgba(255,234,0,0.9); }
-.text-lime-500\/30, .text-amber-500\/30, .text-orange-500\/30, .text-yellow-500\/30 { color: rgba(230,212,0,0.3); }
-.text-lime-500\/50, .text-amber-500\/50, .text-orange-500\/50, .text-yellow-500\/50 { color: rgba(230,212,0,0.5); }
-.text-lime-500\/70, .text-amber-500\/70, .text-orange-500\/70, .text-yellow-500\/70 { color: rgba(230,212,0,0.7); }
+/* Text opacity variants → black with opacity */
+.text-lime-300\/50, .text-amber-300\/50, .text-orange-300\/50, .text-yellow-300\/50 { color: rgba(0,0,0,0.5); }
+.text-lime-300\/70, .text-amber-300\/70, .text-orange-300\/70, .text-yellow-300\/70 { color: rgba(0,0,0,0.7); }
+.text-lime-400\/50, .text-amber-400\/50, .text-orange-400\/50, .text-yellow-400\/50 { color: rgba(0,0,0,0.5); }
+.text-lime-400\/60, .text-amber-400\/60, .text-orange-400\/60, .text-yellow-400\/60 { color: rgba(0,0,0,0.6); }
+.text-lime-400\/70, .text-amber-400\/70, .text-orange-400\/70, .text-yellow-400\/70 { color: rgba(0,0,0,0.7); }
+.text-lime-400\/80, .text-amber-400\/80, .text-orange-400\/80, .text-yellow-400\/80 { color: rgba(0,0,0,0.8); }
+.text-lime-400\/90, .text-amber-400\/90, .text-orange-400\/90, .text-yellow-400\/90 { color: rgba(0,0,0,0.9); }
+.text-lime-500\/30, .text-amber-500\/30, .text-orange-500\/30, .text-yellow-500\/30 { color: rgba(0,0,0,0.3); }
+.text-lime-500\/50, .text-amber-500\/50, .text-orange-500\/50, .text-yellow-500\/50 { color: rgba(0,0,0,0.5); }
+.text-lime-500\/70, .text-amber-500\/70, .text-orange-500\/70, .text-yellow-500\/70 { color: rgba(0,0,0,0.7); }
 
-/* Border color */
-.border-lime-300, .border-amber-300, .border-orange-300, .border-yellow-300 { border-color: #FFEE33; }
-.border-lime-400, .border-amber-400, .border-orange-400, .border-yellow-400 { border-color: #FFEA00; }
-.border-lime-500, .border-amber-500, .border-orange-500, .border-yellow-500 { border-color: #E6D400; }
-.border-lime-600, .border-amber-600, .border-orange-600, .border-yellow-600 { border-color: #CCBB00; }
+/* Border color → black/10 */
+.border-lime-300, .border-amber-300, .border-orange-300, .border-yellow-300 { border-color: rgba(0,0,0,0.1); }
+.border-lime-400, .border-amber-400, .border-orange-400, .border-yellow-400 { border-color: rgba(0,0,0,0.15); }
+.border-lime-500, .border-amber-500, .border-orange-500, .border-yellow-500 { border-color: rgba(0,0,0,0.2); }
+.border-lime-600, .border-amber-600, .border-orange-600, .border-yellow-600 { border-color: rgba(0,0,0,0.25); }
 
-/* Border opacity variants */
-.border-lime-400\/20, .border-amber-400\/20, .border-orange-400\/20, .border-yellow-400\/20 { border-color: rgba(255,234,0,0.2); }
-.border-lime-400\/30, .border-amber-400\/30, .border-orange-400\/30, .border-yellow-400\/30 { border-color: rgba(255,234,0,0.3); }
-.border-lime-400\/40, .border-amber-400\/40, .border-orange-400\/40, .border-yellow-400\/40 { border-color: rgba(255,234,0,0.4); }
-.border-lime-400\/50, .border-amber-400\/50, .border-orange-400\/50, .border-yellow-400\/50 { border-color: rgba(255,234,0,0.5); }
-.border-lime-500\/30, .border-amber-500\/30, .border-orange-500\/30, .border-yellow-500\/30 { border-color: rgba(230,212,0,0.3); }
-.border-lime-500\/50, .border-amber-500\/50, .border-orange-500\/50, .border-yellow-500\/50 { border-color: rgba(230,212,0,0.5); }
-.border-lime-600\/30, .border-amber-600\/30, .border-orange-600\/30, .border-yellow-600\/30 { border-color: rgba(204,187,0,0.3); }
+/* Border opacity variants → black with opacity */
+.border-lime-400\/20, .border-amber-400\/20, .border-orange-400\/20, .border-yellow-400\/20 { border-color: rgba(0,0,0,0.1); }
+.border-lime-400\/30, .border-amber-400\/30, .border-orange-400\/30, .border-yellow-400\/30 { border-color: rgba(0,0,0,0.12); }
+.border-lime-400\/40, .border-amber-400\/40, .border-orange-400\/40, .border-yellow-400\/40 { border-color: rgba(0,0,0,0.15); }
+.border-lime-400\/50, .border-amber-400\/50, .border-orange-400\/50, .border-yellow-400\/50 { border-color: rgba(0,0,0,0.2); }
+.border-lime-500\/30, .border-amber-500\/30, .border-orange-500\/30, .border-yellow-500\/30 { border-color: rgba(0,0,0,0.12); }
+.border-lime-500\/50, .border-amber-500\/50, .border-orange-500\/50, .border-yellow-500\/50 { border-color: rgba(0,0,0,0.2); }
+.border-lime-600\/30, .border-amber-600\/30, .border-orange-600\/30, .border-yellow-600\/30 { border-color: rgba(0,0,0,0.15); }
 
-/* Ring */
-.ring-lime-400, .ring-amber-400, .ring-orange-400, .ring-yellow-400 { --tw-ring-color: #FFEA00; }
-.ring-lime-500, .ring-amber-500, .ring-orange-500, .ring-yellow-500 { --tw-ring-color: #E6D400; }
+/* Ring → black */
+.ring-lime-400, .ring-amber-400, .ring-orange-400, .ring-yellow-400 { --tw-ring-color: rgba(0,0,0,0.2); }
+.ring-lime-500, .ring-amber-500, .ring-orange-500, .ring-yellow-500 { --tw-ring-color: rgba(0,0,0,0.25); }
 
-/* Fill / Stroke */
-.fill-lime-400, .fill-amber-400, .fill-orange-400, .fill-yellow-400 { fill: #FFEA00; }
-.fill-lime-500, .fill-amber-500, .fill-orange-500, .fill-yellow-500 { fill: #E6D400; }
-.stroke-lime-400, .stroke-amber-400, .stroke-orange-400, .stroke-yellow-400 { stroke: #FFEA00; }
+/* Fill / Stroke → black */
+.fill-lime-400, .fill-amber-400, .fill-orange-400, .fill-yellow-400 { fill: #000; }
+.fill-lime-500, .fill-amber-500, .fill-orange-500, .fill-yellow-500 { fill: #000; }
+.stroke-lime-400, .stroke-amber-400, .stroke-orange-400, .stroke-yellow-400 { stroke: #000; }
 
-/* Gradient stops */
-.from-lime-300, .from-amber-300, .from-orange-300, .from-yellow-300 { --tw-gradient-from: #FFEE33 var(--tw-gradient-from-position); --tw-gradient-to: transparent var(--tw-gradient-to-position); }
-.from-lime-400, .from-amber-400, .from-orange-400, .from-yellow-400 { --tw-gradient-from: #FFEA00 var(--tw-gradient-from-position); --tw-gradient-to: transparent var(--tw-gradient-to-position); }
-.from-lime-500, .from-amber-500, .from-orange-500, .from-yellow-500 { --tw-gradient-from: #E6D400 var(--tw-gradient-from-position); --tw-gradient-to: transparent var(--tw-gradient-to-position); }
-.to-lime-300, .to-amber-300, .to-orange-300, .to-yellow-300 { --tw-gradient-to: #FFEE33 var(--tw-gradient-to-position); }
-.to-lime-400, .to-amber-400, .to-orange-400, .to-yellow-400 { --tw-gradient-to: #FFEA00 var(--tw-gradient-to-position); }
-.to-lime-500, .to-amber-500, .to-orange-500, .to-yellow-500 { --tw-gradient-to: #E6D400 var(--tw-gradient-to-position); }
-.to-lime-600, .to-amber-600, .to-orange-600, .to-yellow-600 { --tw-gradient-to: #CCBB00 var(--tw-gradient-to-position); }
-.via-lime-400, .via-amber-400, .via-orange-400, .via-yellow-400 { --tw-gradient-via: #FFEA00 var(--tw-gradient-via-position); }
+/* Gradient stops → black/white */
+.from-lime-300, .from-amber-300, .from-orange-300, .from-yellow-300 { --tw-gradient-from: #fff var(--tw-gradient-from-position); --tw-gradient-to: transparent var(--tw-gradient-to-position); }
+.from-lime-400, .from-amber-400, .from-orange-400, .from-yellow-400 { --tw-gradient-from: #000 var(--tw-gradient-from-position); --tw-gradient-to: transparent var(--tw-gradient-to-position); }
+.from-lime-500, .from-amber-500, .from-orange-500, .from-yellow-500 { --tw-gradient-from: #000 var(--tw-gradient-from-position); --tw-gradient-to: transparent var(--tw-gradient-to-position); }
+.to-lime-300, .to-amber-300, .to-orange-300, .to-yellow-300 { --tw-gradient-to: #fff var(--tw-gradient-to-position); }
+.to-lime-400, .to-amber-400, .to-orange-400, .to-yellow-400 { --tw-gradient-to: #000 var(--tw-gradient-to-position); }
+.to-lime-500, .to-amber-500, .to-orange-500, .to-yellow-500 { --tw-gradient-to: #000 var(--tw-gradient-to-position); }
+.to-lime-600, .to-amber-600, .to-orange-600, .to-yellow-600 { --tw-gradient-to: #000 var(--tw-gradient-to-position); }
+.via-lime-400, .via-amber-400, .via-orange-400, .via-yellow-400 { --tw-gradient-via: #000 var(--tw-gradient-via-position); }
 
-/* Hover variants */
-.hover\:bg-lime-300:hover, .hover\:bg-amber-300:hover, .hover\:bg-orange-300:hover, .hover\:bg-yellow-300:hover { background-color: #FFEE33; }
-.hover\:bg-lime-400:hover, .hover\:bg-amber-400:hover, .hover\:bg-orange-400:hover, .hover\:bg-yellow-400:hover { background-color: #FFEA00; }
-.hover\:bg-lime-500:hover, .hover\:bg-amber-500:hover, .hover\:bg-orange-500:hover, .hover\:bg-yellow-500:hover { background-color: #E6D400; }
-.hover\:bg-lime-400\/10:hover, .hover\:bg-amber-400\/10:hover, .hover\:bg-orange-400\/10:hover, .hover\:bg-yellow-400\/10:hover { background-color: rgba(255,234,0,0.1); }
-.hover\:bg-lime-400\/20:hover, .hover\:bg-amber-400\/20:hover, .hover\:bg-orange-400\/20:hover, .hover\:bg-yellow-400\/20:hover { background-color: rgba(255,234,0,0.2); }
-.hover\:text-lime-300:hover, .hover\:text-amber-300:hover, .hover\:text-orange-300:hover, .hover\:text-yellow-300:hover { color: #FFEE33; }
-.hover\:text-lime-400:hover, .hover\:text-amber-400:hover, .hover\:text-orange-400:hover, .hover\:text-yellow-400:hover { color: #FFEA00; }
-.hover\:text-lime-500:hover, .hover\:text-amber-500:hover, .hover\:text-orange-500:hover, .hover\:text-yellow-500:hover { color: #E6D400; }
-.hover\:border-lime-400:hover, .hover\:border-amber-400:hover, .hover\:border-orange-400:hover, .hover\:border-yellow-400:hover { border-color: #FFEA00; }
-.hover\:border-lime-500:hover, .hover\:border-amber-500:hover, .hover\:border-orange-500:hover, .hover\:border-yellow-500:hover { border-color: #E6D400; }
+/* Hover variants → subtle black tint */
+.hover\:bg-lime-300:hover, .hover\:bg-amber-300:hover, .hover\:bg-orange-300:hover, .hover\:bg-yellow-300:hover { background-color: rgba(0,0,0,0.05); }
+.hover\:bg-lime-400:hover, .hover\:bg-amber-400:hover, .hover\:bg-orange-400:hover, .hover\:bg-yellow-400:hover { background-color: #000; }
+.hover\:bg-lime-500:hover, .hover\:bg-amber-500:hover, .hover\:bg-orange-500:hover, .hover\:bg-yellow-500:hover { background-color: #000; }
+.hover\:bg-lime-400\/10:hover, .hover\:bg-amber-400\/10:hover, .hover\:bg-orange-400\/10:hover, .hover\:bg-yellow-400\/10:hover { background-color: rgba(0,0,0,0.05); }
+.hover\:bg-lime-400\/20:hover, .hover\:bg-amber-400\/20:hover, .hover\:bg-orange-400\/20:hover, .hover\:bg-yellow-400\/20:hover { background-color: rgba(0,0,0,0.08); }
+.hover\:text-lime-300:hover, .hover\:text-amber-300:hover, .hover\:text-orange-300:hover, .hover\:text-yellow-300:hover { color: #000; }
+.hover\:text-lime-400:hover, .hover\:text-amber-400:hover, .hover\:text-orange-400:hover, .hover\:text-yellow-400:hover { color: #000; }
+.hover\:text-lime-500:hover, .hover\:text-amber-500:hover, .hover\:text-orange-500:hover, .hover\:text-yellow-500:hover { color: #000; }
+.hover\:border-lime-400:hover, .hover\:border-amber-400:hover, .hover\:border-orange-400:hover, .hover\:border-yellow-400:hover { border-color: rgba(0,0,0,0.2); }
+.hover\:border-lime-500:hover, .hover\:border-amber-500:hover, .hover\:border-orange-500:hover, .hover\:border-yellow-500:hover { border-color: rgba(0,0,0,0.25); }
 
-/* Focus variants */
-.focus\:border-lime-400:focus, .focus\:border-amber-400:focus, .focus\:border-orange-400:focus, .focus\:border-yellow-400:focus { border-color: #FFEA00; }
-.focus\:ring-lime-400:focus, .focus\:ring-amber-400:focus, .focus\:ring-orange-400:focus, .focus\:ring-yellow-400:focus { --tw-ring-color: #FFEA00; }
+/* Focus variants → black */
+.focus\:border-lime-400:focus, .focus\:border-amber-400:focus, .focus\:border-orange-400:focus, .focus\:border-yellow-400:focus { border-color: #000; }
+.focus\:ring-lime-400:focus, .focus\:ring-amber-400:focus, .focus\:ring-orange-400:focus, .focus\:ring-yellow-400:focus { --tw-ring-color: rgba(0,0,0,0.2); }
+
+/* ============================================================
+   Gray text overrides — map all gray/zinc/slate/neutral/stone
+   text utilities to black with appropriate opacity. This gives
+   the entire app a standard black font.
+   ============================================================ */
+.text-gray-300, .text-zinc-300, .text-slate-300, .text-neutral-300, .text-stone-300 { color: rgba(0,0,0,0.4); }
+.text-gray-400, .text-zinc-400, .text-slate-400, .text-neutral-400, .text-stone-400 { color: rgba(0,0,0,0.5); }
+.text-gray-500, .text-zinc-500, .text-slate-500, .text-neutral-500, .text-stone-500 { color: rgba(0,0,0,0.6); }
+.text-gray-600, .text-zinc-600, .text-slate-600, .text-neutral-600, .text-stone-600 { color: rgba(0,0,0,0.7); }
+
+/* Gray text opacity variants */
+.text-gray-400\/50, .text-zinc-400\/50, .text-slate-400\/50 { color: rgba(0,0,0,0.4); }
+.text-gray-400\/60, .text-zinc-400\/60, .text-slate-400\/60 { color: rgba(0,0,0,0.5); }
+.text-gray-400\/70, .text-zinc-400\/70, .text-slate-400\/70 { color: rgba(0,0,0,0.55); }
+.text-gray-400\/80, .text-zinc-400\/80, .text-slate-400\/80 { color: rgba(0,0,0,0.65); }
+.text-gray-500\/50, .text-zinc-500\/50, .text-slate-500\/50 { color: rgba(0,0,0,0.5); }
+.text-gray-500\/70, .text-zinc-500\/70, .text-slate-500\/70 { color: rgba(0,0,0,0.6); }
+
+/* ============================================================
+   Additional dark background overrides — cover all gray/zinc/
+   slate/neutral/stone dark shades not in the original override
+   list. Maps them all to white.
+   ============================================================ */
+.bg-gray-200, .bg-slate-200, .bg-stone-200 { background-color: #fff; }
+.bg-gray-300, .bg-zinc-300, .bg-slate-300, .bg-neutral-300, .bg-stone-300 { background-color: #fff; }
+.bg-gray-400, .bg-zinc-400, .bg-slate-400, .bg-neutral-400, .bg-stone-400 { background-color: #fff; }
+.bg-gray-500, .bg-zinc-500, .bg-slate-500, .bg-neutral-500, .bg-stone-500 { background-color: #fff; }
+.bg-gray-600, .bg-zinc-600, .bg-slate-600, .bg-neutral-600, .bg-stone-600 { background-color: #fff; }
+.bg-gray-700, .bg-zinc-700, .bg-slate-700, .bg-neutral-700, .bg-stone-700 { background-color: #fff; }
+.bg-gray-800, .bg-slate-800, .bg-neutral-800, .bg-stone-800 { background-color: #fff; }
+.bg-gray-900, .bg-slate-900, .bg-neutral-900, .bg-stone-900 { background-color: #fff; }
+.bg-gray-950, .bg-slate-950, .bg-neutral-950, .bg-stone-950 { background-color: #fff; }
+
+/* Black opacity backgrounds → white */
+.bg-black\/5, .bg-black\/10, .bg-black\/20, .bg-black\/30, .bg-black\/40, .bg-black\/50 { background-color: rgba(0,0,0,0.03); }
+.bg-black\/60, .bg-black\/70, .bg-black\/80, .bg-black\/90 { background-color: rgba(0,0,0,0.03); }
+
+/* Gray border overrides → black/10 */
+.border-gray-700, .border-slate-700, .border-neutral-700, .border-stone-700 { border-color: rgba(0,0,0,0.1); }
+.border-gray-800, .border-slate-800, .border-neutral-800, .border-stone-800 { border-color: rgba(0,0,0,0.1); }
+.border-gray-900, .border-slate-900, .border-neutral-900, .border-stone-900 { border-color: rgba(0,0,0,0.1); }
+.border-gray-600, .border-slate-600, .border-neutral-600, .border-stone-600 { border-color: rgba(0,0,0,0.1); }
+.border-gray-500, .border-slate-500, .border-neutral-500, .border-stone-500 { border-color: rgba(0,0,0,0.1); }
 
 /* ============================================================
    Neon green hover outline — system-wide
@@ -562,69 +606,28 @@
 }
 
 /* ============================================================
-   Electric Metallic Gradient — gives the yellow accent a
-   polished, reflective metallic sheen with light highlights
-   and dark edges, simulating brushed electric gold metal.
+   Standard button/card accent — clean black on white.
+   The xa-gold utility is neutralized to a standard black
+   background with white text for a consistent look.
    ============================================================ */
 
-/* Primary accent backgrounds get a metallic gradient */
-.bg-amber-400, .bg-lime-400, .bg-orange-400, .bg-yellow-400 {
-  background: linear-gradient(135deg,
-    #FFF7B3 0%,
-    #FFEA00 20%,
-    #E6D400 45%,
-    #FFEE33 65%,
-    #FFEA00 80%,
-    #CCBB00 100%
-  ) !important;
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.4),
-              inset 0 -1px 0 rgba(140, 110, 0, 0.25),
-              0 1px 3px rgba(0, 0, 0, 0.15);
-}
-
-/* Hover shifts the shine position for a reflective effect */
-.hover\:bg-amber-400:hover, .hover\:bg-lime-400:hover,
-.hover\:bg-orange-400:hover, .hover\:bg-yellow-400:hover {
-  background: linear-gradient(135deg,
-    #FFEE33 0%,
-    #FFEA00 25%,
-    #E6D400 55%,
-    #FFF7B3 75%,
-    #CCBB00 100%
-  ) !important;
-  filter: brightness(1.06);
-}
-
-/* xa-gold updated to match the electric metallic look */
 .xa-gold {
-  background: linear-gradient(135deg,
-    #FFF7B3 0%,
-    #FFEA00 20%,
-    #E6D400 45%,
-    #FFEE33 65%,
-    #FFEA00 80%,
-    #CCBB00 100%
-  );
-  color: #000;
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.4),
-              inset 0 -1px 0 rgba(140, 110, 0, 0.25),
-              0 2px 10px -2px rgba(255, 234, 0, 0.45);
+  background: #000;
+  color: #fff;
 }
 
 .xa-gold:hover {
-  filter: brightness(1.08);
+  background: rgba(0,0,0,0.85);
 }
 
 .xa-gold-text {
-  background: linear-gradient(135deg, #FFF7B3 0%, #FFEA00 30%, #E6D400 55%, #FFEE33 75%, #CCBB00 100%);
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
-  color: transparent;
+  color: #000;
+}
+
+.xa-gold-border {
+  border-color: #000;
 }
 
 .xa-gold-glow {
-  box-shadow: 0 0 0 1px rgba(255, 234, 0, 0.35),
-              0 0 18px -4px rgba(255, 234, 0, 0.5),
-              inset 0 1px 0 rgba(255, 255, 255, 0.3);
+  box-shadow: 0 0 0 1px rgba(0,0,0,0.2), 0 0 8px -2px rgba(0,0,0,0.15);
 }
