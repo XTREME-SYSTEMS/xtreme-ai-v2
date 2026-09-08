@@ -130,7 +130,7 @@ export default async function(req) {
             return row;
           });
 
-          // Upsert to Supabase (merge duplicates by id)
+          // Upsert to Supabase — try PostgREST first, fall back to SQL INSERT
           const upsertRes = await fetch(`${postgrestUrl}/${entityDef.table}`, {
             method: 'POST',
             headers: { ...postgrestHeaders, 'Prefer': 'resolution=merge-duplicates' },
@@ -141,7 +141,7 @@ export default async function(req) {
             syncResults.push({ entity: entityDef.name, table: entityDef.table, synced: rows.length, status: 'success' });
           } else {
             const errText = await upsertRes.text();
-            // If table doesn't exist, create it via SQL
+            // If table doesn't exist, create it via SQL then INSERT via SQL
             if (errText.includes('Could not find the table') || errText.includes('does not exist')) {
               const createTableSQL = generateCreateTableSQL(entityDef.table, entityDef.columns);
               const ddlRes = await fetch(`https://api.supabase.com/v1/projects/${projectRef}/database/query`, {
@@ -151,16 +151,17 @@ export default async function(req) {
               });
 
               if (ddlRes.ok) {
-                // Retry the upsert
-                const retryRes = await fetch(`${postgrestUrl}/${entityDef.table}`, {
+                // Use SQL INSERT with ON CONFLICT for upsert (avoids PostgREST schema cache delay)
+                const insertSQL = generateInsertSQL(entityDef.table, rows);
+                const insertRes = await fetch(`https://api.supabase.com/v1/projects/${projectRef}/database/query`, {
                   method: 'POST',
-                  headers: { ...postgrestHeaders, 'Prefer': 'resolution=merge-duplicates' },
-                  body: JSON.stringify(rows),
+                  headers: supabaseHeaders,
+                  body: JSON.stringify({ query: insertSQL }),
                 });
-                if (retryRes.ok) {
+                if (insertRes.ok) {
                   syncResults.push({ entity: entityDef.name, table: entityDef.table, synced: rows.length, status: 'created_table_and_synced' });
                 } else {
-                  syncResults.push({ entity: entityDef.name, table: entityDef.table, synced: 0, status: 'table_created_but_upsert_failed', error: await retryRes.text() });
+                  syncResults.push({ entity: entityDef.name, table: entityDef.table, synced: 0, status: 'table_created_but_insert_failed', error: await insertRes.text() });
                 }
               } else {
                 syncResults.push({ entity: entityDef.name, table: entityDef.table, synced: 0, status: 'create_table_failed', error: await ddlRes.text() });
@@ -205,4 +206,25 @@ function generateCreateTableSQL(tableName: string, columnsDef: string): string {
   }).join(', ');
 
   return `CREATE TABLE IF NOT EXISTS "${tableName}" (${columnSQL});`;
+}
+
+// Generate SQL INSERT with ON CONFLICT (id) DO UPDATE for upsert
+function generateInsertSQL(tableName: string, rows: any[]): string {
+  if (rows.length === 0) return 'SELECT 1;';
+  const columns = Object.keys(rows[0]);
+  const values = rows.map((r, i) => {
+    const vals = columns.map((col) => {
+      const v = r[col];
+      if (v === null || v === undefined) return 'NULL';
+      if (typeof v === 'boolean') return v ? 'true' : 'false';
+      if (typeof v === 'number') return String(v);
+      // Escape single quotes
+      return `'${String(v).replace(/'/g, "''")}'`;
+    });
+    return `(${vals.join(', ')})`;
+  }).join(', ');
+
+  const updateCols = columns.filter(c => c !== 'id').map(c => `"${c}" = EXCLUDED."${c}"`).join(', ');
+
+  return `INSERT INTO "${tableName}" (${columns.map(c => `"${c}"`).join(', ')}) VALUES ${values} ON CONFLICT (id) DO UPDATE SET ${updateCols};`;
 }
