@@ -237,13 +237,8 @@
 .bg-lime-600\/10, .bg-amber-600\/10, .bg-orange-600\/10, .bg-yellow-600\/10 { background-color: rgba(0,0,0,0.05); }
 .bg-lime-600\/20, .bg-amber-600\/20, .bg-orange-600\/20, .bg-yellow-600\/20 { background-color: rgba(0,0,0,0.08); }
 
-/* Text color → black */
-.text-lime-200, .text-amber-200, .text-orange-200, .text-yellow-200 { color: #000; }
-.text-lime-300, .text-amber-300, .text-orange-300, .text-yellow-300 { color: #000; }
-.text-lime-400, .text-amber-400, .text-orange-400, .text-yellow-400 { color: #000; }
-.text-lime-500, .text-amber-500, .text-orange-500, .text-yellow-500 { color: #000; }
-.text-lime-600, .text-amber-600, .text-orange-600, .text-yellow-600 { color: #000; }
-.text-lime-700, .text-amber-700, .text-orange-700, .text-yellow-700 { color: #000; }
+/* Text color → black (catch-all: every shade + every opacity variant) */
+[class*="text-lime"], [class*="text-amber"], [class*="text-orange"], [class*="text-yellow"] { color: #000 !important; }
 
 /* Text opacity variants → black with opacity */
 .text-lime-300\/50, .text-amber-300\/50, .text-orange-300\/50, .text-yellow-300\/50 { color: rgba(0,0,0,0.5); }
