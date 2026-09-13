@@ -150,6 +150,31 @@
 :root:not(.dark) .bg-zinc-800\/90, :root:not(.dark) .bg-zinc-900\/90, :root:not(.dark) .bg-zinc-950\/90 { background-color: hsl(var(--background)); }
 
 :root:not(.dark) .text-white { color: hsl(var(--foreground)); }
+
+/* Restore black buttons/links — keep them black with white text so
+   they're visible. Without this, the bg-black→white and text-white→black
+   overrides above make dark buttons invisible (white on white). */
+:root:not(.dark) button.bg-black,
+:root:not(.dark) a.bg-black,
+:root:not(.dark) button.bg-zinc-800,
+:root:not(.dark) a.bg-zinc-800,
+:root:not(.dark) button.bg-zinc-900,
+:root:not(.dark) a.bg-zinc-900,
+:root:not(.dark) button.bg-zinc-950,
+:root:not(.dark) a.bg-zinc-950 {
+  background-color: #000 !important;
+  color: #fff !important;
+}
+:root:not(.dark) button.bg-black .text-white,
+:root:not(.dark) a.bg-black .text-white,
+:root:not(.dark) button.bg-zinc-800 .text-white,
+:root:not(.dark) a.bg-zinc-800 .text-white,
+:root:not(.dark) button.bg-zinc-900 .text-white,
+:root:not(.dark) a.bg-zinc-900 .text-white,
+:root:not(.dark) button.bg-zinc-950 .text-white,
+:root:not(.dark) a.bg-zinc-950 .text-white {
+  color: #fff !important;
+}
 :root:not(.dark) .text-white\/30 { color: hsl(var(--foreground) / 0.4); }
 :root:not(.dark) .text-white\/40 { color: hsl(var(--foreground) / 0.5); }
 :root:not(.dark) .text-white\/50 { color: hsl(var(--foreground) / 0.6); }
