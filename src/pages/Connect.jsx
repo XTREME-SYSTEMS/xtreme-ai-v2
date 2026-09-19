@@ -54,7 +54,9 @@ export default function Connect() {
   const [activeTab, setActiveTab] = useState("chatgpt");
   const [copied, setCopied] = useState(false);
 
-  const serverUrl = new URL("/api/mcp", window.location.origin).toString();
+  // MCP OAuth only works on the published domain, not the preview URL.
+  // Always show the production server URL so clients connect successfully.
+  const serverUrl = "https://autobuilder.base44.app/api/mcp";
 
   const copyUrl = () => {
     navigator.clipboard.writeText(serverUrl);
