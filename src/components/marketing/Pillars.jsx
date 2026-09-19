@@ -9,7 +9,7 @@ const PILLARS = [
 
 export default function Pillars() {
   return (
-    <section className="bg-white py-20 sm:py-28">
+    <section id="solutions" className="bg-white py-20 sm:py-28">
       <div className="mx-auto max-w-7xl px-4 sm:px-6">
         <div className="text-center">
           <h2 className="mx-auto max-w-2xl text-2xl font-bold tracking-tight text-black sm:text-3xl">

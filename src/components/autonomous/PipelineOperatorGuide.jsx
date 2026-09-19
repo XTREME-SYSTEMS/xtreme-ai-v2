@@ -126,7 +126,7 @@ export default function PipelineOperatorGuide() {
             </div>
             <div>
               <p className="text-sm leading-relaxed text-white/80">
-                <span className="font-semibold text-white">Lead Gen Near You</span> is an autonomous growth operating system.
+                <span className="font-semibold text-white">AUTO BUILDER</span> is an autonomous growth operating system.
                 It researches market opportunities, audits local business presence, and executes high-performance marketing
                 strategies to scale lead generation — all with minimal human intervention.
               </p>

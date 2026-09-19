@@ -111,9 +111,9 @@ export default function LeadEngine() {
     try {
       setDiscovering(true);
       const res = await base44.functions.invoke("discoverSourcesRecursive", {
-        max_sources: 20,
-        max_depth: 2,
-        verify_urls: true,
+        max_sources: 10,
+        max_depth: 1,
+        verify_urls: false,
       });
       await loadData();
       alert(`Discovery complete: ${res?.sources_discovered || 0} new sources found.`);

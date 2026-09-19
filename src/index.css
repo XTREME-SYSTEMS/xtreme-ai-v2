@@ -239,13 +239,8 @@
    text.
    ============================================================ */
 
-/* Solid backgrounds → white */
-.bg-lime-200, .bg-amber-200, .bg-orange-200, .bg-yellow-200 { background-color: #fff; }
-.bg-lime-300, .bg-amber-300, .bg-orange-300, .bg-yellow-300 { background-color: #fff; }
-.bg-lime-400, .bg-amber-400, .bg-orange-400, .bg-yellow-400 { background-color: #000; }
-.bg-lime-500, .bg-amber-500, .bg-orange-500, .bg-yellow-500 { background-color: #000; }
-.bg-lime-600, .bg-amber-600, .bg-orange-600, .bg-yellow-600 { background-color: #000; }
-.bg-lime-700, .bg-amber-700, .bg-orange-700, .bg-yellow-700 { background-color: #000; }
+/* Gold backgrounds — let tailwind.config.js gold palette (#FFEA00) show
+   through so buttons and accents render as metallic gold, not black. */
 
 /* Background opacity variants → subtle black tint */
 .bg-lime-300\/10, .bg-amber-300\/10, .bg-orange-300\/10, .bg-yellow-300\/10 { background-color: rgba(0,0,0,0.03); }
@@ -312,9 +307,8 @@
 .via-lime-400, .via-amber-400, .via-orange-400, .via-yellow-400 { --tw-gradient-via: #000 var(--tw-gradient-via-position); }
 
 /* Hover variants → subtle black tint */
-.hover\:bg-lime-300:hover, .hover\:bg-amber-300:hover, .hover\:bg-orange-300:hover, .hover\:bg-yellow-300:hover { background-color: rgba(0,0,0,0.05); }
-.hover\:bg-lime-400:hover, .hover\:bg-amber-400:hover, .hover\:bg-orange-400:hover, .hover\:bg-yellow-400:hover { background-color: #000; }
-.hover\:bg-lime-500:hover, .hover\:bg-amber-500:hover, .hover\:bg-orange-500:hover, .hover\:bg-yellow-500:hover { background-color: #000; }
+/* Gold hover backgrounds — let tailwind.config.js gold palette show through. */
+/* Gold hover backgrounds — let tailwind.config.js gold palette show through. */
 .hover\:bg-lime-400\/10:hover, .hover\:bg-amber-400\/10:hover, .hover\:bg-orange-400\/10:hover, .hover\:bg-yellow-400\/10:hover { background-color: rgba(0,0,0,0.05); }
 .hover\:bg-lime-400\/20:hover, .hover\:bg-amber-400\/20:hover, .hover\:bg-orange-400\/20:hover, .hover\:bg-yellow-400\/20:hover { background-color: rgba(0,0,0,0.08); }
 .hover\:text-lime-300:hover, .hover\:text-amber-300:hover, .hover\:text-orange-300:hover, .hover\:text-yellow-300:hover { color: #000; }

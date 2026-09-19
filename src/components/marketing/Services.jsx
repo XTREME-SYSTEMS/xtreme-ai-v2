@@ -8,7 +8,7 @@ const FEATURES = [
   { icon: Mail, tag: "Marketing", title: "Email & SMS that nurture", desc: "Automated campaigns and broadcasts across email and text, with smart segmentation and a shared unified inbox.", img: "https://images.unsplash.com/photo-1596526131083-e8c633c948d2?auto=format&fit=crop&w=1000&q=80" },
   { icon: Calendar, tag: "Bookings", title: "Calendar & scheduling", desc: "Round-robin and class-based booking with automated reminders, rescheduling, and payments at the time of booking.", img: "https://images.unsplash.com/photo-1506784983877-45594efa4cbe?auto=format&fit=crop&w=1000&q=80" },
   { icon: Workflow, tag: "Automation", title: "AI-powered workflows", desc: "Trigger-based automations that follow up instantly, route leads, and even handle inbound calls with AI Voice.", img: "https://images.unsplash.com/photo-1531746790731-6c087fecd65a?auto=format&fit=crop&w=1000&q=80" },
-  { icon: Star, tag: "Reputation", title: "Reviews & reputation", desc: "Automatically request reviews from happy customers and manage your listings across Google and Facebook.", img: "https://images.unsplash.com/photo-1554224155-6726b0148b8c?auto=format&fit=crop&w=1000&q=80" },
+  { icon: Star, tag: "Reputation", title: "Reviews & reputation", desc: "Automatically request reviews from happy customers and manage your listings across Google and Facebook.", img: "https://images.unsplash.com/photo-1556761175-b413da4baf72?auto=format&fit=crop&w=1000&q=80" },
 ];
 
 export default function Services() {

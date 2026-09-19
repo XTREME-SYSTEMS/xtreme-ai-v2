@@ -40,7 +40,7 @@ const TABS = [
   {
     key: "evangelize", label: "Evangelize", title: "Create fans, not just customers",
     desc: "Everything you need to turn happy customers into reviews, referrals and buzz.",
-    img: "https://images.unsplash.com/photo-1554224155-6726b0148b8c?auto=format&fit=crop&w=900&q=80",
+    img: "https://images.unsplash.com/photo-1556761175-b413da4baf72?auto=format&fit=crop&w=900&q=80",
     features: [
       "Reputation Management", "Automated Review Requests", "Affiliate Manager (for referral tracking)",
       "Website Review Widgets", "Video Review Capture", "Video Review Widgets",
