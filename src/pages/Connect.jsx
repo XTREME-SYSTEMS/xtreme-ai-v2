@@ -70,13 +70,13 @@ export default function Connect() {
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-black">AUTO BUILDER</h1>
           <p className="mt-2 text-sm text-black/60">
-            Connect ChatGPT, Claude, Cursor, or any MCP-compatible AI client to operate your Xtreme AI system directly from the chat. Your AI assistant can read and write data, trigger builds, discover leads, deploy sites, run simulations, and manage every part of the platform.
+            Connect ChatGPT, Claude, Cursor, or any MCP-compatible AI client to operate the AUTO BUILDER directly from the chat. Your AI assistant can read and write data, trigger builds, discover leads, deploy sites, run simulations, and manage every part of the platform.
           </p>
         </div>
 
         {/* Server URL */}
         <div className="mb-8 rounded-xl border border-black/15 bg-white p-5">
-          <label className="text-xs font-semibold uppercase tracking-wider text-black/50">MCP Server URL</label>
+          <label className="text-xs font-semibold uppercase tracking-wider text-black/50">AUTO BUILDER Server URL</label>
           <div className="mt-2 flex items-center gap-2">
             <code className="flex-1 truncate rounded-lg border border-black/10 bg-black/5 px-3 py-2 text-sm font-mono text-black">
               {serverUrl}
@@ -87,7 +87,7 @@ export default function Connect() {
             </Button>
           </div>
           <p className="mt-2 text-xs text-black/40">
-            This URL exposes your app's database, backend functions, and AI agents to any MCP-compatible client via OAuth.
+            This URL connects your AI assistant to the AUTO BUILDER — exposing your app's database, backend functions, and AI agents to any MCP-compatible client via OAuth.
           </p>
         </div>
 
