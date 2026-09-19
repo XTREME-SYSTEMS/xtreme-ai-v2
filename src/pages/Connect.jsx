@@ -68,7 +68,7 @@ export default function Connect() {
     <div className="min-h-screen bg-white text-black">
       <div className="mx-auto max-w-3xl px-4 py-12 sm:px-6 lg:py-16">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-black">Connect Your AI Assistant</h1>
+          <h1 className="text-3xl font-bold text-black">AUTO BUILDER</h1>
           <p className="mt-2 text-sm text-black/60">
             Connect ChatGPT, Claude, Cursor, or any MCP-compatible AI client to operate your Xtreme AI system directly from the chat. Your AI assistant can read and write data, trigger builds, discover leads, deploy sites, run simulations, and manage every part of the platform.
           </p>

@@ -24,7 +24,7 @@ const DROPDOWN_PAGES = [
   { to: "/coupon", label: "Coupon", icon: Ticket },
   { to: "/about", label: "About", icon: Heart },
   { to: "/contact", label: "Contact", icon: Mail },
-  { to: "/connect", label: "Connect AI", icon: Bot },
+  { to: "/connect", label: "AUTO BUILDER", icon: Bot },
 ];
 
 export default function MarketingNav() {

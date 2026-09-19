@@ -346,7 +346,7 @@ export default function Layout() {
             )}
           >
             <Bot className="h-4 w-4 shrink-0" />
-            Connect AI Assistant
+            AUTO BUILDER
           </NavLink>
 
           {/* Council Chamber — multi-agent council debate + simulation lab */}
