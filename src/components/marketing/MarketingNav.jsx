@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
-import { Menu, X, ChevronDown, LogIn, Home, DollarSign, Search, Wrench, Ticket, Heart, Mail } from "lucide-react";
+import { Menu, X, ChevronDown, LogIn, Home, DollarSign, Search, Wrench, Ticket, Heart, Mail, Bot } from "lucide-react";
 import { LOGO_ICON } from "@/lib/brandAssets";
 import { Image } from "@/components/ui/image";
 import { cn } from "@/lib/utils";
@@ -24,6 +24,7 @@ const DROPDOWN_PAGES = [
   { to: "/coupon", label: "Coupon", icon: Ticket },
   { to: "/about", label: "About", icon: Heart },
   { to: "/contact", label: "Contact", icon: Mail },
+  { to: "/connect", label: "Connect AI", icon: Bot },
 ];
 
 export default function MarketingNav() {

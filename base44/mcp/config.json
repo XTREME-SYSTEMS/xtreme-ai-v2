@@ -1,0 +1,297 @@
+{
+  "auth": "oauth",
+  "tools": {
+    "functions": [
+      {
+        "name": "generate_vision_doc",
+        "title": "Generate Vision Document",
+        "description": "Generates a comprehensive vision document defining what to build and why for a business/project. The mandatory foundation before any building begins. Call when starting a new project or when the user wants to define their business vision.",
+        "input_schema": {
+          "type": "object",
+          "properties": {
+            "businessName": { "type": "string", "description": "Business or project name" },
+            "industry": { "type": "string", "description": "Industry or niche (e.g. epoxy, hvac, roofing)" },
+            "subIndustry": { "type": "string", "description": "Sub-industry specialization" },
+            "primaryLocation": { "type": "string", "description": "Primary service area or city" },
+            "services": { "type": "array", "items": { "type": "string" }, "description": "List of services offered" },
+            "productDescription": { "type": "string", "description": "What the product/app does (for non-marketing builds)" },
+            "targetAudience": { "type": "string", "description": "Target audience description" },
+            "businessType": { "type": "string", "description": "local service business, SaaS, e-commerce, etc." }
+          }
+        },
+        "handler": "generateVision",
+        "annotations": { "read_only_hint": false, "destructive_hint": false, "idempotent_hint": false }
+      },
+      {
+        "name": "generate_strategy_doc",
+        "title": "Generate Strategy Document",
+        "description": "Generates a comprehensive strategy document (positioning, GTM, revenue, pricing, roadmap, risks) building on an approved vision. Requires an existing vision document. Call after vision is generated and approved.",
+        "input_schema": {
+          "type": "object",
+          "properties": {
+            "businessName": { "type": "string" },
+            "industry": { "type": "string" },
+            "subIndustry": { "type": "string" },
+            "primaryLocation": { "type": "string" },
+            "services": { "type": "array", "items": { "type": "string" } },
+            "productDescription": { "type": "string" },
+            "targetAudience": { "type": "string" },
+            "businessType": { "type": "string" }
+          }
+        },
+        "handler": "generateStrategy",
+        "annotations": { "read_only_hint": false, "destructive_hint": false, "idempotent_hint": false }
+      },
+      {
+        "name": "run_autonomous_build_cycle",
+        "title": "Run Autonomous Build Cycle",
+        "description": "Drives the Auto Builder pipeline — finds builds with auto-advance enabled and processes their next step. Enforces blast radius caps and governance tiers. Call to advance queued builds through their pipeline steps automatically.",
+        "input_schema": { "type": "object", "properties": {} },
+        "handler": "runAutonomousBuild",
+        "annotations": { "read_only_hint": false, "destructive_hint": false, "idempotent_hint": true }
+      },
+      {
+        "name": "discover_business_leads",
+        "title": "Discover Business Leads",
+        "description": "Autonomous lead discovery engine — searches for businesses with bad websites or poor online presence, checks website health, calculates opportunity scores, and saves as BusinessLead records. Call to find new sales prospects in a specific industry and location.",
+        "input_schema": {
+          "type": "object",
+          "properties": {
+            "industry": { "type": "string", "description": "Industry to search (default: home services)" },
+            "sub_industry": { "type": "string", "description": "Sub-industry specialization" },
+            "location": { "type": "string", "description": "Geographic location/city to search" },
+            "max_results": { "type": "number", "description": "Max businesses to find (default 10)" },
+            "check_websites": { "type": "boolean", "description": "Whether to check actual website health (default true)" }
+          }
+        },
+        "handler": "discoverBusinessLeads",
+        "annotations": { "read_only_hint": false, "destructive_hint": false, "idempotent_hint": true }
+      },
+      {
+        "name": "send_outreach_email",
+        "title": "Send Outreach Email",
+        "description": "Sends an outreach email to a backlink prospect via the connected Gmail account. Requires a prospect_id and email body. Call to send partnership/outreach emails to prospects.",
+        "input_schema": {
+          "type": "object",
+          "properties": {
+            "prospect_id": { "type": "string", "description": "ID of the BacklinkProspect to email" },
+            "from_name": { "type": "string", "description": "Sender display name" },
+            "subject": { "type": "string", "description": "Email subject line" },
+            "body": { "type": "string", "description": "Email body text" }
+          },
+          "required": ["prospect_id", "body"]
+        },
+        "handler": "sendOutreach",
+        "annotations": { "read_only_hint": false, "destructive_hint": false, "idempotent_hint": false }
+      },
+      {
+        "name": "generate_api_key",
+        "title": "Generate API Key",
+        "description": "Generates a cryptographically random API key for external access to the platform. Three types: admin (full access), user (read-only), vision_cortex (full diagnostic/heal/optimize autonomy). Call to create new API keys for external integrations.",
+        "input_schema": {
+          "type": "object",
+          "properties": {
+            "key_name": { "type": "string", "description": "Human-readable name for this key" },
+            "key_type": { "type": "string", "enum": ["admin", "user", "vision_cortex"], "description": "Type determines permissions" },
+            "permissions": { "type": "array", "items": { "type": "string" }, "description": "Custom permissions list (optional, defaults by type)" },
+            "expires_at": { "type": "string", "description": "ISO datetime when key expires (optional, null = never)" }
+          },
+          "required": ["key_name", "key_type"]
+        },
+        "handler": "generateApiKey",
+        "annotations": { "read_only_hint": false, "destructive_hint": false, "idempotent_hint": false }
+      },
+      {
+        "name": "run_self_optimization",
+        "title": "Run Self-Optimization",
+        "description": "Self-healing and self-optimization engine — monitors for stuck builds, failed builds, XPS catalog health, floor systems, pipeline health, and lead engine status. Auto-heals issues found. Call to run a system health check and auto-fix problems.",
+        "input_schema": { "type": "object", "properties": {} },
+        "handler": "runSelfOptimization",
+        "annotations": { "read_only_hint": false, "destructive_hint": false, "idempotent_hint": true }
+      },
+      {
+        "name": "run_architect_scan",
+        "title": "Run AI Architect Scan",
+        "description": "The AI Chief Architect — analyzes current system state, searches the web for emerging AI capabilities and technologies, and generates visionary proposals across 6 categories (what to build, how to build, new technology, AI capabilities, integrations, strategic direction). Call for strategic AI-driven system analysis and improvement proposals.",
+        "input_schema": {
+          "type": "object",
+          "properties": {
+            "triggered_by": { "type": "string", "description": "Source of the scan (manual, workflow, etc.)" },
+            "max_proposals": { "type": "number", "description": "Max proposals to generate (default 15)" }
+          }
+        },
+        "handler": "architectScan",
+        "annotations": { "read_only_hint": false, "destructive_hint": false, "idempotent_hint": false }
+      },
+      {
+        "name": "run_council_decision",
+        "title": "Run Council Decision",
+        "description": "Runs an 11-round multi-agent council debate across specialized intelligence archetypes (systems architect, contrarian, epistemic auditor, economist, risk engineer, etc.) to reach a well-reasoned decision on a strategic question. Dissent is preserved, confidence is scored. Call for complex strategic/architectural/investment decisions.",
+        "input_schema": {
+          "type": "object",
+          "properties": {
+            "question": { "type": "string", "description": "The decision question to debate" },
+            "context": { "type": "string", "description": "Background context, data, and constraints" },
+            "decision_type": { "type": "string", "enum": ["strategic", "architectural", "build", "investment", "product", "market", "technical", "operational", "research"], "description": "Type of decision (default strategic)" },
+            "triggered_by": { "type": "string", "description": "Source trigger (manual, workflow, etc.)" },
+            "subject_id": { "type": "string", "description": "Optional ID of the subject being decided on" },
+            "subject_type": { "type": "string", "description": "Optional type of the subject" }
+          },
+          "required": ["question"]
+        },
+        "handler": "runCouncilDecision",
+        "annotations": { "read_only_hint": false, "destructive_hint": false, "idempotent_hint": false }
+      },
+      {
+        "name": "deploy_autobuild_site",
+        "title": "Deploy AutoBuild Site",
+        "description": "Takes an AutoBuild record, generates a real React app from its specs (architecture, data_model, ui_system), pushes to GitHub, deploys to Vercel, and verifies the site is live. Call to deploy a completed build to production.",
+        "input_schema": {
+          "type": "object",
+          "properties": {
+            "autobuild_id": { "type": "string", "description": "ID of the AutoBuild record to deploy" }
+          },
+          "required": ["autobuild_id"]
+        },
+        "handler": "deployAutoBuildSite",
+        "annotations": { "read_only_hint": false, "destructive_hint": false, "idempotent_hint": true }
+      },
+      {
+        "name": "generate_website_content",
+        "title": "Generate Website Content",
+        "description": "Generates rich, location-aware website copy (hero, about, services, FAQ) for a client's site using real web context about their area. Call to create website content for a business.",
+        "input_schema": {
+          "type": "object",
+          "properties": {
+            "businessName": { "type": "string" },
+            "industry": { "type": "string" },
+            "city": { "type": "string" },
+            "services": { "type": "array", "items": { "type": "string" } },
+            "tone": { "type": "string" }
+          }
+        },
+        "handler": "generateWebsiteContent",
+        "annotations": { "read_only_hint": false, "destructive_hint": false, "idempotent_hint": false }
+      },
+      {
+        "name": "check_domain_availability",
+        "title": "Check Domain Availability",
+        "description": "Checks real-time domain availability via RDAP for a list of domains. Returns available/registered status for each. Call to check if domain names are available for purchase.",
+        "input_schema": {
+          "type": "object",
+          "properties": {
+            "domains": { "type": "array", "items": { "type": "string" }, "description": "List of domain names to check (e.g. example.com)" }
+          },
+          "required": ["domains"]
+        },
+        "handler": "checkDomainAvailability",
+        "annotations": { "read_only_hint": true, "destructive_hint": false, "idempotent_hint": true }
+      },
+      {
+        "name": "generate_invoice",
+        "title": "Generate Invoice",
+        "description": "Generates a professional invoice with realistic line items for a digital marketing/lead gen engagement. Returns line items, subtotal, tax, total, and notes. Call to create an invoice for a client.",
+        "input_schema": {
+          "type": "object",
+          "properties": {
+            "account_name": { "type": "string", "description": "Client/account name" },
+            "deal_name": { "type": "string", "description": "Project or deal name" },
+            "value": { "type": "number", "description": "Approximate dollar value" },
+            "scope": { "type": "string", "description": "Scope of work description" }
+          }
+        },
+        "handler": "generateInvoice",
+        "annotations": { "read_only_hint": false, "destructive_hint": false, "idempotent_hint": false }
+      },
+      {
+        "name": "run_business_simulation",
+        "title": "Run Business Simulation",
+        "description": "Monte Carlo business simulation engine — runs probabilistic projections (1000 iterations) across time horizons and scenarios. Shows p10/p50/p90 outcomes, break-even, probability of success, expected value, and sensitivity analysis. Call to simulate business/decision outcomes before committing.",
+        "input_schema": {
+          "type": "object",
+          "properties": {
+            "simulation_name": { "type": "string", "description": "Name for this simulation" },
+            "simulation_type": { "type": "string", "description": "Type (default business_model)" },
+            "subject_id": { "type": "string" },
+            "subject_type": { "type": "string" },
+            "input_variables": { "type": "object", "description": "Business input variables (customers, price, growth rate, costs, etc.)" },
+            "scenario": { "type": "string", "enum": ["baseline", "conservative", "expected", "optimistic", "adverse", "black_swan"], "description": "Scenario adjustment (default expected)" },
+            "time_horizon": { "type": "string", "enum": ["1_week", "1_month", "3_months", "6_months", "12_months", "2_years", "3_years", "5_years", "10_years", "15_years"], "description": "Projection horizon (default 12_months)" },
+            "iterations": { "type": "number", "description": "Monte Carlo iterations (default 1000)" },
+            "prior_result_id": { "type": "string", "description": "Optional prior result ID for comparison" }
+          },
+          "required": ["simulation_name"]
+        },
+        "handler": "runBusinessSimulation",
+        "annotations": { "read_only_hint": false, "destructive_hint": false, "idempotent_hint": false }
+      },
+      {
+        "name": "score_idea_candidate",
+        "title": "Score Idea Candidate",
+        "description": "Re-scores an individual IdeaCandidate using the AI scoring engine (YC 10-key-question framework, autonomous system classification). Call to evaluate or re-evaluate a business idea.",
+        "input_schema": {
+          "type": "object",
+          "properties": {
+            "idea_id": { "type": "string", "description": "ID of the IdeaCandidate to score" }
+          },
+          "required": ["idea_id"]
+        },
+        "handler": "scoreIdeaCandidate",
+        "annotations": { "read_only_hint": false, "destructive_hint": false, "idempotent_hint": true }
+      },
+      {
+        "name": "generate_mass_websites",
+        "title": "Generate Mass Websites",
+        "description": "Bulk generates every auto-builder step (logos, content, HTML) for all sites in a MassBuildProject batch. Processes sites in parallel. Call to generate websites in bulk for a mass build project.",
+        "input_schema": {
+          "type": "object",
+          "properties": {
+            "mass_build_id": { "type": "string", "description": "ID of the MassBuildProject" },
+            "step": { "type": "string", "description": "Optional specific step to run (default all)" }
+          },
+          "required": ["mass_build_id"]
+        },
+        "handler": "generateMassWebsites",
+        "annotations": { "read_only_hint": false, "destructive_hint": false, "idempotent_hint": false }
+      },
+      {
+        "name": "clone_and_launch",
+        "title": "Clone and Launch Site",
+        "description": "Unified clone-to-launch pipeline — scrapes a target website, analyzes it, generates rebranded content, provisions GitHub/Drive/Supabase/Vercel, generates logos and images, creates SEO campaign, identifies monetization, and validates. Call to clone a competitor site and launch a rebranded version.",
+        "input_schema": {
+          "type": "object",
+          "properties": {
+            "project_id": { "type": "string", "description": "Existing CloneProject ID to resume (optional)" },
+            "target_url": { "type": "string", "description": "URL of the site to clone (required if no project_id)" },
+            "industry": { "type": "string", "description": "Industry niche" },
+            "business_name": { "type": "string", "description": "New business name" },
+            "auto_proceed": { "type": "boolean", "description": "Whether to auto-advance through phases (default true)" }
+          }
+        },
+        "handler": "cloneAndLaunch",
+        "annotations": { "read_only_hint": false, "destructive_hint": false, "idempotent_hint": false }
+      },
+      {
+        "name": "run_rank_engine",
+        "title": "Run Rank Engine",
+        "description": "SEO rank engine — discovers keywords, generates programmatic landing pages with JSON-LD, builds citation targets, and audits SEO readiness. Supports quick_start (auto-detect from URL) or start (manual config). Call to create or run an SEO campaign for a site.",
+        "input_schema": {
+          "type": "object",
+          "properties": {
+            "action": { "type": "string", "enum": ["run", "quick_start", "start"], "description": "Action mode (default run)" },
+            "engine_id": { "type": "string", "description": "Existing engine ID to run (optional)" },
+            "site_url": { "type": "string", "description": "Site URL (for quick_start)" },
+            "site_name": { "type": "string", "description": "Site name (for start)" },
+            "niche": { "type": "string", "description": "Industry niche" },
+            "cities": { "type": "array", "items": { "type": "string" } },
+            "services": { "type": "array", "items": { "type": "string" } },
+            "market_id": { "type": "string" },
+            "project_id": { "type": "string" }
+          }
+        },
+        "handler": "runRankEngine",
+        "annotations": { "read_only_hint": false, "destructive_hint": false, "idempotent_hint": false }
+      }
+    ]
+  }
+}

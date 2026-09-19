@@ -139,6 +139,8 @@ import XpsCatalog from '@/pages/XpsCatalog';
 import Preflight from '@/pages/Preflight';
 import BidEngine from '@/pages/BidEngine';
 import ApiKeyGenerator from '@/pages/ApiKeyGenerator';
+import OAuthConsent from '@/pages/OAuthConsent';
+import Connect from '@/pages/Connect';
 import { PortalStudioProvider } from '@/lib/PortalStudioContext';
 import XtremeShell from '@/components/xtremeai/XtremeShell';
 import PortalStudio from '@/pages/portalstudio/PortalStudio';
@@ -172,6 +174,8 @@ const AuthenticatedApp = () => {
       <Route path="/seo/:slug" element={<SeoLanding />} />
       <Route path="/coupon" element={<CouponPage />} />
       <Route path="/free-audit" element={<FreeAuditPage />} />
+      <Route path="/connect" element={<Connect />} />
+      <Route path="/oauth/consent" element={<OAuthConsent />} />
       <Route path="/free-tools" element={<FreeTools />} />
       <Route path="/visualizer" element={<FloorVisualizer />} />
       <Route path="/about" element={<About />} />

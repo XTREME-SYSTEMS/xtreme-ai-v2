@@ -335,6 +335,20 @@ export default function Layout() {
             API Key Generator
           </NavLink>
 
+          {/* Connect AI — link ChatGPT/Claude/Cursor to operate this system */}
+          <NavLink
+            to="/connect"
+            end
+            onClick={() => setOpen(false)}
+            className={({ isActive }) => cn(
+              "flex items-center gap-2.5 rounded-lg px-2.5 py-2 text-sm transition-colors",
+              isActive ? "bg-amber-400/10 text-amber-600 font-semibold" : "text-black hover:bg-black/5"
+            )}
+          >
+            <Bot className="h-4 w-4 shrink-0" />
+            Connect AI Assistant
+          </NavLink>
+
           {/* Council Chamber — multi-agent council debate + simulation lab */}
           <NavLink
             to={COUNCIL_CHAMBER.to}
