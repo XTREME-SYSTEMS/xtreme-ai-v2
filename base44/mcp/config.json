@@ -51,6 +51,14 @@
         "annotations": { "read_only_hint": false, "destructive_hint": false, "idempotent_hint": true }
       },
       {
+        "name": "run_persistent_coding_cycle",
+        "title": "Run Persistent Coding Cycle",
+        "description": "Advances one due coding_packet from the durable GenerationJob queue. Produces a bounded draft patch bundle, runs an independent validator, retries failed drafts, records receipts, deterministically enqueues the next approved plan step, and stops at protected-action gates. This tool does not deploy or merge code.",
+        "input_schema": { "type": "object", "properties": {} },
+        "handler": "persistentCodingSupervisor",
+        "annotations": { "read_only_hint": false, "destructive_hint": false, "idempotent_hint": true }
+      },
+      {
         "name": "discover_business_leads",
         "title": "Discover Business Leads",
         "description": "Autonomous lead discovery engine — searches for businesses with bad websites or poor online presence, checks website health, calculates opportunity scores, and saves as BusinessLead records. Call to find new sales prospects in a specific industry and location.",
