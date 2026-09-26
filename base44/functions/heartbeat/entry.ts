@@ -37,6 +37,10 @@ export default async function(req) {
     const maxAttempts = 3;
 
     for (const job of queuedJobs) {
+      // coding_packet jobs are owned by persistentCodingSupervisor, which is
+      // invoked by the same 5-minute workflow after this general queue pass.
+      if (job.job_type === "coding_packet") continue;
+
       // Skip jobs not yet due
       if (job.next_attempt_at && new Date(job.next_attempt_at) > now) continue;
 
