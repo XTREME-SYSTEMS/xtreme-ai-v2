@@ -14,10 +14,24 @@
             "function_name": "heartbeat",
             "args": {}
           },
-          "then": "end",
+          "then": "process_coding",
           "x-base44": {
             "title": "Process due queue jobs",
-            "description": "Picks up queued GenerationJobs that are due and processes them with retries + receipts"
+            "description": "Picks up standard queued GenerationJobs that are due and processes them with retries + receipts"
+          }
+        }
+      },
+      {
+        "process_coding": {
+          "call": "invoke_backend_function",
+          "with": {
+            "function_name": "persistentCodingSupervisor",
+            "args": {}
+          },
+          "then": "end",
+          "x-base44": {
+            "title": "Advance persistent coding",
+            "description": "Advances one due coding packet through bounded generation, independent validation, retry/repair, receipts, and deterministic continuation"
           }
         }
       }
