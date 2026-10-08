@@ -42,13 +42,13 @@ const EMPLOYEE_PORTAL = { to: "/employee-portal", label: "Employee Portal", icon
 // All class strings are literals so Tailwind preserves them.
 const PIPELINE_STEPS = [
   { to: "/pipeline-catalog", label: "Pipeline Catalog",   icon: Layers, step: 1, desc: "Browse packages, templates & tools",
-    color: { ring: "border-emerald-400 bg-emerald-400 text-black shadow-[0_0_14px_3px_rgba(52,211,153,0.45)]", text: "text-emerald-400", icon: "text-emerald-400", idle: "text-emerald-400/40" } },
+    color: { ring: "border-emerald-400 bg-emerald-400 text-white shadow-[0_0_14px_3px_rgba(52,211,153,0.45)]", text: "text-emerald-400", icon: "text-emerald-400", idle: "text-emerald-400/40" } },
   { to: "/build-queue",      label: "Queue System",       icon: Boxes,  step: 2, desc: "Ideas queued for building",
-    color: { ring: "border-amber-400 bg-amber-400 text-black shadow-[0_0_14px_3px_rgba(255,234,0,0.45)]", text: "text-amber-600", icon: "text-amber-600", idle: "text-amber-600/40" } },
+    color: { ring: "border-amber-400 bg-amber-400 text-white shadow-[0_0_14px_3px_rgba(0,71,255,0.45)]", text: "text-amber-600", icon: "text-amber-600", idle: "text-amber-600/40" } },
   { to: "/mass-website-factory", label: "Mass Website Factory", icon: Factory, step: 3, desc: "Bulk produce websites from templates",
-    color: { ring: "border-cyan-400 bg-cyan-400 text-black shadow-[0_0_14px_3px_rgba(34,211,238,0.45)]", text: "text-cyan-400", icon: "text-cyan-400", idle: "text-cyan-400/40" } },
+    color: { ring: "border-cyan-400 bg-cyan-400 text-white shadow-[0_0_14px_3px_rgba(34,211,238,0.45)]", text: "text-cyan-400", icon: "text-cyan-400", idle: "text-cyan-400/40" } },
   { to: "/auto-builder",     label: "Auto Builder",       icon: Rocket, step: 4, desc: "Full builder pipeline",
-    color: { ring: "border-rose-400 bg-rose-400 text-black shadow-[0_0_14px_3px_rgba(251,113,133,0.45)]", text: "text-rose-400", icon: "text-rose-400", idle: "text-rose-400/40" } },
+    color: { ring: "border-rose-400 bg-rose-400 text-white shadow-[0_0_14px_3px_rgba(251,113,133,0.45)]", text: "text-rose-400", icon: "text-rose-400", idle: "text-rose-400/40" } },
 ];
 
 // Auto Builder sub-steps — the builder's own pipeline, shown as a nested
@@ -442,7 +442,7 @@ export default function Layout() {
                             <div className={cn(
                               "flex h-7 w-7 shrink-0 items-center justify-center rounded-full border text-[10px] font-bold transition-all",
                               subActive
-                                ? "border-amber-400 bg-amber-400 text-black shadow-[0_0_8px_1px_rgba(255,234,0,0.4)]"
+                                ? "border-amber-400 bg-amber-400 text-white shadow-[0_0_8px_1px_rgba(0,71,255,0.4)]"
                                 : "border-black/15 bg-white text-black/40"
                             )}>
                               {sub.number}

@@ -45,28 +45,28 @@ module.exports = {
   			ring: 'hsl(var(--ring))',
   			'vx-accent': 'hsl(var(--vx-accent))',
   			'vx-accent-2': 'hsl(var(--vx-accent-2))',
-  			// Gold palette — lime/amber/orange/yellow all remapped to metallic
-			// gold (#FFD700) and darker goldenrod (#B8860B) so every accent across
-			// the app renders as the Xtreme AI brand gold.
+  			// Electric deep blue palette — lime/amber/orange/yellow all remapped
+			// to electric deep blue (#0047FF) so every accent across the app
+			// renders as the brand electric blue.
 			lime: {
-				50: '#FFFCF0', 100: '#FFF9CC', 200: '#FFF299', 300: '#FFEE33',
-				400: '#FFEA00', 500: '#E6D400', 600: '#CCBB00', 700: '#998800',
-				800: '#665500', 900: '#332200', 950: '#1A1100'
+				50: '#E6F0FF', 100: '#CCE0FF', 200: '#99C2FF', 300: '#66A3FF',
+				400: '#0047FF', 500: '#0033CC', 600: '#002299', 700: '#001A73',
+				800: '#00114D', 900: '#000A33', 950: '#000524'
 			},
 			amber: {
-				50: '#FFFCF0', 100: '#FFF9CC', 200: '#FFF299', 300: '#FFEE33',
-				400: '#FFEA00', 500: '#E6D400', 600: '#CCBB00', 700: '#998800',
-				800: '#665500', 900: '#332200', 950: '#1A1100'
+				50: '#E6F0FF', 100: '#CCE0FF', 200: '#99C2FF', 300: '#66A3FF',
+				400: '#0047FF', 500: '#0033CC', 600: '#002299', 700: '#001A73',
+				800: '#00114D', 900: '#000A33', 950: '#000524'
 			},
 			orange: {
-				50: '#FFFCF0', 100: '#FFF9CC', 200: '#FFF299', 300: '#FFEE33',
-				400: '#FFEA00', 500: '#E6D400', 600: '#CCBB00', 700: '#998800',
-				800: '#665500', 900: '#332200', 950: '#1A1100'
+				50: '#E6F0FF', 100: '#CCE0FF', 200: '#99C2FF', 300: '#66A3FF',
+				400: '#0047FF', 500: '#0033CC', 600: '#002299', 700: '#001A73',
+				800: '#00114D', 900: '#000A33', 950: '#000524'
 			},
 			yellow: {
-				50: '#FFFCF0', 100: '#FFF9CC', 200: '#FFF299', 300: '#FFEE33',
-				400: '#FFEA00', 500: '#E6D400', 600: '#CCBB00', 700: '#998800',
-				800: '#665500', 900: '#332200', 950: '#1A1100'
+				50: '#E6F0FF', 100: '#CCE0FF', 200: '#99C2FF', 300: '#66A3FF',
+				400: '#0047FF', 500: '#0033CC', 600: '#002299', 700: '#001A73',
+				800: '#00114D', 900: '#000A33', 950: '#000524'
 			},
   			chart: {
   				'1': 'hsl(var(--chart-1))',
