@@ -198,8 +198,8 @@ export default function OnboardingCardGrid() {
         </div>
       )}
 
-      {/* ── 4 square cards ── */}
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      {/* ── 4 square cards — horizontal row ── */}
+      <div className="grid grid-cols-4 gap-3">
         {ONBOARDING_CARDS.map((card, idx) => {
           const Icon = ICON_MAP[card.icon] || Eye;
           const isExpanded = expandedCard === card.id;
@@ -210,46 +210,72 @@ export default function OnboardingCardGrid() {
             <div
               key={card.id}
               className={cn(
-                "flex flex-col rounded-xl border bg-zinc-950 transition-all",
-                isExpanded ? cn(c.ring, "col-span-1 sm:col-span-2 lg:col-span-4") : c.ring,
-                "hover:shadow-lg"
+                "flex flex-col rounded-xl border bg-zinc-950 transition-all hover:shadow-lg",
+                c.ring,
+                isExpanded && "col-span-4"
               )}
             >
-              {/* Card header — the square card face */}
+              {/* Card header — square face (compact bar when expanded) */}
               <button
                 onClick={() => setExpandedCard(isExpanded ? null : card.id)}
-                className="flex flex-col items-center gap-3 p-5 text-center"
-              >
-                <div className={cn("flex h-14 w-14 items-center justify-center rounded-xl", c.solid)}>
-                  <Icon className="h-7 w-7" />
-                </div>
-                <div className="flex items-center gap-2">
-                  <span className={cn("flex h-6 w-6 items-center justify-center rounded-full border text-xs font-bold", c.ring, c.text)}>
-                    {idx + 1}
-                  </span>
-                  <h3 className="text-sm font-bold text-white">{card.title}</h3>
-                </div>
-                <p className="text-xs text-white/50">{card.subtitle}</p>
-                {/* Completion indicator */}
-                <div className="flex items-center gap-2">
-                  <div className="h-1.5 w-20 rounded-full bg-white/10">
-                    <div
-                      className={cn("h-1.5 rounded-full transition-all", c.solid)}
-                      style={{ width: `${(completion.done / completion.total) * 100}%` }}
-                    />
-                  </div>
-                  <span className={cn("text-[10px] font-semibold", completion.complete ? c.text : "text-white/40")}>
-                    {completion.done}/{completion.total}
-                  </span>
-                </div>
-                {completion.complete && (
-                  <span className={cn("flex items-center gap-1 text-[10px] font-semibold", c.text)}>
-                    <CheckCircle className="h-3 w-3" /> Complete
-                  </span>
+                className={cn(
+                  "flex items-center gap-3 text-left transition-all",
+                  isExpanded ? "p-3" : "aspect-square flex-col justify-center gap-2 p-3"
                 )}
-                <div className={cn("flex items-center gap-1 text-[10px] text-white/40 transition-transform", isExpanded && "rotate-180")}>
-                  <ChevronDown className="h-3 w-3" /> {isExpanded ? "Collapse" : "Expand"}
+              >
+                <div className={cn("flex h-12 w-12 shrink-0 items-center justify-center rounded-xl", c.solid)}>
+                  <Icon className="h-6 w-6" />
                 </div>
+                {isExpanded ? (
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-center gap-1.5">
+                      <span className={cn("flex h-5 w-5 items-center justify-center rounded-full border text-[10px] font-bold", c.ring, c.text)}>
+                        {idx + 1}
+                      </span>
+                      <h3 className="text-sm font-bold text-white">{card.title}</h3>
+                      {completion.complete && (
+                        <span className={cn("flex items-center gap-0.5 text-[10px] font-semibold", c.text)}>
+                          <CheckCircle className="h-3 w-3" /> Done
+                        </span>
+                      )}
+                    </div>
+                    <p className="mt-0.5 text-[11px] text-white/50">{card.subtitle}</p>
+                  </div>
+                ) : (
+                  <div className="flex flex-col items-center gap-1.5">
+                    <div className="flex items-center gap-1.5">
+                      <span className={cn("flex h-5 w-5 items-center justify-center rounded-full border text-[10px] font-bold", c.ring, c.text)}>
+                        {idx + 1}
+                      </span>
+                      <h3 className="text-xs font-bold text-white">{card.title}</h3>
+                    </div>
+                    <p className="text-[10px] leading-tight text-white/50">{card.subtitle}</p>
+                    <div className="flex items-center gap-1.5">
+                      <div className="h-1 w-16 rounded-full bg-white/10">
+                        <div
+                          className={cn("h-1 rounded-full transition-all", c.solid)}
+                          style={{ width: `${(completion.done / completion.total) * 100}%` }}
+                        />
+                      </div>
+                      <span className={cn("text-[9px] font-semibold", completion.complete ? c.text : "text-white/40")}>
+                        {completion.done}/{completion.total}
+                      </span>
+                    </div>
+                    {completion.complete && (
+                      <span className={cn("flex items-center gap-0.5 text-[9px] font-semibold", c.text)}>
+                        <CheckCircle className="h-2.5 w-2.5" /> Done
+                      </span>
+                    )}
+                    <div className={cn("flex items-center gap-0.5 text-[9px] text-white/40 transition-transform", isExpanded && "rotate-180")}>
+                      <ChevronDown className="h-2.5 w-2.5" /> Open
+                    </div>
+                  </div>
+                )}
+                {isExpanded && (
+                  <div className={cn("flex items-center gap-0.5 text-[10px] text-white/40 transition-transform rotate-180")}>
+                    <ChevronDown className="h-3 w-3" /> Close
+                  </div>
+                )}
               </button>
 
               {/* Expanded content — the questions */}
