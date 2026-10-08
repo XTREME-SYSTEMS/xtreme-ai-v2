@@ -39,6 +39,7 @@ import PackInbox from '@/pages/PackInbox';
 import MassWebsiteFactory from '@/pages/MassWebsiteFactory';
 import RankingMonitor from '@/pages/RankingMonitor';
 import VideoGenerator from '@/pages/VideoGenerator';
+import GptSync from '@/pages/GptSync';
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin, isAuthenticated } = useAuth();
@@ -80,6 +81,7 @@ const AuthenticatedApp = () => {
         <Route path="/onboarding" element={<OnboardingAssistant />} />
         <Route path="/projects" element={<Projects />} />
         <Route path="/video-generator" element={<VideoGenerator />} />
+        <Route path="/gpt-sync" element={<GptSync />} />
         <Route element={<Layout />}>
           <Route path="/client-portal" element={<Dashboard />} />
           <Route path="/business-generator" element={<BusinessGenerator />} />

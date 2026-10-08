@@ -1,5 +1,5 @@
 import { NavLink } from 'react-router-dom';
-const steps = [{ to: '/onboarding', label: 'Onboarding' }, { to: '/strategy-review', label: 'Strategy' }, { to: '/pack-inbox', label: 'Pack Inbox' }, { to: '/mass-website-factory', label: 'Mass Deploy' }, { to: '/ranking-monitor', label: 'Monitor' }, { to: '/video-generator', label: 'Video' }];
+const steps = [{ to: '/onboarding', label: 'Onboarding' }, { to: '/strategy-review', label: 'Strategy' }, { to: '/gpt-sync', label: 'GPT Sync' }, { to: '/pack-inbox', label: 'Pack Inbox' }, { to: '/mass-website-factory', label: 'Mass Deploy' }, { to: '/ranking-monitor', label: 'Monitor' }, { to: '/video-generator', label: 'Video' }];
 
 export default function StudioSteps({ projectId }) {
   return <nav className="flex shrink-0 items-center gap-1" aria-label="Growth pipeline steps">{steps.map((step, index) => <NavLink key={step.to} to={step.to === '/onboarding' ? `/onboarding${projectId ? `?project=${projectId}` : ''}` : `${step.to}${projectId ? `?session=${projectId}` : ''}`} className={({ isActive }) => `flex items-center gap-1.5 rounded-md px-2 py-1 text-[11px] ${isActive ? 'bg-secondary text-foreground' : 'text-muted-foreground hover:bg-secondary'}`}><span className="flex h-4 w-4 items-center justify-center rounded border border-border text-[10px]">{index + 1}</span><span>{step.label}</span></NavLink>)}</nav>;
