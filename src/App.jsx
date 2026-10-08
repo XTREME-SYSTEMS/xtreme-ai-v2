@@ -141,6 +141,9 @@ import BidEngine from '@/pages/BidEngine';
 import ApiKeyGenerator from '@/pages/ApiKeyGenerator';
 import SimulationLab from '@/pages/SimulationLab';
 import DigitalDominance from '@/pages/DigitalDominance';
+import OnboardingAssistant from '@/pages/OnboardingAssistant';
+import StrategyReview from '@/pages/StrategyReview';
+import PackInbox from '@/pages/PackInbox';
 import OAuthConsent from '@/pages/OAuthConsent';
 import Connect from '@/pages/Connect';
 import { PortalStudioProvider } from '@/lib/PortalStudioContext';
@@ -302,6 +305,9 @@ const AuthenticatedApp = () => {
       <Route path="/council-chamber" element={<CouncilChamber />} />
       <Route path="/simulation-lab" element={<SimulationLab />} />
       <Route path="/digital-dominance" element={<DigitalDominance />} />
+      <Route path="/onboarding" element={<OnboardingAssistant />} />
+      <Route path="/strategy-review" element={<StrategyReview />} />
+      <Route path="/pack-inbox" element={<PackInbox />} />
         </Route>
       </Route>
       {/* Xtreme AI — mobile device shell with bottom tab bar. Isolated

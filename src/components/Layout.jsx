@@ -41,14 +41,16 @@ const EMPLOYEE_PORTAL = { to: "/employee-portal", label: "Employee Portal", icon
 // spectrum (violet → cyan → emerald → gold → rose) instead of all-yellow.
 // All class strings are literals so Tailwind preserves them.
 const PIPELINE_STEPS = [
-  { to: "/pipeline-catalog", label: "Pipeline Catalog",   icon: Layers, step: 1, desc: "Browse packages, templates & tools",
+  { to: "/onboarding", label: "AI Onboarding", icon: Sparkles, step: 1, desc: "Answer questions — we skip-trace everything",
     color: { ring: "border-emerald-400 bg-emerald-400 text-white shadow-[0_0_14px_3px_rgba(52,211,153,0.45)]", text: "text-emerald-400", icon: "text-emerald-400", idle: "text-emerald-400/40" } },
-  { to: "/build-queue",      label: "Queue System",       icon: Boxes,  step: 2, desc: "Ideas queued for building",
+  { to: "/strategy-review", label: "Strategy Lock", icon: Brain, step: 2, desc: "Review & lock your strategy",
     color: { ring: "border-amber-400 bg-amber-400 text-white shadow-[0_0_14px_3px_rgba(0,71,255,0.45)]", text: "text-amber-600", icon: "text-amber-600", idle: "text-amber-600/40" } },
-  { to: "/mass-website-factory", label: "Mass Website Factory", icon: Factory, step: 3, desc: "Bulk produce websites from templates",
+  { to: "/pack-inbox", label: "Pack Inbox", icon: Inbox, step: 3, desc: "GPT mockups land here for review",
     color: { ring: "border-cyan-400 bg-cyan-400 text-white shadow-[0_0_14px_3px_rgba(34,211,238,0.45)]", text: "text-cyan-400", icon: "text-cyan-400", idle: "text-cyan-400/40" } },
-  { to: "/auto-builder",     label: "Auto Builder",       icon: Rocket, step: 4, desc: "Full builder pipeline",
+  { to: "/mass-website-factory", label: "Mass Deploy", icon: Rocket, step: 4, desc: "Spin up hundreds of sites",
     color: { ring: "border-rose-400 bg-rose-400 text-white shadow-[0_0_14px_3px_rgba(251,113,133,0.45)]", text: "text-rose-400", icon: "text-rose-400", idle: "text-rose-400/40" } },
+  { to: "/ranking-monitor", label: "Monitor", icon: Activity, step: 5, desc: "Track traffic & leads across all sites",
+    color: { ring: "border-violet-400 bg-violet-400 text-white shadow-[0_0_14px_3px_rgba(167,139,250,0.45)]", text: "text-violet-400", icon: "text-violet-400", idle: "text-violet-400/40" } },
 ];
 
 // Auto Builder sub-steps — the builder's own pipeline, shown as a nested
