@@ -3,7 +3,7 @@ import { base44 } from "@/api/base44Client";
 import {
   ClipboardList, Loader2, CheckCircle, RefreshCw, Target, TrendingUp,
   DollarSign, Sparkles, AlertTriangle, Rocket, Shield, Zap, Handshake,
-  Edit3, Users, Search, Share2, Filter, Bot,
+  Edit3, Users, Search, Share2, Filter, Bot, Activity,
 } from "lucide-react";
 import { useClientUser } from "@/hooks/useClientUser";
 import { useClientTrack } from "@/hooks/useClientTrack";
@@ -259,17 +259,25 @@ export default function Strategy() {
               <Edit3 className="h-4 w-4" /> Edit
             </button>
             {strategy.approved ? (
-              <BrandedButton
-                onClick={() => {
-                  const idx = visibleSteps.findIndex((s) => s.to === "/strategy");
-                  const next = idx >= 0 && idx < visibleSteps.length - 1 ? visibleSteps[idx + 1] : null;
-                  navigate(next ? next.to : "/business-name-studio");
-                }}
-                icon={Rocket}
-                showLogo
-              >
-                Activate & Continue to Next Step
-              </BrandedButton>
+              <>
+                <button
+                  onClick={() => navigate("/simulation-lab")}
+                  className="inline-flex items-center gap-1.5 rounded-lg border border-lime-400/40 bg-lime-400/10 px-4 py-2 text-sm font-medium text-lime-400 hover:bg-lime-400/20"
+                >
+                  <Activity className="h-4 w-4" /> Run Simulation
+                </button>
+                <BrandedButton
+                  onClick={() => {
+                    const idx = visibleSteps.findIndex((s) => s.to === "/strategy");
+                    const next = idx >= 0 && idx < visibleSteps.length - 1 ? visibleSteps[idx + 1] : null;
+                    navigate(next ? next.to : "/business-name-studio");
+                  }}
+                  icon={Rocket}
+                  showLogo
+                >
+                  Activate & Continue to Next Step
+                </BrandedButton>
+              </>
             ) : (
               <BrandedButton onClick={approve} icon={CheckCircle} showLogo>
                 Approve Strategy & Continue

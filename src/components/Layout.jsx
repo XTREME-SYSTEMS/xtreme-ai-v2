@@ -363,6 +363,34 @@ export default function Layout() {
             {COUNCIL_CHAMBER.label}
           </NavLink>
 
+          {/* Simulation Lab — Vision → Strategy → Monte Carlo projections */}
+          <NavLink
+            to="/simulation-lab"
+            end
+            onClick={() => setOpen(false)}
+            className={({ isActive }) => cn(
+              "flex items-center gap-2.5 rounded-lg px-2.5 py-2 text-sm transition-colors",
+              isActive ? "bg-amber-400/10 text-amber-600 font-semibold" : "text-black hover:bg-black/5"
+            )}
+          >
+            <Activity className="h-4 w-4 shrink-0" />
+            Simulation Lab
+          </NavLink>
+
+          {/* Digital Dominance — mass programmatic website deployment */}
+          <NavLink
+            to="/digital-dominance"
+            end
+            onClick={() => setOpen(false)}
+            className={({ isActive }) => cn(
+              "flex items-center gap-2.5 rounded-lg px-2.5 py-2 text-sm transition-colors",
+              isActive ? "bg-amber-400/10 text-amber-600 font-semibold" : "text-black hover:bg-black/5"
+            )}
+          >
+            <Globe className="h-4 w-4 shrink-0" />
+            Digital Dominance
+          </NavLink>
+
           {/* Employee Portal — for employees; admins see it too for oversight */}
           <NavLink
             to={EMPLOYEE_PORTAL.to}

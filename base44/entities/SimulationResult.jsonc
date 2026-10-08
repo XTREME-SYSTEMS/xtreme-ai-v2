@@ -1,8 +1,13 @@
 {
   "name": "SimulationResult",
   "type": "object",
-  "description": "A Monte Carlo simulation result for a business model, strategy, or decision. The simulator is a laboratory, not a fortune teller \u2014 it runs probabilistic projections across time horizons (1 week to 15 years) and scenarios (baseline, conservative, expected, optimistic, adverse, black-swan). Every projection shows uncertainty. Every variable is editable. When a variable changes, prior results are preserved for comparison.",
+  "description": "A Monte Carlo simulation result for a business model, strategy, or decision. The simulator is a laboratory, not a fortune teller \u2014 it runs probabilistic projections across time horizons (1 week to 15 years) and scenarios (baseline, conservative, expected, optimistic, adverse, black-swan). Every projection shows uncertainty. Every variable is editable. When a variable changes, prior results are preserved for comparison. The Digital Dominance simulation adds SEO traffic, domain authority, site count, keyword rankings, and market share projections alongside revenue/cost/profit.",
   "properties": {
+    "description": {
+      "type": "string",
+      "description": "Optional description (up to 1000 characters)",
+      "maxLength": 1000
+    },
     "simulation_name": {
       "type": "string",
       "description": "Human-readable name for this simulation"
@@ -17,7 +22,8 @@
         "market_entry",
         "product_launch",
         "cost_optimization",
-        "growth"
+        "growth",
+        "digital_dominance"
       ],
       "default": "business_model"
     },
@@ -31,7 +37,7 @@
     },
     "input_variables": {
       "type": "object",
-      "description": "The input variables used for this simulation run \u2014 customers, price, conversion, churn, CAC, LTV, margin, costs, etc.",
+      "description": "The input variables used for this simulation run \u2014 customers, price, conversion, churn, CAC, LTV, margin, costs, sites per month, traffic per site, etc.",
       "properties": {
         "customers": {
           "type": "number"
@@ -59,6 +65,27 @@
         },
         "growth_rate": {
           "type": "number"
+        },
+        "sites_per_month": {
+          "type": "number"
+        },
+        "avg_traffic_per_site": {
+          "type": "number"
+        },
+        "avg_revenue_per_site": {
+          "type": "number"
+        },
+        "domain_cost": {
+          "type": "number"
+        },
+        "hosting_cost_per_site": {
+          "type": "number"
+        },
+        "keywords_per_site": {
+          "type": "number"
+        },
+        "market_share_target": {
+          "type": "number"
         }
       }
     },
@@ -85,6 +112,7 @@
         "12_months",
         "2_years",
         "3_years",
+        "4_years",
         "5_years",
         "10_years",
         "15_years"
@@ -106,16 +134,13 @@
             "description": "e.g. 'month_1', 'year_1'"
           },
           "revenue_p50": {
-            "type": "number",
-            "description": "Median projected revenue"
+            "type": "number"
           },
           "revenue_p10": {
-            "type": "number",
-            "description": "10th percentile (adverse)"
+            "type": "number"
           },
           "revenue_p90": {
-            "type": "number",
-            "description": "90th percentile (optimistic)"
+            "type": "number"
           },
           "customers_p50": {
             "type": "number"
@@ -137,6 +162,38 @@
           },
           "profit_p90": {
             "type": "number"
+          },
+          "traffic_p50": {
+            "type": "number",
+            "description": "Total monthly organic traffic across all sites"
+          },
+          "traffic_p10": {
+            "type": "number"
+          },
+          "traffic_p90": {
+            "type": "number"
+          },
+          "site_count_p50": {
+            "type": "number",
+            "description": "Total deployed sites"
+          },
+          "site_count_p10": {
+            "type": "number"
+          },
+          "site_count_p90": {
+            "type": "number"
+          },
+          "domain_authority_p50": {
+            "type": "number",
+            "description": "Average domain authority (0-100)"
+          },
+          "keywords_ranking_p50": {
+            "type": "number",
+            "description": "Total keywords ranking in top 10"
+          },
+          "market_share_p50": {
+            "type": "number",
+            "description": "Estimated market share percentage"
           }
         }
       },
@@ -147,8 +204,7 @@
       "description": "Headline results",
       "properties": {
         "break_even_months": {
-          "type": "number",
-          "description": "Months until break-even (p50)"
+          "type": "number"
         },
         "expected_revenue_12m": {
           "type": "number"
@@ -157,20 +213,36 @@
           "type": "number"
         },
         "probability_of_success": {
-          "type": "number",
-          "description": "0-100 \u2014 P(profitable at horizon end)"
+          "type": "number"
         },
         "worst_case_loss": {
-          "type": "number",
-          "description": "Maximum projected loss (p10)"
+          "type": "number"
         },
         "best_case_gain": {
-          "type": "number",
-          "description": "Maximum projected gain (p90)"
+          "type": "number"
         },
         "expected_value": {
+          "type": "number"
+        },
+        "total_sites_projected": {
           "type": "number",
-          "description": "EV = P(success) \u00d7 upside - P(failure) \u00d7 downside"
+          "description": "Total sites at horizon end (p50)"
+        },
+        "total_traffic_projected": {
+          "type": "number",
+          "description": "Total monthly traffic at horizon end (p50)"
+        },
+        "total_keywords_projected": {
+          "type": "number",
+          "description": "Total keywords ranking at horizon end (p50)"
+        },
+        "avg_domain_authority_projected": {
+          "type": "number",
+          "description": "Average DA at horizon end (p50)"
+        },
+        "market_share_projected": {
+          "type": "number",
+          "description": "Market share at horizon end (p50)"
         }
       }
     },
@@ -183,40 +255,39 @@
             "type": "string"
           },
           "impact": {
-            "type": "number",
-            "description": "How much this variable affects the outcome (0-100)"
+            "type": "number"
           },
           "direction": {
-            "type": "string",
-            "description": "positive or negative"
+            "type": "string"
           }
         }
-      },
-      "description": "Which input variables have the biggest impact on the outcome \u2014 for interactive what-if analysis"
+      }
     },
     "assumptions": {
       "type": "array",
       "items": {
         "type": "string"
-      },
-      "description": "Key assumptions made \u2014 labeled explicitly so they can be challenged"
+      }
     },
     "uncertainty_notes": {
-      "type": "string",
-      "description": "Explicit statement of what is uncertain and why \u2014 never present simulation as certainty"
+      "type": "string"
     },
     "prior_result_id": {
-      "type": "string",
-      "description": "If this is a re-run with changed variables, the prior SimulationResult ID for comparison"
+      "type": "string"
     },
     "comparison_delta": {
       "type": "object",
-      "description": "If re-run, the delta from the prior result",
       "properties": {
         "revenue_delta": {
           "type": "number"
         },
         "profit_delta": {
+          "type": "number"
+        },
+        "traffic_delta": {
+          "type": "number"
+        },
+        "site_count_delta": {
           "type": "number"
         },
         "changed_variables": {

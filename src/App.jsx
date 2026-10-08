@@ -139,6 +139,8 @@ import XpsCatalog from '@/pages/XpsCatalog';
 import Preflight from '@/pages/Preflight';
 import BidEngine from '@/pages/BidEngine';
 import ApiKeyGenerator from '@/pages/ApiKeyGenerator';
+import SimulationLab from '@/pages/SimulationLab';
+import DigitalDominance from '@/pages/DigitalDominance';
 import OAuthConsent from '@/pages/OAuthConsent';
 import Connect from '@/pages/Connect';
 import { PortalStudioProvider } from '@/lib/PortalStudioContext';
@@ -298,6 +300,8 @@ const AuthenticatedApp = () => {
       <Route path="/bid-engine" element={<BidEngine />} />
       <Route path="/api-keys" element={<ApiKeyGenerator />} />
       <Route path="/council-chamber" element={<CouncilChamber />} />
+      <Route path="/simulation-lab" element={<SimulationLab />} />
+      <Route path="/digital-dominance" element={<DigitalDominance />} />
         </Route>
       </Route>
       {/* Xtreme AI — mobile device shell with bottom tab bar. Isolated
