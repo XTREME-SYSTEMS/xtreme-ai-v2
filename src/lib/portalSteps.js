@@ -3,7 +3,7 @@ import {
   Video, LayoutTemplate, FileSignature, ShieldCheck, Rocket, Sparkles,
   LayoutDashboard, Settings, Compass, Box, FolderOpen,
   Cpu, Database, ClipboardCheck, Code, Server,
-  Eye, ClipboardList,
+  Eye, ClipboardList, Brain, Inbox, Radar, Activity,
 } from "lucide-react";
 
 // ─────────────────────────────────────────────────────────────────────────
