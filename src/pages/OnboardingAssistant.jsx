@@ -1,41 +1,29 @@
 import React, { useState, useEffect, useCallback } from "react";
-import { useNavigate } from "react-router-dom";
 import { base44 } from "@/api/base44Client";
 import { Loader2 } from "lucide-react";
-import StudioSidebar from "@/components/studio/StudioSidebar";
+import StudioTopBar from "@/components/studio/StudioTopBar";
 import ChatPanel from "@/components/studio/ChatPanel";
+import VisualEditor from "@/components/studio/VisualEditor";
 import Workbench from "@/components/studio/Workbench";
 
-// The Studio — a three-column dark workspace.
-// Left: narrow sidebar (nav, sessions, profile)
-// Middle: chat command shell (onboarding Q&A + GPT commands)
-// Right: workbench (arsenal, ChatGPT control, intake form, intelligence, preview, packs)
+// The Studio — two-panel workspace with a top step strip.
+// Page "studio": Chat (left) + Visual Editor (right)
+// Page "workbench": Arsenal, ChatGPT control, intake form, intelligence, packs (full width)
 export default function OnboardingAssistant() {
-  const navigate = useNavigate();
   const [session, setSession] = useState(null);
   const [traceResults, setTraceResults] = useState({});
   const [creating, setCreating] = useState(true);
   const [packs, setPacks] = useState([]);
   const [actionLoading, setActionLoading] = useState(null);
-  const [sessions, setSessions] = useState([]);
   const [user, setUser] = useState(null);
+  const [view, setView] = useState("studio"); // "studio" | "workbench"
 
-  // Create or load session on mount
   useEffect(() => {
     async function initSession() {
       setCreating(true);
       try {
         const me = await base44.auth.me();
         setUser(me);
-
-        // Load recent sessions for sidebar
-        try {
-          const sessRes = await base44.entities.OnboardingSession.filter(
-            { user_email: me.email },
-            { sort: "-created_date", limit: 10 }
-          );
-          setSessions(sessRes.items || sessRes || []);
-        } catch {}
 
         const existing = await base44.entities.OnboardingSession.filter(
           { user_email: me.email, status: { $in: ["onboarding", "strategy_locked", "pack_pending"] } },
@@ -53,12 +41,9 @@ export default function OnboardingAssistant() {
             answers: {},
           });
           setSession(newSession);
-          setSessions(prev => [newSession, ...prev]);
         }
         loadPacks(me.email);
-      } catch (e) {
-        console.error(e);
-      }
+      } catch (e) { console.error(e); }
       setCreating(false);
     }
     initSession();
@@ -69,17 +54,12 @@ export default function OnboardingAssistant() {
       const query = email ? { user_email: email } : {};
       const res = await base44.entities.GptPack.filter(query, { sort: "-created_date", limit: 20 });
       setPacks(res.items || res || []);
-    } catch (e) {
-      console.error(e);
-    }
+    } catch (e) { console.error(e); }
   }, []);
 
-  // Poll for new packs every 10 seconds
   useEffect(() => {
     if (!user) return;
-    const interval = setInterval(() => {
-      loadPacks(user.email);
-    }, 10000);
+    const interval = setInterval(() => loadPacks(user.email), 10000);
     return () => clearInterval(interval);
   }, [user, loadPacks]);
 
@@ -92,14 +72,11 @@ export default function OnboardingAssistant() {
     try {
       const me = await base44.auth.me();
       await base44.entities.GptPack.update(pack.id, {
-        status: "approved",
-        approved_by: me.email,
-        approved_at: new Date().toISOString(),
+        status: "approved", approved_by: me.email, approved_at: new Date().toISOString(),
       });
       if (session) {
         await base44.entities.OnboardingSession.update(session.id, {
-          status: "pack_approved",
-          approved_pack_id: pack.id,
+          status: "pack_approved", approved_pack_id: pack.id,
         });
       }
       if (user) loadPacks(user.email);
@@ -122,46 +99,18 @@ export default function OnboardingAssistant() {
       const me = await base44.auth.me();
       await base44.entities.GptPack.create({
         name: `Pasted Mockup ${new Date().toLocaleTimeString()}`,
-        kind: "web_pack",
-        preview_html: html,
-        status: "pending",
-        source: "manual_paste",
-        submitted_by_label: "You",
-        session_id: session.session_id || session.id,
-        user_email: me.email,
+        kind: "web_pack", preview_html: html, status: "pending",
+        source: "manual_paste", submitted_by_label: "You",
+        session_id: session.session_id || session.id, user_email: me.email,
       });
       if (user) loadPacks(user.email);
-    } catch (e) {
-      console.error(e);
-      throw e;
-    }
+    } catch (e) { console.error(e); throw e; }
   }, [session, user, loadPacks]);
-
-  const handleNewChat = useCallback(async () => {
-    if (!user) return;
-    try {
-      const newSession = await base44.entities.OnboardingSession.create({
-        user_email: user.email,
-        status: "onboarding",
-        current_step: 0,
-        answers: {},
-      });
-      setSession(newSession);
-      setTraceResults({});
-      setSessions(prev => [newSession, ...prev]);
-      window.location.href = "/onboarding";
-    } catch (e) { console.error(e); }
-  }, [user]);
-
-  const handleSelectSession = useCallback((s) => {
-    setSession(s);
-    if (s.answers) setTraceResults(s.answers);
-  }, []);
 
   if (creating) {
     return (
       <div className="flex h-full items-center justify-center bg-[#0d0d0d]">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+        <Loader2 className="h-8 w-8 animate-spin" style={{ color: "#FF8C00" }} />
       </div>
     );
   }
@@ -169,44 +118,53 @@ export default function OnboardingAssistant() {
   const previewPack = packs.find(p => p.preview_html && p.status === "pending") || packs.find(p => p.preview_html);
 
   return (
-    <div className="flex h-[calc(100vh-3.5rem)] overflow-hidden bg-[#0d0d0d]">
-      {/* Left: Sidebar */}
-      <StudioSidebar
-        user={user}
-        sessions={sessions}
-        activeSessionId={session?.id}
-        onSelectSession={handleSelectSession}
-        onNewChat={handleNewChat}
-      />
+    <div className="flex h-[calc(100vh-3.5rem)] flex-col overflow-hidden bg-[#0d0d0d]">
+      {/* Top strip — steps + page toggle + profile */}
+      <StudioTopBar user={user} view={view} onToggleView={() => setView(view === "studio" ? "workbench" : "studio")} />
 
-      {/* Middle: Chat */}
-      <div className="w-[420px] shrink-0">
-        <ChatPanel
-          session={session}
-          setSession={setSession}
-          traceResults={traceResults}
-          setTraceResults={setTraceResults}
-          onOnboardingComplete={handleOnboardingComplete}
-          onPackRefresh={() => user && loadPacks(user.email)}
-          previewHtml={previewPack?.preview_html}
-        />
-      </div>
-
-      {/* Right: Workbench */}
-      <div className="flex-1 min-w-0">
-        <Workbench
-          session={session}
-          traceResults={traceResults}
-          setTraceResults={setTraceResults}
-          packs={packs}
-          onApprove={approvePack}
-          onReject={rejectPack}
-          onPasteHtml={handlePasteHtml}
-          onPackRefresh={() => user && loadPacks(user.email)}
-          actionLoading={actionLoading}
-          previewPack={previewPack}
-        />
-      </div>
+      {/* Main area */}
+      {view === "studio" ? (
+        <div className="flex flex-1 overflow-hidden">
+          {/* Left: Chat */}
+          <div className="w-[400px] shrink-0">
+            <ChatPanel
+              session={session}
+              setSession={setSession}
+              traceResults={traceResults}
+              setTraceResults={setTraceResults}
+              onOnboardingComplete={handleOnboardingComplete}
+              onPackRefresh={() => user && loadPacks(user.email)}
+              previewHtml={previewPack?.preview_html}
+            />
+          </div>
+          {/* Right: Full visual editor */}
+          <div className="flex-1 min-w-0">
+            <VisualEditor
+              activePack={previewPack}
+              onApprove={approvePack}
+              onReject={rejectPack}
+              onPasteHtml={handlePasteHtml}
+              actionLoading={actionLoading}
+            />
+          </div>
+        </div>
+      ) : (
+        /* Workbench page — full width */
+        <div className="flex-1 overflow-hidden">
+          <Workbench
+            session={session}
+            traceResults={traceResults}
+            setTraceResults={setTraceResults}
+            packs={packs}
+            onApprove={approvePack}
+            onReject={rejectPack}
+            onPasteHtml={handlePasteHtml}
+            onPackRefresh={() => user && loadPacks(user.email)}
+            actionLoading={actionLoading}
+            previewPack={previewPack}
+          />
+        </div>
+      )}
     </div>
   );
 }
