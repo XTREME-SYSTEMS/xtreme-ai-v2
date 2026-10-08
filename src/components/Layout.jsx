@@ -8,7 +8,7 @@ import {
   BookMarked, CheckCircle, ScrollText, Plug, Settings, LogOut, Menu, X,
   MapPin, Plus, Rocket, Bot, LayoutTemplate, Copy, Wand2, Crosshair, Activity, Radar, Package, UserPlus, Tag, Box, ShieldAlert, Sparkles, Brain,
   Archive, ChevronDown, Compass, Building2, MessageSquareText, PenTool, Shirt, Share2, Video, Layers,
-  ClipboardList, Key,
+  ClipboardList, Key, Inbox,
 } from "lucide-react";
 import { Image } from "@/components/ui/image";
 import { cn } from "@/lib/utils";
@@ -221,195 +221,22 @@ export default function Layout() {
             {PIPELINE_OVERVIEW.label}
           </NavLink>
 
-          {/* Product Catalog — finished, validated products ready for deployment */}
-          {(hasFullAccess || hasAccessToPage(userCaps, PRODUCT_CATALOG.to)) && (
+          {/* Start Growth Pipeline — the only primary action */}
           <NavLink
-            to={PRODUCT_CATALOG.to}
-            end={PRODUCT_CATALOG.end}
+            to="/onboarding"
             onClick={() => setOpen(false)}
             className={({ isActive }) => cn(
-              "flex items-center gap-2.5 rounded-lg px-2.5 py-2 text-sm transition-colors",
-              isActive ? "bg-amber-400/10 text-amber-600 font-semibold" : "text-black hover:bg-black/5"
+              "mt-2 flex items-center justify-center gap-2 rounded-xl bg-primary px-4 py-3 text-sm font-bold text-primary-foreground transition-colors hover:bg-primary/90",
+              isActive && "ring-2 ring-primary ring-offset-2"
             )}
           >
-            <Package className="h-4 w-4 shrink-0" />
-            {PRODUCT_CATALOG.label}
-          </NavLink>
-          )}
-
-          {/* XPS Products & Inventory — Xtreme Polishing Systems catalog + inventory */}
-          <NavLink
-            to="/xps-catalog"
-            end
-            onClick={() => setOpen(false)}
-            className={({ isActive }) => cn(
-              "flex items-center gap-2.5 rounded-lg px-2.5 py-2 text-sm transition-colors",
-              isActive ? "bg-amber-400/10 text-amber-600 font-semibold" : "text-black hover:bg-black/5"
-            )}
-          >
-            <Boxes className="h-4 w-4 shrink-0" />
-            XPS Products &amp; Inventory
-          </NavLink>
-
-          {/* Preflight — launch readiness check & score */}
-          <NavLink
-            to="/preflight"
-            end
-            onClick={() => setOpen(false)}
-            className={({ isActive }) => cn(
-              "flex items-center gap-2.5 rounded-lg px-2.5 py-2 text-sm transition-colors",
-              isActive ? "bg-amber-400/10 text-amber-600 font-semibold" : "text-black hover:bg-black/5"
-            )}
-          >
-            <ShieldCheck className="h-4 w-4 shrink-0" />
-            Preflight Launch Check
-          </NavLink>
-
-          {/* Prompt Library — self-optimization prompts */}
-          <NavLink
-            to="/prompt-library"
-            end
-            onClick={() => setOpen(false)}
-            className={({ isActive }) => cn(
-              "flex items-center gap-2.5 rounded-lg px-2.5 py-2 text-sm transition-colors",
-              isActive ? "bg-amber-400/10 text-amber-600 font-semibold" : "text-black hover:bg-black/5"
-            )}
-          >
-            <Brain className="h-4 w-4 shrink-0" />
-            Prompt Library
-          </NavLink>
-
-          {/* Lead Engine — autonomous scraping + outreach system */}
-          {(hasFullAccess || hasAccessToPage(userCaps, LEAD_ENGINE.to)) && (
-          <NavLink
-            to={LEAD_ENGINE.to}
-            end={LEAD_ENGINE.end}
-            onClick={() => setOpen(false)}
-            className={({ isActive }) => cn(
-              "flex items-center gap-2.5 rounded-lg px-2.5 py-2 text-sm transition-colors",
-              isActive ? "bg-amber-400/10 text-amber-600 font-semibold" : "text-black hover:bg-black/5"
-            )}
-          >
-            <Radar className="h-4 w-4 shrink-0" />
-            {LEAD_ENGINE.label}
-          </NavLink>
-          )}
-
-          {/* Visualizer Inbox — customer floor visualizer sessions & estimates */}
-          <NavLink
-            to={VISUALIZER_INBOX.to}
-            end={VISUALIZER_INBOX.end}
-            onClick={() => setOpen(false)}
-            className={({ isActive }) => cn(
-              "flex items-center gap-2.5 rounded-lg px-2.5 py-2 text-sm transition-colors",
-              isActive ? "bg-amber-400/10 text-amber-600 font-semibold" : "text-black hover:bg-black/5"
-            )}
-          >
-            <Eye className="h-4 w-4 shrink-0" />
-            {VISUALIZER_INBOX.label}
-          </NavLink>
-
-          {/* Bid Engine — XPS-powered professional quote generator */}
-          <NavLink
-            to="/bid-engine"
-            end
-            onClick={() => setOpen(false)}
-            className={({ isActive }) => cn(
-              "flex items-center gap-2.5 rounded-lg px-2.5 py-2 text-sm transition-colors",
-              isActive ? "bg-amber-400/10 text-amber-600 font-semibold" : "text-black hover:bg-black/5"
-            )}
-          >
-            <ClipboardList className="h-4 w-4 shrink-0" />
-            Bid Engine
-          </NavLink>
-
-          {/* API Key Generator — manage external access keys */}
-          <NavLink
-            to="/api-keys"
-            end
-            onClick={() => setOpen(false)}
-            className={({ isActive }) => cn(
-              "flex items-center gap-2.5 rounded-lg px-2.5 py-2 text-sm transition-colors",
-              isActive ? "bg-amber-400/10 text-amber-600 font-semibold" : "text-black hover:bg-black/5"
-            )}
-          >
-            <Key className="h-4 w-4 shrink-0" />
-            API Key Generator
-          </NavLink>
-
-          {/* Connect AI — link ChatGPT/Claude/Cursor to operate this system */}
-          <NavLink
-            to="/connect"
-            end
-            onClick={() => setOpen(false)}
-            className={({ isActive }) => cn(
-              "flex items-center gap-2.5 rounded-lg px-2.5 py-2 text-sm transition-colors",
-              isActive ? "bg-amber-400/10 text-amber-600 font-semibold" : "text-black hover:bg-black/5"
-            )}
-          >
-            <Bot className="h-4 w-4 shrink-0" />
-            AUTO BUILDER
-          </NavLink>
-
-          {/* Council Chamber — multi-agent council debate + simulation lab */}
-          <NavLink
-            to={COUNCIL_CHAMBER.to}
-            end={COUNCIL_CHAMBER.end}
-            onClick={() => setOpen(false)}
-            className={({ isActive }) => cn(
-              "flex items-center gap-2.5 rounded-lg px-2.5 py-2 text-sm transition-colors",
-              isActive ? "bg-amber-400/10 text-amber-600 font-semibold" : "text-black hover:bg-black/5"
-            )}
-          >
-            <Brain className="h-4 w-4 shrink-0" />
-            {COUNCIL_CHAMBER.label}
-          </NavLink>
-
-          {/* Simulation Lab — Vision → Strategy → Monte Carlo projections */}
-          <NavLink
-            to="/simulation-lab"
-            end
-            onClick={() => setOpen(false)}
-            className={({ isActive }) => cn(
-              "flex items-center gap-2.5 rounded-lg px-2.5 py-2 text-sm transition-colors",
-              isActive ? "bg-amber-400/10 text-amber-600 font-semibold" : "text-black hover:bg-black/5"
-            )}
-          >
-            <Activity className="h-4 w-4 shrink-0" />
-            Simulation Lab
-          </NavLink>
-
-          {/* Digital Dominance — mass programmatic website deployment */}
-          <NavLink
-            to="/digital-dominance"
-            end
-            onClick={() => setOpen(false)}
-            className={({ isActive }) => cn(
-              "flex items-center gap-2.5 rounded-lg px-2.5 py-2 text-sm transition-colors",
-              isActive ? "bg-amber-400/10 text-amber-600 font-semibold" : "text-black hover:bg-black/5"
-            )}
-          >
-            <Globe className="h-4 w-4 shrink-0" />
-            Digital Dominance
-          </NavLink>
-
-          {/* Employee Portal — for employees; admins see it too for oversight */}
-          <NavLink
-            to={EMPLOYEE_PORTAL.to}
-            end={EMPLOYEE_PORTAL.end}
-            onClick={() => setOpen(false)}
-            className={({ isActive }) => cn(
-              "flex items-center gap-2.5 rounded-lg px-2.5 py-2 text-sm transition-colors",
-              isActive ? "bg-amber-400/10 text-amber-600 font-semibold" : "text-black hover:bg-black/5"
-            )}
-          >
-            <Users className="h-4 w-4 shrink-0" />
-            {EMPLOYEE_PORTAL.label}
+            <Sparkles className="h-4 w-4" />
+            Start Growth Pipeline
           </NavLink>
 
           {/* Timeline header — prominent, with a gradient accent rule */}
           <div className="mt-5 mb-2 flex items-center gap-2 px-1">
-            <span className="text-xs font-bold uppercase tracking-[0.22em] text-amber-600">Autonomous Pipeline</span>
+            <span className="text-xs font-bold uppercase tracking-[0.22em] text-amber-600">Growth Pipeline</span>
             <div className="h-px flex-1 bg-gradient-to-r from-amber-400/40 via-black/10 to-transparent" />
           </div>
 
