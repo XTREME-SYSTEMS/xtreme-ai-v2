@@ -17,7 +17,7 @@ import ExpandableLineItems from "@/components/client/ExpandableLineItems";
 import { useRevisionThreads } from "@/hooks/useRevisionThreads";
 import RevisionThreadPanel from "@/components/client/RevisionThreadPanel";
 import SystemActivities from "@/components/client/SystemActivities";
-import VisionGeneratorPanel from "@/components/client/VisionGeneratorPanel";
+import OnboardingCardGrid from "@/components/client/OnboardingCardGrid";
 import StartNewProjectButton from "@/components/client/StartNewProjectButton";
 
 // The Business Generator — the top-level destination of the client portal.
@@ -156,8 +156,8 @@ export default function BusinessGenerator() {
         </div>
       </div>
 
-      {/* ── Vision Generator — AI-assisted, discovery-driven vision builder ── */}
-      <VisionGeneratorPanel />
+      {/* ── 4-Card Onboarding Grid — Vision, Strategy, Business, Content ── */}
+      <OnboardingCardGrid />
 
       {/* System capabilities — orients the user on everything they can do */}
       <SystemActivities />
