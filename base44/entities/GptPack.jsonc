@@ -1,16 +1,15 @@
 {
   "name": "GptPack",
   "type": "object",
-  "description": "A website mockup pack received from GPT (or any external tool) via the ingestPack sync endpoint. Packs land as pending review \u2014 nothing goes live until the user approves. Once approved, the pack can be deployed to a single live domain and then mass-deployed across hundreds/thousands of city/niche variations.",
+  "description": "A brand asset pack received from GPT via the ingestPack sync endpoint. Packs land as pending review and are grouped in sets of 3 versions (version_group_id) for each asset type (kind). Nothing goes live until the user approves.",
   "properties": {
     "description": {
       "type": "string",
-      "description": "Optional description (up to 1000 characters)",
       "maxLength": 1000
     },
     "name": {
       "type": "string",
-      "description": "Name/label for this pack (e.g. 'Hero Mockup v2')"
+      "description": "Name/label for this pack"
     },
     "kind": {
       "type": "string",
@@ -19,36 +18,44 @@
         "brand_pack",
         "marketing_pack",
         "social_pack",
-        "video_pack"
+        "video_pack",
+        "logo_pack"
       ],
       "default": "web_pack",
-      "description": "What kind of pack this is"
+      "description": "What kind of asset this is"
     },
     "preview_html": {
       "type": "string",
-      "description": "The full HTML of the mockup \u2014 this is what gets reviewed and deployed"
+      "description": "Full HTML of the mockup"
     },
     "brand_tokens": {
       "type": "string",
-      "description": "JSON string of brand tokens (colors, fonts, etc.)"
+      "description": "JSON string of brand tokens"
     },
     "source": {
       "type": "string",
-      "default": "gpt_sync",
-      "description": "Where this pack came from (gpt_sync, manual_upload)"
+      "default": "gpt_sync"
     },
     "submitted_by_label": {
       "type": "string",
-      "default": "GPT",
-      "description": "Who submitted this pack (display label)"
+      "default": "GPT"
     },
     "session_id": {
       "type": "string",
-      "description": "The OnboardingSession this pack is for (links strategy \u2192 mockup)"
+      "description": "The OnboardingSession this pack is for"
     },
     "user_email": {
       "type": "string",
       "description": "Owner email for RLS isolation"
+    },
+    "version_number": {
+      "type": "number",
+      "default": 1,
+      "description": "Version 1, 2, or 3 within the group"
+    },
+    "version_group_id": {
+      "type": "string",
+      "description": "Groups 3 versions of the same asset type together"
     },
     "status": {
       "type": "string",
@@ -58,12 +65,10 @@
         "rejected",
         "deployed"
       ],
-      "default": "pending",
-      "description": "Review status \u2014 pending = waiting for user approval, approved = user approved, rejected = user rejected, deployed = live on a domain"
+      "default": "pending"
     },
     "review_notes": {
-      "type": "string",
-      "description": "Admin/user notes during review"
+      "type": "string"
     },
     "approved_by": {
       "type": "string"
@@ -73,12 +78,10 @@
       "format": "date-time"
     },
     "deployed_url": {
-      "type": "string",
-      "description": "Live URL once deployed"
+      "type": "string"
     },
     "deployed_site_id": {
-      "type": "string",
-      "description": "ID of the DeployedSite record once live"
+      "type": "string"
     }
   },
   "required": [

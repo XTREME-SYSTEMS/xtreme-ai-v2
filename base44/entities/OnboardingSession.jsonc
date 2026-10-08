@@ -34,6 +34,23 @@
       "type": "string",
       "description": "Original website pack opened in this project"
     },
+    "client_phone": {
+      "type": "string",
+      "description": "Client's phone number"
+    },
+    "client_address": {
+      "type": "string",
+      "description": "Client's full street address"
+    },
+    "business_type": {
+      "type": "string",
+      "enum": [
+        "new",
+        "ai_enhancement",
+        "rebrand"
+      ],
+      "description": "new = new business, ai_enhancement = AI enhancements, rebrand = rebrand existing"
+    },
     "status": {
       "type": "string",
       "enum": [

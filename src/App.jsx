@@ -40,6 +40,8 @@ import MassWebsiteFactory from '@/pages/MassWebsiteFactory';
 import RankingMonitor from '@/pages/RankingMonitor';
 import VideoGenerator from '@/pages/VideoGenerator';
 import GptSync from '@/pages/GptSync';
+import PipelineFlow from '@/pages/PipelineFlow';
+import ClientOnboarding from '@/pages/ClientOnboarding';
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin, isAuthenticated } = useAuth();
@@ -73,6 +75,7 @@ const AuthenticatedApp = () => {
       <Route path="/contact" element={<Contact />} />
       <Route path="/sign/:token" element={<SignPortal />} />
       <Route path="/walkthrough/:token" element={<WalkthroughView />} />
+      <Route path="/onboarding-form" element={<ClientOnboarding />} />
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
       <Route path="/forgot-password" element={<ForgotPassword />} />
@@ -82,6 +85,7 @@ const AuthenticatedApp = () => {
         <Route path="/projects" element={<Projects />} />
         <Route path="/video-generator" element={<VideoGenerator />} />
         <Route path="/gpt-sync" element={<GptSync />} />
+      <Route path="/pipeline-flow" element={<PipelineFlow />} />
         <Route element={<Layout />}>
           <Route path="/client-portal" element={<Dashboard />} />
           <Route path="/business-generator" element={<BusinessGenerator />} />

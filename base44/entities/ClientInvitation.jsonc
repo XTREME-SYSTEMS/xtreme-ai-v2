@@ -1,0 +1,94 @@
+{
+  "name": "ClientInvitation",
+  "type": "object",
+  "description": "An invitation sent to a client to begin the deterministic onboarding pipeline. The admin enters the client's contact info and business type; the system emails them a link to the public onboarding form. Once the client completes the form, an OnboardingSession is created and skip-tracing begins.",
+  "properties": {
+    "description": {
+      "type": "string",
+      "maxLength": 1000
+    },
+    "admin_email": {
+      "type": "string",
+      "description": "Admin who sent the invitation"
+    },
+    "client_name": {
+      "type": "string",
+      "description": "Client's full name"
+    },
+    "client_email": {
+      "type": "string",
+      "description": "Client's email address"
+    },
+    "client_phone": {
+      "type": "string",
+      "description": "Client's phone number (optional, for text)"
+    },
+    "business_type": {
+      "type": "string",
+      "enum": [
+        "new",
+        "ai_enhancement",
+        "rebrand"
+      ],
+      "description": "new = new business, ai_enhancement = AI enhancements to current business, rebrand = rebrand existing business"
+    },
+    "invitation_token": {
+      "type": "string",
+      "description": "Unique token for the public onboarding link"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "sent",
+        "opened",
+        "completed",
+        "expired"
+      ],
+      "default": "sent"
+    },
+    "session_id": {
+      "type": "string",
+      "description": "OnboardingSession ID once the client completes onboarding"
+    },
+    "sent_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "opened_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "completed_at": {
+      "type": "string",
+      "format": "date-time"
+    }
+  },
+  "required": [
+    "admin_email",
+    "client_email",
+    "invitation_token",
+    "status"
+  ],
+  "rls": {
+    "read": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "create": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}
