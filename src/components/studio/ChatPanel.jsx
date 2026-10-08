@@ -2,12 +2,13 @@ import React, { useState, useRef, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
 import {
   ArrowRight, Loader2, AlertCircle, Sparkles, Radar,
-  CheckCircle2, Brain, Send, Bot, User,
+  CheckCircle2, Send, Bot, User, Plus, BookOpen, Paperclip, Mic,
+  Zap,
 } from "lucide-react";
 import { ONBOARDING_QUESTIONS } from "@/lib/onboardingQuestions";
 import { cn } from "@/lib/utils";
 
-// The chat panel — left side of the studio.
+// Middle panel — the command shell chat.
 // Phase 1: structured onboarding Q&A (AI asks, user answers, skip-trace runs).
 // Phase 2: free-form chat — user tells GPT what website to build / change.
 export default function ChatPanel({
@@ -18,26 +19,29 @@ export default function ChatPanel({
   const [input, setInput] = useState("");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState(null);
-  const [phase, setPhase] = useState("onboarding"); // onboarding | chat
+  const [phase, setPhase] = useState("onboarding");
   const [step, setStep] = useState(0);
+  const [seeded, setSeeded] = useState(false);
   const scrollRef = useRef(null);
 
   // Seed the first AI question when the session loads
   useEffect(() => {
-    if (!session) return;
-    if (session.current_step >= ONBOARDING_QUESTIONS.length) {
+    if (!session || seeded) return;
+    const startStep = session.current_step || 0;
+    if (startStep >= ONBOARDING_QUESTIONS.length) {
       setPhase("chat");
       setMessages([
-        { role: "ai", text: "Onboarding complete! Your strategy is ready. Tell me what kind of website you want to build, or say \"generate website\" to start.", ts: Date.now() },
+        { role: "ai", text: "Onboarding complete. Your strategy is locked. Tell me what website to build — say \"generate website\" or describe what you want.", ts: Date.now() },
       ]);
     } else {
-      setStep(session.current_step || 0);
-      const q = ONBOARDING_QUESTIONS[session.current_step || 0];
+      setStep(startStep);
+      const q = ONBOARDING_QUESTIONS[startStep];
       setMessages([
         { role: "ai", text: q.question, hint: q.hint, ts: Date.now() },
       ]);
     }
-  }, [session]);
+    setSeeded(true);
+  }, [session, seeded]);
 
   // Auto-scroll to bottom
   useEffect(() => {
@@ -45,34 +49,6 @@ export default function ChatPanel({
       scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
     }
   }, [messages, busy]);
-
-  // Rebuild messages from traceResults when session has prior answers
-  useEffect(() => {
-    if (!session || messages.length > 0) return;
-    const prior = Object.entries(traceResults);
-    if (prior.length === 0) return;
-    const rebuilt = [];
-    prior.forEach(([key, val], idx) => {
-      if (!val) return;
-      const q = ONBOARDING_QUESTIONS.find((x) => x.key === key);
-      if (q) rebuilt.push({ role: "ai", text: q.question, ts: idx });
-      rebuilt.push({ role: "user", text: val.answer_text, ts: idx + 0.5 });
-      if (val.trace) {
-        rebuilt.push({
-          role: "system", text: `Skip-trace complete: ${val.trace.competitors?.length || 0} competitors found, ${val.trace.sources?.length || 0} sources, ${val.trace.confidence_score || 50}% confidence.`,
-          ts: idx + 0.6,
-        });
-      }
-    });
-    const nextQ = ONBOARDING_QUESTIONS[session.current_step];
-    if (nextQ && session.current_step < ONBOARDING_QUESTIONS.length) {
-      rebuilt.push({ role: "ai", text: nextQ.question, hint: nextQ.hint, ts: Date.now() });
-    } else if (session.current_step >= ONBOARDING_QUESTIONS.length) {
-      setPhase("chat");
-      rebuilt.push({ role: "ai", text: "Onboarding complete! Tell me what website to build.", ts: Date.now() });
-    }
-    setMessages(rebuilt);
-  }, [session]);
 
   const submitOnboarding = async () => {
     if (!input.trim() || !session || busy) return;
@@ -108,10 +84,9 @@ export default function ChatPanel({
       };
       setTraceResults(newAnswers);
 
-      // System message with trace summary
       setMessages(prev => [...prev, {
         role: "system",
-        text: `Researched "${userText}" — found ${traceData?.competitors?.length || 0} competitors, ${traceData?.sources?.length || 0} sources.`,
+        text: `Researched "${userText}" — ${traceData?.competitors?.length || 0} competitors, ${traceData?.sources?.length || 0} sources, ${traceData?.confidence_score || 50}% confidence.`,
         trace: traceData,
         ts: Date.now(),
       }]);
@@ -126,7 +101,7 @@ export default function ChatPanel({
         setPhase("chat");
         setMessages(prev => [...prev, {
           role: "ai",
-          text: "All questions answered! Your strategy is locked. Tell me what website to build — say \"generate website\" or describe what you want.",
+          text: "All questions answered. Strategy locked. Tell me what website to build, or say \"generate website\".",
           ts: Date.now(),
         }]);
         onOnboardingComplete?.(session.session_id || session.id);
@@ -138,7 +113,7 @@ export default function ChatPanel({
         }]);
       }
     } catch (e) {
-      setError(e.message || "Research failed. You can continue.");
+      setError(e.message || "Research failed.");
       setMessages(prev => [...prev, {
         role: "system", text: "Research failed — you can continue anyway.", ts: Date.now(), error: true,
       }]);
@@ -154,131 +129,162 @@ export default function ChatPanel({
     setBusy(true);
 
     try {
-      // If the user asks to generate a website, lock the strategy + send brief
       const wantsGenerate = /generate|build|create|make.*website|website/i.test(userText);
 
       if (wantsGenerate && !previewHtml) {
-        // Lock strategy first (if not already locked)
         const lockRes = await base44.functions.invoke("lockStrategy", {
           session_id: session.session_id || session.id,
         });
         setMessages(prev => [...prev, {
           role: "ai",
-          text: `Strategy locked. Here's your website brief — copy it into ChatGPT and paste the result back, or use the sync endpoint:\n\n${lockRes.data?.website_brief || lockRes.data?.strategy_summary || "Brief generated."}`,
+          text: `Strategy locked. Website brief ready — copy it into ChatGPT or use the sync endpoint. The mockup will appear in the workbench preview tab.\n\n${(lockRes.data?.website_brief || lockRes.data?.strategy_summary || "Brief generated.").slice(0, 500)}...`,
           ts: Date.now(),
         }]);
       } else {
-        // General chat — acknowledge and refresh packs
         setMessages(prev => [...prev, {
           role: "ai",
-          text: "Got it. When GPT sends a mockup via the sync endpoint, it'll appear in the visual editor on the right. You can also paste HTML directly using the \"Paste HTML\" button in the editor.",
+          text: "Got it. When GPT sends a mockup via the sync endpoint, it appears in the workbench Preview tab. You can also paste HTML there directly.",
           ts: Date.now(),
         }]);
       }
       onPackRefresh?.();
     } catch (e) {
       setMessages(prev => [...prev, {
-        role: "ai", text: `Sorry, something went wrong: ${e.message}`, ts: Date.now(), error: true,
+        role: "ai", text: `Error: ${e.message}`, ts: Date.now(), error: true,
       }]);
     }
     setBusy(false);
   };
 
   const submit = phase === "onboarding" ? submitOnboarding : submitChat;
+  const isEmpty = messages.length === 0;
   const placeholder = phase === "onboarding"
     ? ONBOARDING_QUESTIONS[step]?.placeholder || "Type your answer..."
-    : "Describe your website or say \"generate website\"...";
+    : "Ask anything, build anything...";
 
   return (
-    <div className="flex h-full flex-col bg-card">
+    <div className="flex h-full flex-col bg-[#121212]">
       {/* Header */}
-      <div className="flex items-center gap-2 border-b border-border px-4 py-3">
-        <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
-          <Sparkles className="h-4 w-4" />
+      <div className="flex items-center gap-2 border-b border-white/5 px-4 py-3">
+        <div className="text-xs font-bold uppercase tracking-wider text-white">
+          Digital Dominance 2.0
         </div>
-        <div className="flex-1 min-w-0">
-          <div className="text-sm font-semibold text-foreground truncate">
-            {phase === "onboarding" ? "AI Onboarding" : "Website Studio Chat"}
-          </div>
-          <div className="text-[11px] text-muted-foreground">
-            {phase === "onboarding"
-              ? `Step ${step + 1} of ${ONBOARDING_QUESTIONS.length}`
-              : "Tell GPT what to build"}
-          </div>
+        <div className="ml-auto flex items-center gap-1.5">
+          <Badge label="Vercel Gateway" color="green" />
+          <Badge label="GPT · unbound" color="blue" />
+          <Badge label="Auto Routing" color="green" />
         </div>
-        {phase === "onboarding" && (
-          <div className="flex items-center gap-1.5">
-            {Array.from({ length: ONBOARDING_QUESTIONS.length }).map((_, i) => (
-              <div key={i} className={cn(
-                "h-1.5 w-1.5 rounded-full transition-colors",
-                i < step ? "bg-primary" : i === step ? "bg-primary/60" : "bg-muted"
-              )} />
+      </div>
+
+      {/* Messages / Empty state */}
+      <div ref={scrollRef} className="flex-1 overflow-y-auto px-4 py-6">
+        {isEmpty && !busy ? (
+          <div className="flex h-full flex-col items-center justify-center text-center">
+            <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-primary/10">
+              <Zap className="h-7 w-7 text-primary" />
+            </div>
+            <h2 className="mt-5 text-2xl font-bold text-white">What are we dominating?</h2>
+            <p className="mt-2 text-sm text-white/40">
+              Answer onboarding questions in the chat, or fill the intake form in the workbench.
+            </p>
+          </div>
+        ) : (
+          <div className="mx-auto max-w-2xl space-y-4">
+            {messages.map((msg, i) => (
+              <MessageBubble key={i} msg={msg} />
             ))}
+            {busy && (
+              <div className="flex items-center gap-2 text-sm text-white/40">
+                <Loader2 className="h-4 w-4 animate-spin text-primary" />
+                {phase === "onboarding" ? "Researching..." : "Working..."}
+              </div>
+            )}
+            {error && (
+              <div className="flex items-center gap-2 rounded-lg bg-red-500/10 px-3 py-2 text-xs text-red-400">
+                <AlertCircle className="h-3.5 w-3.5 shrink-0" /> {error}
+              </div>
+            )}
           </div>
         )}
       </div>
 
-      {/* Messages */}
-      <div ref={scrollRef} className="flex-1 overflow-y-auto px-4 py-4 space-y-3">
-        {messages.map((msg, i) => (
-          <MessageBubble key={i} msg={msg} />
-        ))}
-        {busy && (
-          <div className="flex items-center gap-2 text-sm text-muted-foreground">
-            <Loader2 className="h-4 w-4 animate-spin text-primary" />
-            {phase === "onboarding" ? "Researching..." : "Working..."}
+      {/* Input area */}
+      <div className="px-4 pb-3">
+        <div className="mx-auto max-w-2xl">
+          <div className="rounded-2xl border border-white/10 bg-[#1a1a1a] p-1">
+            <textarea
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" && !e.shiftKey) {
+                  e.preventDefault();
+                  submit();
+                }
+              }}
+              placeholder={placeholder}
+              disabled={busy}
+              rows={1}
+              className="w-full resize-none bg-transparent px-3 py-2.5 text-sm text-white placeholder:text-white/30 focus:outline-none disabled:opacity-50 max-h-32"
+            />
+            <div className="flex items-center gap-1 px-2 pb-1.5">
+              <ToolbarIcon icon={Plus} label="Add" />
+              <ToolbarIcon icon={BookOpen} label="Prompts" />
+              <ToolbarIcon icon={Paperclip} label="Attach" />
+              <ToolbarIcon icon={Mic} label="Voice" />
+              <button
+                onClick={submit}
+                disabled={busy || !input.trim()}
+                className="ml-auto flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-primary-foreground hover:bg-primary/90 disabled:opacity-30"
+              >
+                {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
+              </button>
+            </div>
           </div>
-        )}
-        {error && (
-          <div className="flex items-center gap-2 rounded-lg bg-destructive/10 px-3 py-2 text-xs text-destructive">
-            <AlertCircle className="h-3.5 w-3.5 shrink-0" /> {error}
+          <div className="mt-1.5 text-center text-[10px] text-white/20">
+            Digital Dominance 2.0 · Apex command · independently validated
           </div>
-        )}
-      </div>
-
-      {/* Input */}
-      <div className="border-t border-border p-3">
-        <div className="flex items-end gap-2">
-          <textarea
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === "Enter" && !e.shiftKey) {
-                e.preventDefault();
-                submit();
-              }
-            }}
-            placeholder={placeholder}
-            disabled={busy}
-            rows={1}
-            className="flex-1 resize-none rounded-xl border border-input bg-background px-3 py-2.5 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:ring-1 focus:ring-primary disabled:opacity-50 max-h-32"
-          />
-          <button
-            onClick={submit}
-            disabled={busy || !input.trim()}
-            className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary text-primary-foreground hover:bg-primary/90 disabled:opacity-50"
-          >
-            {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
-          </button>
         </div>
       </div>
     </div>
   );
 }
 
+function Badge({ label, color }) {
+  const styles = {
+    green: "bg-green-500/10 text-green-400 border-green-500/20",
+    blue: "bg-blue-500/10 text-blue-400 border-blue-500/20",
+  };
+  return (
+    <span className={cn("hidden rounded-md border px-2 py-0.5 text-[10px] font-semibold sm:inline-block", styles[color])}>
+      {label}
+    </span>
+  );
+}
+
+function ToolbarIcon({ icon: Icon, label }) {
+  return (
+    <button
+      title={label}
+      className="flex h-8 w-8 items-center justify-center rounded-lg text-white/30 hover:bg-white/5 hover:text-white/60"
+    >
+      <Icon className="h-4 w-4" />
+    </button>
+  );
+}
+
 function MessageBubble({ msg }) {
   if (msg.role === "ai") {
     return (
-      <div className="flex gap-2.5">
-        <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
+      <div className="flex gap-3">
+        <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
           <Bot className="h-4 w-4" />
         </div>
-        <div className="flex-1 pt-0.5">
-          <div className="rounded-lg rounded-tl-none bg-primary/5 px-3 py-2 text-sm text-foreground">
+        <div className="flex-1 pt-1">
+          <div className="rounded-xl rounded-tl-none bg-[#1a1a1a] px-4 py-2.5 text-sm text-white whitespace-pre-wrap">
             {msg.text}
           </div>
           {msg.hint && (
-            <div className="mt-1 text-xs text-muted-foreground">{msg.hint}</div>
+            <div className="mt-1.5 text-xs text-white/30">{msg.hint}</div>
           )}
         </div>
       </div>
@@ -286,35 +292,34 @@ function MessageBubble({ msg }) {
   }
   if (msg.role === "user") {
     return (
-      <div className="flex gap-2.5 justify-end">
-        <div className="flex-1 pt-0.5 text-right">
-          <div className="inline-block rounded-lg rounded-tr-none bg-primary px-3 py-2 text-sm text-primary-foreground">
+      <div className="flex gap-3 justify-end">
+        <div className="flex-1 pt-1 text-right">
+          <div className="inline-block rounded-xl rounded-tr-none bg-primary px-4 py-2.5 text-sm text-primary-foreground">
             {msg.text}
           </div>
         </div>
-        <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-muted text-muted-foreground">
+        <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-white/5 text-white/40">
           <User className="h-4 w-4" />
         </div>
       </div>
     );
   }
-  // system / trace
   return (
-    <div className="flex gap-2.5">
-      <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-muted text-muted-foreground">
+    <div className="flex gap-3">
+      <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-white/5 text-white/40">
         {msg.error ? <AlertCircle className="h-4 w-4" /> : <Radar className="h-4 w-4" />}
       </div>
-      <div className="flex-1 pt-0.5">
+      <div className="flex-1 pt-1">
         <div className={cn(
           "rounded-lg border px-3 py-2 text-xs",
-          msg.error ? "border-destructive/30 bg-destructive/5 text-destructive" : "border-border bg-muted/50 text-muted-foreground"
+          msg.error ? "border-red-500/20 bg-red-500/5 text-red-400" : "border-white/10 bg-white/5 text-white/50"
         )}>
           {msg.text}
         </div>
         {msg.trace?.competitors?.length > 0 && (
           <div className="mt-1.5 flex flex-wrap gap-1">
-            {msg.trace.competitors.slice(0, 4).map((c, i) => (
-              <span key={i} className="rounded bg-muted px-1.5 py-0.5 text-[10px] text-muted-foreground">
+            {msg.trace.competitors.slice(0, 5).map((c, i) => (
+              <span key={i} className="rounded bg-white/5 px-1.5 py-0.5 text-[10px] text-white/40">
                 {c.name}
               </span>
             ))}
