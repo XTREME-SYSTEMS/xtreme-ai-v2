@@ -18,6 +18,7 @@ import { useRevisionThreads } from "@/hooks/useRevisionThreads";
 import RevisionThreadPanel from "@/components/client/RevisionThreadPanel";
 import SystemActivities from "@/components/client/SystemActivities";
 import OnboardingCardGrid from "@/components/client/OnboardingCardGrid";
+import SkipToGptSync from "@/components/client/SkipToGptSync";
 import StartNewProjectButton from "@/components/client/StartNewProjectButton";
 
 // The Business Generator — the top-level destination of the client portal.
@@ -155,6 +156,9 @@ export default function BusinessGenerator() {
           <StartNewProjectButton user={user} project={project} />
         </div>
       </div>
+
+      {/* ── Skip & Sync with ChatGPT — bypass onboarding shortcut ── */}
+      <SkipToGptSync />
 
       {/* ── 4-Card Onboarding Grid — Vision, Strategy, Business, Content ── */}
       <OnboardingCardGrid />
