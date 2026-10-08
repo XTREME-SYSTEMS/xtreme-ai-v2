@@ -204,12 +204,12 @@
    labels, subheadings, and body copy; in dark mode these now
    read as bright white instead of dim gray.
    ============================================================ */
-.dark .text-white\/30 { color: rgba(255, 255, 255, 0.95); }
-.dark .text-white\/40 { color: rgba(255, 255, 255, 0.95); }
-.dark .text-white\/50 { color: rgba(255, 255, 255, 1); }
-.dark .text-white\/60 { color: rgba(255, 255, 255, 1); }
-.dark .text-white\/70 { color: rgba(255, 255, 255, 1); }
-.dark .text-white\/80 { color: rgba(255, 255, 255, 1); }
+.dark .text-white\/30 { color: rgba(255, 255, 255, 0.4); }
+.dark .text-white\/40 { color: rgba(255, 255, 255, 0.5); }
+.dark .text-white\/50 { color: rgba(255, 255, 255, 0.6); }
+.dark .text-white\/60 { color: rgba(255, 255, 255, 0.7); }
+.dark .text-white\/70 { color: rgba(255, 255, 255, 0.85); }
+.dark .text-white\/80 { color: rgba(255, 255, 255, 0.9); }
 .dark .text-white\/90 { color: rgba(255, 255, 255, 1); }
 
 /* ============================================================
