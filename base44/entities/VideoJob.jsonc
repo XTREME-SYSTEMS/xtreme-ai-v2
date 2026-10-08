@@ -1,0 +1,122 @@
+{
+  "name": "VideoJob",
+  "type": "object",
+  "description": "An AI video generation job. The user uploads several images and a prompt; the system generates a video clip (15-30 seconds) via the AI Gateway. Jobs persist so the user can leave and return to check progress.",
+  "properties": {
+    "description": {
+      "type": "string",
+      "maxLength": 1000
+    },
+    "user_email": {
+      "type": "string",
+      "description": "Owner email for isolation"
+    },
+    "prompt": {
+      "type": "string",
+      "description": "Text prompt describing the desired video"
+    },
+    "model": {
+      "type": "string",
+      "default": "seedance_2_5",
+      "description": "AI video model used"
+    },
+    "seconds": {
+      "type": "number",
+      "default": 15,
+      "description": "Video duration in seconds (15-30)"
+    },
+    "aspect_ratio": {
+      "type": "string",
+      "default": "16:9",
+      "description": "Output aspect ratio"
+    },
+    "resolution": {
+      "type": "string",
+      "default": "720p"
+    },
+    "generate_audio": {
+      "type": "boolean",
+      "default": true
+    },
+    "image_uris": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Private file URIs of uploaded reference images"
+    },
+    "gateway_video_id": {
+      "type": "string",
+      "description": "AI Gateway job ID for polling"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "pending",
+        "queued",
+        "in_progress",
+        "complete",
+        "failed"
+      ],
+      "default": "pending"
+    },
+    "video_url": {
+      "type": "string",
+      "description": "Generated video URL once complete"
+    },
+    "error": {
+      "type": "string"
+    },
+    "estimated_credits": {
+      "type": "number"
+    }
+  },
+  "required": [
+    "user_email",
+    "prompt",
+    "status"
+  ],
+  "rls": {
+    "read": {
+      "$or": [
+        {
+          "data.user_email": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "create": {
+      "$or": [
+        {
+          "data.user_email": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "update": {
+      "$or": [
+        {
+          "data.user_email": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

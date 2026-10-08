@@ -38,6 +38,7 @@ import StrategyReview from '@/pages/StrategyReview';
 import PackInbox from '@/pages/PackInbox';
 import MassWebsiteFactory from '@/pages/MassWebsiteFactory';
 import RankingMonitor from '@/pages/RankingMonitor';
+import VideoGenerator from '@/pages/VideoGenerator';
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin, isAuthenticated } = useAuth();
@@ -78,6 +79,7 @@ const AuthenticatedApp = () => {
       <Route element={<ProtectedRoute unauthenticatedElement={<Navigate to="/login" replace />} />}>
         <Route path="/onboarding" element={<OnboardingAssistant />} />
         <Route path="/projects" element={<Projects />} />
+        <Route path="/video-generator" element={<VideoGenerator />} />
         <Route element={<Layout />}>
           <Route path="/client-portal" element={<Dashboard />} />
           <Route path="/business-generator" element={<BusinessGenerator />} />
