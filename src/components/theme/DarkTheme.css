@@ -1,0 +1,163 @@
+/* Theme compatibility for legacy light-only utilities, including body portals.
+   Artwork, brand swatches, images, and embedded site previews stay untouched. */
+:root.dark { color-scheme: dark; }
+
+:root.dark :is(.bg-white, .bg-zinc-50, .bg-zinc-100, .bg-zinc-200,
+  .bg-gray-50, .bg-gray-100, .bg-gray-200, .bg-slate-50, .bg-slate-100,
+  .bg-slate-200, .bg-neutral-50, .bg-neutral-100, .bg-stone-50, .bg-stone-100) {
+  background-color: hsl(var(--card));
+}
+:root.dark :is(.bg-gray-300, .bg-gray-400, .bg-gray-500, .bg-gray-600,
+  .bg-gray-700, .bg-gray-800, .bg-gray-900, .bg-gray-950,
+  .bg-zinc-300, .bg-zinc-400, .bg-zinc-500, .bg-zinc-600, .bg-zinc-700,
+  .bg-zinc-800, .bg-zinc-900, .bg-zinc-950,
+  .bg-slate-300, .bg-slate-400, .bg-slate-500, .bg-slate-600,
+  .bg-slate-700, .bg-slate-800, .bg-slate-900, .bg-slate-950,
+  .bg-neutral-200, .bg-neutral-300, .bg-neutral-400, .bg-neutral-500,
+  .bg-neutral-600, .bg-neutral-700, .bg-neutral-800, .bg-neutral-900, .bg-neutral-950,
+  .bg-stone-200, .bg-stone-300, .bg-stone-400, .bg-stone-500,
+  .bg-stone-600, .bg-stone-700, .bg-stone-800, .bg-stone-900, .bg-stone-950) {
+  background-color: hsl(var(--secondary));
+}
+:root.dark :is(.bg-white\/50, .bg-white\/85, .bg-zinc-50\/80) {
+  background-color: hsl(var(--card) / 0.95);
+}
+:root.dark :is(.bg-black\/5, .bg-black\/10, .bg-black\/20,
+  .bg-black\/30, .bg-black\/40) {
+  background-color: hsl(var(--foreground) / 0.06);
+}
+:root.dark .bg-black\/50 { background-color: hsl(var(--background) / 0.5); }
+:root.dark .bg-black\/60 { background-color: hsl(var(--background) / 0.6); }
+:root.dark .bg-black\/70 { background-color: hsl(var(--background) / 0.7); }
+:root.dark .bg-black\/80 { background-color: hsl(var(--background) / 0.8); }
+:root.dark .bg-black\/90 { background-color: hsl(var(--background) / 0.9); }
+
+:root.dark :is(.text-black, .text-zinc-700, .text-zinc-900,
+  .text-slate-700, .text-slate-800, .text-slate-900, .text-slate-950,
+  .text-gray-700, .text-gray-800, .text-gray-900, .text-gray-950,
+  .text-neutral-700, .text-neutral-800, .text-neutral-900,
+  .text-stone-700, .text-stone-800, .text-stone-900) {
+  color: hsl(var(--foreground));
+}
+:root.dark :is(.text-black\/5, .text-black\/20, .text-black\/25,
+  .text-black\/30, .text-black\/40, .text-black\/50, .text-black\/55,
+  .text-black\/60, .text-black\/70, .text-black\/80,
+  .text-zinc-300, .text-zinc-400, .text-zinc-500, .text-zinc-600,
+  .text-gray-300, .text-gray-400, .text-gray-500, .text-gray-600,
+  .text-slate-300, .text-slate-400, .text-slate-500, .text-slate-600,
+  .text-neutral-300, .text-neutral-400, .text-neutral-500, .text-neutral-600,
+  .text-stone-300, .text-stone-400, .text-stone-500, .text-stone-600,
+  .text-gray-400\/50, .text-gray-400\/60, .text-gray-400\/70, .text-gray-400\/80,
+  .text-gray-500\/50, .text-gray-500\/70,
+  .text-zinc-400\/50, .text-zinc-400\/60, .text-zinc-400\/70, .text-zinc-400\/80,
+  .text-zinc-500\/50, .text-zinc-500\/70,
+  .text-slate-400\/50, .text-slate-400\/60, .text-slate-400\/70, .text-slate-400\/80,
+  .text-slate-500\/50, .text-slate-500\/70) {
+  color: hsl(var(--muted-foreground));
+}
+:root.dark :is(.border-black, .border-black\/5, .border-black\/10,
+  .border-black\/15, .border-black\/20, .border-black\/25, .border-black\/30,
+  .border-white\/5, .border-white\/10, .border-white\/15,
+  .border-white\/20, .border-white\/25, .border-white\/30,
+  .border-zinc-100, .border-zinc-200, .border-zinc-300,
+  .border-zinc-600, .border-zinc-700, .border-zinc-800,
+  .border-slate-100, .border-slate-200, .border-slate-300,
+  .border-slate-500, .border-slate-600, .border-slate-700, .border-slate-800, .border-slate-900,
+  .border-gray-500, .border-gray-600, .border-gray-700, .border-gray-800, .border-gray-900,
+  .border-neutral-500, .border-neutral-600, .border-neutral-700, .border-neutral-800, .border-neutral-900,
+  .border-stone-500, .border-stone-600, .border-stone-700, .border-stone-800, .border-stone-900) {
+  border-color: hsl(var(--border));
+}
+:root.dark :is(.border-t-black, .border-b-black) { border-color: hsl(var(--foreground)); }
+:root.dark :is(.divide-black\/10, .divide-white\/5) > :not([hidden]) ~ :not([hidden]) {
+  border-color: hsl(var(--border));
+}
+:root.dark .ring-black\/10 { --tw-ring-color: hsl(var(--border)); }
+:root.dark :is(.placeholder-black\/30, .placeholder-white\/30, .placeholder-white\/40)::placeholder {
+  color: hsl(var(--muted-foreground));
+}
+:root.dark :is(select, option) {
+  background-color: hsl(var(--card));
+  color: hsl(var(--foreground));
+}
+
+:root.dark :is(.hover\:bg-white:hover, .hover\:bg-zinc-50:hover,
+  .hover\:bg-zinc-100:hover, .hover\:bg-gray-50:hover, .hover\:bg-gray-100:hover,
+  .hover\:bg-slate-50:hover, .hover\:bg-slate-100:hover,
+  .hover\:bg-black\/5:hover, .hover\:bg-black\/10:hover,
+  .hover\:bg-black\/80:hover) { background-color: hsl(var(--muted)); }
+:root.dark :is(.hover\:text-black:hover, .hover\:text-black\/70:hover,
+  .hover\:text-black\/80:hover) { color: hsl(var(--foreground)); }
+:root.dark :is(.hover\:border-black:hover, .hover\:border-black\/20:hover,
+  .hover\:border-black\/30:hover) { border-color: hsl(var(--foreground) / 0.4); }
+:root.dark :is(.focus\:border-black:focus, .focus\:border-lime-400:focus,
+  .focus\:border-amber-400:focus, .focus\:border-orange-400:focus,
+  .focus\:border-yellow-400:focus) { border-color: hsl(var(--ring)); }
+:root.dark :is(.focus\:ring-lime-400:focus, .focus\:ring-amber-400:focus,
+  .focus\:ring-orange-400:focus, .focus\:ring-yellow-400:focus,
+  .ring-lime-400, .ring-lime-500, .ring-amber-400, .ring-amber-500,
+  .ring-orange-400, .ring-orange-500, .ring-yellow-400, .ring-yellow-500) {
+  --tw-ring-color: hsl(var(--ring));
+}
+:root.dark :is(.border-lime-300, .border-lime-400, .border-lime-500, .border-lime-600,
+  .border-amber-300, .border-amber-400, .border-amber-500, .border-amber-600,
+  .border-orange-300, .border-orange-400, .border-orange-500, .border-orange-600,
+  .border-yellow-300, .border-yellow-400, .border-yellow-500, .border-yellow-600) {
+  border-color: hsl(var(--primary));
+}
+:root.dark :is(.border-lime-400\/20, .border-lime-400\/30, .border-lime-400\/40,
+  .border-lime-400\/50, .border-lime-500\/30, .border-lime-500\/50,
+  .border-amber-400\/20, .border-amber-400\/30, .border-amber-400\/40,
+  .border-amber-400\/50, .border-amber-500\/30, .border-amber-500\/50) {
+  border-color: hsl(var(--primary) / 0.3);
+}
+
+/* Gold labels remain legible; solid gold actions keep dark lettering. */
+:root.dark :is([class*="text-lime"], [class*="text-amber"],
+  [class*="text-orange"], [class*="text-yellow"]) {
+  color: hsl(var(--primary)) !important;
+}
+:root.dark :is(.bg-primary, .bg-accent, .btn-gold-metallic,
+  .bg-lime-300, .bg-lime-400, .bg-lime-500, .bg-lime-600,
+  .bg-amber-300, .bg-amber-400, .bg-amber-500, .bg-amber-600,
+  .bg-orange-300, .bg-orange-400, .bg-orange-500, .bg-orange-600,
+  .bg-yellow-300, .bg-yellow-400, .bg-yellow-500, .bg-yellow-600):not(:disabled),
+:root.dark :is(.bg-primary, .bg-accent, .btn-gold-metallic,
+  .bg-lime-300, .bg-lime-400, .bg-lime-500, .bg-lime-600,
+  .bg-amber-300, .bg-amber-400, .bg-amber-500, .bg-amber-600,
+  .bg-orange-300, .bg-orange-400, .bg-orange-500, .bg-orange-600,
+  .bg-yellow-300, .bg-yellow-400, .bg-yellow-500, .bg-yellow-600):not(:disabled)
+  :is(.text-black, .text-white, [class*="text-lime"], [class*="text-amber"],
+    [class*="text-orange"], [class*="text-yellow"]) {
+  color: hsl(var(--primary-foreground)) !important;
+}
+:root.dark .text-black:is(.bg-emerald-400, .bg-cyan-400, .bg-rose-400) {
+  color: hsl(var(--primary-foreground));
+}
+:root.dark :is(.bg-lime-400\/5, .bg-lime-400\/10, .bg-lime-400\/15, .bg-lime-400\/20,
+  .bg-lime-500\/10, .bg-lime-500\/20, .bg-lime-600\/10,
+  .bg-amber-400\/5, .bg-amber-400\/10, .bg-amber-400\/15, .bg-amber-400\/20,
+  .bg-amber-500\/10, .bg-amber-500\/20, .bg-amber-600\/10,
+  .bg-yellow-400\/10, .bg-yellow-400\/20, .bg-orange-400\/10, .bg-orange-400\/20) {
+  background-color: hsl(var(--primary) / 0.1);
+}
+:root.dark :is(.fill-black, .stroke-black) { color: hsl(var(--foreground)); }
+:root.dark .fill-black { fill: currentColor; }
+:root.dark .stroke-black { stroke: currentColor; }
+:root.dark :is(.fill-lime-400, .fill-amber-400, .fill-orange-400, .fill-yellow-400,
+  .fill-lime-500, .fill-amber-500, .fill-orange-500, .fill-yellow-500) { fill: hsl(var(--primary)); }
+:root.dark :is(.stroke-lime-400, .stroke-amber-400, .stroke-orange-400, .stroke-yellow-400) {
+  stroke: hsl(var(--primary));
+}
+
+/* Light decorative gradients must not reintroduce white sections. */
+:root.dark .from-white {
+  --tw-gradient-from: hsl(var(--card)) var(--tw-gradient-from-position);
+  --tw-gradient-to: hsl(var(--card) / 0) var(--tw-gradient-to-position);
+}
+:root.dark .via-white {
+  --tw-gradient-stops: var(--tw-gradient-from), hsl(var(--card)) var(--tw-gradient-via-position), var(--tw-gradient-to);
+}
+:root.dark :is(.to-white, .to-slate-50) {
+  --tw-gradient-to: hsl(var(--card)) var(--tw-gradient-to-position);
+}

@@ -185,10 +185,10 @@ export default function Layout() {
   if ((!isAdmin && !isEmployee) || previewAsClient) return <ClientLayout user={user} />;
 
   return (
-    <div className="flex h-screen bg-white text-black">
+    <div className="flex h-screen bg-background text-foreground">
       {/* Sidebar */}
       <aside className={cn(
-        "fixed inset-y-0 left-0 z-40 w-64 transform border-r border-black/10 bg-white transition-transform md:static md:translate-x-0",
+        "fixed inset-y-0 left-0 z-40 w-64 transform border-r border-border bg-card transition-transform md:static md:translate-x-0",
         open ? "translate-x-0" : "-translate-x-full"
       )}>
         <div className="flex h-14 items-center gap-2 border-b border-black/10 px-4">
@@ -507,7 +507,7 @@ export default function Layout() {
 
       {/* Main */}
       <div className="flex flex-1 flex-col overflow-hidden">
-        <header className="flex h-14 items-center gap-3 border-b border-black/10 bg-white px-4 backdrop-blur">
+        <header className="flex h-14 items-center gap-3 border-b border-border bg-card px-4 backdrop-blur">
           <button onClick={() => setOpen(true)} className="md:hidden text-black/50 hover:text-black"><Menu className="h-5 w-5" /></button>
           <div className="flex items-center gap-2 text-xs">
             <span className="rounded-md bg-black px-2 py-1 font-mono text-white font-semibold">{user?.role === "admin" ? "XTREME AI PIPELINE" : "BUSINESS GENERATOR"}</span>

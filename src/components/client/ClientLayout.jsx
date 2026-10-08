@@ -28,8 +28,8 @@ export default function ClientLayout({ user }) {
   };
 
   return (
-    <div className="flex h-screen flex-col bg-white text-black">
-      <header className="flex h-14 items-center gap-3 border-b border-black/10 bg-white px-4">
+    <div className="flex h-screen flex-col bg-background text-foreground">
+      <header className="flex h-14 items-center gap-3 border-b border-border bg-card px-4">
         <Image src={LOGO_ICON} alt="Xtreme AI" className="h-10 w-10" fittingType="fit" />
         <div className="leading-tight">
           <div className="text-sm font-semibold text-black">Xtreme AI</div>

@@ -1,3 +1,5 @@
+@import "./components/theme/DarkTheme.css";
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -57,13 +59,13 @@
     --secondary: 0 0% 8%;
     --secondary-foreground: 0 0% 100%;
     --muted: 0 0% 8%;
-    --muted-foreground: 0 0% 60%;
+    --muted-foreground: 0 0% 72%;
     --accent: 55 100% 50%;
     --accent-foreground: 0 0% 0%;
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 0 0% 98%;
-    --border: 0 0% 15%;
-    --input: 0 0% 15%;
+    --border: 0 0% 20%;
+    --input: 0 0% 20%;
     --ring: 55 100% 50%;
     --vx-accent: 55 100% 50%;
     --vx-accent-2: 55 100% 40%;
