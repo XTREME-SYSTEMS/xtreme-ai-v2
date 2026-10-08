@@ -53,6 +53,7 @@ export default function ChatPanel({
     if (prior.length === 0) return;
     const rebuilt = [];
     prior.forEach(([key, val], idx) => {
+      if (!val) return;
       const q = ONBOARDING_QUESTIONS.find((x) => x.key === key);
       if (q) rebuilt.push({ role: "ai", text: q.question, ts: idx });
       rebuilt.push({ role: "user", text: val.answer_text, ts: idx + 0.5 });
@@ -85,7 +86,7 @@ export default function ChatPanel({
     try {
       const context = {};
       Object.entries(traceResults).forEach(([k, v]) => {
-        if (v.answer_text) context[k] = { answer_text: v.answer_text };
+        if (v?.answer_text) context[k] = { answer_text: v.answer_text };
       });
 
       const res = await base44.functions.invoke("skipTraceAnswer", {
