@@ -9,19 +9,8 @@ import { getVisibleSteps } from "@/lib/clientSteps";
 import StrategyCard from "@/components/client/StrategyCard";
 import {
   Loader2, Search, Rocket, CheckCircle, ArrowRight,
-  RefreshCw, Eye, AlertTriangle, TrendingUp, Zap,
+  RefreshCw, Eye, AlertTriangle, Zap,
 } from "lucide-react";
-import { getCategoryIcon } from "@/lib/categoryIcons";
-
-// Fallback categories shown immediately while the research function runs.
-// Icons are resolved via getCategoryIcon() — no emojis.
-const FALLBACK_CATEGORIES = [
-  { name: "Epoxy Flooring", icon: "paint-bucket", description: "Garage floors, basement floors, metallic epoxy, flake systems, self-leveling epoxy", trending_score: 95, is_system_capability: true },
-  { name: "Epoxy Coatings", icon: "shield-check", description: "Concrete coatings, protective coatings, warehouse floors, anti-slip, food-grade epoxy", trending_score: 92, is_system_capability: true },
-  { name: "Epoxy Contractors", icon: "hard-hat", description: "Full-service epoxy installation — residential, commercial, industrial, repair & resurfacing", trending_score: 90, is_system_capability: true },
-  { name: "Polished Concrete", icon: "sparkles", description: "Grind & seal, burnished concrete, stained concrete, densification — commercial & residential", trending_score: 88, is_system_capability: true },
-  { name: "Decorative Concrete", icon: "building-2", description: "Stamped concrete, overlays, micro-toppings, stained concrete, resurfacing, exposed aggregate", trending_score: 87, is_system_capability: true },
-];
 
 // The Vision Generator — an AI-assisted, discovery-driven vision builder.
 // The user describes their vision in one sentence (or picks a trending
@@ -36,11 +25,8 @@ export default function VisionGeneratorPanel() {
   const navigate = useNavigate();
   const visibleSteps = getVisibleSteps(productId, user);
 
-  const [categories, setCategories] = useState([]);
-  const [loadingCats, setLoadingCats] = useState(true);
   const [expanded, setExpanded] = useState(false);
   const [visionText, setVisionText] = useState("");
-  const [selectedCategory, setSelectedCategory] = useState(null);
   const [discovering, setDiscovering] = useState(false);
   const [discoveryResults, setDiscoveryResults] = useState([]);
   const [selectedDiscovery, setSelectedDiscovery] = useState(null);
@@ -55,27 +41,6 @@ export default function VisionGeneratorPanel() {
   const strategyApproved = !!project?.strategy?.approved;
   const bothApproved = visionApproved && strategyApproved;
 
-  // Load trending categories (or seed them on first visit)
-  useEffect(() => {
-    (async () => {
-      try {
-        let cats = await base44.entities.TrendingCategory.filter({ active: true }, "-trending_score", 30);
-        if (!cats || cats.length === 0) {
-          // First visit — trigger research to seed categories
-          try {
-            await base44.functions.invoke("researchTrendingCategories", {});
-            cats = await base44.entities.TrendingCategory.filter({ active: true }, "-trending_score", 30);
-          } catch {}
-        }
-        setCategories(cats?.length > 0 ? cats : FALLBACK_CATEGORIES);
-      } catch {
-        setCategories(FALLBACK_CATEGORIES);
-      } finally {
-        setLoadingCats(false);
-      }
-    })();
-  }, []);
-
   const continueToBuild = () => {
     try { localStorage.setItem("coach:done:/business-generator", "1"); } catch {}
     notifyStepComplete("welcome", { clientEmail: user?.email || "" });
@@ -86,9 +51,9 @@ export default function VisionGeneratorPanel() {
 
   // Step 1: Run web discovery on the user's topic
   const handleDiscover = async () => {
-    const topic = selectedCategory?.name || visionText.trim();
+    const topic = visionText.trim();
     if (!topic) {
-      setError("Describe your vision in one sentence or pick a category below.");
+      setError("Describe your vision in one sentence.");
       return;
     }
     setDiscovering(true);
@@ -118,7 +83,7 @@ export default function VisionGeneratorPanel() {
     setError("");
     setStrategies([]);
     try {
-      const topic = selectedCategory?.name || visionText.trim();
+      const topic = visionText.trim();
       const res = await base44.functions.invoke("generateStrategyOptions", {
         topic,
         vision: visionText.trim() || option.name,
@@ -143,7 +108,7 @@ export default function VisionGeneratorPanel() {
     setSaving(true);
     setError("");
     try {
-      const topic = selectedCategory?.name || visionText.trim();
+      const topic = visionText.trim();
       const discoveryName = selectedDiscovery?.name || "";
 
       // Construct the vision document from the user's input + discovery
@@ -272,7 +237,7 @@ export default function VisionGeneratorPanel() {
           <Eye className="h-4 w-4" /> Vision Generator — AI-Assisted Discovery
         </div>
         <p className="mt-1 text-sm text-white/50">
-          Describe your epoxy or concrete business vision in <span className="text-lime-400">one sentence</span>, or pick a category below. The system will research, discover, and build your full strategy.
+          Describe your epoxy or concrete business vision in <span className="text-lime-400">one sentence</span>. The system will research, discover, and build your full strategy.
         </p>
       </div>
 
@@ -288,51 +253,19 @@ export default function VisionGeneratorPanel() {
           <input
             type="text"
             value={visionText}
-            onChange={(e) => { setVisionText(e.target.value); setSelectedCategory(null); }}
+            onChange={(e) => { setVisionText(e.target.value); }}
             placeholder="I want to build an epoxy flooring business that…"
             className="flex-1 rounded-lg border border-white/15 bg-black px-4 py-3 text-sm text-white placeholder-white/30 focus:border-lime-400 focus:outline-none"
             onKeyDown={(e) => { if (e.key === "Enter" && !discovering) handleDiscover(); }}
           />
           <button
             onClick={handleDiscover}
-            disabled={discovering || (!visionText.trim() && !selectedCategory)}
+            disabled={discovering || !visionText.trim()}
             className="inline-flex items-center justify-center gap-2 rounded-lg bg-lime-400 px-5 py-3 text-sm font-bold text-black transition-all hover:bg-lime-300 disabled:cursor-not-allowed disabled:opacity-50"
           >
             {discovering ? <><Loader2 className="h-4 w-4 animate-spin" /> Discovering…</> : <><Search className="h-4 w-4" /> Generate Vision</>}
           </button>
         </div>
-      </div>
-
-      {/* ── Trending categories ────────────────────────────────────── */}
-      <div className="rounded-xl border border-white/10 bg-zinc-950 p-4">
-        <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-lime-400">
-          <TrendingUp className="h-3.5 w-3.5" /> {loadingCats ? "Loading trending categories…" : "Trending Categories — or pick one to auto-fill"}
-        </div>
-        {!loadingCats && (
-          <div className="mt-3 flex flex-wrap gap-2">
-            {categories.map((cat, i) => {
-              const active = selectedCategory?.name === cat.name;
-              return (
-                <button
-                  key={i}
-                  onClick={() => {
-                    setSelectedCategory(active ? null : cat);
-                    setVisionText(active ? "" : `${cat.name} — ${cat.description}`);
-                  }}
-                  className={`inline-flex items-center gap-1.5 rounded-lg border px-3 py-2 text-xs font-medium transition-all ${
-                    active
-                      ? "border-lime-400 bg-lime-400/10 text-lime-400"
-                      : "border-white/10 bg-black/30 text-white/60 hover:border-lime-400/30 hover:text-lime-400"
-                  }`}
-                >
-                  {(() => { const Icon = getCategoryIcon(cat.name, cat.icon); return <Icon className="h-3.5 w-3.5 text-amber-400" />; })()}
-                  {cat.name}
-                  {cat.is_system_capability && <span className="text-[9px] uppercase text-lime-400/50">SYS</span>}
-                </button>
-              );
-            })}
-          </div>
-        )}
       </div>
 
       {/* ── Discovery results (multiple choice) ───────────────────── */}
