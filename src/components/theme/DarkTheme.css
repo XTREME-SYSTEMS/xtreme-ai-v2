@@ -112,10 +112,10 @@
   border-color: hsl(var(--primary) / 0.3);
 }
 
-/* Gold labels remain legible; solid gold actions keep dark lettering. */
+/* Accent text renders white — only backgrounds/borders stay blue. */
 :root.dark :is([class*="text-lime"], [class*="text-amber"],
   [class*="text-orange"], [class*="text-yellow"]) {
-  color: hsl(var(--primary)) !important;
+  color: hsl(var(--foreground)) !important;
 }
 :root.dark :is(.bg-primary, .bg-accent, .btn-gold-metallic,
   .bg-lime-300, .bg-lime-400, .bg-lime-500, .bg-lime-600,

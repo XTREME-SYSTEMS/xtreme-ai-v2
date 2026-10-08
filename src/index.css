@@ -259,20 +259,20 @@
 .bg-lime-600\/10, .bg-amber-600\/10, .bg-orange-600\/10, .bg-yellow-600\/10 { background-color: rgba(0,0,0,0.05); }
 .bg-lime-600\/20, .bg-amber-600\/20, .bg-orange-600\/20, .bg-yellow-600\/20 { background-color: rgba(0,0,0,0.08); }
 
-/* Text color → black (catch-all: every shade + every opacity variant) */
-[class*="text-lime"], [class*="text-amber"], [class*="text-orange"], [class*="text-yellow"] { color: #000 !important; }
+/* Text color → foreground/white (catch-all: every shade + every opacity variant) */
+[class*="text-lime"], [class*="text-amber"], [class*="text-orange"], [class*="text-yellow"] { color: hsl(var(--foreground)) !important; }
 
-/* Text opacity variants → black with opacity */
-.text-lime-300\/50, .text-amber-300\/50, .text-orange-300\/50, .text-yellow-300\/50 { color: rgba(0,0,0,0.5); }
-.text-lime-300\/70, .text-amber-300\/70, .text-orange-300\/70, .text-yellow-300\/70 { color: rgba(0,0,0,0.7); }
-.text-lime-400\/50, .text-amber-400\/50, .text-orange-400\/50, .text-yellow-400\/50 { color: rgba(0,0,0,0.5); }
-.text-lime-400\/60, .text-amber-400\/60, .text-orange-400\/60, .text-yellow-400\/60 { color: rgba(0,0,0,0.6); }
-.text-lime-400\/70, .text-amber-400\/70, .text-orange-400\/70, .text-yellow-400\/70 { color: rgba(0,0,0,0.7); }
-.text-lime-400\/80, .text-amber-400\/80, .text-orange-400\/80, .text-yellow-400\/80 { color: rgba(0,0,0,0.8); }
-.text-lime-400\/90, .text-amber-400\/90, .text-orange-400\/90, .text-yellow-400\/90 { color: rgba(0,0,0,0.9); }
-.text-lime-500\/30, .text-amber-500\/30, .text-orange-500\/30, .text-yellow-500\/30 { color: rgba(0,0,0,0.3); }
-.text-lime-500\/50, .text-amber-500\/50, .text-orange-500\/50, .text-yellow-500\/50 { color: rgba(0,0,0,0.5); }
-.text-lime-500\/70, .text-amber-500\/70, .text-orange-500\/70, .text-yellow-500\/70 { color: rgba(0,0,0,0.7); }
+/* Text opacity variants → foreground with opacity */
+.text-lime-300\/50, .text-amber-300\/50, .text-orange-300\/50, .text-yellow-300\/50 { color: hsl(var(--foreground) / 0.5); }
+.text-lime-300\/70, .text-amber-300\/70, .text-orange-300\/70, .text-yellow-300\/70 { color: hsl(var(--foreground) / 0.7); }
+.text-lime-400\/50, .text-amber-400\/50, .text-orange-400\/50, .text-yellow-400\/50 { color: hsl(var(--foreground) / 0.5); }
+.text-lime-400\/60, .text-amber-400\/60, .text-orange-400\/60, .text-yellow-400\/60 { color: hsl(var(--foreground) / 0.6); }
+.text-lime-400\/70, .text-amber-400\/70, .text-orange-400\/70, .text-yellow-400\/70 { color: hsl(var(--foreground) / 0.7); }
+.text-lime-400\/80, .text-amber-400\/80, .text-orange-400\/80, .text-yellow-400\/80 { color: hsl(var(--foreground) / 0.8); }
+.text-lime-400\/90, .text-amber-400\/90, .text-orange-400\/90, .text-yellow-400\/90 { color: hsl(var(--foreground) / 0.9); }
+.text-lime-500\/30, .text-amber-500\/30, .text-orange-500\/30, .text-yellow-500\/30 { color: hsl(var(--foreground) / 0.3); }
+.text-lime-500\/50, .text-amber-500\/50, .text-orange-500\/50, .text-yellow-500\/50 { color: hsl(var(--foreground) / 0.5); }
+.text-lime-500\/70, .text-amber-500\/70, .text-orange-500\/70, .text-yellow-500\/70 { color: hsl(var(--foreground) / 0.7); }
 
 /* Border color → black/10 */
 .border-lime-300, .border-amber-300, .border-orange-300, .border-yellow-300 { border-color: rgba(0,0,0,0.1); }
@@ -313,9 +313,9 @@
 /* Gold hover backgrounds — let tailwind.config.js gold palette show through. */
 .hover\:bg-lime-400\/10:hover, .hover\:bg-amber-400\/10:hover, .hover\:bg-orange-400\/10:hover, .hover\:bg-yellow-400\/10:hover { background-color: rgba(0,0,0,0.05); }
 .hover\:bg-lime-400\/20:hover, .hover\:bg-amber-400\/20:hover, .hover\:bg-orange-400\/20:hover, .hover\:bg-yellow-400\/20:hover { background-color: rgba(0,0,0,0.08); }
-.hover\:text-lime-300:hover, .hover\:text-amber-300:hover, .hover\:text-orange-300:hover, .hover\:text-yellow-300:hover { color: #000; }
-.hover\:text-lime-400:hover, .hover\:text-amber-400:hover, .hover\:text-orange-400:hover, .hover\:text-yellow-400:hover { color: #000; }
-.hover\:text-lime-500:hover, .hover\:text-amber-500:hover, .hover\:text-orange-500:hover, .hover\:text-yellow-500:hover { color: #000; }
+.hover\:text-lime-300:hover, .hover\:text-amber-300:hover, .hover\:text-orange-300:hover, .hover\:text-yellow-300:hover { color: hsl(var(--foreground)); }
+.hover\:text-lime-400:hover, .hover\:text-amber-400:hover, .hover\:text-orange-400:hover, .hover\:text-yellow-400:hover { color: hsl(var(--foreground)); }
+.hover\:text-lime-500:hover, .hover\:text-amber-500:hover, .hover\:text-orange-500:hover, .hover\:text-yellow-500:hover { color: hsl(var(--foreground)); }
 .hover\:border-lime-400:hover, .hover\:border-amber-400:hover, .hover\:border-orange-400:hover, .hover\:border-yellow-400:hover { border-color: rgba(0,0,0,0.2); }
 .hover\:border-lime-500:hover, .hover\:border-amber-500:hover, .hover\:border-orange-500:hover, .hover\:border-yellow-500:hover { border-color: rgba(0,0,0,0.25); }
 
