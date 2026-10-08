@@ -4,9 +4,17 @@ const ThemeContext = createContext(null);
 
 function getInitial() {
   if (typeof window === "undefined") return "dark";
+  // Version key — old code forced "light" into localStorage; bumping this
+  // version ignores that stale value and defaults to dark.
+  const VERSION = "v2-dark";
+  const savedVersion = localStorage.getItem("theme_version");
   const saved = localStorage.getItem("theme");
+  if (savedVersion !== VERSION) {
+    localStorage.setItem("theme_version", VERSION);
+    localStorage.setItem("theme", "dark");
+    return "dark";
+  }
   if (saved === "light" || saved === "dark") return saved;
-  // Default to dark mode — dark is the primary system theme.
   return "dark";
 }
 
