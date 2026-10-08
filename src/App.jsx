@@ -41,6 +41,7 @@ import RankingMonitor from '@/pages/RankingMonitor';
 import VideoGenerator from '@/pages/VideoGenerator';
 import GptSync from '@/pages/GptSync';
 import PipelineFlow from '@/pages/PipelineFlow';
+import SkipTracePortal from '@/pages/SkipTracePortal';
 import ClientOnboarding from '@/pages/ClientOnboarding';
 
 const AuthenticatedApp = () => {
@@ -86,6 +87,7 @@ const AuthenticatedApp = () => {
         <Route path="/video-generator" element={<VideoGenerator />} />
         <Route path="/gpt-sync" element={<GptSync />} />
       <Route path="/pipeline-flow" element={<PipelineFlow />} />
+      <Route path="/skip-trace-portal" element={<SkipTracePortal />} />
         <Route element={<Layout />}>
           <Route path="/client-portal" element={<Dashboard />} />
           <Route path="/business-generator" element={<BusinessGenerator />} />
