@@ -1,0 +1,225 @@
+{
+  "name": "SkipTraceReport",
+  "type": "object",
+  "description": "A background intelligence profile built from a single onboarding answer. When the user answers a question (business name, owner name, industry, location, etc.), the skip-trace engine researches publicly available information and builds a full profile: competitors, market data, suppliers, adjacent trades, permits, properties, and the owner/principal behind the business. All research is deterministic (web fetches, no LLM credits).",
+  "properties": {
+    "description": {
+      "type": "string",
+      "description": "Optional description (up to 1000 characters)",
+      "maxLength": 1000
+    },
+    "session_id": {
+      "type": "string",
+      "description": "The OnboardingSession this report belongs to"
+    },
+    "user_email": {
+      "type": "string",
+      "description": "Owner email for RLS isolation"
+    },
+    "question_key": {
+      "type": "string",
+      "description": "Which onboarding question triggered this trace (business_name, owner_name, industry, location, etc.)"
+    },
+    "answer_text": {
+      "type": "string",
+      "description": "The user's answer that was traced"
+    },
+    "business_name": {
+      "type": "string",
+      "description": "Business name found or confirmed"
+    },
+    "owner_name": {
+      "type": "string",
+      "description": "Owner/principal name if found"
+    },
+    "industry": {
+      "type": "string"
+    },
+    "location": {
+      "type": "string"
+    },
+    "website": {
+      "type": "string"
+    },
+    "competitors": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "url": {
+            "type": "string"
+          },
+          "note": {
+            "type": "string"
+          }
+        }
+      },
+      "description": "Competitors discovered in the market"
+    },
+    "market_data": {
+      "type": "object",
+      "description": "Market size, trends, average pricing, demand signals",
+      "properties": {
+        "market_size": {
+          "type": "string"
+        },
+        "trend": {
+          "type": "string"
+        },
+        "avg_pricing": {
+          "type": "string"
+        },
+        "demand_signals": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "suppliers": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "url": {
+            "type": "string"
+          }
+        }
+      },
+      "description": "Key suppliers or vendors in the industry"
+    },
+    "adjacent_trades": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Adjacent trades or complementary services"
+    },
+    "permits": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string"
+          },
+          "jurisdiction": {
+            "type": "string"
+          }
+        }
+      },
+      "description": "Relevant permits or licensing requirements"
+    },
+    "properties": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "address": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string"
+          }
+        }
+      },
+      "description": "Notable properties or projects found"
+    },
+    "social_profiles": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "platform": {
+            "type": "string"
+          },
+          "url": {
+            "type": "string"
+          }
+        }
+      },
+      "description": "Social media profiles found for the business or owner"
+    },
+    "sources": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "URLs where this intelligence was gathered from"
+    },
+    "confidence_score": {
+      "type": "number",
+      "default": 50,
+      "description": "0-100 confidence in the intelligence gathered"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "pending",
+        "tracing",
+        "complete",
+        "failed"
+      ],
+      "default": "pending"
+    },
+    "error": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "session_id",
+    "user_email",
+    "question_key",
+    "answer_text"
+  ],
+  "rls": {
+    "read": {
+      "$or": [
+        {
+          "data.user_email": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "create": {
+      "$or": [
+        {
+          "data.user_email": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "update": {
+      "$or": [
+        {
+          "data.user_email": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

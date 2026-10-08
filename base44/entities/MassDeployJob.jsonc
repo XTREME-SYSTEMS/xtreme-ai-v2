@@ -1,0 +1,149 @@
+{
+  "name": "MassDeployJob",
+  "type": "object",
+  "description": "A mass deployment job \u2014 spins up hundreds or thousands of website variations from an approved GptPack. The user provides cities and niches/names; the system generates every combination, deploys each to Vercel, and tracks them as DeployedSite records.",
+  "properties": {
+    "description": {
+      "type": "string",
+      "description": "Optional description (up to 1000 characters)",
+      "maxLength": 1000
+    },
+    "pack_id": {
+      "type": "string",
+      "description": "The approved GptPack being mass-deployed"
+    },
+    "session_id": {
+      "type": "string",
+      "description": "The OnboardingSession this job belongs to"
+    },
+    "user_email": {
+      "type": "string",
+      "description": "Owner email for RLS isolation"
+    },
+    "cities": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "List of cities to deploy in"
+    },
+    "niches": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "List of niches/services to vary by"
+    },
+    "business_names": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Optional list of business names to use (paired with cities or cycled)"
+    },
+    "name_strategy": {
+      "type": "string",
+      "enum": [
+        "paired",
+        "cartesian",
+        "cycle_names",
+        "auto_generate"
+      ],
+      "default": "cartesian",
+      "description": "How to combine cities + niches + names. cartesian = every city \u00d7 every niche; paired = zip city[i]+niche[i]; cycle_names = cycle names across city\u00d7niche; auto_generate = AI generates names per site"
+    },
+    "total_sites": {
+      "type": "number",
+      "default": 0,
+      "description": "Total sites to deploy (computed from combinations)"
+    },
+    "generated_count": {
+      "type": "number",
+      "default": 0
+    },
+    "deployed_count": {
+      "type": "number",
+      "default": 0
+    },
+    "failed_count": {
+      "type": "number",
+      "default": 0
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "configuring",
+        "queued",
+        "generating",
+        "deploying",
+        "complete",
+        "failed"
+      ],
+      "default": "configuring"
+    },
+    "current_index": {
+      "type": "number",
+      "default": 0
+    },
+    "error": {
+      "type": "string"
+    },
+    "logs": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "completed_at": {
+      "type": "string",
+      "format": "date-time"
+    }
+  },
+  "required": [
+    "pack_id",
+    "user_email"
+  ],
+  "rls": {
+    "read": {
+      "$or": [
+        {
+          "data.user_email": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "create": {
+      "$or": [
+        {
+          "data.user_email": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "update": {
+      "$or": [
+        {
+          "data.user_email": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

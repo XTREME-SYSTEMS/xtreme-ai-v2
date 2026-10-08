@@ -1,0 +1,122 @@
+{
+  "name": "GptPack",
+  "type": "object",
+  "description": "A website mockup pack received from GPT (or any external tool) via the ingestPack sync endpoint. Packs land as pending review \u2014 nothing goes live until the user approves. Once approved, the pack can be deployed to a single live domain and then mass-deployed across hundreds/thousands of city/niche variations.",
+  "properties": {
+    "description": {
+      "type": "string",
+      "description": "Optional description (up to 1000 characters)",
+      "maxLength": 1000
+    },
+    "name": {
+      "type": "string",
+      "description": "Name/label for this pack (e.g. 'Hero Mockup v2')"
+    },
+    "kind": {
+      "type": "string",
+      "enum": [
+        "web_pack",
+        "brand_pack",
+        "marketing_pack",
+        "social_pack",
+        "video_pack"
+      ],
+      "default": "web_pack",
+      "description": "What kind of pack this is"
+    },
+    "preview_html": {
+      "type": "string",
+      "description": "The full HTML of the mockup \u2014 this is what gets reviewed and deployed"
+    },
+    "brand_tokens": {
+      "type": "string",
+      "description": "JSON string of brand tokens (colors, fonts, etc.)"
+    },
+    "source": {
+      "type": "string",
+      "default": "gpt_sync",
+      "description": "Where this pack came from (gpt_sync, manual_upload)"
+    },
+    "submitted_by_label": {
+      "type": "string",
+      "default": "GPT",
+      "description": "Who submitted this pack (display label)"
+    },
+    "session_id": {
+      "type": "string",
+      "description": "The OnboardingSession this pack is for (links strategy \u2192 mockup)"
+    },
+    "user_email": {
+      "type": "string",
+      "description": "Owner email for RLS isolation"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "pending",
+        "approved",
+        "rejected",
+        "deployed"
+      ],
+      "default": "pending",
+      "description": "Review status \u2014 pending = waiting for user approval, approved = user approved, rejected = user rejected, deployed = live on a domain"
+    },
+    "review_notes": {
+      "type": "string",
+      "description": "Admin/user notes during review"
+    },
+    "approved_by": {
+      "type": "string"
+    },
+    "approved_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "deployed_url": {
+      "type": "string",
+      "description": "Live URL once deployed"
+    },
+    "deployed_site_id": {
+      "type": "string",
+      "description": "ID of the DeployedSite record once live"
+    }
+  },
+  "required": [
+    "name",
+    "kind",
+    "preview_html",
+    "status"
+  ],
+  "rls": {
+    "read": {
+      "$or": [
+        {
+          "data.user_email": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "create": {},
+    "update": {
+      "$or": [
+        {
+          "data.user_email": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

@@ -1,0 +1,129 @@
+{
+  "name": "DeployedSite",
+  "type": "object",
+  "description": "A single deployed website \u2014 either a one-off deploy from an approved GptPack, or one of hundreds/thousands in a MassDeployJob. Each site tracks its live URL, Vercel project, traffic, keyword rankings, and leads generated for monitoring.",
+  "properties": {
+    "description": {
+      "type": "string",
+      "description": "Optional description (up to 1000 characters)",
+      "maxLength": 1000
+    },
+    "pack_id": {
+      "type": "string",
+      "description": "The GptPack this site was deployed from"
+    },
+    "mass_deploy_id": {
+      "type": "string",
+      "description": "The MassDeployJob this site belongs to (null if single deploy)"
+    },
+    "session_id": {
+      "type": "string",
+      "description": "The OnboardingSession"
+    },
+    "user_email": {
+      "type": "string",
+      "description": "Owner email for RLS isolation"
+    },
+    "city": {
+      "type": "string"
+    },
+    "niche": {
+      "type": "string"
+    },
+    "business_name": {
+      "type": "string"
+    },
+    "domain": {
+      "type": "string",
+      "description": "Custom domain (if purchased/connected)"
+    },
+    "vercel_url": {
+      "type": "string",
+      "description": "Live Vercel URL"
+    },
+    "vercel_project_id": {
+      "type": "string"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "pending",
+        "deploying",
+        "deployed",
+        "failed",
+        "archived"
+      ],
+      "default": "pending"
+    },
+    "deployed_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "traffic_monthly": {
+      "type": "number",
+      "default": 0,
+      "description": "Monthly organic traffic (from GSC/monitoring)"
+    },
+    "keywords_ranking": {
+      "type": "number",
+      "default": 0,
+      "description": "Keywords ranking in top 10"
+    },
+    "leads_generated": {
+      "type": "number",
+      "default": 0,
+      "description": "Total leads generated from this site"
+    },
+    "error": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "pack_id",
+    "user_email",
+    "status"
+  ],
+  "rls": {
+    "read": {
+      "$or": [
+        {
+          "data.user_email": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "create": {
+      "$or": [
+        {
+          "data.user_email": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "update": {
+      "$or": [
+        {
+          "data.user_email": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

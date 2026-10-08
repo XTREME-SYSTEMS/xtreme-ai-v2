@@ -1,0 +1,130 @@
+{
+  "name": "LockedStrategy",
+  "type": "object",
+  "description": "The locked strategy generated from onboarding answers + skip-trace intelligence. Once locked, this IS the strategy \u2014 no branching into 15 different tools. It feeds directly into GPT website generation.",
+  "properties": {
+    "description": {
+      "type": "string",
+      "description": "Optional description (up to 1000 characters)",
+      "maxLength": 1000
+    },
+    "session_id": {
+      "type": "string",
+      "description": "The OnboardingSession this strategy belongs to"
+    },
+    "user_email": {
+      "type": "string",
+      "description": "Owner email for RLS isolation"
+    },
+    "strategy_summary": {
+      "type": "string",
+      "description": "One-paragraph summary of the locked strategy"
+    },
+    "positioning": {
+      "type": "string",
+      "description": "How the business positions itself in the market"
+    },
+    "target_market": {
+      "type": "string",
+      "description": "Who the strategy targets"
+    },
+    "competitive_advantage": {
+      "type": "string",
+      "description": "The edge over competitors identified in skip-trace"
+    },
+    "pricing_model": {
+      "type": "string"
+    },
+    "growth_channels": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Primary channels for growth (SEO, paid, social, referrals, etc.)"
+    },
+    "risk_factors": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "website_brief": {
+      "type": "string",
+      "description": "The brief sent to GPT for website mockup generation \u2014 derived from the locked strategy"
+    },
+    "approved": {
+      "type": "boolean",
+      "default": false,
+      "description": "Whether the user has approved this strategy (locks it)"
+    },
+    "approved_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "intelligence_summary": {
+      "type": "object",
+      "description": "Aggregated intelligence from all skip-trace reports",
+      "properties": {
+        "competitor_count": {
+          "type": "number"
+        },
+        "market_trend": {
+          "type": "string"
+        },
+        "key_findings": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  },
+  "required": [
+    "session_id",
+    "user_email"
+  ],
+  "rls": {
+    "read": {
+      "$or": [
+        {
+          "data.user_email": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "create": {
+      "$or": [
+        {
+          "data.user_email": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "update": {
+      "$or": [
+        {
+          "data.user_email": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}
