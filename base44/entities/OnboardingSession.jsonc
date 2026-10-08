@@ -1,11 +1,10 @@
 {
   "name": "OnboardingSession",
   "type": "object",
-  "description": "The AI onboarding session \u2014 the entry point to the entire simplified pipeline. An AI assistant asks the user a series of questions about their business. Every answer triggers a background skip-trace that builds a full intelligence profile (business, owner, competitors, market, suppliers, adjacent trades, permits, properties). Once all questions are answered, the session moves to strategy lock, then GPT website generation, review, deploy, and mass deploy.",
+  "description": "A business onboarding and editor project, with private draft storage and its own editor-agent conversation.",
   "properties": {
     "description": {
       "type": "string",
-      "description": "Optional description (up to 1000 characters)",
       "maxLength": 1000
     },
     "session_id": {
@@ -14,7 +13,26 @@
     },
     "user_email": {
       "type": "string",
-      "description": "Email of the user who owns this session"
+      "description": "Owner email for isolation"
+    },
+    "project_name": {
+      "type": "string",
+      "maxLength": 160
+    },
+    "studio_conversation_id": {
+      "type": "string"
+    },
+    "draft_file_uri": {
+      "type": "string",
+      "description": "Private HTML document edited by the studio agent"
+    },
+    "draft_revision": {
+      "type": "integer",
+      "default": 0
+    },
+    "draft_pack_id": {
+      "type": "string",
+      "description": "Original website pack opened in this project"
     },
     "status": {
       "type": "string",
@@ -27,17 +45,14 @@
         "mass_deploying",
         "complete"
       ],
-      "default": "onboarding",
-      "description": "Where in the 5-8 step flow this session is"
+      "default": "onboarding"
     },
     "current_step": {
       "type": "number",
-      "default": 1,
-      "description": "Which onboarding question the user is currently on"
+      "default": 1
     },
     "answers": {
       "type": "object",
-      "description": "Map of question_key \u2192 { answer_text, skip_trace_id, answered_at }",
       "properties": {
         "business_name": {
           "type": "object"
@@ -66,20 +81,16 @@
       }
     },
     "locked_strategy_id": {
-      "type": "string",
-      "description": "ID of the LockedStrategy record once the strategy is locked"
+      "type": "string"
     },
     "approved_pack_id": {
-      "type": "string",
-      "description": "ID of the approved GptPack once a mockup is approved"
+      "type": "string"
     },
     "deployed_site_id": {
-      "type": "string",
-      "description": "ID of the DeployedSite once the single site is live"
+      "type": "string"
     },
     "mass_deploy_job_id": {
-      "type": "string",
-      "description": "ID of the MassDeployJob if mass deployment was started"
+      "type": "string"
     },
     "completed_at": {
       "type": "string",

@@ -33,6 +33,7 @@ import ResetPassword from '@/pages/ResetPassword';
 import Dashboard from '@/pages/Dashboard';
 import BusinessGenerator from '@/pages/BusinessGenerator';
 import OnboardingAssistant from '@/pages/OnboardingAssistant';
+import Projects from '@/pages/Projects';
 import StrategyReview from '@/pages/StrategyReview';
 import PackInbox from '@/pages/PackInbox';
 import MassWebsiteFactory from '@/pages/MassWebsiteFactory';
@@ -75,10 +76,12 @@ const AuthenticatedApp = () => {
       <Route path="/forgot-password" element={<ForgotPassword />} />
       <Route path="/reset-password" element={<ResetPassword />} />
       <Route element={<ProtectedRoute unauthenticatedElement={<Navigate to="/login" replace />} />}>
+        <Route path="/onboarding" element={<OnboardingAssistant />} />
+        <Route path="/projects" element={<Projects />} />
         <Route element={<Layout />}>
           <Route path="/client-portal" element={<Dashboard />} />
           <Route path="/business-generator" element={<BusinessGenerator />} />
-          <Route path="/onboarding" element={<OnboardingAssistant />} />
+
           <Route path="/strategy-review" element={<StrategyReview />} />
           <Route path="/pack-inbox" element={<PackInbox />} />
           <Route path="/mass-website-factory" element={<MassWebsiteFactory />} />
