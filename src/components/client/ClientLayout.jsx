@@ -39,7 +39,7 @@ export default function ClientLayout({ user }) {
         </div>
         {autoBuild.isActive && (
           <button
-            onClick={() => { autoBuild.clearActiveBuild(); navigate("/auto-builder"); }}
+            onClick={() => { autoBuild.clearActiveBuild(); navigate("/onboarding"); }}
             className="ml-2 flex items-center gap-1.5 rounded-md border border-amber-400 px-2.5 py-1.5 text-xs font-semibold text-amber-400 hover:bg-amber-400/10"
           >
             <Hammer className="h-3.5 w-3.5" /> Back to Queue
@@ -47,7 +47,7 @@ export default function ClientLayout({ user }) {
         )}
         {user?.role === "admin" && !autoBuild.isActive && !previewAsClient && (
           <a
-            href="/autonomous-system?view=admin"
+            href="/onboarding?view=admin"
             className="ml-2 flex items-center gap-1.5 rounded-md border border-black/15 px-2.5 py-1.5 text-xs font-semibold text-black hover:bg-black/5"
           >
             <LayoutDashboard className="h-3.5 w-3.5" /> Admin Panel

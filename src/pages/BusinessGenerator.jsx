@@ -56,7 +56,7 @@ export default function BusinessGenerator() {
     notifyStepComplete("welcome", { clientEmail: user?.email || "" });
     const idx = visibleSteps.findIndex((s) => s.to === "/business-generator");
     const next = idx >= 0 && idx < visibleSteps.length - 1 ? visibleSteps[idx + 1] : null;
-    navigate(next ? next.to : "/business-name-studio");
+    navigate(next ? next.to : "/onboarding");
   };
 
   const requestRevision = async () => {

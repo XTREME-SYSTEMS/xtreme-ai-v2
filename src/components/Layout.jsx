@@ -1,45 +1,20 @@
-import { NavLink, Outlet, useNavigate, useLocation } from "react-router-dom";
+import { NavLink, Outlet, useNavigate } from "react-router-dom";
 import { base44 } from "@/api/base44Client";
 import { useState, useEffect } from "react";
 import {
-  LayoutDashboard, Search, Users, ClipboardCheck, Target, Globe, BookOpen,
-  Lightbulb, Palette, Monitor, Megaphone, Boxes, Factory, Database, Eye,
-  Hammer, ShieldCheck, FileText, TrendingUp, FlaskConical, Dna, Network, BarChart3,
-  BookMarked, CheckCircle, ScrollText, Plug, Settings, LogOut, Menu, X,
-  MapPin, Plus, Rocket, Bot, LayoutTemplate, Copy, Wand2, Crosshair, Activity, Radar, Package, UserPlus, Tag, Box, ShieldAlert, Sparkles, Brain,
-  Archive, ChevronDown, Compass, Building2, MessageSquareText, PenTool, Shirt, Share2, Video, Layers,
-  ClipboardList, Key, Inbox,
+  Sparkles, Brain, Inbox, Rocket, Activity,
+  Menu, X, LogOut, Globe, Eye,
 } from "lucide-react";
 import { Image } from "@/components/ui/image";
 import { cn } from "@/lib/utils";
 import { LOGO_ICON } from "@/lib/brandAssets";
-import { UNIFIED_BUILD_STEPS } from "@/lib/unifiedSteps";
-import { hasAccessToPage } from "@/lib/accessCapabilities";
 import BrandLoader from "@/components/BrandLoader";
 import { usePreview } from "@/lib/PreviewContext";
 import ClientLayout from "@/components/client/ClientLayout";
 import PreviewAsClientModal from "@/components/admin/PreviewAsClientModal";
 import { useAutoBuild } from "@/lib/AutoBuildContext";
 
-// Client portal navigation lives in ClientLayout; this admin NAV is the only
-// nav array used by the admin sidebar.
-
-// The focused autonomous pipeline — the only primary navigation.
-// Step 1: Pipeline Catalog → Browse packages, templates & tools
-// Step 2: Queue System     → Ideas queued for building (received from Vision Cortex)
-// Step 3: Auto Builder     → Full builder pipeline
-const PIPELINE_OVERVIEW = { to: "/autonomous-system", label: "Pipeline Overview", icon: Bot, end: true };
-
-const PIPELINE_CATALOG = { to: "/pipeline-catalog", label: "Pipeline Catalog", icon: Layers, end: true };
-const PRODUCT_CATALOG = { to: "/product-catalog", label: "Product Catalog", icon: Package, end: true };
-const LEAD_ENGINE = { to: "/lead-engine", label: "Lead Engine", icon: Radar, end: true };
-const VISUALIZER_INBOX = { to: "/visualizer-inbox", label: "Visualizer Inbox", icon: Eye, end: true };
-const COUNCIL_CHAMBER = { to: "/council-chamber", label: "Council Chamber", icon: Brain, end: true };
-const EMPLOYEE_PORTAL = { to: "/employee-portal", label: "Employee Portal", icon: Users, end: true };
-
-// Each step gets its own brand color so the pipeline reads as a creative
-// spectrum (violet → cyan → emerald → gold → rose) instead of all-yellow.
-// All class strings are literals so Tailwind preserves them.
+// The 5-step growth pipeline — the only navigation.
 const PIPELINE_STEPS = [
   { to: "/onboarding", label: "AI Onboarding", icon: Sparkles, step: 1, desc: "Answer questions — we skip-trace everything",
     color: { ring: "border-emerald-400 bg-emerald-400 text-white shadow-[0_0_14px_3px_rgba(52,211,153,0.45)]", text: "text-emerald-400", icon: "text-emerald-400", idle: "text-emerald-400/40" } },
@@ -53,112 +28,11 @@ const PIPELINE_STEPS = [
     color: { ring: "border-violet-400 bg-violet-400 text-white shadow-[0_0_14px_3px_rgba(167,139,250,0.45)]", text: "text-violet-400", icon: "text-violet-400", idle: "text-violet-400/40" } },
 ];
 
-// Auto Builder sub-steps — the builder's own pipeline, shown as a nested
-// timeline when the user is on the Auto Builder step. Mirrors the client
-// portal journey: Welcome → Business Name → Profile → Content → Logo →
-// Brand → Website → Social → Video → Review.
-// Auto Builder sub-steps — derived from the unified build journey so the
-// admin sub-timeline shows the exact same numbered steps as the client
-// portal and employee portal (single source of truth: unifiedSteps.js).
-const AUTOBUILDER_STEPS = UNIFIED_BUILD_STEPS.map((s) => ({
-  to: s.to, label: s.label, icon: s.icon, number: s.number,
-}));
-
-const AUTOBUILDER_ROUTES = ["/auto-builder", ...AUTOBUILDER_STEPS.map((s) => s.to)];
-
-// Archived items — still accessible but collapsed out of the way.
-const ARCHIVE_ITEMS = [
-  { to: "/client-portal", label: "Command Center", icon: LayoutDashboard, end: true },
-  { section: "Xtreme AI" },
-  { to: "/portal-studio", label: "Xtreme AI Studio", icon: Hammer, end: true },
-  { section: "Discovery" },
-  { to: "/idea-discovery", label: "Autonomous Discovery", icon: Radar },
-  { to: "/discovery", label: "Business Discovery", icon: Search },
-  { to: "/prospects", label: "Prospects", icon: Users },
-  { to: "/audits", label: "Audits", icon: ClipboardCheck },
-  { to: "/opportunities", label: "Search Opportunities", icon: Target },
-  { to: "/domains", label: "Domains", icon: Globe },
-  { section: "Strategy" },
-  { to: "/throw-the-book", label: "Throw The Book", icon: BookOpen },
-  { to: "/concepts", label: "Concepts", icon: Lightbulb },
-  { to: "/brand-lab", label: "Brand Lab", icon: Palette },
-  { to: "/website-lab", label: "Website Lab", icon: Monitor },
-  { to: "/marketing-lab", label: "Marketing Lab", icon: Megaphone },
-  { section: "Registries" },
-  { to: "/capabilities", label: "Capability Registry", icon: Boxes },
-  { to: "/generators", label: "Generator Registry", icon: Factory },
-  { to: "/sources", label: "Scraper / Source Registry", icon: Database },
-  { to: "/visualizer-hub", label: "Visualizer Hub", icon: Eye },
-  { to: "/xps-catalog", label: "XPS Asset Catalog", icon: Boxes },
-  { section: "Build & QA" },
-  { to: "/preview-factory", label: "Preview Factory", icon: Eye },
-  { to: "/qa-repair", label: "QA & Repair", icon: ShieldCheck },
-  { to: "/proposals", label: "Proposal Factory", icon: FileText },
-  { to: "/pipeline", label: "Sales Pipeline", icon: TrendingUp },
-  { to: "/experiments", label: "Experiments", icon: FlaskConical },
-  { section: "Intelligence" },
-  { to: "/vision-cortex", label: "Vision Cortex (legacy)", icon: Eye },
-  { to: "/architect", label: "AI Chief Architect (legacy)", icon: Brain },
-  { to: "/industry-dna", label: "Industry DNA", icon: Dna },
-  { to: "/website-genomes", label: "Website Genome", icon: Network },
-  { to: "/playbooks", label: "Playbooks", icon: BookMarked },
-  { section: "Business Suite" },
-  { to: "/business-suite", label: "Suite Dashboard", icon: LayoutDashboard, end: true },
-  { to: "/crm/contacts", label: "Contacts", icon: Users },
-  { to: "/crm/accounts", label: "Accounts", icon: Users },
-  { to: "/crm/deals", label: "Deals", icon: TrendingUp },
-  { to: "/crm/activities", label: "Activities", icon: ClipboardCheck },
-  { to: "/crm/campaigns", label: "Campaigns", icon: Megaphone },
-  { to: "/crm/quotes", label: "Quotes", icon: FileText },
-  { to: "/esign/documents", label: "E-Sign Documents", icon: ShieldCheck },
-  { to: "/billing/invoices", label: "Invoices", icon: ScrollText },
-  { to: "/billing/expenses", label: "Expenses", icon: ScrollText },
-  { section: "Site Factory" },
-  { to: "/website-factory", label: "Website Factory", icon: Factory },
-  { to: "/template-library", label: "Template Library", icon: LayoutTemplate },
-  { to: "/prompt-library", label: "Prompt Library", icon: BookOpen },
-  { to: "/clone-studio", label: "Clone Studio", icon: Copy },
-  { to: "/clone-pipeline", label: "Clone Pipeline", icon: Rocket },
-  { to: "/rebrand-studio", label: "Rebrand Studio", icon: Wand2 },
-  { to: "/race-to-rank", label: "Race to Rank", icon: Rocket },
-  { to: "/ranking-monitor", label: "Ranking Monitor", icon: TrendingUp },
-  { to: "/gsc-traffic", label: "GSC Traffic", icon: BarChart3 },
-  { to: "/seo-accelerator", label: "Page 1 Accelerator", icon: Crosshair },
-  { to: "/seo-standard", label: "SEO Standard Checklist", icon: ClipboardCheck },
-  { to: "/seo-agent", label: "SEO AI Agent", icon: Bot },
-  { to: "/serp-blueprint", label: "SERP Competitor Cloner", icon: Crosshair },
-  { to: "/domain-acquisition", label: "Domain Acquisition AI", icon: Radar },
-  { to: "/pipeline-dashboard", label: "Growth Pipeline", icon: Activity },
-  { to: "/domain-portfolio", label: "Domain Portfolio", icon: Globe },
-  { to: "/rank-engine", label: "Rank Engine", icon: TrendingUp },
-  { to: "/markets", label: "Markets", icon: MapPin },
-  { to: "/markets/new", label: "New Market", icon: Plus },
-  { to: "/seo-launch-pad", label: "SEO Launch Pad", icon: Rocket },
-  { section: "Lab" },
-  { to: "/test-lab", label: "Test Lab", icon: FlaskConical },
-  { section: "Governance" },
-  { to: "/client-setup", label: "Client Setup", icon: UserPlus },
-  { to: "/admin-packages", label: "Package Gallery", icon: Package },
-  { to: "/admin-promo-codes", label: "Promo Codes", icon: Tag },
-  { to: "/admin-domain-purchase", label: "Domain Purchaser", icon: Globe },
-  { to: "/employee-management", label: "Employee Management", icon: Users },
-  { to: "/walkthrough-studio", label: "3D Walkthroughs", icon: Box },
-  { to: "/system-alerts", label: "System Alerts", icon: ShieldAlert },
-  { to: "/system-optimization", label: "System Optimization", icon: Sparkles },
-  { to: "/approvals", label: "Approvals", icon: CheckCircle },
-  { to: "/receipts", label: "Receipts", icon: ScrollText },
-  { to: "/connectors", label: "Connectors", icon: Plug },
-  { to: "/settings", label: "Settings", icon: Settings },
-];
-
 export default function Layout() {
   const [open, setOpen] = useState(false);
   const [user, setUser] = useState(null);
   const [showPreviewModal, setShowPreviewModal] = useState(false);
-  const [archiveOpen, setArchiveOpen] = useState(false);
   const navigate = useNavigate();
-  const location = useLocation();
-  const showAutoBuilderSub = AUTOBUILDER_ROUTES.includes(location.pathname);
 
   useEffect(() => {
     base44.auth.me().then(setUser).catch(() => {});
@@ -170,7 +44,7 @@ export default function Layout() {
     navigate("/login");
   };
 
-  const { previewAsClient, setPreview, clearPreview } = usePreview();
+  const { previewAsClient, clearPreview } = usePreview();
   const autoBuild = useAutoBuild();
 
   if (user === null) {
@@ -178,16 +52,12 @@ export default function Layout() {
   }
   const isAdmin = user?.role === "admin";
   const isEmployee = user?.role === "employee";
-  const userCaps = user?.access_capabilities || [];
-  const hasFullAccess = isAdmin || !userCaps.length || userCaps.includes("all");
-  const filterNav = (items) => hasFullAccess ? items : items.filter((item) => !item.to || hasAccessToPage(userCaps, item.to));
+
   // Admins work in the client portal by default — the clean, distraction-free
   // UI with the growth pipeline timeline. The admin sidebar is accessible via
   // the "Admin Panel" button in the client portal header when needed.
   if (autoBuild.isActive) return <ClientLayout user={user} />;
   if ((!isAdmin && !isEmployee) || previewAsClient) return <ClientLayout user={user} />;
-  // Admins: default to client portal unless they explicitly requested the
-  // admin sidebar via ?view=admin
   if (isAdmin && new URLSearchParams(window.location.search).get('view') !== 'admin') {
     return <ClientLayout user={user} />;
   }
@@ -200,39 +70,20 @@ export default function Layout() {
         open ? "translate-x-0" : "-translate-x-full"
       )}>
         <div className="flex h-14 items-center gap-2 border-b border-black/10 px-4">
-          <Image
-            src={LOGO_ICON}
-            alt="Xtreme AI"
-            className="h-10 w-10"
-            fittingType="fit"
-          />
+          <Image src={LOGO_ICON} alt="Xtreme AI" className="h-10 w-10" fittingType="fit" />
           <div className="leading-tight">
             <div className="text-sm font-semibold text-black">Xtreme AI</div>
-            <div className="text-[10px] uppercase tracking-wider text-amber-600">{user?.role === "admin" ? "Growth Factory" : "Business Generator"}</div>
-            </div>
-            <button onClick={() => setOpen(false)} className="ml-auto md:hidden text-black/50 hover:text-black"><X className="h-5 w-5" /></button>
+            <div className="text-[10px] uppercase tracking-wider text-amber-600">Growth Factory</div>
+          </div>
+          <button onClick={() => setOpen(false)} className="ml-auto md:hidden text-black/50 hover:text-black"><X className="h-5 w-5" /></button>
         </div>
         <nav className="h-[calc(100vh-3.5rem)] overflow-y-auto px-2 py-3">
-          {/* Pipeline Overview — home base */}
-          <NavLink
-            to={PIPELINE_OVERVIEW.to}
-            end={PIPELINE_OVERVIEW.end}
-            onClick={() => setOpen(false)}
-            className={({ isActive }) => cn(
-              "flex items-center gap-2.5 rounded-lg px-2.5 py-2 text-sm transition-colors",
-              isActive ? "bg-amber-400/10 text-amber-600 font-semibold" : "text-black hover:bg-black/5"
-            )}
-          >
-            <Bot className="h-4 w-4 shrink-0" />
-            {PIPELINE_OVERVIEW.label}
-          </NavLink>
-
           {/* Start Growth Pipeline — the only primary action */}
           <NavLink
             to="/onboarding"
             onClick={() => setOpen(false)}
             className={({ isActive }) => cn(
-              "mt-2 flex items-center justify-center gap-2 rounded-xl bg-primary px-4 py-3 text-sm font-bold text-primary-foreground transition-colors hover:bg-primary/90",
+              "flex items-center justify-center gap-2 rounded-xl bg-primary px-4 py-3 text-sm font-bold text-primary-foreground transition-colors hover:bg-primary/90",
               isActive && "ring-2 ring-primary ring-offset-2"
             )}
           >
@@ -240,7 +91,7 @@ export default function Layout() {
             Start Growth Pipeline
           </NavLink>
 
-          {/* Timeline header — prominent, with a gradient accent rule */}
+          {/* Timeline header */}
           <div className="mt-5 mb-2 flex items-center gap-2 px-1">
             <span className="text-xs font-bold uppercase tracking-[0.22em] text-amber-600">Growth Pipeline</span>
             <div className="h-px flex-1 bg-gradient-to-r from-amber-400/40 via-black/10 to-transparent" />
@@ -248,120 +99,45 @@ export default function Layout() {
 
           {/* Vertical step-by-step timeline */}
           <div className="relative mt-2">
-            {/* Connecting line — gradient tying the step colors together */}
             <div className="absolute left-[28px] top-7 bottom-7 w-0.5 rounded-full bg-gradient-to-b from-violet-400/30 via-black/10 to-rose-400/30" />
-            {filterNav(PIPELINE_STEPS).map((step) => {
+            {PIPELINE_STEPS.map((step) => {
               const Icon = step.icon;
-              const isAutoBuilder = step.to === "/auto-builder";
               return (
-                <div key={step.to}>
-                  <NavLink
-                    to={step.to}
-                    end={step.end}
-                    onClick={() => setOpen(false)}
-                    className={({ isActive }) => cn(
-                      "relative flex items-center gap-3.5 rounded-lg px-1 py-2.5 transition-colors",
-                      isActive ? "" : "hover:bg-black/5"
-                    )}
-                  >
-                    {({ isActive }) => {
-                      const active = isActive || (isAutoBuilder && showAutoBuilderSub);
-                      const c = step.color;
-                      return (
+                <NavLink
+                  key={step.to}
+                  to={step.to}
+                  onClick={() => setOpen(false)}
+                  className={({ isActive }) => cn(
+                    "relative flex items-center gap-3.5 rounded-lg px-1 py-2.5 transition-colors",
+                    isActive ? "" : "hover:bg-black/5"
+                  )}
+                >
+                  {({ isActive }) => {
+                    const c = step.color;
+                    return (
                       <>
                         <div className={cn(
                           "relative z-10 flex h-12 w-12 shrink-0 items-center justify-center rounded-full border-2 text-base font-bold transition-all duration-200",
-                          active ? c.ring : cn("border-black/15 bg-white", c.idle)
+                          isActive ? c.ring : cn("border-black/15 bg-white", c.idle)
                         )}>
                           {step.step}
                         </div>
                         <div>
                           <div className={cn(
                             "flex items-center gap-2 text-sm font-semibold transition-colors",
-                            active ? c.text : "text-black"
+                            isActive ? c.text : "text-black"
                           )}>
-                            <Icon className={cn("h-5 w-5 shrink-0 transition-colors", active ? c.icon : "text-black/50")} />
+                            <Icon className={cn("h-5 w-5 shrink-0 transition-colors", isActive ? c.icon : "text-black/50")} />
                             {step.label}
                           </div>
                           <div className="text-[11px] leading-tight text-black/40">{step.desc}</div>
                         </div>
                       </>
-                      );
-                    }}
-                  </NavLink>
-                  {/* Auto Builder sub-timeline — expands when active */}
-                  {isAutoBuilder && showAutoBuilderSub && (
-                    <div className="relative ml-[26px] mt-1 mb-2 border-l border-black/10 pl-5">
-                      {AUTOBUILDER_STEPS.map((sub, j) => {
-                        const SubIcon = sub.icon;
-                        const subActive = location.pathname === sub.to;
-                        return (
-                          <NavLink
-                            key={sub.to}
-                            to={sub.to}
-                            onClick={() => setOpen(false)}
-                            className="relative flex items-center gap-2.5 rounded-lg px-1 py-1.5 transition-colors hover:bg-black/5"
-                          >
-                            <div className={cn(
-                              "flex h-7 w-7 shrink-0 items-center justify-center rounded-full border text-[10px] font-bold transition-all",
-                              subActive
-                                ? "border-amber-400 bg-amber-400 text-white shadow-[0_0_8px_1px_rgba(0,71,255,0.4)]"
-                                : "border-black/15 bg-white text-black/40"
-                            )}>
-                              {sub.number}
-                            </div>
-                            <span className={cn(
-                              "flex items-center gap-1.5 text-[13px] font-medium",
-                              subActive ? "text-amber-600" : "text-black/60"
-                            )}>
-                              <SubIcon className={cn("h-4 w-4 shrink-0", subActive ? "text-amber-600" : "text-black/50")} />
-                              {sub.label}
-                            </span>
-                          </NavLink>
-                        );
-                      })}
-                    </div>
-                  )}
-                </div>
+                    );
+                  }}
+                </NavLink>
               );
             })}
-          </div>
-
-          {/* Archive — collapsed by default, still accessible */}
-          <div className="mt-6 border-t border-black/10 pt-3">
-            <button
-              onClick={() => setArchiveOpen((v) => !v)}
-              className="flex w-full items-center gap-2 rounded-lg px-2.5 py-2 text-sm text-black/40 transition-colors hover:bg-black/5 hover:text-black/70"
-            >
-              <Archive className="h-4 w-4 shrink-0" />
-              <span className="text-[10px] font-semibold uppercase tracking-wider">Archive</span>
-              <ChevronDown className={cn("ml-auto h-4 w-4 transition-transform", archiveOpen && "rotate-180")} />
-            </button>
-            {archiveOpen && (
-              <div className="mt-1 space-y-0.5">
-                {filterNav(ARCHIVE_ITEMS).map((item, i) => {
-                  if (item.section) {
-                    return <div key={i} className="mt-3 mb-1 px-2.5 text-[9px] font-semibold uppercase tracking-wider text-black/25">{item.section}</div>;
-                  }
-                  const Icon = item.icon;
-                  return (
-                    <NavLink
-                      key={item.to}
-                      to={item.to}
-                      end={item.end}
-                      onClick={() => setOpen(false)}
-                      className={({ isActive }) => cn(
-                        "flex items-center gap-2.5 rounded-lg px-2.5 py-1.5 text-[13px] transition-colors",
-                        isActive ? "bg-black/10 text-black" : "text-black/40 hover:bg-black/5 hover:text-black/70"
-                      )}
-                    >
-                      <Icon className="h-3.5 w-3.5 shrink-0" />
-                      {item.label}
-                    </NavLink>
-                  );
-                })}
-              </div>
-            )}
           </div>
         </nav>
       </aside>
@@ -373,8 +149,8 @@ export default function Layout() {
         <header className="flex h-14 items-center gap-3 border-b border-border bg-card px-4 backdrop-blur">
           <button onClick={() => setOpen(true)} className="md:hidden text-black/50 hover:text-black"><Menu className="h-5 w-5" /></button>
           <div className="flex items-center gap-2 text-xs">
-            <span className="rounded-md bg-black px-2 py-1 font-mono text-white font-semibold">{user?.role === "admin" ? "XTREME AI PIPELINE" : "BUSINESS GENERATOR"}</span>
-            <span className="hidden text-black/50 sm:inline">{user?.role === "admin" ? "Autonomous growth factory · AI-driven pipeline" : "AI-powered business generation workflow"}</span>
+            <span className="rounded-md bg-black px-2 py-1 font-mono text-white font-semibold">XTREME AI PIPELINE</span>
+            <span className="hidden text-black/50 sm:inline">Autonomous growth factory · AI-driven pipeline</span>
           </div>
           <div className="ml-auto flex items-center gap-3">
             <span className="hidden text-xs text-black/60 sm:inline">{user?.email || ""}</span>
