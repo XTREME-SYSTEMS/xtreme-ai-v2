@@ -199,6 +199,47 @@ export const PORTAL_STEPS = {
     body: "Review the complete system blueprint and finalize the build.",
     nextLabel: "Go to Launch", nextTo: "/receipts",
   },
+  // ── Growth Pipeline steps (the new autonomous 5-step flow) ──
+  "gp-onboarding": {
+    key: "gp-onboarding",
+    to: "/onboarding", label: "Onboarding", icon: Sparkles, gate: "auto",
+    activityLabel: "Answer onboarding questions",
+    title: "AI Onboarding",
+    body: "Answer a few questions about your business. Every answer triggers a background skip-trace that builds a full intelligence profile.",
+    nextLabel: "Go to Strategy Lock", nextTo: "/strategy-review",
+  },
+  "gp-strategy": {
+    key: "gp-strategy",
+    to: "/strategy-review", label: "Strategy Lock", icon: Brain, gate: "auto",
+    activityLabel: "Review and lock your strategy",
+    title: "Strategy Lock",
+    body: "Review the strategy synthesized from your answers and skip-trace intelligence. Lock it to generate your website brief.",
+    nextLabel: "Go to Pack Inbox", nextTo: "/pack-inbox",
+  },
+  "gp-pack": {
+    key: "gp-pack",
+    to: "/pack-inbox", label: "Pack Inbox", icon: Inbox, gate: "auto",
+    activityLabel: "Review GPT mockups",
+    title: "Pack Inbox",
+    body: "Website mockups from GPT land here for your review. Preview, approve, or reject each one before deployment.",
+    nextLabel: "Go to Mass Deploy", nextTo: "/mass-website-factory",
+  },
+  "gp-deploy": {
+    key: "gp-deploy",
+    to: "/mass-website-factory", label: "Mass Deploy", icon: Rocket, gate: "auto",
+    activityLabel: "Deploy sites at scale",
+    title: "Mass Deploy",
+    body: "Spin up hundreds of website variations across cities and niches from your approved mockup.",
+    nextLabel: "Go to Monitor", nextTo: "/ranking-monitor",
+  },
+  "gp-monitor": {
+    key: "gp-monitor",
+    to: "/ranking-monitor", label: "Monitor", icon: Activity, gate: "auto",
+    activityLabel: "Track traffic and leads",
+    title: "Monitor",
+    body: "Track traffic, keyword rankings, and leads across all your deployed sites.",
+    nextLabel: null, nextTo: null,
+  },
 };
 
 // ─────────────────────────────────────────────────────────────────────────
@@ -229,7 +270,15 @@ const SYSTEM_BUILD = [
   "welcome", "business-profile", "strategy", "system-architecture", "data-model", "ui-system", "codegen", "deploy", "system-review", "launch",
 ];
 
+// Growth Pipeline — the new autonomous 5-step flow. This is the default
+// for all users (including admins) so the client portal shows the simplified
+// onboarding-to-deployment journey instead of the old 15-step build.
+const GROWTH_PIPELINE = [
+  "gp-onboarding", "gp-strategy", "gp-pack", "gp-deploy", "gp-monitor",
+];
+
 export const PRODUCT_STEPS = {
+  "growth-pipeline": GROWTH_PIPELINE,
   "elite-monthly": FULL_BUILD,
   "elite-annual": FULL_BUILD,
   "pro-monthly": FULL_BUILD,
@@ -247,10 +296,9 @@ export const PRODUCT_STEPS = {
   "platform": SYSTEM_BUILD,
 };
 
-// Fallback for users with no purchase and no plan. grantStarterAccess now
-// grants "demo" plan (full workflow, paywalled at finalization); this fallback
-// covers edge cases where a user has no plan at all.
-export const DEFAULT_STEPS = FULL_BUILD_PLUS_MEDIA;
+// Fallback for users with no purchase and no plan — the growth pipeline is
+// the default experience for everyone, including admins.
+export const DEFAULT_STEPS = GROWTH_PIPELINE;
 
 // Utility nav items (not part of the build journey)
 export const CLIENT_UTILITIES = [

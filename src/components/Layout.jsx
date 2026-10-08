@@ -181,10 +181,16 @@ export default function Layout() {
   const userCaps = user?.access_capabilities || [];
   const hasFullAccess = isAdmin || !userCaps.length || userCaps.includes("all");
   const filterNav = (items) => hasFullAccess ? items : items.filter((item) => !item.to || hasAccessToPage(userCaps, item.to));
-  // AutoBuild mode: render the client portal shell so the admin walks the
-  // same guided timeline + StepCoach as a real client.
-  if (isAdmin && autoBuild.isActive) return <ClientLayout user={user} />;
+  // Admins work in the client portal by default — the clean, distraction-free
+  // UI with the growth pipeline timeline. The admin sidebar is accessible via
+  // the "Admin Panel" button in the client portal header when needed.
+  if (autoBuild.isActive) return <ClientLayout user={user} />;
   if ((!isAdmin && !isEmployee) || previewAsClient) return <ClientLayout user={user} />;
+  // Admins: default to client portal unless they explicitly requested the
+  // admin sidebar via ?view=admin
+  if (isAdmin && new URLSearchParams(window.location.search).get('view') !== 'admin') {
+    return <ClientLayout user={user} />;
+  }
 
   return (
     <div className="flex h-screen bg-background text-foreground">

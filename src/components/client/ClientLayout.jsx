@@ -1,6 +1,6 @@
 import { Outlet, useNavigate } from "react-router-dom";
 import { base44 } from "@/api/base44Client";
-import { LogOut, ArrowLeft, Hammer } from "lucide-react";
+import { LogOut, ArrowLeft, Hammer, LayoutDashboard } from "lucide-react";
 import { Image } from "@/components/ui/image";
 import { LOGO_ICON } from "@/lib/brandAssets";
 import { usePreview } from "@/lib/PreviewContext";
@@ -17,7 +17,7 @@ import ClientWelcomeModal from "@/components/client/ClientWelcomeModal";
 // else (pipeline state, approvals, etc.) keeps working in the background.
 export default function ClientLayout({ user }) {
   const navigate = useNavigate();
-  const { setPreview, clearPreview } = usePreview();
+  const { setPreview, clearPreview, previewAsClient } = usePreview();
   const autoBuild = useAutoBuild();
 
   const logout = async () => {
@@ -34,7 +34,7 @@ export default function ClientLayout({ user }) {
         <div className="leading-tight">
           <div className="text-sm font-semibold text-black">Xtreme AI</div>
           <div className="text-[10px] uppercase tracking-wider text-amber-600">
-            {autoBuild.isActive ? "Auto Builder" : "Business Generator"}
+            {autoBuild.isActive ? "Auto Builder" : "Growth Pipeline"}
           </div>
         </div>
         {autoBuild.isActive && (
@@ -45,7 +45,15 @@ export default function ClientLayout({ user }) {
             <Hammer className="h-3.5 w-3.5" /> Back to Queue
           </button>
         )}
-        {user?.role === "admin" && !autoBuild.isActive && (
+        {user?.role === "admin" && !autoBuild.isActive && !previewAsClient && (
+          <a
+            href="/autonomous-system?view=admin"
+            className="ml-2 flex items-center gap-1.5 rounded-md border border-black/15 px-2.5 py-1.5 text-xs font-semibold text-black hover:bg-black/5"
+          >
+            <LayoutDashboard className="h-3.5 w-3.5" /> Admin Panel
+          </a>
+        )}
+        {user?.role === "admin" && previewAsClient && (
           <button
             onClick={() => { setPreview(false); navigate("/client-portal"); }}
             className="ml-2 flex items-center gap-1.5 rounded-md border border-amber-400 px-2.5 py-1.5 text-xs font-semibold text-amber-400 hover:bg-amber-400/10"

@@ -12,7 +12,7 @@ import { PORTAL_STEPS, PRODUCT_STEPS } from "@/lib/portalSteps";
 // canonical number so the count stays in sync across portals.
 // ─────────────────────────────────────────────────────────────────────────
 
-const CANONICAL_KEYS = PRODUCT_STEPS["demo"]; // FULL_BUILD_PLUS_MEDIA (15 steps)
+const CANONICAL_KEYS = PRODUCT_STEPS["growth-pipeline"]; // GROWTH_PIPELINE (5 steps)
 
 export const UNIFIED_BUILD_STEPS = CANONICAL_KEYS.map((key, i) => ({
   ...PORTAL_STEPS[key],

@@ -173,7 +173,7 @@ const AuthenticatedApp = () => {
   // Render the main app
   return (
     <Routes>
-      <Route path="/" element={isAuthenticated && new URLSearchParams(window.location.search).get('view') !== 'site' ? <Navigate to="/business-generator" replace /> : <Marketing />} />
+      <Route path="/" element={isAuthenticated && new URLSearchParams(window.location.search).get('view') !== 'site' ? <Navigate to="/onboarding" replace /> : <Marketing />} />
       <Route path="/pricing" element={<Pricing />} />
       <Route path="/ThankYou" element={<ThankYou />} />
       <Route path="/seo/:slug" element={<SeoLanding />} />
