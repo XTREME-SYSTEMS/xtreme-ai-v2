@@ -23,17 +23,18 @@ export default function ClientOnboarding() {
   const [form, setForm] = useState({
     full_name: '', address: '', phone: '', email: '',
     business_name: '', industry: '', services: '', target_audience: '', competitive_advantage: '', budget: '',
+    business_type: 'new',
   });
 
   useEffect(() => {
-    if (!token) { setError('No invitation token found. Ask your account manager for a new link.'); setLoading(false); return; }
+    if (!token) { setLoading(false); return; } // No token — allow direct self-onboarding
     base44.entities.ClientInvitation.filter({ invitation_token: token }, { limit: 1 })
       .then(page => {
         const inv = page.items?.[0];
         if (!inv) { setError('This invitation link is invalid or has expired.'); return; }
         if (inv.status === 'completed') { setError('This onboarding form has already been submitted.'); return; }
         setInvitation(inv);
-        if (inv.client_name) setForm(f => ({ ...f, full_name: inv.client_name, email: inv.client_email, phone: inv.client_phone || '' }));
+        if (inv.client_name) setForm(f => ({ ...f, full_name: inv.client_name, email: inv.client_email, phone: inv.client_phone || '', business_type: inv.business_type }));
         base44.entities.ClientInvitation.update(inv.id, { status: 'opened', opened_at: new Date().toISOString() }).catch(() => {});
       })
       .catch(() => setError('Could not load this invitation.'))
@@ -54,17 +55,17 @@ export default function ClientOnboarding() {
         budget: { answer_text: form.budget, answered_at: new Date().toISOString() },
       };
       const session = await base44.entities.OnboardingSession.create({
-        user_email: invitation.client_email,
+        user_email: invitation?.client_email || form.email,
         session_id: crypto.randomUUID(),
         status: 'onboarding',
         current_step: 8,
         answers,
         client_phone: form.phone,
         client_address: form.address,
-        business_type: invitation.business_type,
+        business_type: invitation?.business_type || form.business_type,
         project_name: form.business_name || form.full_name,
       });
-      await base44.entities.ClientInvitation.update(invitation.id, { status: 'completed', session_id: session.id, completed_at: new Date().toISOString() });
+      if (invitation) await base44.entities.ClientInvitation.update(invitation.id, { status: 'completed', session_id: session.id, completed_at: new Date().toISOString() });
       // Trigger skip traces in the background for key answers
       for (const [key, val] of Object.entries(answers)) {
         if (val.answer_text && ['business_name', 'owner_name', 'industry', 'location'].includes(key)) {
@@ -103,15 +104,15 @@ export default function ClientOnboarding() {
         <div className="space-y-3">
           {BUSINESS_TYPES.map(bt => (
             <button key={bt.value} onClick={() => setForm(f => ({ ...f, business_type: bt.value }))}
-              className={`flex w-full items-start gap-3 rounded-xl border p-4 text-left transition-colors ${invitation.business_type === bt.value ? 'border-primary bg-primary/5' : 'border-border hover:bg-secondary'}`}>
-              <div className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-full border-2 ${invitation.business_type === bt.value ? 'border-primary' : 'border-border'}`}>
-                {invitation.business_type === bt.value && <div className="h-2.5 w-2.5 rounded-full bg-primary" />}
+              className={`flex w-full items-start gap-3 rounded-xl border p-4 text-left transition-colors ${form.business_type === bt.value ? 'border-primary bg-primary/5' : 'border-border hover:bg-secondary'}`}>
+              <div className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-full border-2 ${form.business_type === bt.value ? 'border-primary' : 'border-border'}`}>
+                {form.business_type === bt.value && <div className="h-2.5 w-2.5 rounded-full bg-primary" />}
               </div>
               <div><p className="text-sm font-semibold">{bt.label}</p><p className="text-xs text-muted-foreground">{bt.desc}</p></div>
             </button>
           ))}
         </div>
-        <p className="text-xs text-muted-foreground">This was selected by your account manager when sending the invitation.</p>
+        {invitation && <p className="text-xs text-muted-foreground">Your account manager pre-selected this type when sending the invitation.</p>}
       </>}
 
       {step === 3 && <>
