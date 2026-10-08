@@ -217,6 +217,7 @@ export default function OnboardingAssistant() {
             Background Intelligence ({Object.keys(traceResults).length} traces)
           </div>
           {Object.entries(traceResults).map(([key, val]) => {
+            if (!val) return null;
             const q = ONBOARDING_QUESTIONS.find((x) => x.key === key);
             const trace = val.trace;
             return (
