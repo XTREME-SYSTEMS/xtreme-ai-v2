@@ -684,7 +684,7 @@
 
 /* The editor retains its existing warm accent without changing other pages. */
 .studio-workspace {
-  --primary: 33 100% 50%;
-  --primary-foreground: 0 0% 0%;
-  --ring: 33 100% 50%;
+  --primary: 219 100% 50%;
+  --primary-foreground: 0 0% 100%;
+  --ring: 219 100% 50%;
 }
