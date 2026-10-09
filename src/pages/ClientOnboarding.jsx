@@ -72,6 +72,8 @@ export default function ClientOnboarding() {
           base44.functions.invoke('skipTraceAnswer', { session_id: session.id, question_key: key, answer_text: val.answer_text, context: answers }).catch(() => {});
         }
       }
+      // Trigger the autonomous pipeline in the background — runs all remaining steps
+      base44.functions.invoke('runAutonomousPipeline', { session_id: session.session_id, auto_deploy: false }).catch(() => {});
       setDone(true);
     } catch (e) { setError(e.message || 'Could not submit. Please try again.'); }
     finally { setSubmitting(false); }

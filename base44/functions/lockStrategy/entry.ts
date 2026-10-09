@@ -18,18 +18,14 @@ export default async function(req: Request): Promise<Response> {
 
     if (!session_id) return Response.json({ error: 'Missing session_id' }, { status: 400 });
 
-    // Fetch all skip-trace reports for this session
-    const tracesResult = await base44.entities.SkipTraceReport.filter(
-      { session_id, user_email: user.email, status: 'complete' },
-      { sort: 'created_date', limit: 50 }
-    );
+    // Fetch all skip-trace reports for this session — admins see all traces
+    const traceQuery = user.role === 'admin' ? { session_id, status: 'complete' } : { session_id, user_email: user.email, status: 'complete' };
+    const tracesResult = await base44.entities.SkipTraceReport.filter(traceQuery, { sort: 'created_date', limit: 50 });
     const traces = tracesResult.items || tracesResult || [];
 
-    // Fetch the session
-    const session = await base44.entities.OnboardingSession.filter(
-      { session_id, user_email: user.email },
-      { limit: 1 }
-    );
+    // Fetch the session — admins can lock any session, regular users only their own
+    const sessionQuery = user.role === 'admin' ? { session_id } : { session_id, user_email: user.email };
+    const session = await base44.entities.OnboardingSession.filter(sessionQuery, { limit: 1 });
     const sessionRecord = (session.items || session)[0];
     if (!sessionRecord) return Response.json({ error: 'Session not found' }, { status: 404 });
 

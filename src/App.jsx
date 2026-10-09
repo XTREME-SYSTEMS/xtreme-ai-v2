@@ -42,6 +42,7 @@ import VideoGenerator from '@/pages/VideoGenerator';
 import GptSync from '@/pages/GptSync';
 import PipelineFlow from '@/pages/PipelineFlow';
 import SkipTracePortal from '@/pages/SkipTracePortal';
+import AutonomousPipeline from '@/pages/AutonomousPipeline';
 import ClientOnboarding from '@/pages/ClientOnboarding';
 
 const AuthenticatedApp = () => {
@@ -88,6 +89,7 @@ const AuthenticatedApp = () => {
         <Route path="/gpt-sync" element={<GptSync />} />
       <Route path="/pipeline-flow" element={<PipelineFlow />} />
       <Route path="/skip-trace-portal" element={<SkipTracePortal />} />
+      <Route path="/autonomous-pipeline" element={<AutonomousPipeline />} />
         <Route element={<Layout />}>
           <Route path="/client-portal" element={<Dashboard />} />
           <Route path="/business-generator" element={<BusinessGenerator />} />
