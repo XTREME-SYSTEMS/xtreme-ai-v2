@@ -60,30 +60,26 @@ export default async function(req: Request): Promise<Response> {
       seenComp.add(k); return true;
     }).slice(0, 15);
 
-    // Try LLM-based strategy synthesis (needs credits)
+    // Try LLM-based strategy synthesis via Vercel AI Gateway (not InvokeLLM —
+    // uses the user's Vercel AI Gateway credits, not Base44 integration credits)
     let strategy = null;
     try {
       const prompt = buildStrategyPrompt(businessName, ownerName, industry, location, website, dedupedComps, keyFindings, sessionRecord.answers);
-      const llmRes = await base44.integrations.Core.InvokeLLM({
-        prompt: prompt,
-        response_json_schema: {
-          type: 'object',
-          properties: {
-            strategy_summary: { type: 'string' },
-            positioning: { type: 'string' },
-            target_market: { type: 'string' },
-            competitive_advantage: { type: 'string' },
-            pricing_model: { type: 'string' },
-            growth_channels: { type: 'array', items: { type: 'string' } },
-            risk_factors: { type: 'array', items: { type: 'string' } },
-            website_brief: { type: 'string' },
-          },
-        },
+      const gatewayRes = await base44.functions.invoke('vercelAIGateway', {
+        model: 'openai/gpt-4o-mini',
+        messages: [
+          { role: 'system', content: 'You are a master business strategist. Respond ONLY with valid JSON matching the requested schema. No markdown, no code fences.' },
+          { role: 'user', content: prompt + '\n\nReturn JSON with keys: strategy_summary, positioning, target_market, competitive_advantage, pricing_model, growth_channels (array of strings), risk_factors (array of strings), website_brief.' },
+        ],
+        max_tokens: 2000,
+        temperature: 0.7,
+        response_format: { type: 'json_object' },
       });
-      strategy = typeof llmRes === 'string' ? JSON.parse(llmRes) : llmRes;
+      const content = gatewayRes?.data?.content || gatewayRes?.content || '';
+      strategy = JSON.parse(content);
     } catch (llmError) {
-      // Credits exhausted or LLM failed — fall back to deterministic strategy
-      console.error('LLM failed, using deterministic fallback:', llmError.message);
+      // Gateway unavailable or failed — fall back to deterministic strategy
+      console.error('Vercel AI Gateway failed, using deterministic fallback:', llmError.message);
       strategy = buildDeterministicStrategy(businessName, ownerName, industry, location, website, dedupedComps, keyFindings);
     }
 

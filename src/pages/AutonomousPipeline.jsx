@@ -85,6 +85,7 @@ export default function AutonomousPipeline() {
                   <ResultCard label="Packs Generated" value={String(result.summary.packs_generated)} ok={result.summary.packs_generated > 0} />
                   <ResultCard label="Pack Approved" value={result.summary.pack_approved ? '✓' : '✗'} ok={result.summary.pack_approved} />
                   <ResultCard label="Deployed" value={result.summary.deployed ? '✓' : 'Skipped'} ok={result.summary.deployed} />
+                  <ResultCard label="Supabase Sync" value={result.steps?.supabase_sync?.status === 'ok' ? '✓' : result.steps?.supabase_sync?.status === 'skipped' ? 'Skipped' : '✗'} ok={result.steps?.supabase_sync?.status === 'ok'} />
                   {result.summary.live_url && <a href={result.summary.live_url} target="_blank" rel="noreferrer" className="col-span-full flex items-center gap-1.5 rounded-lg bg-primary/10 p-3 text-sm text-primary hover:underline"><Rocket className="h-4 w-4" /> {result.summary.live_url}</a>}
                 </div>
               )}

@@ -214,6 +214,23 @@ export default async function(req: Request): Promise<Response> {
       steps.deploy = { status: 'skipped', note: 'Set auto_deploy=true to deploy to Vercel' };
     }
 
+    // ─── STEP 9: Sync to Supabase ──────────────────────────
+    logs.push(`[9] Syncing to Supabase...`);
+    try {
+      const syncRes = await base44.functions.invoke('syncToSupabase', { mode: 'sync' });
+      const syncData = syncRes?.data || syncRes;
+      if (syncData?.ok || syncData?.synced) {
+        logs.push(`[9] Supabase sync complete: ${syncData.synced || syncData.records_synced || 'ok'}`);
+        steps.supabase_sync = { status: 'ok' };
+      } else {
+        logs.push(`[9] Supabase sync skipped: ${syncData?.error || 'no data'}`);
+        steps.supabase_sync = { status: 'skipped', note: syncData?.error || 'Not configured' };
+      }
+    } catch (e: any) {
+      logs.push(`[9] Supabase sync failed: ${e.message}`);
+      steps.supabase_sync = { status: 'failed', error: e.message };
+    }
+
     logs.push(`[${new Date().toISOString()}] Autonomous pipeline COMPLETE`);
 
     return Response.json({
@@ -228,6 +245,7 @@ export default async function(req: Request): Promise<Response> {
         pack_approved: !!approvedPack,
         deployed: steps.deploy?.status === 'ok',
         live_url: steps.deploy?.live_url || null,
+        supabase_synced: steps.supabase_sync?.status === 'ok',
       },
     });
   } catch (error: any) {
