@@ -11,7 +11,6 @@ import ProtectedRoute from '@/components/ProtectedRoute';
 import BrandLoader from '@/components/BrandLoader';
 import { ThemeProvider } from '@/lib/ThemeContext';
 import { PreviewProvider } from '@/lib/PreviewContext';
-import Layout from '@/components/Layout';
 import Marketing from '@/pages/Marketing';
 import Pricing from '@/pages/Pricing';
 import ThankYou from '@/pages/ThankYou';
@@ -87,18 +86,15 @@ const AuthenticatedApp = () => {
         <Route path="/projects" element={<Projects />} />
         <Route path="/video-generator" element={<VideoGenerator />} />
         <Route path="/gpt-sync" element={<GptSync />} />
-      <Route path="/pipeline-flow" element={<PipelineFlow />} />
-      <Route path="/skip-trace-portal" element={<SkipTracePortal />} />
-      <Route path="/autonomous-pipeline" element={<AutonomousPipeline />} />
-        <Route element={<Layout />}>
-          <Route path="/client-portal" element={<Dashboard />} />
-          <Route path="/business-generator" element={<BusinessGenerator />} />
-
-          <Route path="/strategy-review" element={<StrategyReview />} />
-          <Route path="/pack-inbox" element={<PackInbox />} />
-          <Route path="/mass-website-factory" element={<MassWebsiteFactory />} />
-          <Route path="/ranking-monitor" element={<RankingMonitor />} />
-        </Route>
+        <Route path="/pipeline-flow" element={<PipelineFlow />} />
+        <Route path="/skip-trace-portal" element={<SkipTracePortal />} />
+        <Route path="/autonomous-pipeline" element={<AutonomousPipeline />} />
+        <Route path="/client-portal" element={<Dashboard />} />
+        <Route path="/business-generator" element={<BusinessGenerator />} />
+        <Route path="/strategy-review" element={<StrategyReview />} />
+        <Route path="/pack-inbox" element={<PackInbox />} />
+        <Route path="/mass-website-factory" element={<MassWebsiteFactory />} />
+        <Route path="/ranking-monitor" element={<RankingMonitor />} />
       </Route>
       <Route path="*" element={<PageNotFound />} />
     </Routes>

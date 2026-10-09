@@ -5,6 +5,7 @@ import {
   Lock, Loader2, CheckCircle2, AlertCircle, FileText, Target,
   TrendingUp, Shield, ArrowRight, Copy, Brain, Radar, Users,
 } from "lucide-react";
+import PipelineShell from "@/components/studio/PipelineShell";
 
 export default function StrategyReview() {
   const navigate = useNavigate();
@@ -54,38 +55,43 @@ export default function StrategyReview() {
 
   if (generating) {
     return (
-      <div className="flex h-full flex-col items-center justify-center gap-4">
-        <div className="flex items-center gap-3">
-          <Brain className="h-8 w-8 animate-pulse text-primary" />
-          <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      <PipelineShell>
+        <div className="flex h-full flex-col items-center justify-center gap-4">
+          <div className="flex items-center gap-3">
+            <Brain className="h-8 w-8 animate-pulse text-primary" />
+            <Loader2 className="h-8 w-8 animate-spin text-primary" />
+          </div>
+          <div className="text-center">
+            <h2 className="text-lg font-semibold text-foreground">Locking your strategy...</h2>
+            <p className="text-sm text-muted-foreground">Synthesizing intelligence from all skip-trace reports</p>
+          </div>
         </div>
-        <div className="text-center">
-          <h2 className="text-lg font-semibold text-foreground">Locking your strategy...</h2>
-          <p className="text-sm text-muted-foreground">Synthesizing intelligence from all skip-trace reports</p>
-        </div>
-      </div>
+      </PipelineShell>
     );
   }
 
   if (error && !strategy) {
     return (
-      <div className="mx-auto max-w-2xl space-y-4">
-        <div className="rounded-xl border border-destructive/30 bg-destructive/10 p-4 text-destructive">
-          <div className="flex items-center gap-2">
-            <AlertCircle className="h-5 w-5" />
-            {error}
+      <PipelineShell>
+        <div className="mx-auto max-w-2xl space-y-4">
+          <div className="rounded-xl border border-destructive/30 bg-destructive/10 p-4 text-destructive">
+            <div className="flex items-center gap-2">
+              <AlertCircle className="h-5 w-5" />
+              {error}
+            </div>
           </div>
+          <button onClick={generateStrategy} className="rounded-xl bg-primary px-6 py-2.5 text-sm font-semibold text-primary-foreground">
+            Retry
+          </button>
         </div>
-        <button onClick={generateStrategy} className="rounded-xl bg-primary px-6 py-2.5 text-sm font-semibold text-primary-foreground">
-          Retry
-        </button>
-      </div>
+      </PipelineShell>
     );
   }
 
-  if (!strategy) return null;
+  if (!strategy) return <PipelineShell />;
 
   return (
+    <PipelineShell>
     <div className="mx-auto max-w-4xl space-y-6">
       {/* Header */}
       <div className="rounded-2xl border border-border bg-gradient-to-br from-primary/10 to-transparent p-6">
@@ -178,6 +184,7 @@ export default function StrategyReview() {
         </button>
       </div>
     </div>
+    </PipelineShell>
   );
 }
 

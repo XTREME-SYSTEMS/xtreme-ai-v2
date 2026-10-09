@@ -5,6 +5,7 @@ import TemplateGallery from "@/components/massbuild/TemplateGallery";
 import MassBuildConfig from "@/components/massbuild/MassBuildConfig";
 import MassBuildReview from "@/components/massbuild/MassBuildReview";
 import { WEBSITE_TEMPLATES, getTemplateById } from "@/lib/websiteTemplates";
+import PipelineShell from "@/components/studio/PipelineShell";
 
 export default function MassWebsiteFactory() {
   const [projects, setProjects] = useState([]);
@@ -151,6 +152,7 @@ export default function MassWebsiteFactory() {
   const active = projects.find((p) => p.id === activeProject);
 
   return (
+    <PipelineShell>
     <div className="space-y-6">
       {/* Header */}
       <div className="flex items-center gap-3">
@@ -272,6 +274,7 @@ export default function MassWebsiteFactory() {
         </>
       )}
     </div>
+    </PipelineShell>
   );
 }
 

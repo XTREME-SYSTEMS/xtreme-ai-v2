@@ -20,6 +20,7 @@ import SystemActivities from "@/components/client/SystemActivities";
 import OnboardingCardGrid from "@/components/client/OnboardingCardGrid";
 import SkipToGptSync from "@/components/client/SkipToGptSync";
 import StartNewProjectButton from "@/components/client/StartNewProjectButton";
+import PipelineShell from "@/components/studio/PipelineShell";
 
 // The Business Generator — the top-level destination of the client portal.
 // Shows the package, the full system capability overview, and the mandatory
@@ -129,6 +130,7 @@ export default function BusinessGenerator() {
   };
 
   return (
+    <PipelineShell>
     <div className="space-y-5">
       {isPreviewing && <PreviewBanner />}
 
@@ -335,6 +337,7 @@ export default function BusinessGenerator() {
         continueLabel="Continue to Build"
       />
     </div>
+    </PipelineShell>
   );
 }
 
