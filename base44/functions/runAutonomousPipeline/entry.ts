@@ -1,4 +1,5 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.52';
+import { secrets } from 'base44:runtime';
 
 // runAutonomousPipeline — The autonomous orchestrator.
 // Chains every pipeline step for a session in a single call:
@@ -217,14 +218,20 @@ export default async function(req: Request): Promise<Response> {
     // ─── STEP 9: Sync to Supabase ──────────────────────────
     logs.push(`[9] Syncing to Supabase...`);
     try {
-      const syncRes = await base44.functions.invoke('syncToSupabase', { mode: 'sync' });
-      const syncData = syncRes?.data || syncRes;
-      if (syncData?.ok || syncData?.synced) {
-        logs.push(`[9] Supabase sync complete: ${syncData.synced || syncData.records_synced || 'ok'}`);
-        steps.supabase_sync = { status: 'ok' };
+      const projectRef = await secrets.get('SUPABASE_PROJECT_REF');
+      if (!projectRef) {
+        logs.push(`[9] Supabase sync skipped: SUPABASE_PROJECT_REF not set`);
+        steps.supabase_sync = { status: 'skipped', note: 'SUPABASE_PROJECT_REF not configured' };
       } else {
-        logs.push(`[9] Supabase sync skipped: ${syncData?.error || 'no data'}`);
-        steps.supabase_sync = { status: 'skipped', note: syncData?.error || 'Not configured' };
+        const syncRes = await base44.functions.invoke('syncToSupabase', { mode: 'sync', project_ref: projectRef });
+        const syncData = syncRes?.data || syncRes;
+        if (syncData?.ok || syncData?.synced) {
+          logs.push(`[9] Supabase sync complete: ${syncData.synced || syncData.records_synced || 'ok'}`);
+          steps.supabase_sync = { status: 'ok' };
+        } else {
+          logs.push(`[9] Supabase sync skipped: ${syncData?.error || 'no data'}`);
+          steps.supabase_sync = { status: 'skipped', note: syncData?.error || 'Not configured' };
+        }
       }
     } catch (e: any) {
       logs.push(`[9] Supabase sync failed: ${e.message}`);
