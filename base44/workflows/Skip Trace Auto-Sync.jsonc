@@ -1,0 +1,40 @@
+{
+  "name": "Skip Trace Auto-Sync",
+  "description": "Automatically syncs completed skip-trace intelligence into the pipeline database (OnboardingSession + draft LockedStrategy) whenever a SkipTraceReport finishes \u2014 no manual input needed.",
+  "trigger": {
+    "config": {
+      "trigger_type": "entity",
+      "entity_name": "SkipTraceReport",
+      "events": [
+        "update"
+      ]
+    },
+    "condition": "${ .trigger.data.status == \"complete\" and .trigger.old_data.status != \"complete\" }"
+  },
+  "definition": {
+    "document": {
+      "dsl": "1.0.0",
+      "name": "skip_trace_auto_sync",
+      "version": "1.0",
+      "namespace": "base44"
+    },
+    "do": [
+      {
+        "sync_to_pipeline": {
+          "call": "invoke_backend_function",
+          "with": {
+            "function_name": "syncSkipTraceToPipeline",
+            "args": {
+              "session_id": "${ .trigger.data.session_id }"
+            }
+          },
+          "then": "end",
+          "x-base44": {
+            "title": "Sync skip-trace to pipeline",
+            "description": "Aggregates all completed traces and pushes intelligence into the session + draft strategy"
+          }
+        }
+      }
+    ]
+  }
+}
