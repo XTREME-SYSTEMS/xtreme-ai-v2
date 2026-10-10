@@ -1,4 +1,5 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.40';
+import { invokeLLM } from '../../shared/aiGateway.ts';
 import { getAdminEmails } from '../../shared/pipelineNotifications.ts';
 
 // Auto-generates a service agreement (EsignDocument) for a client when they
@@ -133,7 +134,7 @@ Include these sections:
 
 Make it professional, enforceable, and easy to read. Use clear headings and bullet points where appropriate.`;
 
-    const res = await base44.asServiceRole.integrations.Core.InvokeLLM({
+    const res = await invokeLLM({
       prompt,
       model: "claude_opus_4_8",
       response_json_schema: { type: "object", properties: { body: { type: "string" } } },

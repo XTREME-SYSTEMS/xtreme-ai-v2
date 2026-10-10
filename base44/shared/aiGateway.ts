@@ -18,6 +18,25 @@
 
 import { secrets } from 'base44:runtime';
 
+// Maps Base44 model names to Vercel AI Gateway model IDs so migrated
+// InvokeLLM calls work without editing every call site.
+const MODEL_MAP: Record<string, string> = {
+  'openai/gpt-4o-mini': 'openai/gpt-4o-mini',
+  'gpt_5_mini': 'openai/gpt-4o-mini',
+  'gpt_5_4': 'openai/gpt-4o',
+  'gpt_5_6_sol': 'openai/gpt-4o',
+  'gpt_5_6_luna': 'openai/gpt-4o',
+  'gemini_3_flash': 'google/gemini-2.0-flash-001',
+  'gemini_3_1_pro': 'google/gemini-2.5-pro-preview-05-06',
+  'claude_sonnet_4_6': 'anthropic/claude-3.5-sonnet',
+  'claude_sonnet_5': 'anthropic/claude-3.5-sonnet',
+  'claude_opus_4_6': 'anthropic/claude-3.5-sonnet',
+  'claude_opus_4_7': 'anthropic/claude-3.5-sonnet',
+  'claude_opus_4_8': 'anthropic/claude-3.5-sonnet',
+  'claude_opus_5': 'anthropic/claude-3.5-sonnet',
+  'automatic': 'openai/gpt-4o-mini',
+};
+
 export async function invokeLLM(opts: {
   prompt: string;
   response_json_schema?: any;
@@ -25,15 +44,23 @@ export async function invokeLLM(opts: {
   max_tokens?: number;
   temperature?: number;
   system_prompt?: string;
+  // Accept and ignore these InvokeLLM-specific params so migrated
+  // calls don't need to be cleaned up:
+  add_context_from_internet?: boolean;
+  file_urls?: any;
+  app_id?: any;
+  app_owner?: any;
 }) {
   const {
     prompt,
     response_json_schema,
-    model = 'openai/gpt-4o-mini',
+    model,
     max_tokens = 2000,
     temperature = 0.7,
     system_prompt,
   } = opts;
+
+  const gatewayModel = (model && MODEL_MAP[model]) || 'openai/gpt-4o-mini';
 
   const apiKey = secrets.get('VERCEL_AI_GATEWAY_API_KEY');
   const gatewayUrl = (secrets.get('VERCEL_AI_GATEWAY_URL') || 'https://ai-gateway.vercel.sh/v1').replace(/\/$/, '');
@@ -57,7 +84,7 @@ export async function invokeLLM(opts: {
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({
-      model,
+      model: gatewayModel,
       messages,
       max_tokens,
       temperature,

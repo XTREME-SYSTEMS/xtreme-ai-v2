@@ -1,4 +1,5 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.40';
+import { invokeLLM } from '../../shared/aiGateway.ts';
 
 // Identifies the top-ranking sites for a keyword and creates SerpBlueprint records.
 // Also identifies high-value site types: direct competitors, authority sites, directories,
@@ -37,7 +38,7 @@ Also identify:
 
 Be specific with real URLs from the actual search results.`;
 
-    const result = await base44.asServiceRole.integrations.Core.InvokeLLM({
+    const result = await invokeLLM({
       prompt,
       add_context_from_internet: true,
       response_json_schema: {

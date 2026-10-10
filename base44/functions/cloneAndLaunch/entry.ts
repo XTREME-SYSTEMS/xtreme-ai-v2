@@ -1,4 +1,5 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.40';
+import { invokeLLM } from '../../shared/aiGateway.ts';
 import { slugify, provisionGithub, provisionDrive, provisionSupabase, provisionVercel, generateSiteApp } from '../../shared/provisioning.ts';
 import { detectIndustry as detectIndustryShared, scrapeTarget } from '../../shared/cloneUtils.ts';
 
@@ -108,7 +109,7 @@ async function doScrape(base44, project, log, persist) {
 async function doAnalyze(base44, project, log, persist) {
   const html = project.scrape?.html_snapshot || '';
   const prompt = `Analyze this cloned website HTML and identify ALL parts specific to the original owner that MUST change to avoid trademark/branding issues and make the clone unique. HTML (truncated):\n${html.slice(0, 50000)}\n\nReturn JSON with exact current values for: logo (type, current_value, location), accent_colors (hex + usage), key_images (url + description), trademark_content (type, current_text, location), contact_info (phone, email, address, social_links).`;
-  const result = await base44.asServiceRole.integrations.Core.InvokeLLM({
+  const result = await invokeLLM({
     prompt, model: 'gemini_3_flash',
     response_json_schema: {
       type: 'object',
@@ -128,7 +129,7 @@ async function doAnalyze(base44, project, log, persist) {
 // ---- Phase 3: Generate 20 name + domain recommendations ----
 async function doRecommend(base44, project, log, persist) {
   const prompt = `You are a brand strategist. A website in the "${project.industry}" industry is being cloned and rebranded to avoid trademark issues. The original site is ${project.target_url}. Generate 20 unique, brandable business name + domain recommendations. Each name must be distinct from the original, memorable, industry-appropriate, and the domain should be a .com that is likely available. Search the web to check domain availability trends. Return JSON: { "options": [ { "name": string, "domain": string (e.g. "newbrand.com"), "rationale": string, "available": boolean } ] }`;
-  const result = await base44.asServiceRole.integrations.Core.InvokeLLM({
+  const result = await invokeLLM({
     prompt, model: 'gemini_3_flash', add_context_from_internet: true,
     response_json_schema: {
       type: 'object',
@@ -149,7 +150,7 @@ async function doRecommend(base44, project, log, persist) {
 // ---- Phase 4: Generate rebranded content ----
 async function doRebrand(base44, project, log, persist) {
   const prompt = `Generate complete rebranded website content for "${project.selected_name}", a ${project.industry} business. The original site had these trademark elements that must be replaced: ${JSON.stringify(project.changeable_parts?.trademark_content || []).slice(0, 2000)}. Generate unique, non-infringing content. Return JSON: { "hero_headline": string, "hero_subhead": string, "about": string (2 paragraphs), "services": [ { "title": string, "description": string } ], "faq": [ { "question": string, "answer": string } ], "tagline": string, "new_colors": { "primary": string (hex), "accent": string (hex) }, "phone": string (fake 555 number), "email": string }`;
-  const result = await base44.asServiceRole.integrations.Core.InvokeLLM({
+  const result = await invokeLLM({
     prompt, model: 'gemini_3_flash',
     response_json_schema: {
       type: 'object',
@@ -284,7 +285,7 @@ async function doImaging(base44, project, log, persist) {
 
 // ---- Phase 8: Create Rank Engine campaign + GSC sync ----
 async function doSEO(base44, project, log, persist) {
-  const rankRes = await base44.asServiceRole.integrations.Core.InvokeLLM({
+  const rankRes = await invokeLLM({
     prompt: `For a ${project.industry} business named "${project.selected_name}" targeting national US market, return 10 target cities and 5 core services as JSON: { "cities": [string], "services": [string] }`,
     model: 'gemini_3_flash',
     response_json_schema: { type: 'object', properties: { cities: { type: 'array', items: { type: 'string' } }, services: { type: 'array', items: { type: 'string' } } } }
@@ -311,7 +312,7 @@ async function doSEO(base44, project, log, persist) {
 // ---- Phase 9: Identify monetization opportunities ----
 async function doMonetize(base44, project, log, persist) {
   const prompt = `Analyze a ${project.industry} website "${project.selected_name}" and identify all monetization opportunities. Return JSON: { "options": [ { "type": string (e.g. "lead_gen", "adsense", "affiliate", "ecommerce", "subscriptions", "appointments"), "description": string, "estimated_revenue": string, "implementation": string } ] }`;
-  const result = await base44.asServiceRole.integrations.Core.InvokeLLM({
+  const result = await invokeLLM({
     prompt, model: 'gemini_3_flash', add_context_from_internet: true,
     response_json_schema: {
       type: 'object',
@@ -330,7 +331,7 @@ async function doMonetize(base44, project, log, persist) {
 // ---- Phase 10: Generate social media content plan ----
 async function doSocial(base44, project, log, persist) {
   const prompt = `Create a social media automation plan for "${project.selected_name}", a ${project.industry} business. Return JSON: { "platforms": [string], "post_schedule": string, "content_templates": [ { "platform": string, "template": string, "frequency": string } ], "video_prompt": string }`;
-  const result = await base44.asServiceRole.integrations.Core.InvokeLLM({
+  const result = await invokeLLM({
     prompt, model: 'gemini_3_flash',
     response_json_schema: {
       type: 'object',
@@ -349,7 +350,7 @@ async function doSocial(base44, project, log, persist) {
 // ---- Phase 11: Validate + audit the full pipeline ----
 async function doValidate(base44, project, log, persist) {
   const prompt = `Audit this cloned+rebranded website project end-to-end. Industry: ${project.industry}, Name: ${project.selected_name}, Domain: ${project.selected_domain}. Provisioned: Drive ${project.provisioning?.drive ? '✓' : '✗'}, GitHub ${project.provisioning?.github ? '✓' : '✗'}, Supabase ${project.provisioning?.supabase ? '✓' : '✗'}, Vercel ${project.provisioning?.vercel ? '✓' : '✗'}. Logos: ${(project.logo_options || []).length}, Images: ${(project.generated_images || []).length}, RankEngine: ${project.rank_engine_id ? '✓' : '✗'}, Monetization options: ${(project.monetization_options || []).length}, Social plan: ${project.social_content?.platforms?.length || 0} platforms. Score the overall completeness 0-100 and list any gaps. Return JSON: { "score": number, "summary": string, "gaps": [string] }`;
-  const result = await base44.asServiceRole.integrations.Core.InvokeLLM({
+  const result = await invokeLLM({
     prompt, model: 'gemini_3_flash',
     response_json_schema: {
       type: 'object',

@@ -1,4 +1,5 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.40';
+import { invokeLLM } from '../../shared/aiGateway.ts';
 
 export default async function(req) {
   try {
@@ -9,7 +10,7 @@ export default async function(req) {
     const { account_name, deal_name, value, scope } = body;
 
     const prompt = `Generate a professional invoice for a digital marketing + lead generation engagement. Client: ${account_name || "Client"}. Project/Deal: ${deal_name || "Project"}. Scope: ${scope || "standard monthly package"}. Approximate value: $${value || 0}. Return realistic line items (description, qty, unit_price, total) for setup, campaign management, creative, and lead gen services, plus subtotal, tax_rate (as a percent number e.g. 7), tax, total, and a short notes string. Totals must be internally consistent.`;
-    const res = await base44.asServiceRole.integrations.Core.InvokeLLM({
+    const res = await invokeLLM({
       prompt,
       response_json_schema: {
         type: "object",

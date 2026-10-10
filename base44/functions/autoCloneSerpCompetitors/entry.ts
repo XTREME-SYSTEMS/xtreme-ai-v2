@@ -1,4 +1,5 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.40';
+import { invokeLLM } from '../../shared/aiGateway.ts';
 
 // Orchestrator: auto-clones top SERP competitors for ALL portfolio keywords.
 // For each active site's top keywords, finds ranking competitors and creates SerpBlueprints.
@@ -39,7 +40,7 @@ export default async function(req) {
           }
 
           // Find top SERP competitors via AI web search
-          const serpResult = await base44.asServiceRole.integrations.Core.InvokeLLM({
+          const serpResult = await invokeLLM({
             prompt: `Search Google for "${fullQuery}" and list the top 5 organic results. For each, provide: url, domain, title, position (1-5), and site_type (direct_competitor, authority_site, directory, featured_snippet, ai_cited, local_pack). Only include real results from the actual search.`,
             add_context_from_internet: true,
             response_json_schema: {
