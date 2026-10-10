@@ -16,7 +16,7 @@ export default function AutonomousPipeline() {
   const loadSessions = async () => {
     setLoading(true);
     try {
-      const page = await base44.entities.OnboardingSession.filter({}, { sort: '-created_date', limit: 50, fields: ['project_name', 'user_email', 'status', 'business_type', 'current_step', 'locked_strategy_id', 'approved_pack_id', 'deployed_site_id', 'answers', 'created_date'] });
+      const page = await base44.entities.OnboardingSession.filter({}, { sort: '-created_date', limit: 50, fields: ['session_id', 'project_name', 'user_email', 'status', 'business_type', 'current_step', 'locked_strategy_id', 'approved_pack_id', 'deployed_site_id', 'answers', 'created_date', 'client_phone'] });
       setSessions(page.items || []);
     } catch (e) { setError(e.message); }
     finally { setLoading(false); }
