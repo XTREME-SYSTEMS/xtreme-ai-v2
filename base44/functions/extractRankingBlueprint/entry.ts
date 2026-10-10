@@ -1,4 +1,5 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.40';
+import { invokeLLM } from '../../shared/aiGateway.ts';
 
 // Analyzes a competitor site and extracts a detailed ranking blueprint.
 // Identifies exactly what makes the site rank: content structure, schema, topics,
@@ -63,7 +64,7 @@ Visit the page and extract a detailed SEO ranking blueprint:
 
 Return a comprehensive JSON blueprint.`;
 
-    const result = await base44.asServiceRole.integrations.Core.InvokeLLM({
+    const result = await invokeLLM({
       prompt,
       add_context_from_internet: true,
       response_json_schema: {

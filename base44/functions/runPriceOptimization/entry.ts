@@ -1,4 +1,5 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.40';
+import { invokeLLM } from '../../shared/aiGateway.ts';
 
 // Weekly price-optimization runner. Calls the competitor platform analysis
 // (same logic as analyzeCompetitorPlatforms) and persists a Receipt with the
@@ -24,7 +25,7 @@ Return a structured report:
 
 All prices in USD. Be specific with real competitor names and pricing.`;
 
-    const res = await sr.integrations.Core.InvokeLLM({
+    const res = await invokeLLM({
       prompt,
       add_context_from_internet: true,
       model: "gemini_3_flash",

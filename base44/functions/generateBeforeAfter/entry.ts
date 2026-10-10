@@ -1,4 +1,5 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.40';
+import { invokeLLM } from '../../shared/aiGateway.ts';
 
 // Generates a matched before/after image pair for a local service business.
 // Both images depict the SAME space/angle — one "before" (the problem/worn
@@ -18,7 +19,7 @@ export default async function(req) {
     const biz = businessName || "this business";
 
     // 1) Build matched prompts — same room/angle, two states.
-    const planRes = await base44.asServiceRole.integrations.Core.InvokeLLM({
+    const planRes = await invokeLLM({
       prompt: `You are a commercial photographer art-directing a before/after pair for a local service business website slider. Both photos must show the SAME exact space from the SAME angle — only the state changes.
 
 BUSINESS: ${biz}

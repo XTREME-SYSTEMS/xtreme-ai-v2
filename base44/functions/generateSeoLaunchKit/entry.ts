@@ -1,4 +1,5 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.40';
+import { invokeLLM } from '../../shared/aiGateway.ts';
 
 // SEO Launch Pad — AI fills the entire Google ranking kit for a market:
 // Google Business Profile listing, Search Console property + verification meta,
@@ -70,7 +71,7 @@ Produce:
 
 Return JSON only.`;
 
-    const res = await base44.asServiceRole.integrations.Core.InvokeLLM({
+    const res = await invokeLLM({
       prompt, add_context_from_internet: true, response_json_schema: schema, model: "gemini_3_flash",
     });
 

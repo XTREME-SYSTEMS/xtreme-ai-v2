@@ -1,4 +1,5 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.40';
+import { invokeLLM } from '../../shared/aiGateway.ts';
 
 // AEO + AI-search optimizer. Takes a page's content + target keyword + location
 // and returns content shaped to be quoted by AI search engines (Google AI
@@ -18,7 +19,7 @@ export default async function(req) {
     const ind = industry || "";
     const svc = (services || []).join(", ");
 
-    const res = await base44.asServiceRole.integrations.Core.InvokeLLM({
+    const res = await invokeLLM({
       prompt: `You are an AEO (Answer Engine Optimization) and AI-search specialist. Optimize the page below so AI search engines (Google AI Overviews, ChatGPT, Perplexity) quote it directly and cite it as a source.
 
 BUSINESS: ${biz}

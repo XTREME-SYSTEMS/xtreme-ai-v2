@@ -1,4 +1,5 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.40';
+import { invokeLLM } from '../../shared/aiGateway.ts';
 
 // Regenerates a single content section (hero / about / services / faq) of the
 // client's website copy via LLM, merging the result back into the saved
@@ -36,7 +37,7 @@ export default async function(req) {
       return Response.json({ error: "unsupported section" }, { status: 400 });
     }
 
-    const res = await base44.asServiceRole.integrations.Core.InvokeLLM({ prompt, response_json_schema: schema, model: "claude_sonnet_4_6" });
+    const res = await invokeLLM({ prompt, response_json_schema: schema, model: "claude_sonnet_4_6" });
     return Response.json({ ok: true, section, updates: res });
   } catch (error) {
     console.error("regenerateWebsiteSection error", error?.message || error);
