@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>XTREME Website Factory | Preview V1</title>
+<style>
+:root{font-family:Inter,ui-sans-serif,system-ui;background:#0a1020;color:#eef5ff;color-scheme:dark}*{box-sizing:border-box}body{margin:0}
+header{border-bottom:1px solid #26374f;padding:20px 28px;display:flex;justify-content:space-between;align-items:center;background:#101b2c}
+.logo{font-weight:900;letter-spacing:1px;font-size:20px}.logo span{color:#69b5ff}.tag{font-size:12px;background:#173951;color:#9ed6ff;padding:8px 12px;border-radius:99px}
+main{max-width:1500px;margin:0 auto;padding:28px;display:grid;grid-template-columns:380px minmax(0,1fr);gap:22px}
+section{background:#111e31;border:1px solid #263951;border-radius:18px;padding:22px}h1{font-size:26px;line-height:1.15;margin:0 0 8px}h2{font-size:18px;margin:0 0 14px}
+p,.hint{color:#9eafc4;font-size:13px;line-height:1.6}.steps{display:flex;gap:8px;flex-wrap:wrap;margin:20px 0}.steps b{border-radius:99px;padding:7px 10px;background:#20324a;font-size:12px}
+label{display:block;color:#cbd9eb;font-size:12px;font-weight:650;margin:14px 0 6px}input,textarea,select{width:100%;padding:12px 13px;background:#0a1525;border:1px solid #35506b;border-radius:10px;color:#fff;font:inherit}textarea{resize:vertical;min-height:90px}
+button{border:0;border-radius:10px;background:#278af0;color:white;padding:12px 15px;cursor:pointer;font-weight:750}button.secondary{background:#263a54}button:disabled{opacity:.45;cursor:not-allowed}.buttons{display:flex;flex-wrap:wrap;gap:9px;margin-top:18px}
+iframe{width:100%;height:620px;background:white;border:0;border-radius:12px}.preview{min-width:0}.status{font-size:12px;color:#b8cce0;margin:12px 0}.metrics{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:14px 0}.metric{background:#0a1525;padding:12px;border-radius:10px}.metric strong{display:block;font-size:23px;color:#8ccaff}.metric span{font-size:11px;color:#b7c7d9}
+.small{font-size:11px}a{color:#80c4ff}
+@media(max-width:900px){main{grid-template-columns:1fr;padding:14px}header{padding:16px}iframe{height:480px}.metrics{grid-template-columns:repeat(3,1fr)}}
+</style></head>
+<body><header><div class="logo">XTREME <span>WEBSITE FACTORY</span></div><div class="tag">SAFE BRANCH PREVIEW · NO PUBLISHING</div></header>
+<main><div><section><h1>One website.<br>One hundred variations.</h1><p>Build a master, approve it, then create a batch of individual HTML sites. No API keys, domain changes, or production writes.</p>
+<div class="steps"><b>1 Create</b><b>2 Approve</b><b>3 Replicate</b><b>4 Export</b></div>
+<label for="business">Master business name</label><input id="business" value="Nation Epoxy Pros" maxlength="100">
+<label for="service">Service</label><input id="service" value="Premium epoxy flooring" maxlength="120">
+<label for="city">City / market</label><input id="city" value="Fort Lauderdale, FL" maxlength="120">
+<label for="phone">Phone (optional)</label><input id="phone" placeholder="(555) 010-1000" maxlength="40">
+<label for="headline">Headline</label><input id="headline" value="Floors built to impress. Engineered to last." maxlength="180">
+<label for="offer">Primary offer</label><input id="offer" value="Request your free flooring consultation" maxlength="200">
+<label for="theme">Design</label><select id="theme"><option value="blue">Midnight blue</option><option value="gold">Black and gold</option><option value="green">Forest green</option></select>
+<div class="buttons"><button id="previewBtn">Generate preview</button><button id="approveBtn" class="secondary">Approve master</button></div>
+<p class="status" id="status" aria-live="polite">Start with Generate preview. Approving locks a snapshot of the master.</p>
+</section><section style="margin-top:18px"><h2>Replicate your approved design</h2><p>Paste one business per line using <b>Business | City | Service | Phone</b>. Missing values inherit from the approved master. Blank business names are rejected.</p>
+<label for="rows">Batch input</label><textarea id="rows" placeholder="Fort Lauderdale Epoxy Co | Fort Lauderdale, FL | Garage epoxy floors | (555) 010-0101"></textarea>
+<div class="buttons"><button id="sampleBtn" class="secondary">Load 100 sample records</button><button id="batchBtn">Generate batch</button></div>
+<div class="metrics"><div class="metric"><strong id="count">0</strong><span>Generated</span></div><div class="metric"><strong id="errors">0</strong><span>Rejected</span></div><div class="metric"><strong id="approved">No</strong><span>Master locked</span></div></div>
+<div class="buttons"><button id="downloadBtn" disabled>Download batch (.tar)</button><button id="manifestBtn" class="secondary" disabled>Export manifest</button></div>
+<p class="hint small">Exports are local files, not hosted websites. Sample records are fictional and must be replaced with verified client data before any publication. Each site needs distinct useful content, real business details, legal review where applicable, QA, and explicit launch approval.</p></section></div>
+<section class="preview"><h2>Live website preview</h2><p>Review the entire template here. Exported pages are plain static HTML that can later be deployed to hosting.</p><iframe id="frame" title="Generated website preview" sandbox="allow-scripts allow-popups"></iframe><div class="buttons"><button id="singleBtn" class="secondary">Download current HTML</button><button id="resetBtn" class="secondary">Reset approval</button></div></section></main>
+<script>
+(function(){
+'use strict';
+var $=id=>document.getElementById(id), locked=null, batch=[], current='', errors=0;
+function escape(s){return String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+function slug(s){return String(s).toLowerCase().normalize('NFKD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'').slice(0,65)||'website';}
+function data(){return {business:$('business').value.trim(),service:$('service').value.trim(),city:$('city').value.trim(),phone:$('phone').value.trim(),headline:$('headline').value.trim(),offer:$('offer').value.trim(),theme:$('theme').value};}
+function valid(d){return !!(d.business&&d.service&&d.city&&d.headline&&d.offer);}
+function render(d){
+var palette={blue:['#071727','#38a3ff'],gold:['#16130a','#f8c968'],green:['#09241d','#55d7a2']}[d.theme]||['#071727','#38a3ff'];
+var phoneLink=d.phone?'<a class="call" href="tel:'+escape(d.phone.replace(/[^+0-9]/g,''))+'">Call '+escape(d.phone)+'</a>':'';
+return '<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="description" content="'+escape(d.service+' in '+d.city+' from '+d.business)+
+'"><title>'+escape(d.business+' | '+d.city)+'</title><style>:root{font-family:Arial,system-ui;background:#fff;color:#162332}*{box-sizing:border-box}body{margin:0}header{display:flex;justify-content:space-between;gap:20px;align-items:center;padding:22px 7%;font-weight:bold}header a{color:#123b64;text-decoration:none}main{background:'+palette[0]+';color:white;padding:95px 7%;min-height:500px}.eyebrow{color:'+palette[1]+';font-weight:700;letter-spacing:2px;text-transform:uppercase;font-size:13px}h1{font-size:clamp(40px,5.5vw,78px);max-width:850px;line-height:1.07;margin:20px 0}main p{color:#c7d5e4;font-size:20px;max-width:620px}.cta,.call{display:inline-block;background:'+palette[1]+';color:#081422!important;padding:15px 23px;border-radius:9px;font-weight:bold;text-decoration:none;margin-top:16px}.call{margin:0;font-size:14px}.details{padding:55px 7%;display:grid;grid-template-columns:repeat(3,1fr);gap:28px}.details article{background:#f1f5f9;border-radius:12px;padding:25px}.details p{line-height:1.7}footer{background:#eef2f6;padding:35px 7%;font-size:13px}@media(max-width:650px){header{flex-wrap:wrap}.details{grid-template-columns:1fr}main{padding:65px 7%}}</style></head><body><header><div>'+escape(d.business)+'</div>'+phoneLink+'</header><main><div class="eyebrow">'+escape(d.service)+' · '+escape(d.city)+'</div><h1>'+escape(d.headline)+'</h1><p>Discover thoughtfully planned '+escape(d.service.toLowerCase())+' solutions for '+escape(d.city)+'. Talk to our team about your project.</p><a class="cta" href="#contact">'+escape(d.offer)+'</a></main><div class="details"><article><h2>Designed for your project</h2><p>Discuss your goals, existing conditions and available options with our team.</p></article><article><h2>Clear next steps</h2><p>Share your requirements and request a tailored consultation.</p></article><article id="contact"><h2>Get started</h2><p>Contact '+escape(d.business)+' to discuss '+escape(d.service.toLowerCase())+'.</p>'+phoneLink+'</article></div><footer>'+escape(d.business)+' · '+escape(d.city)+'<p>Website preview. Verify all business claims, licensing and service areas before publishing.</p></footer></body></html>';
+}
+function show(t){$('status').textContent=t;}
+function preview(){var d=data();if(!valid(d)){show('Enter business, service, city, headline and offer.');return;}current=render(d);$('frame').srcdoc=current;show(locked?'Preview updated. Approved master remains locked until reset.':'Preview ready. Review then approve master.');}
+function save(){if(!current){show('Generate a preview first.');return;}locked=Object.freeze(Object.assign({},data()));$('approved').textContent='Yes';show('Master approved locally. Now supply records and generate a batch.');try{localStorage.setItem('xtreme_factory_master_v1',JSON.stringify(locked));}catch(e){}}
+function reset(){locked=null;batch=[];$('approved').textContent='No';$('count').textContent='0';$('errors').textContent='0';$('downloadBtn').disabled=true;$('manifestBtn').disabled=true;try{localStorage.removeItem('xtreme_factory_master_v1');}catch(e){}show('Approval reset. Generate and approve a new master.');}
+function records(){return $('rows').value.split(/\r?\n/).map(v=>v.trim()).filter(Boolean).map(v=>v.split('|').map(x=>x.trim()));}
+function build(){if(!locked){show('Approve the master before replicating.');return;}var inputs=records();if(inputs.length>100){show('Maximum 100 records per batch.');return;}batch=[];errors=0;var seen=new Set();
+for(var i=0;i<inputs.length;i++){var r=inputs[i];if(!r[0]){errors++;continue;}var d=Object.assign({},locked,{business:r[0],city:r[1]||locked.city,service:r[2]||locked.service,phone:r[3]||locked.phone});var id=slug(d.business)+'-'+String(i+1).padStart(3,'0');if(seen.has(id)){errors++;continue;}seen.add(id);batch.push({id:id,data:d,html:render(d)});}
+$('count').textContent=String(batch.length);$('errors').textContent=String(errors);$('downloadBtn').disabled=!batch.length;$('manifestBtn').disabled=!batch.length;show(batch.length+' draft websites generated locally. Review content before publishing.');}
+function download(name,blob){var url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),3000);}
+function tar(files){var enc=new TextEncoder(),parts=[];function oct(n,l){return n.toString(8).padStart(l-1,'0')+'\0';}
+for(var file of files){var body=enc.encode(file.body),h=new Uint8Array(512);function put(s,at,len){h.set(enc.encode(s).slice(0,len),at);}put(file.name,0,100);put(oct(420,8),100,8);put(oct(0,8),108,8);put(oct(0,8),116,8);put(oct(body.length,12),124,12);put(oct(0,12),136,12);put('        ',148,8);put('0',156,1);put('ustar\0',257,6);put('00',263,2);var sum=h.reduce((a,b)=>a+b,0);put(oct(sum,8),148,8);parts.push(h,body);var padding=(512-body.length%512)%512;if(padding)parts.push(new Uint8Array(padding));}
+parts.push(new Uint8Array(1024));return new Blob(parts,{type:'application/x-tar'});}
+$('previewBtn').addEventListener('click',preview);$('approveBtn').addEventListener('click',save);$('resetBtn').addEventListener('click',reset);$('batchBtn').addEventListener('click',build);
+$('sampleBtn').addEventListener('click',()=>{var rows=[];for(var i=1;i<=100;i++)rows.push('Sample Epoxy Business '+String(i).padStart(3,'0')+' | Sample Market '+i+' | Epoxy flooring | ');$('rows').value=rows.join('\n');show('100 fictional sample records loaded.');});
+$('downloadBtn').addEventListener('click',()=>{if(!batch.length)return;download('xtreme-website-factory-batch.tar',tar(batch.map(x=>({name:x.id+'/index.html',body:x.html})).concat([{name:'manifest.json',body:JSON.stringify(batch.map(x=>({id:x.id,record:x.data,status:'draft_not_published'})),null,2)}])));});
+$('manifestBtn').addEventListener('click',()=>{if(batch.length)download('xtreme-factory-manifest.json',new Blob([JSON.stringify(batch.map(x=>({id:x.id,record:x.data,status:'draft_not_published'})),null,2)],{type:'application/json'}));});
+$('singleBtn').addEventListener('click',()=>{if(!current)preview();if(current)download(slug(data().business)+'.html',new Blob([current],{type:'text/html'}));});
+try{var stored=localStorage.getItem('xtreme_factory_master_v1');if(stored){var parsed=JSON.parse(stored);if(valid(parsed)){locked=Object.freeze(parsed);$('approved').textContent='Yes';show('Previously approved local master restored.');}}}catch(e){}
+preview();
+})();
+</script></body></html>
