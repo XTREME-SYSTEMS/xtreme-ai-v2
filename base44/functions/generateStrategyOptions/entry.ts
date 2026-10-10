@@ -7,6 +7,7 @@
 // for fast, market-aware strategy generation.
 
 import { createClientFromRequest } from "npm:@base44/sdk@0.8.40";
+import { invokeLLM } from "../../shared/aiGateway.ts";
 
 export default async function(req: Request): Promise<Response> {
   try {
@@ -30,7 +31,7 @@ export default async function(req: Request): Promise<Response> {
       discoveryOption ? `Chosen angle: "${discoveryOption}"` : "",
     ].filter(Boolean).join("\n");
 
-    const llmRes = await base44.asServiceRole.integrations.Core.InvokeLLM({
+    const llmRes = await invokeLLM({
       prompt: `${context}
 
 Generate 10 distinct business strategies for a digital product in this space. Each must be genuinely different. Strategy #1 = best overall.
@@ -73,8 +74,7 @@ For EACH strategy provide ALL fields as JSON:
 - retention_strategy: 2-3 sentences — ongoing value delivery, performance reporting, new features, why clients keep paying
 
 Keep each field concise. Return JSON with "strategies" array sorted by overall_score descending.`,
-      add_context_from_internet: true,
-      model: "gemini_3_flash",
+      system_prompt: "You are a world-class business strategist. Respond ONLY with valid JSON matching the requested schema. No markdown, no code fences.",
       response_json_schema: {
         type: "object",
         properties: {

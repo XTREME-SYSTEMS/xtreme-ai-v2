@@ -11,7 +11,12 @@
 //   - generateVision backend function (client portal)
 //   - generateStrategy backend function (client portal)
 //   - processAutoBuildStep (AutoBuilder pipeline)
+//
+// LLM calls route through the Vercel AI Gateway (not Core InvokeLLM)
+// so generation works even when Base44 integration credits are exhausted.
 // ============================================================
+
+import { invokeLLM } from "./aiGateway.ts";
 
 // ── Vision Document Generation ──────────────────────────────────────────
 // The vision answers: What are we building? Why does it matter?
@@ -48,8 +53,9 @@ Generate a VISION document with these exact fields. Be specific, inspiring, and 
 
 Return ONLY a JSON object with these exact keys: mission, problem, target_audience, long_term_vision, success_metrics (array of strings), core_values (array of strings), value_proposition, market_opportunity, monetization_potential, lead_generation_approach, seo_aeo_opportunity, autonomous_value_plan.`;
 
-  const res = await base44.asServiceRole.integrations.Core.InvokeLLM({
+  const res = await invokeLLM({
     prompt,
+    system_prompt: "You are a world-class vision strategist. Respond ONLY with valid JSON matching the requested schema. No markdown, no code fences.",
     response_json_schema: {
       type: "object",
       properties: {
@@ -127,8 +133,9 @@ Generate a STRATEGY document with these exact fields. Be specific, practical, an
 
 Return ONLY a JSON object with these exact keys: competitive_positioning, go_to_market, revenue_model, pricing_strategy, acquisition_channels (array of strings), roadmap (array of objects with phase, timeline, goals array, key_initiatives array), risks (array of objects with risk, severity, mitigation), resources, differentiation, partnerships, monetization_model, lead_generation_architecture, seo_aeo_roadmap, social_media_automation, funnel_system, autonomous_enhancement_plan, retention_strategy.`;
 
-  const res = await base44.asServiceRole.integrations.Core.InvokeLLM({
+  const res = await invokeLLM({
     prompt,
+    system_prompt: "You are a world-class strategy consultant. Respond ONLY with valid JSON matching the requested schema. No markdown, no code fences.",
     response_json_schema: {
       type: "object",
       properties: {

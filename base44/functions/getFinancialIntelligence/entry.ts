@@ -1,4 +1,5 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.40';
+import { invokeLLM } from '../../shared/aiGateway.ts';
 
 // Researches competitor pricing, retail/standard pricing, pricing models, and
 // market intelligence for a user's specific industry, location, and service
@@ -55,10 +56,9 @@ Return a structured financial intelligence report:
 
 All prices in USD. Be specific to ${industryContext} and the ${zip || "local"} area. If you can't find exact local data, use regional/national averages and note the source.`;
 
-    const res = await base44.asServiceRole.integrations.Core.InvokeLLM({
+    const res = await invokeLLM({
       prompt,
-      add_context_from_internet: true,
-      model: "gemini_3_flash",
+      system_prompt: "You are a financial intelligence analyst. Respond ONLY with valid JSON matching the requested schema. No markdown, no code fences.",
       response_json_schema: {
         type: "object",
         properties: {

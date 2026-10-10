@@ -6,6 +6,7 @@
 // Business Generator pipeline.
 
 import { createClientFromRequest } from "npm:@base44/sdk@0.8.40";
+import { invokeLLM } from "../../shared/aiGateway.ts";
 
 export default async function(req: Request): Promise<Response> {
   try {
@@ -77,8 +78,9 @@ Generate 5 of the BEST suggestions for this field. Each suggestion should be:
 
 Return as a JSON object with a "suggestions" array of strings. Each string is one complete suggestion ready to drop into the field.`;
 
-    const llmRes = await base44.asServiceRole.integrations.Core.InvokeLLM({
+    const llmRes = await invokeLLM({
       prompt,
+      system_prompt: "You are an expert business strategist. Respond ONLY with valid JSON matching the requested schema. No markdown, no code fences.",
       response_json_schema: {
         type: "object",
         properties: {
