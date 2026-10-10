@@ -12,6 +12,7 @@
 import { compileBrief, briefText, photoStyleSuffix } from "./generatorBrief.ts";
 import { researchBusinessNamesDeep } from "./businessNameResearcher.ts";
 import { formatLibraryForPrompt } from "./xpsAssetLibrary.ts";
+import { invokeLLM } from './aiGateway.ts';
 
 // Check if the industry is flooring-related (epoxy, concrete, polishing, coating).
 // If so, the auto builder injects real XPS product/equipment/marketing data into
@@ -113,7 +114,7 @@ Return JSON with this structure:
 
 Guidelines: Short (1-3 words), memorable, easy to spell. Evokes trust, speed, quality, or proximity. Has viral potential. The .com domain should be short and brandable (no hyphens). Avoid trademarked names. Consider names with location hints or "near me" phrasing. Prioritize premium-sounding names. Each name must be distinct.`;
 
-  const result = await base44.asServiceRole.integrations.Core.InvokeLLM({
+  const result = await invokeLLM({
     prompt,
     add_context_from_internet: true,
     model: "gemini_3_flash",
@@ -212,7 +213,7 @@ Return JSON:
   recommendationReason: string
 }`;
 
-  const res = await base44.asServiceRole.integrations.Core.InvokeLLM({
+  const res = await invokeLLM({
     prompt,
     add_context_from_internet: true,
     model: "gemini_3_1_pro",
@@ -311,7 +312,7 @@ Return JSON with exactly these fields:
 - faq: array of 6-8 { question, answer }
 - localArea, cta, metaTitle (<=60 chars), metaDescription (<=160 chars)`;
 
-  const res = await base44.asServiceRole.integrations.Core.InvokeLLM({
+  const res = await invokeLLM({
     prompt,
     add_context_from_internet: true,
     model: "gemini_3_1_pro",
@@ -372,7 +373,7 @@ export async function generateSocial(base44: any, params: Record<string, any>) {
 
   const xpsContext = await getXpsContext(base44, ind);
 
-  const calRes = await base44.asServiceRole.integrations.Core.InvokeLLM({
+  const calRes = await invokeLLM({
     prompt: `Create a 30-day social media content calendar for ${ind} "${biz}" in ${loc}.
 
 CLIENT BRIEF:
@@ -443,7 +444,7 @@ export async function generateVideo(base44: any, params: Record<string, any>) {
 
   const xpsContext = await getXpsContext(base44, ind);
 
-  const scriptRes = await base44.asServiceRole.integrations.Core.InvokeLLM({
+  const scriptRes = await invokeLLM({
     prompt: `Write a compelling video script for each of these 10 video concepts for ${ind} "${biz}" in ${loc}.
 
 CLIENT BRIEF:

@@ -6,6 +6,7 @@
 // Admin-only.
 
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.43';
+import { invokeLLM } from '../../shared/aiGateway.ts';
 
 export default async function(req: Request): Promise<Response> {
   const body = await req.json().catch(() => ({}));
@@ -64,7 +65,7 @@ SEO: Semantic HTML5, h1 for hero, h2 for sections, alt text, JSON-LD LocalBusine
 
 Return ONLY raw HTML from <!DOCTYPE html> to </html>. No markdown fences, no explanations.`;
 
-    const llmRes = await base44.integrations.Core.InvokeLLM({
+    const llmRes = await invokeLLM({
       prompt,
       file_urls: [pack.image_url],
       model: 'gemini_3_flash',

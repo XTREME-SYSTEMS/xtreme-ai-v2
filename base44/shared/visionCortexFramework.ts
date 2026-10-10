@@ -1,3 +1,5 @@
+import { invokeLLM } from './aiGateway.ts';
+
 // visionCortexFramework.ts — Shared Vision Cortex logic.
 // Source definitions for Browserbase scraping + the YC 10-key-question
 // scoring framework + exhaustive summary generation.
@@ -272,7 +274,7 @@ Overall = weighted composite: problem_acuity 20%, market_size 15%, autonomous_bu
 
 Search the web for market data, competitor info, and trend validation.`;
 
-  const response = await base44.integrations.Core.InvokeLLM({
+  const response = await invokeLLM({
     prompt,
     add_context_from_internet: true,
     response_json_schema: YC_SCORING_SCHEMA,
@@ -346,7 +348,7 @@ Generate a comprehensive, production-grade summary covering EVERY aspect:
 
 Search the web for competitor pricing, market size data, and technology costs to make your estimates realistic.`;
 
-  const response = await base44.integrations.Core.InvokeLLM({
+  const response = await invokeLLM({
     prompt,
     add_context_from_internet: true,
     response_json_schema: EXHAUSTIVE_SUMMARY_SCHEMA,

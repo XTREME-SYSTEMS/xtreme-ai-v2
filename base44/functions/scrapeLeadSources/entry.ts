@@ -8,6 +8,7 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.44';
 import { scrapePage, scrapePageWithCookies, isEngineConfigured } from '../../shared/cloudBrowserScrape.ts';
 import { SERVICE_UNIVERSE, INTENT_PHRASES, PROBLEM_SIGNALS, ADJACENT_TRADES } from '../../shared/leadKeywords.ts';
+import { invokeLLM } from '../../shared/aiGateway.ts';
 
 const DEFAULT_SERVICE_KEYWORDS = [
   'epoxy flooring', 'garage floor', 'garage floor coating', 'decorative concrete',
@@ -80,7 +81,7 @@ export default async function(req: Request): Promise<Response> {
 
         // Use AI to extract structured leads from the scraped content
         const contentForAI = (scraped.html || scraped.text || '').substring(0, 45000);
-        const llmResponse = await base44.integrations.Core.InvokeLLM({
+        const llmResponse = await invokeLLM({
           prompt: extractionPrompt + '\n\n--- PAGE CONTENT ---\n' + contentForAI,
           response_json_schema: {
             type: 'object',

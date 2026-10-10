@@ -8,6 +8,7 @@
 // Admin-only. Processes sites in parallel batches to stay within latency limits.
 
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.43';
+import { invokeLLM } from '../../shared/aiGateway.ts';
 
 const TEMPLATE_LIBRARY: Record<string, any> = {
   'epoxy-elite': {
@@ -255,7 +256,7 @@ export default async function(req: Request): Promise<Response> {
           const contentPrompt = `Generate website content for a ${project.industry.replace(/_/g, ' ')} company named "${site.website_name}" in ${site.city}. Tone: ${site.tone || 'professional'}. Return JSON with: hero_headline, hero_subtext, about (2 paragraphs), services (array of {title, desc, icon} with 4-5 items), faq (array of {question, answer} with 4 items), reviews (array of {text, author} with 3 items), cta_text.`;
           let content: any = {};
           try {
-            const contentRes = await base44.integrations.Core.InvokeLLM({
+            const contentRes = await invokeLLM({
               prompt: contentPrompt,
               response_json_schema: {
                 type: 'object',

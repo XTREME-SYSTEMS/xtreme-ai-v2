@@ -6,6 +6,7 @@
 // the Vision Generator and weekly via a scheduled workflow.
 
 import { createClientFromRequest } from "npm:@base44/sdk@0.8.40";
+import { invokeLLM } from '../../shared/aiGateway.ts';
 
 // This system is exclusively focused on epoxy & concrete contracting.
 // The trending categories below are the 5 supported niches — no universal
@@ -83,7 +84,7 @@ export default async function(req: Request): Promise<Response> {
 
     // Research trending sub-categories within the epoxy & concrete industry
     const year = new Date().getFullYear();
-    const llmRes = await base44.asServiceRole.integrations.Core.InvokeLLM({
+    const llmRes = await invokeLLM({
       prompt: `Research the top trending sub-categories and emerging opportunities WITHIN the epoxy flooring, epoxy coatings, polished concrete, and decorative concrete contracting industry in ${year}. For each sub-category provide: name (short, 2-4 words), description (1 sentence about what it is and why it's trending), icon (a lucide icon name in kebab-case, e.g. "paint-bucket", "shield-check", "hard-hat", "sparkles", "building-2", "layers", "factory", "zap" — NOT an emoji), subcategories (3-5 specific services or niches within it), trending_score (0-100, higher = more trending right now), market_size (brief), and profitability (brief). Focus on: metallic epoxy floors, garage floor coatings, commercial epoxy, industrial coatings, polished concrete, stamped concrete, concrete overlays, micro-toppings, 3D epoxy, food-safe epoxy, warehouse floors, anti-slip coatings, decorative resurfacing, and other emerging epoxy/concrete trends. Return as JSON.`,
       add_context_from_internet: true,
       model: "gemini_3_flash",

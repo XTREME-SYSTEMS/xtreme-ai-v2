@@ -64,7 +64,7 @@ Audit across these dimensions (0-100 each):
 
 Return JSON with: overall_score, completeness_score, correctness_score, integration_score, security_score, performance_score, autonomy_score, critical_findings (array of strings), hardening_actions (array of {area, action, priority}), recommendation (string).`;
 
-    const auditRes = await base44.asServiceRole.integrations.Core.InvokeLLM({
+    const auditRes = await invokeLLM({
       prompt: auditPrompt,
       response_json_schema: {
         type: "object",

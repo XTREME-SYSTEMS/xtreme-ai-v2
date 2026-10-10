@@ -11,6 +11,7 @@ import {
   realFixPhase, realHealPhase, realHardenPhase, realOptimizePhase,
   calculateWeightedScore, verifyDeploymentInLoop, recordIncident,
 } from "./bulletproofValidation.ts";
+import { invokeLLM } from './aiGateway.ts';
 
 const QUALITY_GATE_THRESHOLD = 75;
 const MAX_RETRIES = 3;
@@ -329,7 +330,7 @@ async function runAuditPhase(base44: any, build: any): Promise<{ score: number; 
     try {
       const auditPrompt = `Audit this autonomous build for quality. Build: "${build.business_name}" (type: ${build.product_type}). All core assets are present. Check for architecture quality, data model consistency, UI system coherence, code manifest completeness, and deployment readiness. Return JSON: { "score": number (0-100), "issues": string, "recommendations": string }`;
 
-      const result = await base44.asServiceRole.integrations.Core.InvokeLLM({
+      const result = await invokeLLM({
         prompt: auditPrompt,
         model: "gemini_3_flash",
         response_json_schema: {

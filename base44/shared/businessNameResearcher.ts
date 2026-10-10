@@ -1,3 +1,5 @@
+import { invokeLLM } from './aiGateway.ts';
+
 // businessNameResearcher.ts — Fast business name + URL researcher.
 // ------------------------------------------------------------
 // Optimized pipeline (avg 30-40s, down from 60-120s):
@@ -119,7 +121,7 @@ Also provide:
 
 Return JSON with "suggestions" array of 15 items, each with: name, domain (lowercase .com), tagline, viral_score, local_seo_score, searchability_score, brandability_score, domain_strength_score, trademark_safety_score, google_search_status, state_registry_status, rationale, target_audience.${excludeStr}${seedStr}`;
 
-  const result = await base44.asServiceRole.integrations.Core.InvokeLLM({
+  const result = await invokeLLM({
     prompt,
     model: 'gemini_3_flash',
     response_json_schema: {

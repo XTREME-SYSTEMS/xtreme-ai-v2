@@ -4,6 +4,7 @@
 // Creates a WalkthroughProject entity with a share token for public viewing.
 
 import { createClientFromRequest } from "npm:@base44/sdk@0.8.40";
+import { invokeLLM } from '../../shared/aiGateway.ts';
 
 export default async function (req: Request) {
   const base44 = createClientFromRequest(req);
@@ -21,7 +22,7 @@ export default async function (req: Request) {
 
   try {
     // Use AI with vision to analyze the uploaded images and create a walkthrough plan
-    const result = await base44.asServiceRole.integrations.Core.InvokeLLM({
+    const result = await invokeLLM({
       prompt: `You are a professional 3D walkthrough designer. Analyze these ${images.length} uploaded images of a space and create an immersive walkthrough plan.
 
 For each image:

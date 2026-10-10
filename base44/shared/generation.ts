@@ -1,3 +1,5 @@
+import { invokeLLM } from './aiGateway.ts';
+
 // Shared server-side generation engine for the Lead Gen Near You Growth Factory.
 // Invoked by the heartbeat dispatcher. Each runner: InvokeLLM -> persist -> enqueue next phase -> write receipt.
 // Production locks enforced: never enqueues domain purchase, DNS, deploy, paid media, messaging, or payments.
@@ -7,7 +9,7 @@ function parseInput(job) {
 }
 
 async function llm(base44, prompt, schema) {
-  return await base44.asServiceRole.integrations.Core.InvokeLLM({
+  return await invokeLLM({
     prompt,
     add_context_from_internet: true,
     response_json_schema: schema,

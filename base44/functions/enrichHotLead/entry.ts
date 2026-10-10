@@ -10,6 +10,7 @@
 
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.44';
 import { scrapePage, isEngineConfigured } from '../../shared/cloudBrowserScrape.ts';
+import { invokeLLM } from '../../shared/aiGateway.ts';
 
 export default async function(req: Request): Promise<Response> {
   try {
@@ -83,7 +84,7 @@ export default async function(req: Request): Promise<Response> {
             const page = await scrapePage(website, { waitMs: 3000, screenshot: false });
             const content = (page.text || '').substring(0, 8000);
             // AI extract company details
-            companyInfo = await base44.integrations.Core.InvokeLLM({
+            companyInfo = await invokeLLM({
               prompt: `Extract company information from this website content. URL: ${website}
 
 Return:
@@ -167,7 +168,7 @@ ${content}`,
     if (lead.lead_type === 'permit_project' || lead.opportunity_type === 'project_demand' || lead.opportunity_type === 'bid_demand') {
       try {
         // Web search for project details
-        const projectInfo = await base44.integrations.Core.InvokeLLM({
+        const projectInfo = await invokeLLM({
           prompt: `Investigate this construction project/permit lead for a concrete/epoxy flooring contractor.
 
 Lead: ${lead.title}

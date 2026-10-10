@@ -13,6 +13,7 @@
 // 1000 iterations → percentile projections → sensitivity analysis → save result.
 
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.44';
+import { invokeLLM } from '../../shared/aiGateway.ts';
 
 const HORIZON_PERIODS: Record<string, number> = {
   '1_week': 1, '1_month': 1, '3_months': 3, '6_months': 6,
@@ -63,7 +64,7 @@ export default async function(req: Request): Promise<Response> {
     const periods = HORIZON_PERIODS[time_horizon] || 12;
 
     // ── Step 1: LLM generates realistic model parameters from the input ──
-    const modelRes = await svc.integrations.Core.InvokeLLM({
+    const modelRes = await invokeLLM({
       prompt: `You are a financial modeling AI. Given these business inputs, generate realistic monthly model parameters for a Monte Carlo simulation.
 
 INPUTS: ${JSON.stringify(input_variables)}

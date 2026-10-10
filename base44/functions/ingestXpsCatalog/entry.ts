@@ -1,5 +1,6 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.44';
 import { COLOR_DATA } from "../../shared/xpsColorData.ts";
+import { invokeLLM } from '../../shared/aiGateway.ts';
 
 // Ingest Xtreme Polishing Systems catalog — directly scrapes the Shopify
 // products.json API for ALL 445 products with real image URLs, ingests all
@@ -282,7 +283,7 @@ export default async function(req) {
 
 // Research Polished Concrete University — training courses, curriculum, marketing content
 async function researchPCU(base44: any) {
-  return await base44.asServiceRole.integrations.Core.InvokeLLM({
+  return await invokeLLM({
     prompt: `Research polishedconcreteuniversity.com — the training/certification subsidiary of Xtreme Polishing Systems.
 
 They offer two 5-day certification courses in Pompano Beach, FL ($1750 each):
@@ -318,7 +319,7 @@ Return JSON with:
 
 // Research XPS social media — Instagram, YouTube, podcast
 async function researchSocialMedia(base44: any) {
-  return await base44.asServiceRole.integrations.Core.InvokeLLM({
+  return await invokeLLM({
     prompt: `Research the social media content of Xtreme Polishing Systems (XPS). Their channels:
 - Instagram: https://www.instagram.com/xtremepolishingsystems/ (industry-leading products, equipment, training & tools)
 - YouTube: https://www.youtube.com/c/XtremePolishingSystems (66.8K subscribers, 546 videos — epoxy techniques, concrete polishing tutorials, product demos, "Epoxy Will Change Your Life" podcast)

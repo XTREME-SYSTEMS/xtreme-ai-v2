@@ -12,6 +12,7 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.44';
 import { scrapePage, isEngineConfigured } from '../../shared/cloudBrowserScrape.ts';
 import { generateSearchQueries, DEFAULT_GEOGRAPHIES } from '../../shared/searchDimensions.ts';
+import { invokeLLM } from '../../shared/aiGateway.ts';
 
 const SOURCE_CATEGORIES = {
   'facebook_group': 'social', 'craigslist': 'marketplace', 'reddit': 'forum',
@@ -55,7 +56,7 @@ export default async function(req: Request): Promise<Response> {
     for (const queryObj of queriesToRun) {
       try {
         // Use InvokeLLM with web search to find new sources
-        const llmRes = await base44.integrations.Core.InvokeLLM({
+        const llmRes = await invokeLLM({
           prompt: `You are a source discovery AI for a concrete/epoxy flooring contractor. Find websites, forums, Facebook groups, directories, bid boards, permit portals, and communities where potential customers or referral partners can be found.
 
 Search query: "${queryObj.query}"
@@ -215,7 +216,7 @@ async function discoverLinkedSources(base44, svc, source, ownerEmail, maxDepth) 
     if (!html) return discovered;
 
     // Extract outbound links and classify with AI
-    const llmRes = await base44.integrations.Core.InvokeLLM({
+    const llmRes = await invokeLLM({
       prompt: `You are a source discovery AI. The following is HTML from ${source.name} (${source.url}).
 
 Extract outbound links that lead to:

@@ -1,3 +1,5 @@
+import { invokeLLM } from './aiGateway.ts';
+
 // Shared resilience utilities for backend functions.
 // Provides retry with exponential backoff, timeout, circuit breaker,
 // and safe LLM invocation with graceful fallback.
@@ -45,7 +47,7 @@ export async function safeInvoke(base44, opts) {
   try {
     const result = await withRetry(
       (attempt) => withTimeout(
-        () => base44.integrations.Core.InvokeLLM({
+        () => invokeLLM({
           prompt, model, response_json_schema, add_context_from_internet, file_urls,
         }),
         timeout,

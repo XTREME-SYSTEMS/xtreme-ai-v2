@@ -1,3 +1,5 @@
+import { invokeLLM } from './aiGateway.ts';
+
 // ============================================================
 // llmJudge.ts — LLM-as-judge quality evaluation. After each
 // generator produces a spec, a second LLM call evaluates the
@@ -50,7 +52,7 @@ export async function judgeSpec(
   spec: any,
   context?: string
 ): Promise<JudgeScore> {
-  const result = await base44.integrations.Core.InvokeLLM({
+  const result = await invokeLLM({
     prompt: buildJudgePrompt(specType, spec, context),
     response_json_schema: {
       type: "object",

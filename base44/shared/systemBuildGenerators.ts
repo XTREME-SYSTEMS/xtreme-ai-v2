@@ -17,6 +17,7 @@ import {
   strictValidateUiSystem, strictValidateCodeManifest, strictValidateDeployment,
 } from "./systemBuildSchemas.ts";
 import { judgeSpec, judgePassed, type JudgeScore } from "./llmJudge.ts";
+import { invokeLLM } from './aiGateway.ts';
 
 // ── Auto-regeneration wrapper ────────────────────────────────────────────
 
@@ -132,7 +133,7 @@ ${productType === 'platform' ? '- Multi-role authentication (e.g. buyers/sellers
 
 Return a detailed JSON architecture spec.`;
 
-  const result = await base44.integrations.Core.InvokeLLM({
+  const result = await invokeLLM({
     prompt,
     response_json_schema: {
       type: "object",
@@ -258,7 +259,7 @@ Be specific and exhaustive — a developer should be able to create the database
 
 Return a detailed JSON data model spec.`;
 
-  const result = await base44.integrations.Core.InvokeLLM({
+  const result = await invokeLLM({
     prompt,
     response_json_schema: {
       type: "object",
@@ -384,7 +385,7 @@ ${productType === 'platform' ? 'Include listing cards, search/filter bars, user 
 
 Return a detailed JSON design system spec.`;
 
-  const result = await base44.integrations.Core.InvokeLLM({
+  const result = await invokeLLM({
     prompt,
     response_json_schema: {
       type: "object",
@@ -585,7 +586,7 @@ Keep each file's content focused and production-quality. Write COMPLETE implemen
 
 Return a detailed JSON codebase manifest.`;
 
-  const result = await base44.integrations.Core.InvokeLLM({
+  const result = await invokeLLM({
     prompt,
     response_json_schema: {
       type: "object",

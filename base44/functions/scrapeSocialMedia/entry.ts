@@ -1,4 +1,5 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.44';
+import { invokeLLM } from '../../shared/aiGateway.ts';
 
 // Social Media Scraper — scrapes all company social media posts and videos
 // from YouTube, Instagram, Facebook, TikTok, LinkedIn, and X/Twitter.
@@ -34,7 +35,7 @@ export default async function(req) {
       : '';
 
     // Use InvokeLLM with web search to discover real social media content
-    const llmResult = await base44.asServiceRole.integrations.Core.InvokeLLM({
+    const llmResult = await invokeLLM({
       prompt: `You are a social media scraping agent. Research the company "${company_name}" and find ALL their social media content across every platform.
 
 ${urlsContext}
