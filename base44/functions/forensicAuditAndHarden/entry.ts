@@ -1,4 +1,5 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.43';
+import { invokeLLM } from '../../shared/aiGateway.ts';
 
 // Deep Forensic Audit & Auto-Harden — audits the AutoBuilder pipeline,
 // identifies hardening actions, and applies auto-fixes.

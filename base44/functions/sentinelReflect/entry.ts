@@ -1,4 +1,5 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.41';
+import { invokeLLM } from '../../shared/aiGateway.ts';
 import { buildReflectionPrompt } from "../../shared/autonomousEngine.ts";
 
 // Self-Reflection System — when a phase fails validation, reflects on root causes,
@@ -24,7 +25,7 @@ export default async function(req) {
 
     await base44.asServiceRole.entities.ImplementationPhase.update(phase_id, { status: 'reflecting' });
 
-    const reflectRes = await base44.asServiceRole.integrations.Core.InvokeLLM({
+    const reflectRes = await invokeLLM({
       prompt: buildReflectionPrompt(phase, phase.implementation_spec || '', lastVal),
       response_json_schema: {
         type: "object",

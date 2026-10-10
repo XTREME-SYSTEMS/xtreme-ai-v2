@@ -1,4 +1,5 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.40';
+import { invokeLLM } from '../../shared/aiGateway.ts';
 
 // AI Site Factory — generates the full SEO + content kit for a market record.
 // Takes market_id (+ optional job_type), loads the Market, calls InvokeLLM with web
@@ -76,7 +77,7 @@ Produce:
 
 Write for humans first, search second. Return JSON only.`;
 
-      const res = await base44.asServiceRole.integrations.Core.InvokeLLM({
+      const res = await invokeLLM({
         prompt, add_context_from_internet: true, response_json_schema: schema, model: "gemini_3_flash",
       });
 

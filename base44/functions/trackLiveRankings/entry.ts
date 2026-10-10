@@ -1,4 +1,5 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.40';
+import { invokeLLM } from '../../shared/aiGateway.ts';
 
 // Checks actual live SERP positions for target keywords using AI web search.
 // Searches Google for each keyword and finds where the domain ranks.
@@ -69,7 +70,7 @@ For each keyword:
 Be accurate. Only report a position if you genuinely find the domain in the results. Do not guess.`;
 
         try {
-          const result = await base44.asServiceRole.integrations.Core.InvokeLLM({
+          const result = await invokeLLM({
             prompt,
             add_context_from_internet: true,
             response_json_schema: {

@@ -1,4 +1,5 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.41';
+import { invokeLLM } from '../../shared/aiGateway.ts';
 
 // Website Factory Orchestrator — top-down AI pipeline driven by the Template + Prompt Libraries.
 // name → url → brand → [GATE 1] → logo → content → images → seo/aeo → [GATE 2] → complete.
@@ -35,7 +36,7 @@ export default async function(req) {
     if (!project) return Response.json({ error: "Project not found" }, { status: 404 });
 
     const patch = (data) => base44.asServiceRole.entities.WebsiteFactoryProject.update(project.id, data);
-    const llm = (prompt, schema) => base44.asServiceRole.integrations.Core.InvokeLLM({
+    const llm = (prompt, schema) => invokeLLM({
       prompt, response_json_schema: schema, model: "claude_sonnet_4_6"
     }).then((r) => r.data || r);
 
