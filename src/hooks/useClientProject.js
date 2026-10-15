@@ -32,16 +32,14 @@ export function useClientProject(user) {
     try {
       // Fetch recent projects and pick the most recent non-archived one as the
       // "current" project. Archived projects are preserved for resume later.
-      const requestedId = new URLSearchParams(location.search).get('project');
       const existing = await base44.entities.ClientProject.filter(
-        { client_email: effectiveEmail, ...(requestedId ? { id: requestedId } : { archived: { $ne: true } }) },
-        { sort: '-created_date', limit: 1 }
+        { client_email: effectiveEmail }, "-created_date", 20
       );
-      const active = existing.items[0];
+      const active = (existing || []).find((p) => p.archived !== true);
       setProject(active || null);
     } catch { setProject(null); }
     finally { setLoading(false); }
-  }, [effectiveEmail, autoBuild.isActive, location.search]);
+  }, [effectiveEmail, autoBuild.isActive]);
 
   useEffect(() => {
     if (autoBuild.isActive) return;

@@ -1,5 +1,4 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.40';
-import { invokeLLM } from '../../shared/aiGateway.ts';
 import { SERVICE_CATALOG_DATA } from "../../shared/serviceCatalogData.ts";
 
 // Seeds the ServiceCatalogEntry entity with all products, their features,
@@ -101,7 +100,7 @@ async function generateFeatureDetails(base44, product) {
   Return a JSON object with an "items" array — one entry per line item, IN THE SAME ORDER as listed above. Each entry is an object with the 6 fields.`;
 
   try {
-  const response = await invokeLLM({
+  const response = await base44.asServiceRole.integrations.Core.InvokeLLM({
     prompt,
     response_json_schema: {
       type: "object",

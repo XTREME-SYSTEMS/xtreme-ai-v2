@@ -1,5 +1,4 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.41';
-import { invokeLLM } from '../../shared/aiGateway.ts';
 import { IMPLEMENTATION_PHASES, buildSpecPrompt } from "../../shared/autonomousEngine.ts";
 
 // Autonomous Coding System — generates a detailed implementation spec for a phase
@@ -24,7 +23,7 @@ export default async function(req) {
 
     // Step 1 — generate the detailed implementation spec via LLM
     const specPrompt = buildSpecPrompt(phase, true);
-    const specRes = await invokeLLM({
+    const specRes = await base44.asServiceRole.integrations.Core.InvokeLLM({
       prompt: specPrompt,
       response_json_schema: {
         type: "object",
@@ -42,7 +41,7 @@ export default async function(req) {
 
     // Step 2 — generate the actual code/file contents from the spec
     const codePrompt = `Based on this implementation spec, generate the COMPLETE file contents for every entity schema, backend function entry.ts, and page JSX file. Output as a JSON object mapping file_path -> file_content (full ready-to-deploy code).\n\nSPEC:\n${spec.slice(0, 6000)}`;
-    const codeRes = await invokeLLM({
+    const codeRes = await base44.asServiceRole.integrations.Core.InvokeLLM({
       prompt: codePrompt,
       response_json_schema: {
         type: "object",

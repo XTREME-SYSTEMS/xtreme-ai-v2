@@ -1,5 +1,4 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.40';
-import { invokeLLM } from '../../shared/aiGateway.ts';
 
 // Programmatic SEO/AEO page generator. Produces a fully optimized, keyword-rich,
 // indexable landing page (service x city x intent) with FAQ-as-open-text and
@@ -49,7 +48,7 @@ export default async function(req) {
 - json_ld_faq: a Schema.org FAQPage object with the same faq entries.
 Do not stuff keywords unnaturally. Write for humans first, search second. Return JSON only.`;
 
-    const res = await invokeLLM({
+    const res = await base44.asServiceRole.integrations.Core.InvokeLLM({
       prompt,
       add_context_from_internet: true,
       response_json_schema: schema,

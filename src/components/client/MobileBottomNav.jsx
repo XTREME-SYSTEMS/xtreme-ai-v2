@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { NavLink } from "react-router-dom";
-import { Sparkles, Brain, Inbox, Rocket, Activity, Download, Check } from "lucide-react";
+import { Package, LayoutTemplate, FileSignature, MessageCircle, Download, Check } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 // Mobile-only bottom navigation bar with the most important quick-access
@@ -36,11 +36,10 @@ export default function MobileBottomNav() {
   };
 
   const navItems = [
-    { to: "/onboarding", label: "Onboard", icon: Sparkles },
-    { to: "/strategy-review", label: "Strategy", icon: Brain },
-    { to: "/pack-inbox", label: "Packs", icon: Inbox },
-    { to: "/mass-website-factory", label: "Deploy", icon: Rocket },
-    { to: "/ranking-monitor", label: "Monitor", icon: Activity },
+    { to: "/business-generator", label: "Package", icon: Package },
+    { to: "/your-designs", label: "Designs", icon: LayoutTemplate },
+    { to: "/signatures", label: "Sign", icon: FileSignature },
+    { to: "/assistant", label: "Help", icon: MessageCircle },
   ];
 
   return (

@@ -1,5 +1,4 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.40';
-import { invokeLLM } from '../../shared/aiGateway.ts';
 
 // Max-quality, industry-aware image generator. Compiles EVERYTHING the client
 // told us in onboarding — industry, sub-industry, business type, location,
@@ -96,7 +95,7 @@ Return JSON: an array of ${n} strings, each a complete image prompt.`;
 
     let prompts: string[] = [];
     try {
-      const res = await invokeLLM({
+      const res = await base44.asServiceRole.integrations.Core.InvokeLLM({
         prompt,
         add_context_from_internet: true,
         model: "gemini_3_1_pro",
@@ -164,7 +163,7 @@ async function generateStyleMatched(base44, refs, ctx) {
   let styleBrief = "";
   let prompts: string[] = [];
   try {
-    const analyzeRes = await invokeLLM({
+    const analyzeRes = await base44.asServiceRole.integrations.Core.InvokeLLM({
       prompt: `You are a master commercial photographer and art director. Analyze the attached project photos from a real business and extract the visual principles that define them.
 
 Business context:

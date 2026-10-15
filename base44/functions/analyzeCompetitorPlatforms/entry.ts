@@ -1,5 +1,4 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.40';
-import { invokeLLM } from '../../shared/aiGateway.ts';
 
 // Analyzes competitor marketing platforms, SaaS tools, and AI website builders
 // that serve local service businesses. Uses InvokeLLM with web search to find
@@ -58,7 +57,7 @@ Return a structured competitor platform intelligence report:
 
 All prices in USD. Be specific with real competitor names and real pricing. If you can't find exact data, use the best available and note it.`;
 
-    const res = await invokeLLM({
+    const res = await base44.asServiceRole.integrations.Core.InvokeLLM({
       prompt,
       add_context_from_internet: true,
       model: "gemini_3_flash",

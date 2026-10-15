@@ -1,5 +1,4 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.43';
-import { invokeLLM } from '../../shared/aiGateway.ts';
 
 // architectScan — The AI Chief Architect.
 //
@@ -128,7 +127,7 @@ For each: be specific and actionable. Name real tools. Include tech references w
 
 Search the web for the LATEST AI capabilities and emerging technologies. Be bold and cutting-edge.`;
 
-    const response = await invokeLLM({
+    const response = await base44.asServiceRole.integrations.Core.InvokeLLM({
       prompt,
       add_context_from_internet: true,
       response_json_schema: {

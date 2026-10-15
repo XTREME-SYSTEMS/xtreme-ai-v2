@@ -1,150 +1,320 @@
-import { useState, useEffect } from 'react';
-import { Sparkles, Loader2, Info } from 'lucide-react';
-import { base44 } from '@/api/base44Client';
-import StudioTopBar from '@/components/studio/StudioTopBar';
-import VideoImageUploader from '@/components/videogen/VideoImageUploader';
-import VideoJobCard from '@/components/videogen/VideoJobCard';
+import { useEffect, useRef, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { base44 } from "@/api/base44Client";
+import { Image } from "@/components/ui/image";
+import { Video, Loader2, Check, RefreshCw, ArrowRight, AlertCircle, X, Send, MessageSquare, Play, Film } from "lucide-react";
+import { cn } from "@/lib/utils";
+import { logReceipt } from "@/lib/pipelineUtils";
+import BackButton from "@/components/client/BackButton";
+import VideoClipPlayer from "@/components/video/VideoClipPlayer";
+import { useClientUser } from "@/hooks/useClientUser";
+import { useClientUpdate } from "@/hooks/useClientUpdate";
+import { useClientProject } from "@/hooks/useClientProject";
+import { deriveFoundation } from "@/lib/pipelineFoundation";
+import { notifyStepComplete } from "@/lib/pipelineNotify";
 
-const MODELS = [
-  { value: 'seedance_2_5', label: 'Seedance 2.5', maxSeconds: 30, resolutions: ['480p', '720p'], note: 'Best for long clips with image references' },
-  { value: 'seedance_2', label: 'Seedance 2', maxSeconds: 15, resolutions: ['480p', '720p', '1080p', '4K'], note: 'Higher resolution, shorter clips' },
-  { value: 'seedance_2_fast', label: 'Seedance 2 Fast', maxSeconds: 15, resolutions: ['480p', '720p'], note: 'Faster generation, lower cost' },
+// Duration options for generated videos. The platform generates up to 8
+// seconds per clip, so longer videos are composed of multiple 8-second clips
+// played back-to-back as one continuous video.
+const DURATION_OPTIONS = [
+  { value: "15", label: "15s", clips: 2, note: "2 scenes" },
+  { value: "30", label: "30s", clips: 4, note: "4 scenes" },
+  { value: "45", label: "45s", clips: 6, note: "6 scenes" },
+  { value: "8", label: "8s", clips: 1, note: "1 scene" },
 ];
 
-const ASPECT_RATIOS = ['16:9', '9:16', '1:1', '4:3', '3:4'];
-
+// Step: Video Generator. Generates 10 video concept cards (thumbnail +
+// description + production script) using the client's onboarding, content
+// tone, logo, and brand. The client can generate the actual video for any
+// concept on demand at their chosen length (8s, 15s, 30s, or 45s).
 export default function VideoGenerator() {
-  const [user, setUser] = useState(null);
-  const [images, setImages] = useState([]);
-  const [prompt, setPrompt] = useState('');
-  const [model, setModel] = useState('seedance_2_5');
-  const [seconds, setSeconds] = useState(15);
-  const [aspectRatio, setAspectRatio] = useState('16:9');
-  const [resolution, setResolution] = useState('720p');
-  const [generateAudio, setGenerateAudio] = useState(true);
+  const navigate = useNavigate();
+  const [profile, setProfile] = useState(null);
+  const [logoUrl, setLogoUrl] = useState("");
+  const [contentTone, setContentTone] = useState("");
+  const [data, setData] = useState(null); // { concepts: [{id,title,description,thumbnailUrl,script,videoPrompt}] }
   const [generating, setGenerating] = useState(false);
-  const [error, setError] = useState('');
-  const [jobs, setJobs] = useState([]);
+  const [genError, setGenError] = useState("");
+  const [saving, setSaving] = useState(false);
+  const [saved, setSaved] = useState(false);
+  const [error, setError] = useState("");
+  const [revising, setRevising] = useState(false);
+  const [reviseComment, setReviseComment] = useState("");
+  const [sendingRevise, setSendingRevise] = useState(false);
+  const [reviseSent, setReviseSent] = useState(false);
+  const [reviseError, setReviseError] = useState("");
+  const [generatingVideoId, setGeneratingVideoId] = useState("");
+  const [genProgress, setGenProgress] = useState("");
+  const [videoDuration, setVideoDuration] = useState("15");
+  const [preview, setPreview] = useState(null);
 
-  const activeModel = MODELS.find(m => m.value === model);
-  const maxSeconds = activeModel?.maxSeconds || 30;
+  const { user } = useClientUser();
+  const { update } = useClientUpdate();
+  const { project } = useClientProject(user);
+
+  useEffect(() => { document.title = "Video Generator · Lead Gen Near You"; }, []);
 
   useEffect(() => {
-    base44.auth.me().then(u => {
-      setUser(u);
-      if (u?.email) {
-        base44.entities.VideoJob.filter({ user_email: u.email }, { sort: '-created_date', limit: 20 })
-          .then(page => setJobs(page.items || []))
-          .catch(() => {});
-      }
-    }).catch(e => setError(e.message));
-  }, []);
+    if (!user) return;
+    setProfile(user?.epoxyProfile || null);
+    setLogoUrl(user?.chosenLogoUrl || "");
+    setContentTone(user?.chosenContentTone || "");
+    if (user?.videoPack) setData(user.videoPack);
+    if (user?.videoChosen) setSaved(true);
+  }, [user]);
 
   const generate = async () => {
-    if (!prompt.trim()) { setError('Enter a prompt describing your video.'); return; }
-    if (images.length === 0) { setError('Upload at least one reference image.'); return; }
-    setGenerating(true); setError('');
+    if (!profile?.businessName) { setGenError("Complete your Business Profile first."); return; }
+    const foundation = deriveFoundation(project, user);
+    setGenerating(true); setGenError("");
     try {
-      const job = await base44.entities.VideoJob.create({
-        user_email: user.email,
-        prompt: prompt.trim(),
-        model, seconds, aspect_ratio: aspectRatio, resolution,
-        generate_audio: generateAudio,
-        image_uris: images.map(i => i.file_uri),
-        status: 'pending',
+      const res = await base44.functions.invoke("generateVideoPack", {
+        businessName: profile.businessName, primaryLocation: profile.primaryLocation,
+        services: profile.services || [], contentTone, logoUrl,
+        industry: profile.industry || "", subIndustry: profile.subIndustry || "",
+        businessType: profile.businessType || "",
+        industryAnswers: profile.industryAnswers || profile.industry_answers || {},
+        differentiators: profile.differentiators || [],
+        vision: foundation.vision,
+        strategy: foundation.strategy,
+        chosenName: foundation.chosenName,
+        tagline: foundation.tagline,
       });
-      setJobs(prev => [job, ...prev]);
-      const request = {
-        model,
-        prompt: prompt.trim(),
-        seconds,
-        aspect_ratio: aspectRatio,
-        resolution,
-        generate_audio: generateAudio,
-        input_references: images.slice(0, 8).map(img => ({
-          type: 'image_url',
-          image_url: { url: img.file_uri },
-        })),
-      };
-      const { data } = await base44.functions.invoke('video-gateway', { action: 'create', request, job_id: job.id });
-      setJobs(prev => prev.map(j => j.id === job.id ? { ...j, gateway_video_id: data.video_id, status: data.status || 'queued' } : j));
-      setPrompt(''); setImages([]);
-    } catch (e) {
-      setError(e.response?.data?.error || e.message || 'Could not start generation.');
-    } finally { setGenerating(false); }
+      const d = res?.data?.data;
+      if (!d?.concepts?.length) throw new Error("no data");
+      setData(d);
+      try { await update({ videoPack: d }); } catch {}
+    } catch (e) { setGenError("Couldn't generate video concepts. Try again."); }
+    finally { setGenerating(false); }
   };
 
+  useEffect(() => {
+    if (profile && project && !data && !generating && !genError) generate();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [profile, project]);
+
+  // Auto-pick: all concepts included — pre-approve so the step is done.
+  const autoPicked = useRef(false);
+  useEffect(() => {
+    if (data && !saved && !autoPicked.current) {
+      autoPicked.current = true;
+      (async () => {
+        try {
+          await update({ videoChosen: true });
+          await notifyStepComplete("video", { businessName: profile?.businessName || "" });
+          try { localStorage.setItem("coach:done:/video-generator", "1"); } catch {}
+        } catch {}
+      })();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [data, saved]);
+
+  // Generate the actual video for a single concept at the selected duration.
+  // Longer videos (15s/30s/45s) are composed of multiple 8-second clips
+  // generated sequentially and played back-to-back as one continuous video.
+  const generateVideo = async (concept, durationValue = videoDuration) => {
+    if (generatingVideoId) return;
+    setGeneratingVideoId(concept.id);
+    const opt = DURATION_OPTIONS.find((o) => o.value === durationValue) || DURATION_OPTIONS[0];
+    try {
+      const clips = [];
+      for (let i = 0; i < opt.clips; i++) {
+        setGenProgress(`Scene ${i + 1} of ${opt.clips}…`);
+        const res = await base44.integrations.Core.GenerateVideo({
+          prompt: `${concept.videoPrompt || `A promotional video for ${profile?.businessName || "a local business"}. ${concept.description}`} Scene ${i + 1} of ${opt.clips}.`,
+          duration: 8, aspect_ratio: "16:9", generate_audio: false,
+        });
+        if (res?.url) clips.push({ url: res.url, duration: 8, label: `Scene ${i + 1}` });
+      }
+      if (clips.length) {
+        const next = { ...data, concepts: data.concepts.map((c) => c.id === concept.id ? { ...c, videoClips: clips, videoUrl: clips[0].url } : c) };
+        setData(next);
+        try { await update({ videoPack: next }); } catch {}
+      }
+    } catch (e) { /* best effort */ }
+    finally { setGeneratingVideoId(""); setGenProgress(""); }
+  };
+
+  const save = async () => {
+    setSaving(true); setError("");
+    try {
+      await update({ videoChosen: true });
+      try { await logReceipt({ action: "Video pack approved", entityType: "User", entityId: "self", status: "success", notes: `${data?.concepts?.length || 0} concepts` }); } catch {}
+      await notifyStepComplete("video", { businessName: profile?.businessName || "" });
+      setSaved(true);
+      try { localStorage.setItem("coach:done:/video-generator", "1"); } catch {}
+      setTimeout(() => navigate("/your-designs"), 800);
+    } catch (e) { setError("Couldn't save."); }
+    finally { setSaving(false); }
+  };
+
+  const requestRevision = async () => {
+    if (!reviseComment.trim()) { setReviseError("Add a note."); return; }
+    setSendingRevise(true); setReviseError("");
+    try {
+      await base44.functions.invoke("submitRevisionRequest", { comment: reviseComment.trim(), pipelineStep: "video", clientEmail: profile?.email || "" });
+      setReviseSent(true); setReviseComment(""); setRevising(false);
+    } catch (e) { setReviseError("Couldn't send."); }
+    finally { setSendingRevise(false); }
+  };
+
+  const concepts = data?.concepts || [];
+  const selDur = DURATION_OPTIONS.find((o) => o.value === videoDuration) || DURATION_OPTIONS[0];
+
   return (
-    <div className="studio-workspace flex h-dvh min-h-0 flex-col bg-background text-foreground">
-      <StudioTopBar />
-      <main className="min-h-0 flex-1 overflow-y-auto p-4 sm:p-6">
-        <div className="mx-auto max-w-3xl space-y-6">
-          <div>
-            <h1 className="flex items-center gap-2 text-xl font-semibold"><Sparkles className="h-5 w-5 text-primary" /> AI Video Generator</h1>
-            <p className="mt-1 text-sm text-muted-foreground">Upload reference images, describe your video, and generate a 15-30 second AI clip.</p>
-          </div>
-
-          <div className="rounded-xl border border-border bg-card p-5 space-y-5">
-            <VideoImageUploader images={images} setImages={setImages} />
-
-            <div className="space-y-2">
-              <label className="text-sm font-semibold">Video prompt</label>
-              <textarea value={prompt} onChange={e => setPrompt(e.target.value)} rows={3} placeholder="Describe the motion, camera, style, and mood you want…" className="w-full resize-none rounded-lg border border-border bg-background p-3 text-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-ring" />
-            </div>
-
-            <div className="space-y-2">
-              <label className="text-sm font-semibold">Model</label>
-              <select value={model} onChange={e => { setModel(e.target.value); const m = MODELS.find(x => x.value === e.target.value); setSeconds(prev => Math.min(prev, m.maxSeconds)); setResolution(prev => m.resolutions.includes(prev) ? prev : m.resolutions[0]); }} className="w-full rounded-lg border border-border bg-background p-2.5 text-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-ring">
-                {MODELS.map(m => <option key={m.value} value={m.value}>{m.label} · up to {m.maxSeconds}s — {m.note}</option>)}
-              </select>
-            </div>
-
-            <div className="space-y-2">
-              <div className="flex items-center justify-between"><label className="text-sm font-semibold">Duration</label><span className="text-sm font-mono text-primary">{seconds}s</span></div>
-              <input type="range" min={15} max={maxSeconds} step={1} value={seconds} onChange={e => setSeconds(Number(e.target.value))} className="w-full accent-primary" />
-              <p className="text-[11px] text-muted-foreground">15-{maxSeconds}s per clip. For longer videos, generate multiple clips.</p>
-            </div>
-
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <label className="text-sm font-semibold">Aspect ratio</label>
-                <select value={aspectRatio} onChange={e => setAspectRatio(e.target.value)} className="w-full rounded-lg border border-border bg-background p-2.5 text-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-ring">
-                  {ASPECT_RATIOS.map(r => <option key={r} value={r}>{r}</option>)}
-                </select>
-              </div>
-              <div className="space-y-2">
-                <label className="text-sm font-semibold">Resolution</label>
-                <select value={resolution} onChange={e => setResolution(e.target.value)} className="w-full rounded-lg border border-border bg-background p-2.5 text-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-ring">
-                  {activeModel?.resolutions.map(r => <option key={r} value={r}>{r}</option>)}
-                </select>
-              </div>
-            </div>
-
-            <label className="flex items-center gap-2 text-sm">
-              <input type="checkbox" checked={generateAudio} onChange={e => setGenerateAudio(e.target.checked)} className="accent-primary" />
-              Generate audio
-            </label>
-
-            {error && <p role="alert" className="rounded-lg border border-destructive/40 p-3 text-sm">{error}</p>}
-
-            <button onClick={generate} disabled={generating || !prompt.trim() || images.length === 0} className="flex w-full items-center justify-center gap-2 rounded-lg bg-primary px-4 py-3 text-sm font-semibold text-primary-foreground disabled:opacity-40">
-              {generating ? <><Loader2 className="h-4 w-4 animate-spin" /> Starting generation…</> : <><Sparkles className="h-4 w-4" /> Generate video</>}
-            </button>
-          </div>
-
-          <div className="flex items-start gap-2 rounded-lg border border-border bg-secondary p-3 text-xs text-muted-foreground">
-            <Info className="mt-0.5 h-4 w-4 shrink-0" />
-            <p>Video generation uses integration credits and takes 1-5 minutes per clip. The platform supports up to 30 seconds per clip — for a 60-second video, generate two 30s clips. Your uploaded images are stored privately — no public URL, so access follows your app's permissions.</p>
-          </div>
-
-          {jobs.length > 0 && (
-            <div className="space-y-3">
-              <h2 className="text-base font-semibold">Your video jobs</h2>
-              {jobs.map(job => <VideoJobCard key={job.id} job={job} />)}
-            </div>
-          )}
+    <div className="mx-auto max-w-5xl">
+      <BackButton to="/social-media" />
+      <div className="rounded-xl border border-lime-400/40 bg-lime-400/5 p-5 sm:p-6">
+        <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-lime-400">
+          <Video className="h-4 w-4" /> Video Generator
         </div>
-      </main>
+        <h1 className="mt-2 text-xl font-semibold text-white sm:text-2xl">10 video concepts for your brand</h1>
+        <p className="mt-1 text-sm text-white/60">
+          We created 10 video concepts using your onboarding, content tone, logo, and brand. All concepts are included and
+          <span className="text-lime-400 font-semibold"> auto-approved</span> — just click Continue. Generate actual videos for any you like, or use them on your website, social media, or YouTube.
+        </p>
+
+        <div className="mt-4 flex flex-wrap items-center gap-2">
+          <span className="text-xs font-medium text-white/50">Video length:</span>
+          {DURATION_OPTIONS.map((o) => (
+            <button key={o.value} type="button" onClick={() => setVideoDuration(o.value)}
+              className={cn("rounded-lg border px-3 py-1.5 text-xs font-semibold transition-colors",
+                videoDuration === o.value ? "border-lime-400 bg-lime-400 text-black" : "border-white/15 text-white/70 hover:border-lime-400/50 hover:text-lime-300")}>
+              {o.label} <span className="opacity-60">· {o.note}</span>
+            </button>
+          ))}
+        </div>
+
+        {saved && (
+          <div className="mt-4 flex items-center gap-2 rounded-lg border border-lime-400/50 bg-lime-400/10 px-3 py-2.5 text-sm text-lime-300">
+            <Check className="h-4 w-4" /> Videos approved — taking you to your designs…
+          </div>
+        )}
+
+        {generating && (
+          <div className="mt-6 flex flex-col items-center justify-center rounded-xl border border-white/10 bg-zinc-950 py-16 text-center">
+            <Loader2 className="h-8 w-8 animate-spin text-lime-400" />
+            <p className="mt-3 text-sm text-white/60">Creating 10 video concepts…</p>
+            <p className="text-xs text-white/40">About 60 seconds.</p>
+          </div>
+        )}
+
+        {genError && !generating && (
+          <div className="mt-4 flex items-center gap-2 rounded-lg border border-red-400/30 bg-red-400/10 px-3 py-2.5 text-sm text-red-300">
+            <AlertCircle className="h-4 w-4" /> {genError}
+            <button onClick={generate} className="ml-auto rounded-md border border-red-400/40 px-2 py-1 text-xs hover:bg-red-400/10">Retry</button>
+          </div>
+        )}
+
+        {concepts.length > 0 && !generating && (
+          <>
+            <div className="mt-5 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
+              {concepts.map((c) => {
+                const busy = generatingVideoId === c.id;
+                return (
+                  <div key={c.id} className="overflow-hidden rounded-xl border-2 border-lime-400/40 bg-zinc-950">
+                    <button type="button" onClick={() => setPreview(c)} className="block w-full text-left">
+                      <div className="relative aspect-video w-full overflow-hidden bg-zinc-900">
+                        {(c.videoClips?.length || c.videoUrl) ? (
+                          <VideoClipPlayer clips={c.videoClips || [{ url: c.videoUrl }]} className="h-full w-full" />
+                        ) : (
+                          <>
+                            <Image src={c.thumbnailUrl} alt={c.title} fittingType="fill" className="h-full w-full" />
+                            <div className="absolute inset-0 flex items-center justify-center bg-black/30">
+                              <Play className="h-8 w-8 text-white/80" />
+                            </div>
+                          </>
+                        )}
+                        <span className="absolute left-1.5 top-1.5 rounded-full bg-lime-400/90 px-1.5 py-0.5 text-[9px] font-bold uppercase text-black">Included</span>
+                        {(c.videoClips?.length || c.videoUrl) && (
+                          <span className="absolute right-1.5 top-1.5 rounded-full bg-black/70 px-1.5 py-0.5 text-[9px] font-bold text-lime-300">{c.videoClips ? `${c.videoClips.length} scenes` : "ready"}</span>
+                        )}
+                        {busy && <div className="absolute inset-0 flex flex-col items-center justify-center gap-1 bg-black/80"><Loader2 className="h-6 w-6 animate-spin text-lime-400" /><span className="text-[10px] text-white/70">{genProgress}</span></div>}
+                      </div>
+                    </button>
+                    <div className="p-2.5">
+                      <div className="truncate text-xs font-semibold text-white">{c.title}</div>
+                      <p className="mt-0.5 line-clamp-2 text-[11px] text-white/50">{c.description}</p>
+                      <button
+                        type="button"
+                        onClick={() => generateVideo(c)}
+                        disabled={!!generatingVideoId}
+                        className="mt-2 inline-flex w-full items-center justify-center gap-1.5 rounded-md border border-white/15 px-2 py-1.5 text-[10px] font-medium text-white/70 hover:border-lime-400/50 hover:text-lime-300 disabled:opacity-50"
+                      >
+                        {busy ? <><Loader2 className="h-3 w-3 animate-spin" /> {genProgress || "Generating…"}</> : (c.videoClips?.length || c.videoUrl) ? <><RefreshCw className="h-3 w-3" /> Regenerate {selDur.label}</> : <><Film className="h-3 w-3" /> Generate {selDur.label}</>}
+                      </button>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+
+            <button type="button" onClick={generate} disabled={generating} className="mt-4 inline-flex items-center gap-1.5 rounded-lg border border-white/15 px-3 py-2 text-xs font-medium text-white/70 hover:border-lime-400/50 hover:text-lime-300">
+              <RefreshCw className="h-3.5 w-3.5" /> Regenerate concepts
+            </button>
+          </>
+        )}
+
+        {error && <p className="mt-4 text-sm text-red-400">{error}</p>}
+
+        {concepts.length > 0 && (
+          <div className="mt-5 space-y-2 border-t border-white/10 pt-4">
+            {reviseSent ? (
+              <div className="flex items-center gap-2 rounded-lg border border-lime-400/50 bg-lime-400/10 px-3 py-2.5 text-sm text-lime-300">
+                <Check className="h-4 w-4" /> Revision sent — we'll be in touch.
+              </div>
+            ) : revising ? (
+              <div className="space-y-2">
+                <textarea value={reviseComment} onChange={(e) => setReviseComment(e.target.value)} rows={3} placeholder="What don't you like about the videos?" className="w-full resize-none rounded-lg border border-white/15 bg-zinc-950 px-3 py-2 text-sm text-white placeholder-white/30 focus:border-lime-400 focus:outline-none" />
+                {reviseError && <p className="text-xs text-red-400">{reviseError}</p>}
+                <div className="flex gap-2">
+                  <button type="button" onClick={requestRevision} disabled={sendingRevise} className="inline-flex items-center gap-1.5 rounded-lg bg-lime-400 px-3 py-2 text-xs font-semibold text-black hover:bg-lime-300 disabled:opacity-50">
+                    {sendingRevise ? <><Loader2 className="h-3.5 w-3.5 animate-spin" /> Sending…</> : <><Send className="h-3.5 w-3.5" /> Send</>}
+                  </button>
+                  <button type="button" onClick={() => setRevising(false)} className="inline-flex items-center gap-1.5 rounded-lg border border-white/15 px-3 py-2 text-xs text-white/70 hover:border-white/30"><X className="h-3.5 w-3.5" /> Cancel</button>
+                </div>
+              </div>
+            ) : (
+              <>
+                <button type="button" onClick={() => setRevising(true)} className="inline-flex items-center gap-1.5 rounded-lg border border-white/15 px-3 py-2 text-xs font-medium text-white/70 hover:border-lime-400/50 hover:text-lime-300">
+                  <MessageSquare className="h-3.5 w-3.5" /> Request Revision
+                </button>
+                <button type="button" onClick={save} disabled={saving} className="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-lime-400 px-4 py-3 text-sm font-semibold text-black transition-colors hover:bg-lime-300 disabled:opacity-50">
+                  {saving ? <><Loader2 className="h-4 w-4 animate-spin" /> Saving…</> : <>Continue to Enhancements <ArrowRight className="h-4 w-4" /></>}
+                </button>
+              </>
+            )}
+          </div>
+        )}
+      </div>
+
+      {preview && (
+        <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/90 p-4 backdrop-blur-sm" onClick={() => setPreview(null)}>
+          <div className="w-full max-w-lg rounded-xl border border-white/10 bg-zinc-950 p-5" onClick={(e) => e.stopPropagation()}>
+            <div className="flex items-center justify-between">
+              <h2 className="text-sm font-semibold text-white">{preview.title}</h2>
+              <button onClick={() => setPreview(null)} className="flex h-8 w-8 items-center justify-center rounded-lg text-white/60 hover:bg-white/5"><X className="h-5 w-5" /></button>
+            </div>
+            {(preview.videoClips?.length || preview.videoUrl) ? (
+              <VideoClipPlayer clips={preview.videoClips || [{ url: preview.videoUrl }]} className="mt-3 aspect-video w-full rounded-lg overflow-hidden" />
+            ) : (
+              <Image src={preview.thumbnailUrl} alt={preview.title} fittingType="fill" className="mt-3 aspect-video w-full rounded-lg" />
+            )}
+            <p className="mt-3 text-sm text-white/70">{preview.description}</p>
+            {preview.script && (
+              <div className="mt-3 rounded-lg border border-white/10 bg-zinc-900 p-3">
+                <div className="text-xs font-semibold text-lime-400">Production Script</div>
+                <p className="mt-1 text-xs text-white/60">{preview.script}</p>
+              </div>
+            )}
+            {!preview.videoUrl && (
+              <button type="button" onClick={() => { generateVideo(preview); setPreview(null); }} disabled={!!generatingVideoId} className="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-lg bg-lime-400 px-4 py-2.5 text-sm font-semibold text-black hover:bg-lime-300 disabled:opacity-50">
+                <Film className="h-4 w-4" /> Generate {selDur.label} video
+              </button>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 }

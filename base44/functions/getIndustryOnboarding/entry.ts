@@ -1,5 +1,4 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.40';
-import { invokeLLM } from '../../shared/aiGateway.ts';
 
 // Generates the top industry-specific onboarding questions for a user based on
 // their selected industry, sub-industry, business type, and business stage.
@@ -148,7 +147,7 @@ RULES:
 
 Return a JSON object with a "questions" array.`;
 
-    const res = await invokeLLM({
+    const res = await base44.asServiceRole.integrations.Core.InvokeLLM({
       prompt,
       add_context_from_internet: true,
       model: "gemini_3_flash",

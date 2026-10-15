@@ -1,5 +1,4 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.40';
-import { invokeLLM } from '../../shared/aiGateway.ts';
 
 // AI-powered domain acquisition intelligence system.
 // Scans Google SERPs, analyzes competition weakness, predicts dollar ROI for each domain.
@@ -103,7 +102,7 @@ Return JSON with this exact structure:
 }`;
 
         try {
-          const analysis = await invokeLLM({
+          const analysis = await base44.asServiceRole.integrations.Core.InvokeLLM({
             prompt,
             add_context_from_internet: true,
             model: 'gemini_3_flash',

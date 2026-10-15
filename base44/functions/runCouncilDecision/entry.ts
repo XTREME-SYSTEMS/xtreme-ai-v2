@@ -22,7 +22,6 @@
 // vs hypothesis vs assumption. Results are saved as a CouncilDecision record.
 
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.44';
-import { invokeLLM } from '../../shared/aiGateway.ts';
 
 const ARCHETYPES = [
   { name: 'systems_architect', focus: 'decompose the system, identify dependencies, see second/third-order effects' },
@@ -75,7 +74,7 @@ export default async function(req: Request): Promise<Response> {
     const archetypePositions: any[] = [];
     const round1Promises = ARCHETYPES.map(async (arch) => {
       const weight = perfMap[arch.name] || 50;
-      const res = await invokeLLM({
+      const res = await svc.integrations.Core.InvokeLLM({
         prompt: `You are the ${arch.name.toUpperCase()} in a multi-agent AI council. Your role: ${arch.focus}.
 
 QUESTION: ${question}
@@ -134,7 +133,7 @@ Respond as JSON: { "position": string, "confidence": number, "key_argument": str
     let epistemicAudit = '';
 
     for (const rd of roundDefs) {
-      const res = await invokeLLM({
+      const res = await svc.integrations.Core.InvokeLLM({
         prompt: `You are the ${rd.archetype.toUpperCase()} in a multi-agent AI council. Round ${rd.num}: ${rd.name.replace(/_/g, ' ')}.
 
 QUESTION: ${question}
@@ -171,7 +170,7 @@ Respond as JSON: { "analysis": string, "evidence": string, "confidence": number,
     }
 
     // ── ROUND 9: Simulation ─────────────────────────────────────────────
-    const simRes = await invokeLLM({
+    const simRes = await svc.integrations.Core.InvokeLLM({
       prompt: `You are the SIMULATION SCIENTIST in a multi-agent AI council. Round 9: simulation.
 
 QUESTION: ${question}
@@ -205,7 +204,7 @@ Respond as JSON: { "simulation_summary": string, "p10_outcome": string, "p50_out
     });
 
     // ── ROUND 10: Decision ──────────────────────────────────────────────
-    const decRes = await invokeLLM({
+    const decRes = await svc.integrations.Core.InvokeLLM({
       prompt: `You are the COUNCIL DECISION SYNTHESIZER. Round 10: final decision.
 
 QUESTION: ${question}
@@ -239,7 +238,7 @@ Respond as JSON: { "final_decision": string, "decision_confidence": number, "dis
     const decParsed = typeof decRes === 'object' ? decRes : JSON.parse(decRes);
 
     // ── ROUND 11: Post-decision confidence ──────────────────────────────
-    const confRes = await invokeLLM({
+    const confRes = await svc.integrations.Core.InvokeLLM({
       prompt: `You are the EPISTEMIC AUDITOR. Round 11: post-decision confidence audit.
 
 DECISION: ${decParsed.final_decision}

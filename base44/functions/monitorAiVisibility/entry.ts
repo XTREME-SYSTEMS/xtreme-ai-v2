@@ -1,5 +1,4 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.40';
-import { invokeLLM } from '../../shared/aiGateway.ts';
 
 // Monitors brand visibility in AI search engines (ChatGPT, Perplexity, Gemini, Claude).
 // Uses InvokeLLM with web search to check if brand appears in AI recommendations.
@@ -46,7 +45,7 @@ Then answer these questions about "${brandDomain}":
 Be specific and factual. Only say a brand is visible if it genuinely appears in your recommendations or you have specific knowledge of it.`;
 
       try {
-        const result = await invokeLLM({
+        const result = await base44.asServiceRole.integrations.Core.InvokeLLM({
           prompt,
           add_context_from_internet: true,
           response_json_schema: {

@@ -1,7 +1,6 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.43';
 import { scrapeUrl } from '../../shared/browserbaseScrape.ts';
 import { VISION_SOURCES, IDEA_EXTRACTION_SCHEMA } from '../../shared/visionCortexFramework.ts';
-import { invokeLLM } from '../../shared/aiGateway.ts';
 
 // visionCortexDiscover — Phase 1 of the Vision Cortex daily cycle.
 // Scrapes social media, Reddit, Product Hunt, Hacker News, AI websites,
@@ -117,7 +116,7 @@ Focus on ideas that are:
 SCRAPED CONTENT (first 15000 chars):
 ${scraped.text.slice(0, 15000)}`;
 
-          const extractionResponse = await invokeLLM({
+          const extractionResponse = await base44.asServiceRole.integrations.Core.InvokeLLM({
             prompt: extractionPrompt,
             response_json_schema: IDEA_EXTRACTION_SCHEMA,
             model: 'gemini_3_flash',

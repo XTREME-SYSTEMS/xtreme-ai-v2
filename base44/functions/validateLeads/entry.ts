@@ -6,7 +6,6 @@
 
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.44';
 import { DIRECT_KEYWORDS, INDIRECT_KEYWORDS, INTENT_TIER_GUIDE } from '../../shared/leadKeywords.ts';
-import { invokeLLM } from '../../shared/aiGateway.ts';
 
 const SPAM_SIGNALS = [
   'job posting', 'hiring', 'we are hiring', 'now hiring',
@@ -83,7 +82,7 @@ Classify:
 
 Return JSON: {"intent_tier": "...", "is_spam": false, "confidence": 85, "intent_score": 90, "reasoning": "..."}`;
 
-        const llmRes = await invokeLLM({
+        const llmRes = await base44.integrations.Core.InvokeLLM({
           prompt,
           response_json_schema: {
             type: 'object',

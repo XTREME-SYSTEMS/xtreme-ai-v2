@@ -1,5 +1,4 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.44';
-import { invokeLLM } from '../../shared/aiGateway.ts';
 
 // Self-Optimization & Self-Healing Engine
 // Continuously monitors the platform for performance issues and automatically
@@ -155,7 +154,7 @@ export default async function(req) {
       if (prompts.length > 0) {
         // Use the first audit prompt to run a system reflection
         const auditPrompt = prompts[0];
-        const reflectionRes = await invokeLLM({
+        const reflectionRes = await base44.asServiceRole.integrations.Core.InvokeLLM({
           prompt: `${auditPrompt.prompt_text}\n\nCurrent system state:\n- Issues found: ${issues.length}\n- Actions taken: ${actions.length}\n- Items healed: ${healed.length}\n\nProvide a brief assessment (2-3 sentences) of system health and any remaining concerns.`,
           model: "gemini_3_flash",
         });

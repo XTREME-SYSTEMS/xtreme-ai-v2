@@ -1,5 +1,3 @@
-@import "./components/theme/DarkTheme.css";
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -12,21 +10,21 @@
     --card-foreground: 0 0% 0%;
     --popover: 0 0% 100%;
     --popover-foreground: 0 0% 0%;
-    --primary: 219 100% 50%;
-    --primary-foreground: 0 0% 100%;
+    --primary: 55 100% 50%;
+    --primary-foreground: 0 0% 0%;
     --secondary: 240 5% 96%;
     --secondary-foreground: 0 0% 0%;
     --muted: 240 5% 96%;
     --muted-foreground: 0 0% 35%;
-    --accent: 219 100% 50%;
-    --accent-foreground: 0 0% 100%;
+    --accent: 55 100% 50%;
+    --accent-foreground: 0 0% 0%;
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 98%;
     --border: 240 6% 90%;
     --input: 240 6% 90%;
-    --ring: 219 100% 50%;
-    --vx-accent: 219 100% 50%;
-    --vx-accent-2: 219 100% 40%;
+    --ring: 55 100% 50%;
+    --vx-accent: 55 100% 50%;
+    --vx-accent-2: 55 100% 40%;
     --chart-1: 12 76% 55%;
     --chart-2: 173 58% 39%;
     --chart-3: 197 37% 40%;
@@ -54,21 +52,21 @@
     --card-foreground: 0 0% 100%;
     --popover: 0 0% 4%;
     --popover-foreground: 0 0% 100%;
-    --primary: 219 100% 50%;
-    --primary-foreground: 0 0% 100%;
+    --primary: 55 100% 50%;
+    --primary-foreground: 0 0% 0%;
     --secondary: 0 0% 8%;
     --secondary-foreground: 0 0% 100%;
     --muted: 0 0% 8%;
-    --muted-foreground: 0 0% 72%;
-    --accent: 219 100% 50%;
-    --accent-foreground: 0 0% 100%;
+    --muted-foreground: 0 0% 60%;
+    --accent: 55 100% 50%;
+    --accent-foreground: 0 0% 0%;
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 0 0% 98%;
-    --border: 0 0% 20%;
-    --input: 0 0% 20%;
-    --ring: 219 100% 50%;
-    --vx-accent: 219 100% 50%;
-    --vx-accent-2: 219 100% 40%;
+    --border: 0 0% 15%;
+    --input: 0 0% 15%;
+    --ring: 55 100% 50%;
+    --vx-accent: 55 100% 50%;
+    --vx-accent-2: 55 100% 40%;
     --chart-1: 220 70% 50%;
     --chart-2: 160 60% 45%;
     --chart-3: 30 80% 55%;
@@ -76,12 +74,12 @@
     --chart-5: 340 75% 55%;
     --sidebar-background: 240 5.9% 10%;
     --sidebar-foreground: 240 4.8% 95.9%;
-    --sidebar-primary: 219 100% 50%;
+    --sidebar-primary: 55 100% 50%;
     --sidebar-primary-foreground: 0 0% 100%;
     --sidebar-accent: 240 3.7% 15.9%;
     --sidebar-accent-foreground: 240 4.8% 95.9%;
     --sidebar-border: 240 3.7% 15.9%;
-    --sidebar-ring: 219 100% 50%;
+    --sidebar-ring: 55 100% 50%;
   }
 }
 
@@ -204,12 +202,12 @@
    labels, subheadings, and body copy; in dark mode these now
    read as bright white instead of dim gray.
    ============================================================ */
-.dark .text-white\/30 { color: rgba(255, 255, 255, 0.4); }
-.dark .text-white\/40 { color: rgba(255, 255, 255, 0.5); }
-.dark .text-white\/50 { color: rgba(255, 255, 255, 0.6); }
-.dark .text-white\/60 { color: rgba(255, 255, 255, 0.7); }
-.dark .text-white\/70 { color: rgba(255, 255, 255, 0.85); }
-.dark .text-white\/80 { color: rgba(255, 255, 255, 0.9); }
+.dark .text-white\/30 { color: rgba(255, 255, 255, 0.95); }
+.dark .text-white\/40 { color: rgba(255, 255, 255, 0.95); }
+.dark .text-white\/50 { color: rgba(255, 255, 255, 1); }
+.dark .text-white\/60 { color: rgba(255, 255, 255, 1); }
+.dark .text-white\/70 { color: rgba(255, 255, 255, 1); }
+.dark .text-white\/80 { color: rgba(255, 255, 255, 1); }
 .dark .text-white\/90 { color: rgba(255, 255, 255, 1); }
 
 /* ============================================================
@@ -259,20 +257,20 @@
 .bg-lime-600\/10, .bg-amber-600\/10, .bg-orange-600\/10, .bg-yellow-600\/10 { background-color: rgba(0,0,0,0.05); }
 .bg-lime-600\/20, .bg-amber-600\/20, .bg-orange-600\/20, .bg-yellow-600\/20 { background-color: rgba(0,0,0,0.08); }
 
-/* Text color → foreground/white (catch-all: every shade + every opacity variant) */
-[class*="text-lime"], [class*="text-amber"], [class*="text-orange"], [class*="text-yellow"] { color: hsl(var(--foreground)) !important; }
+/* Text color → black (catch-all: every shade + every opacity variant) */
+[class*="text-lime"], [class*="text-amber"], [class*="text-orange"], [class*="text-yellow"] { color: #000 !important; }
 
-/* Text opacity variants → foreground with opacity */
-.text-lime-300\/50, .text-amber-300\/50, .text-orange-300\/50, .text-yellow-300\/50 { color: hsl(var(--foreground) / 0.5); }
-.text-lime-300\/70, .text-amber-300\/70, .text-orange-300\/70, .text-yellow-300\/70 { color: hsl(var(--foreground) / 0.7); }
-.text-lime-400\/50, .text-amber-400\/50, .text-orange-400\/50, .text-yellow-400\/50 { color: hsl(var(--foreground) / 0.5); }
-.text-lime-400\/60, .text-amber-400\/60, .text-orange-400\/60, .text-yellow-400\/60 { color: hsl(var(--foreground) / 0.6); }
-.text-lime-400\/70, .text-amber-400\/70, .text-orange-400\/70, .text-yellow-400\/70 { color: hsl(var(--foreground) / 0.7); }
-.text-lime-400\/80, .text-amber-400\/80, .text-orange-400\/80, .text-yellow-400\/80 { color: hsl(var(--foreground) / 0.8); }
-.text-lime-400\/90, .text-amber-400\/90, .text-orange-400\/90, .text-yellow-400\/90 { color: hsl(var(--foreground) / 0.9); }
-.text-lime-500\/30, .text-amber-500\/30, .text-orange-500\/30, .text-yellow-500\/30 { color: hsl(var(--foreground) / 0.3); }
-.text-lime-500\/50, .text-amber-500\/50, .text-orange-500\/50, .text-yellow-500\/50 { color: hsl(var(--foreground) / 0.5); }
-.text-lime-500\/70, .text-amber-500\/70, .text-orange-500\/70, .text-yellow-500\/70 { color: hsl(var(--foreground) / 0.7); }
+/* Text opacity variants → black with opacity */
+.text-lime-300\/50, .text-amber-300\/50, .text-orange-300\/50, .text-yellow-300\/50 { color: rgba(0,0,0,0.5); }
+.text-lime-300\/70, .text-amber-300\/70, .text-orange-300\/70, .text-yellow-300\/70 { color: rgba(0,0,0,0.7); }
+.text-lime-400\/50, .text-amber-400\/50, .text-orange-400\/50, .text-yellow-400\/50 { color: rgba(0,0,0,0.5); }
+.text-lime-400\/60, .text-amber-400\/60, .text-orange-400\/60, .text-yellow-400\/60 { color: rgba(0,0,0,0.6); }
+.text-lime-400\/70, .text-amber-400\/70, .text-orange-400\/70, .text-yellow-400\/70 { color: rgba(0,0,0,0.7); }
+.text-lime-400\/80, .text-amber-400\/80, .text-orange-400\/80, .text-yellow-400\/80 { color: rgba(0,0,0,0.8); }
+.text-lime-400\/90, .text-amber-400\/90, .text-orange-400\/90, .text-yellow-400\/90 { color: rgba(0,0,0,0.9); }
+.text-lime-500\/30, .text-amber-500\/30, .text-orange-500\/30, .text-yellow-500\/30 { color: rgba(0,0,0,0.3); }
+.text-lime-500\/50, .text-amber-500\/50, .text-orange-500\/50, .text-yellow-500\/50 { color: rgba(0,0,0,0.5); }
+.text-lime-500\/70, .text-amber-500\/70, .text-orange-500\/70, .text-yellow-500\/70 { color: rgba(0,0,0,0.7); }
 
 /* Border color → black/10 */
 .border-lime-300, .border-amber-300, .border-orange-300, .border-yellow-300 { border-color: rgba(0,0,0,0.1); }
@@ -313,9 +311,9 @@
 /* Gold hover backgrounds — let tailwind.config.js gold palette show through. */
 .hover\:bg-lime-400\/10:hover, .hover\:bg-amber-400\/10:hover, .hover\:bg-orange-400\/10:hover, .hover\:bg-yellow-400\/10:hover { background-color: rgba(0,0,0,0.05); }
 .hover\:bg-lime-400\/20:hover, .hover\:bg-amber-400\/20:hover, .hover\:bg-orange-400\/20:hover, .hover\:bg-yellow-400\/20:hover { background-color: rgba(0,0,0,0.08); }
-.hover\:text-lime-300:hover, .hover\:text-amber-300:hover, .hover\:text-orange-300:hover, .hover\:text-yellow-300:hover { color: hsl(var(--foreground)); }
-.hover\:text-lime-400:hover, .hover\:text-amber-400:hover, .hover\:text-orange-400:hover, .hover\:text-yellow-400:hover { color: hsl(var(--foreground)); }
-.hover\:text-lime-500:hover, .hover\:text-amber-500:hover, .hover\:text-orange-500:hover, .hover\:text-yellow-500:hover { color: hsl(var(--foreground)); }
+.hover\:text-lime-300:hover, .hover\:text-amber-300:hover, .hover\:text-orange-300:hover, .hover\:text-yellow-300:hover { color: #000; }
+.hover\:text-lime-400:hover, .hover\:text-amber-400:hover, .hover\:text-orange-400:hover, .hover\:text-yellow-400:hover { color: #000; }
+.hover\:text-lime-500:hover, .hover\:text-amber-500:hover, .hover\:text-orange-500:hover, .hover\:text-yellow-500:hover { color: #000; }
 .hover\:border-lime-400:hover, .hover\:border-amber-400:hover, .hover\:border-orange-400:hover, .hover\:border-yellow-400:hover { border-color: rgba(0,0,0,0.2); }
 .hover\:border-lime-500:hover, .hover\:border-amber-500:hover, .hover\:border-orange-500:hover, .hover\:border-yellow-500:hover { border-color: rgba(0,0,0,0.25); }
 
@@ -398,24 +396,24 @@
    from bright gold to deep gold with a soft shimmer.
    ============================================================ */
 .xa-gold {
-  background-image: linear-gradient(135deg, #0047FF 0%, #0033CC 45%, #001A73 100%);
-  color: #fff;
+  background-image: linear-gradient(135deg, #FFEA00 0%, #E6D400 45%, #CCBB00 100%);
+  color: #000;
 }
 .xa-gold:hover {
-  filter: brightness(1.15);
+  filter: brightness(1.08);
 }
 .xa-gold-text {
-  background-image: linear-gradient(135deg, #0047FF 0%, #0033CC 45%, #001A73 100%);
+  background-image: linear-gradient(135deg, #FFEA00 0%, #E6D400 45%, #CCBB00 100%);
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
   color: transparent;
 }
 .xa-gold-border {
-  border-color: #0047FF;
+  border-color: #FFEA00;
 }
 .xa-gold-glow {
-  box-shadow: 0 0 0 1px rgba(0, 71, 255, 0.35), 0 0 18px -4px rgba(0, 71, 255, 0.5);
+  box-shadow: 0 0 0 1px rgba(255, 234, 0, 0.35), 0 0 18px -4px rgba(255, 234, 0, 0.5);
 }
 
 /* ============================================================
@@ -628,24 +626,24 @@
    ============================================================ */
 
 .xa-gold {
-  background: #0047FF;
+  background: #000;
   color: #fff;
 }
 
 .xa-gold:hover {
-  background: #0033CC;
+  background: rgba(0,0,0,0.85);
 }
 
 .xa-gold-text {
-  color: #0047FF;
+  color: #000;
 }
 
 .xa-gold-border {
-  border-color: #0047FF;
+  border-color: #000;
 }
 
 .xa-gold-glow {
-  box-shadow: 0 0 0 1px rgba(0, 71, 255, 0.35), 0 0 14px -3px rgba(0, 71, 255, 0.5);
+  box-shadow: 0 0 0 1px rgba(0,0,0,0.2), 0 0 8px -2px rgba(0,0,0,0.15);
 }
 
 /* ============================================================
@@ -655,36 +653,29 @@
    ============================================================ */
 .btn-gold-metallic {
   background: linear-gradient(135deg,
-    #66A3FF 0%,
-    #0047FF 20%,
-    #0033CC 45%,
-    #1A5CFF 65%,
-    #0047FF 80%,
-    #001A73 100%
+    #FFF7B3 0%,
+    #FFEA00 20%,
+    #E6D400 45%,
+    #FFEE33 65%,
+    #FFEA00 80%,
+    #CCBB00 100%
   );
-  color: #fff;
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.3),
-              inset 0 -1px 0 rgba(0, 20, 80, 0.4),
-              0 2px 8px -2px rgba(0, 71, 255, 0.5);
+  color: #000;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.5),
+              inset 0 -1px 0 rgba(140, 110, 0, 0.3),
+              0 2px 8px -2px rgba(255, 234, 0, 0.4);
   transition: filter 0.2s ease, box-shadow 0.2s ease;
 }
 .btn-gold-metallic:hover {
   background: linear-gradient(135deg,
-    #1A5CFF 0%,
-    #0047FF 25%,
-    #0033CC 55%,
-    #66A3FF 75%,
-    #001A73 100%
+    #FFEE33 0%,
+    #FFEA00 25%,
+    #E6D400 55%,
+    #FFF7B3 75%,
+    #CCBB00 100%
   );
-  filter: brightness(1.12);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.35),
-              inset 0 -1px 0 rgba(0, 20, 80, 0.45),
-              0 4px 16px -2px rgba(0, 71, 255, 0.6);
-}
-
-/* The editor retains its existing warm accent without changing other pages. */
-.studio-workspace {
-  --primary: 219 100% 50%;
-  --primary-foreground: 0 0% 100%;
-  --ring: 219 100% 50%;
+  filter: brightness(1.06);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.6),
+              inset 0 -1px 0 rgba(140, 110, 0, 0.35),
+              0 4px 16px -2px rgba(255, 234, 0, 0.5);
 }

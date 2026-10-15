@@ -1,5 +1,4 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.40';
-import { invokeLLM } from '../../shared/aiGateway.ts';
 
 // Generates social media content + syndication plan from existing site content.
 // Fills "Automated Social Posting", "Content Syndication", "Content Repurposing" methods.
@@ -41,7 +40,7 @@ export default async function(req) {
       const niche = p.niche || 'general';
 
       // Use InvokeLLM to generate multi-platform content
-      const result = await invokeLLM({
+      const result = await base44.asServiceRole.integrations.Core.InvokeLLM({
         prompt: `Generate social media content for ${p.domain} (${niche} services).
 
 Recent published content:

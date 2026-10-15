@@ -1,7 +1,6 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.40';
 import { slugify, provisionGithub, provisionDrive, provisionSupabase, provisionVercel } from '../../shared/provisioning.ts';
 import { withRetry, safeInvoke, parallelSafe, safeUpdate, captureError } from '../../shared/resilience.ts';
-import { invokeLLM } from '../../shared/aiGateway.ts';
 import { isStepComplete, markFailed } from '../../shared/pipelineState.ts';
 
 // Provision Approved Clone — runs AFTER user approval (idempotent + resilient):
@@ -469,7 +468,7 @@ async function identifyAndFillSeoAeoGaps(base44, project, files, domain) {
 
 Mark gaps as "filled": true if the fix is already in the generated site. Only list gaps that still need manual attention.`;
 
-  const result = await invokeLLM({
+  const result = await base44.asServiceRole.integrations.Core.InvokeLLM({
     prompt, model: 'gemini_3_flash',
     response_json_schema: {
       type: 'object',

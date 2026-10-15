@@ -30,13 +30,13 @@ export default function ClientTimeline() {
   }, [currentIdx]);
 
   return (
-    <div className="border-b border-border bg-card">
+    <div className="border-b border-white/10 bg-zinc-950">
       {/* Mobile: compact "Step X of N" header with current step label */}
       <div className="flex items-center justify-between px-4 pt-2 sm:hidden">
-        <span className="text-[11px] font-semibold uppercase tracking-wider text-primary">
+        <span className="text-[11px] font-semibold uppercase tracking-wider text-amber-400">
           Step {current?.step || Math.max(currentIdx + 1, 1)} of {TOTAL_BUILD_STEPS}
         </span>
-        <span className="truncate pl-2 text-[11px] font-medium text-muted-foreground">
+        <span className="truncate pl-2 text-[11px] font-medium text-white/60">
           {current?.label || ""}
         </span>
       </div>
@@ -49,7 +49,6 @@ export default function ClientTimeline() {
         {visibleSteps.map((step, i) => {
           const Icon = step.icon;
           const isCurrent = i === currentIdx;
-          const isDone = i < currentIdx;
           return (
             <div key={step.to} className="flex items-center" data-step-idx={i}>
               <button
@@ -61,10 +60,8 @@ export default function ClientTimeline() {
                   className={cn(
                     "flex h-8 w-8 items-center justify-center rounded-full border-2 text-xs font-bold transition-all sm:h-9 sm:w-9",
                     isCurrent
-                      ? "border-primary bg-primary text-primary-foreground shadow-[0_0_10px_2px_hsl(var(--primary)/0.4)]"
-                      : isDone
-                        ? "border-primary/50 bg-primary/20 text-primary"
-                        : "border-border bg-muted text-muted-foreground hover:border-primary/40 hover:text-primary"
+                      ? "border-amber-400 bg-amber-400 text-black"
+                      : "border-white/15 bg-zinc-900 text-white/40 hover:border-amber-400/40 hover:text-amber-300"
                   )}
                 >
                   <Icon className="h-4 w-4" />
@@ -72,7 +69,7 @@ export default function ClientTimeline() {
                 <span
                   className={cn(
                     "hidden whitespace-nowrap text-[11px] font-medium sm:block",
-                    isCurrent ? "text-primary" : isDone ? "text-foreground/70" : "text-muted-foreground"
+                    isCurrent ? "text-amber-400" : "text-white/30"
                   )}
                 >
                   {step.label}
@@ -82,7 +79,7 @@ export default function ClientTimeline() {
                 <div
                   className={cn(
                     "mx-0.5 h-0.5 w-3 shrink-0 rounded-full sm:mx-1 sm:w-5",
-                    isDone ? "bg-primary" : "bg-border"
+                    i < currentIdx ? "bg-amber-400" : "bg-white/10"
                   )}
                 />
               )}

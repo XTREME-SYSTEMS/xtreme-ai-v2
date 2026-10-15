@@ -1,5 +1,3 @@
-import { invokeLLM } from './aiGateway.ts';
-
 // ideaScoring.ts — Shared idea scoring logic.
 // Uses InvokeLLM to score idea candidates on key business viability dimensions.
 // Shared between runDiscoveryScrape (auto-scoring on ingestion) and the
@@ -79,7 +77,7 @@ Score each dimension 0-100 (100 = excellent):
 
 Also suggest a monetization model, list known competitors, and provide 5-10 relevant keywords.`;
 
-  const response = await invokeLLM({
+  const response = await base44.integrations.Core.InvokeLLM({
     prompt,
     add_context_from_internet: true,
     response_json_schema: SCORING_SCHEMA,
@@ -192,7 +190,7 @@ Focus on ideas that are profitable, scalable, and serve an underserved niche. Av
     required: ['ideas'],
   };
 
-  const response = await invokeLLM({
+  const response = await base44.integrations.Core.InvokeLLM({
     prompt,
     add_context_from_internet: true,
     response_json_schema: schema,
@@ -286,7 +284,7 @@ Focus on real, findable businesses. Use actual URLs and contact info from search
     required: ['businesses'],
   };
 
-  const response = await invokeLLM({
+  const response = await base44.integrations.Core.InvokeLLM({
     prompt,
     add_context_from_internet: true,
     response_json_schema: schema,

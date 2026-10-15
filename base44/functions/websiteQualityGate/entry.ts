@@ -1,5 +1,4 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.40';
-import { invokeLLM } from '../../shared/aiGateway.ts';
 
 // Website quality gate — the critic half of a generate→critique→fix loop.
 // Scores every section of the generated website content against a rubric
@@ -23,7 +22,7 @@ export default async function(req) {
     const diff = (p.differentiators || []).join("; ");
 
     // ── Critique pass ───────────────────────────────────────────────
-    const critique = await invokeLLM({
+    const critique = await base44.asServiceRole.integrations.Core.InvokeLLM({
       prompt: `You are a senior conversion copywriter, local SEO specialist, and brand director reviewing a generated website for a real local business. Score it against a strict rubric and give concrete fixes.
 
 BUSINESS:
@@ -74,7 +73,7 @@ Return JSON:
         .filter(([, v]) => v && typeof v.score === "number" && v.score < 75)
         .map(([k]) => k);
       if (weakSections.length > 0) {
-        const fixRes = await invokeLLM({
+        const fixRes = await base44.asServiceRole.integrations.Core.InvokeLLM({
           prompt: `You are rewriting weak sections of a local business website to top-tier quality. Apply the fixes below and return ONLY the updated sections as JSON — preserve everything else.
 
 BUSINESS: ${biz} — ${ind}${subInd ? ` (${subInd})` : ""} — ${loc || "n/a"}

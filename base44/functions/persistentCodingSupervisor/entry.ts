@@ -1,5 +1,4 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.43';
-import { invokeLLM } from '../../shared/aiGateway.ts';
 
 // Persistent Coding Supervisor
 // Runs from the existing 5-minute heartbeat. It advances only "coding_packet"
@@ -246,7 +245,7 @@ Return a bounded implementation bundle. If the next required action is protected
 set requires_protected_action=true instead of attempting it.
 `;
 
-    const generated = await invokeLLM({
+    const generated = await sr.integrations.Core.InvokeLLM({
       prompt: codingPrompt,
       response_json_schema: {
         type: "object",
@@ -329,7 +328,7 @@ Return PASS only when this is a coherent draft patch ready for sandbox applicati
 and testing. A PASS here does NOT mean deployed, production-ready, or runtime-tested.
 `;
 
-    const validation = await invokeLLM({
+    const validation = await sr.integrations.Core.InvokeLLM({
       prompt: validationPrompt,
       response_json_schema: {
         type: "object",

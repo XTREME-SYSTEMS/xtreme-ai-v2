@@ -17,10 +17,8 @@ import ExpandableLineItems from "@/components/client/ExpandableLineItems";
 import { useRevisionThreads } from "@/hooks/useRevisionThreads";
 import RevisionThreadPanel from "@/components/client/RevisionThreadPanel";
 import SystemActivities from "@/components/client/SystemActivities";
-import OnboardingCardGrid from "@/components/client/OnboardingCardGrid";
-import SkipToGptSync from "@/components/client/SkipToGptSync";
+import VisionGeneratorPanel from "@/components/client/VisionGeneratorPanel";
 import StartNewProjectButton from "@/components/client/StartNewProjectButton";
-import PipelineShell from "@/components/studio/PipelineShell";
 
 // The Business Generator — the top-level destination of the client portal.
 // Shows the package, the full system capability overview, and the mandatory
@@ -57,7 +55,7 @@ export default function BusinessGenerator() {
     notifyStepComplete("welcome", { clientEmail: user?.email || "" });
     const idx = visibleSteps.findIndex((s) => s.to === "/business-generator");
     const next = idx >= 0 && idx < visibleSteps.length - 1 ? visibleSteps[idx + 1] : null;
-    navigate(next ? next.to : "/onboarding");
+    navigate(next ? next.to : "/business-name-studio");
   };
 
   const requestRevision = async () => {
@@ -130,7 +128,6 @@ export default function BusinessGenerator() {
   };
 
   return (
-    <PipelineShell>
     <div className="space-y-5">
       {isPreviewing && <PreviewBanner />}
 
@@ -159,11 +156,8 @@ export default function BusinessGenerator() {
         </div>
       </div>
 
-      {/* ── Skip & Sync with ChatGPT — bypass onboarding shortcut ── */}
-      <SkipToGptSync />
-
-      {/* ── 4-Card Onboarding Grid — Vision, Strategy, Business, Content ── */}
-      <OnboardingCardGrid />
+      {/* ── Vision Generator — AI-assisted, discovery-driven vision builder ── */}
+      <VisionGeneratorPanel />
 
       {/* System capabilities — orients the user on everything they can do */}
       <SystemActivities />
@@ -337,7 +331,6 @@ export default function BusinessGenerator() {
         continueLabel="Continue to Build"
       />
     </div>
-    </PipelineShell>
   );
 }
 

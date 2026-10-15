@@ -1,5 +1,4 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.43';
-import { invokeLLM } from '../../shared/aiGateway.ts';
 
 // systemSelfReflection — Scans the entire system for failures, gaps, and
 // optimization opportunities. Creates SystemOptimization records for each
@@ -162,7 +161,7 @@ export default async function(req) {
         stuckBuilds: findings.filter(f => f.title?.startsWith('Stuck build')).length,
       };
 
-      const llmRes = await invokeLLM({
+      const llmRes = await base44.asServiceRole.integrations.Core.InvokeLLM({
         prompt: `You are a system optimization AI analyzing a marketing automation platform. Based on this system health summary, identify 3-5 high-impact optimization, enhancement, or hardening opportunities. Focus on SYSTEMIC improvements, not individual failures.
 
 System Health Summary:
