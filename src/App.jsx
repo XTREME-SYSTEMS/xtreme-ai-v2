@@ -30,8 +30,6 @@ import GeneratorRegistry from '@/pages/GeneratorRegistry';
 import SourceRegistry from '@/pages/SourceRegistry';
 import VisualizerHub from '@/pages/VisualizerHub';
 import BuildQueue from '@/pages/BuildQueue';
-import WebPackQueue from '@/pages/WebPackQueue';
-import MassWebsiteFactory from '@/pages/MassWebsiteFactory';
 import PreviewFactory from '@/pages/PreviewFactory';
 import QARepair from '@/pages/QARepair';
 import ProposalFactory from '@/pages/ProposalFactory';
@@ -133,14 +131,6 @@ import EmployeeManagement from '@/pages/EmployeeManagement';
 import ProductCatalog from '@/pages/ProductCatalog';
 import LeadEngine from '@/pages/LeadEngine';
 import CouncilChamber from '@/pages/CouncilChamber';
-import FloorVisualizer from '@/pages/FloorVisualizer';
-import VisualizerInbox from '@/pages/VisualizerInbox';
-import XpsCatalog from '@/pages/XpsCatalog';
-import Preflight from '@/pages/Preflight';
-import BidEngine from '@/pages/BidEngine';
-import ApiKeyGenerator from '@/pages/ApiKeyGenerator';
-import OAuthConsent from '@/pages/OAuthConsent';
-import Connect from '@/pages/Connect';
 import { PortalStudioProvider } from '@/lib/PortalStudioContext';
 import XtremeShell from '@/components/xtremeai/XtremeShell';
 import PortalStudio from '@/pages/portalstudio/PortalStudio';
@@ -174,10 +164,7 @@ const AuthenticatedApp = () => {
       <Route path="/seo/:slug" element={<SeoLanding />} />
       <Route path="/coupon" element={<CouponPage />} />
       <Route path="/free-audit" element={<FreeAuditPage />} />
-      <Route path="/connect" element={<Connect />} />
-      <Route path="/oauth/consent" element={<OAuthConsent />} />
       <Route path="/free-tools" element={<FreeTools />} />
-      <Route path="/visualizer" element={<FloorVisualizer />} />
       <Route path="/about" element={<About />} />
       <Route path="/contact" element={<Contact />} />
       <Route path="/sign/:token" element={<SignPortal />} />
@@ -223,8 +210,6 @@ const AuthenticatedApp = () => {
           <Route path="/sources" element={<SourceRegistry />} />
           <Route path="/visualizer-hub" element={<VisualizerHub />} />
           <Route path="/build-queue" element={<BuildQueue />} />
-          <Route path="/web-pack-queue" element={<WebPackQueue />} />
-      <Route path="/mass-website-factory" element={<MassWebsiteFactory />} />
           <Route path="/preview-factory" element={<PreviewFactory />} />
           <Route path="/qa-repair" element={<QARepair />} />
           <Route path="/proposals" element={<ProposalFactory />} />
@@ -292,11 +277,6 @@ const AuthenticatedApp = () => {
       <Route path="/employee-management" element={<EmployeeManagement />} />
       <Route path="/product-catalog" element={<ProductCatalog />} />
       <Route path="/lead-engine" element={<LeadEngine />} />
-      <Route path="/visualizer-inbox" element={<VisualizerInbox />} />
-      <Route path="/xps-catalog" element={<XpsCatalog />} />
-      <Route path="/preflight" element={<Preflight />} />
-      <Route path="/bid-engine" element={<BidEngine />} />
-      <Route path="/api-keys" element={<ApiKeyGenerator />} />
       <Route path="/council-chamber" element={<CouncilChamber />} />
         </Route>
       </Route>

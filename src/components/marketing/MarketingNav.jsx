@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
-import { Menu, X, ChevronDown, LogIn, Home, DollarSign, Search, Wrench, Ticket, Heart, Mail, Bot } from "lucide-react";
+import { Menu, X, ChevronDown, LogIn, Home, DollarSign, Search, Wrench, Ticket, Heart, Mail } from "lucide-react";
 import { LOGO_ICON } from "@/lib/brandAssets";
 import { Image } from "@/components/ui/image";
 import { cn } from "@/lib/utils";
@@ -24,7 +24,6 @@ const DROPDOWN_PAGES = [
   { to: "/coupon", label: "Coupon", icon: Ticket },
   { to: "/about", label: "About", icon: Heart },
   { to: "/contact", label: "Contact", icon: Mail },
-  { to: "/connect", label: "AUTO BUILDER", icon: Bot },
 ];
 
 export default function MarketingNav() {
@@ -76,7 +75,7 @@ export default function MarketingNav() {
             <div className="relative" ref={dropdownRef}>
               <button
                 onClick={() => setDropdownOpen(!dropdownOpen)}
-                className="btn-gold-metallic flex items-center gap-1.5 rounded-lg px-4 py-2.5 text-sm font-semibold"
+                className="flex items-center gap-1.5 rounded-lg bg-amber-400 px-4 py-2.5 text-sm font-semibold text-black transition-all hover:bg-amber-300 hover:shadow-lg hover:shadow-amber-400/40"
               >
                 Get Started
                 <ChevronDown className={cn("h-4 w-4 transition-transform", dropdownOpen && "rotate-180")} />

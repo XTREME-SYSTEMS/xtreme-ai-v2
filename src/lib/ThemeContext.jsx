@@ -2,45 +2,45 @@ import { createContext, useContext, useEffect, useState, useCallback } from "rea
 
 const ThemeContext = createContext(null);
 
-function getInitial() {
+function getSystem() {
   if (typeof window === "undefined") return "dark";
-  // Version key — old code forced "light" into localStorage; bumping this
-  // version ignores that stale value and defaults to dark.
-  const VERSION = "v2-dark";
-  const savedVersion = localStorage.getItem("theme_version");
-  const saved = localStorage.getItem("theme");
-  if (savedVersion !== VERSION) {
-    localStorage.setItem("theme_version", VERSION);
-    localStorage.setItem("theme", "dark");
-    return "dark";
-  }
-  if (saved === "light" || saved === "dark") return saved;
-  return "dark";
+  return window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
 }
 
 export function ThemeProvider({ children }) {
-  const [theme, setThemeState] = useState(getInitial);
+  const [theme, setThemeState] = useState(() => {
+    if (typeof window === "undefined") return "light";
+    return localStorage.getItem("theme") || "light";
+  });
 
+  const resolved = theme === "system" ? getSystem() : theme;
+
+  // Apply the resolved theme to <html>.
   useEffect(() => {
-    const root = document.documentElement;
-    if (theme === "dark") {
-      root.classList.add("dark");
-    } else {
-      root.classList.remove("dark");
-    }
-    localStorage.setItem("theme", theme);
+    document.documentElement.classList.toggle("dark", resolved === "dark");
+  }, [resolved]);
+
+  // When following the system, react to OS changes live.
+  useEffect(() => {
+    if (theme !== "system") return;
+    const mq = window.matchMedia("(prefers-color-scheme: dark)");
+    const handler = () => document.documentElement.classList.toggle("dark", mq.matches);
+    mq.addEventListener("change", handler);
+    return () => mq.removeEventListener("change", handler);
   }, [theme]);
 
   const setTheme = useCallback((t) => {
-    setThemeState(t === "dark" ? "dark" : "light");
+    localStorage.setItem("theme", t);
+    setThemeState(t);
   }, []);
 
+  // Manual toggle: flip to the opposite of what's currently resolved and persist it.
   const toggle = useCallback(() => {
-    setThemeState((prev) => (prev === "dark" ? "light" : "dark"));
-  }, []);
+    setTheme(resolved === "dark" ? "light" : "dark");
+  }, [resolved, setTheme]);
 
   return (
-    <ThemeContext.Provider value={{ theme, resolved: theme, setTheme, toggle }}>
+    <ThemeContext.Provider value={{ theme, resolved, setTheme, toggle }}>
       {children}
     </ThemeContext.Provider>
   );
@@ -48,6 +48,6 @@ export function ThemeProvider({ children }) {
 
 export function useTheme() {
   const ctx = useContext(ThemeContext);
-  if (!ctx) return { theme: "dark", resolved: "dark", setTheme: () => {}, toggle: () => {} };
+  if (!ctx) return { theme: "light", resolved: "light", setTheme: () => {}, toggle: () => {} };
   return ctx;
 }

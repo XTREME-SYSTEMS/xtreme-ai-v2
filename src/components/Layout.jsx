@@ -8,7 +8,7 @@ import {
   BookMarked, CheckCircle, ScrollText, Plug, Settings, LogOut, Menu, X,
   MapPin, Plus, Rocket, Bot, LayoutTemplate, Copy, Wand2, Crosshair, Activity, Radar, Package, UserPlus, Tag, Box, ShieldAlert, Sparkles, Brain,
   Archive, ChevronDown, Compass, Building2, MessageSquareText, PenTool, Shirt, Share2, Video, Layers,
-  ClipboardList, Key,
+  ClipboardList,
 } from "lucide-react";
 import { Image } from "@/components/ui/image";
 import { cn } from "@/lib/utils";
@@ -19,6 +19,7 @@ import BrandLoader from "@/components/BrandLoader";
 import { usePreview } from "@/lib/PreviewContext";
 import ClientLayout from "@/components/client/ClientLayout";
 import PreviewAsClientModal from "@/components/admin/PreviewAsClientModal";
+import ThemeToggle from "@/components/ThemeToggle";
 import { useAutoBuild } from "@/lib/AutoBuildContext";
 
 // Client portal navigation lives in ClientLayout; this admin NAV is the only
@@ -33,7 +34,6 @@ const PIPELINE_OVERVIEW = { to: "/autonomous-system", label: "Pipeline Overview"
 const PIPELINE_CATALOG = { to: "/pipeline-catalog", label: "Pipeline Catalog", icon: Layers, end: true };
 const PRODUCT_CATALOG = { to: "/product-catalog", label: "Product Catalog", icon: Package, end: true };
 const LEAD_ENGINE = { to: "/lead-engine", label: "Lead Engine", icon: Radar, end: true };
-const VISUALIZER_INBOX = { to: "/visualizer-inbox", label: "Visualizer Inbox", icon: Eye, end: true };
 const COUNCIL_CHAMBER = { to: "/council-chamber", label: "Council Chamber", icon: Brain, end: true };
 const EMPLOYEE_PORTAL = { to: "/employee-portal", label: "Employee Portal", icon: Users, end: true };
 
@@ -44,10 +44,8 @@ const PIPELINE_STEPS = [
   { to: "/pipeline-catalog", label: "Pipeline Catalog",   icon: Layers, step: 1, desc: "Browse packages, templates & tools",
     color: { ring: "border-emerald-400 bg-emerald-400 text-black shadow-[0_0_14px_3px_rgba(52,211,153,0.45)]", text: "text-emerald-400", icon: "text-emerald-400", idle: "text-emerald-400/40" } },
   { to: "/build-queue",      label: "Queue System",       icon: Boxes,  step: 2, desc: "Ideas queued for building",
-    color: { ring: "border-amber-400 bg-amber-400 text-black shadow-[0_0_14px_3px_rgba(255,234,0,0.45)]", text: "text-amber-600", icon: "text-amber-600", idle: "text-amber-600/40" } },
-  { to: "/mass-website-factory", label: "Mass Website Factory", icon: Factory, step: 3, desc: "Bulk produce websites from templates",
-    color: { ring: "border-cyan-400 bg-cyan-400 text-black shadow-[0_0_14px_3px_rgba(34,211,238,0.45)]", text: "text-cyan-400", icon: "text-cyan-400", idle: "text-cyan-400/40" } },
-  { to: "/auto-builder",     label: "Auto Builder",       icon: Rocket, step: 4, desc: "Full builder pipeline",
+    color: { ring: "border-amber-400 bg-amber-400 text-black shadow-[0_0_14px_3px_rgba(255,234,0,0.45)]", text: "text-amber-400", icon: "text-amber-400", idle: "text-amber-400/40" } },
+  { to: "/auto-builder",     label: "Auto Builder",       icon: Rocket, step: 3, desc: "Full builder pipeline",
     color: { ring: "border-rose-400 bg-rose-400 text-black shadow-[0_0_14px_3px_rgba(251,113,133,0.45)]", text: "text-rose-400", icon: "text-rose-400", idle: "text-rose-400/40" } },
 ];
 
@@ -87,7 +85,6 @@ const ARCHIVE_ITEMS = [
   { to: "/generators", label: "Generator Registry", icon: Factory },
   { to: "/sources", label: "Scraper / Source Registry", icon: Database },
   { to: "/visualizer-hub", label: "Visualizer Hub", icon: Eye },
-  { to: "/xps-catalog", label: "XPS Asset Catalog", icon: Boxes },
   { section: "Build & QA" },
   { to: "/preview-factory", label: "Preview Factory", icon: Eye },
   { to: "/qa-repair", label: "QA & Repair", icon: ShieldCheck },
@@ -185,13 +182,13 @@ export default function Layout() {
   if ((!isAdmin && !isEmployee) || previewAsClient) return <ClientLayout user={user} />;
 
   return (
-    <div className="flex h-screen bg-white text-black">
+    <div className="flex h-screen bg-black text-white">
       {/* Sidebar */}
       <aside className={cn(
-        "fixed inset-y-0 left-0 z-40 w-64 transform border-r border-black/10 bg-white transition-transform md:static md:translate-x-0",
+        "fixed inset-y-0 left-0 z-40 w-64 transform border-r border-white/10 bg-black transition-transform md:static md:translate-x-0",
         open ? "translate-x-0" : "-translate-x-full"
       )}>
-        <div className="flex h-14 items-center gap-2 border-b border-black/10 px-4">
+        <div className="flex h-14 items-center gap-2 border-b border-white/10 px-4">
           <Image
             src={LOGO_ICON}
             alt="Xtreme AI"
@@ -199,10 +196,10 @@ export default function Layout() {
             fittingType="fit"
           />
           <div className="leading-tight">
-            <div className="text-sm font-semibold text-black">Xtreme AI</div>
-            <div className="text-[10px] uppercase tracking-wider text-amber-600">{user?.role === "admin" ? "Growth Factory" : "Business Generator"}</div>
-            </div>
-            <button onClick={() => setOpen(false)} className="ml-auto md:hidden text-black/50 hover:text-black"><X className="h-5 w-5" /></button>
+            <div className="text-sm font-semibold text-white">Xtreme AI</div>
+            <div className="text-[10px] uppercase tracking-wider text-amber-400">{user?.role === "admin" ? "Growth Factory" : "Business Generator"}</div>
+          </div>
+          <button onClick={() => setOpen(false)} className="ml-auto md:hidden text-white/50 hover:text-white"><X className="h-5 w-5" /></button>
         </div>
         <nav className="h-[calc(100vh-3.5rem)] overflow-y-auto px-2 py-3">
           {/* Pipeline Overview — home base */}
@@ -212,7 +209,7 @@ export default function Layout() {
             onClick={() => setOpen(false)}
             className={({ isActive }) => cn(
               "flex items-center gap-2.5 rounded-lg px-2.5 py-2 text-sm transition-colors",
-              isActive ? "bg-amber-400/10 text-amber-600 font-semibold" : "text-black hover:bg-black/5"
+              isActive ? "bg-amber-400/10 text-amber-400 font-semibold" : "text-white hover:bg-white/5"
             )}
           >
             <Bot className="h-4 w-4 shrink-0" />
@@ -227,55 +224,13 @@ export default function Layout() {
             onClick={() => setOpen(false)}
             className={({ isActive }) => cn(
               "flex items-center gap-2.5 rounded-lg px-2.5 py-2 text-sm transition-colors",
-              isActive ? "bg-amber-400/10 text-amber-600 font-semibold" : "text-black hover:bg-black/5"
+              isActive ? "bg-amber-400/10 text-amber-400 font-semibold" : "text-white hover:bg-white/5"
             )}
           >
             <Package className="h-4 w-4 shrink-0" />
             {PRODUCT_CATALOG.label}
           </NavLink>
           )}
-
-          {/* XPS Products & Inventory — Xtreme Polishing Systems catalog + inventory */}
-          <NavLink
-            to="/xps-catalog"
-            end
-            onClick={() => setOpen(false)}
-            className={({ isActive }) => cn(
-              "flex items-center gap-2.5 rounded-lg px-2.5 py-2 text-sm transition-colors",
-              isActive ? "bg-amber-400/10 text-amber-600 font-semibold" : "text-black hover:bg-black/5"
-            )}
-          >
-            <Boxes className="h-4 w-4 shrink-0" />
-            XPS Products &amp; Inventory
-          </NavLink>
-
-          {/* Preflight — launch readiness check & score */}
-          <NavLink
-            to="/preflight"
-            end
-            onClick={() => setOpen(false)}
-            className={({ isActive }) => cn(
-              "flex items-center gap-2.5 rounded-lg px-2.5 py-2 text-sm transition-colors",
-              isActive ? "bg-amber-400/10 text-amber-600 font-semibold" : "text-black hover:bg-black/5"
-            )}
-          >
-            <ShieldCheck className="h-4 w-4 shrink-0" />
-            Preflight Launch Check
-          </NavLink>
-
-          {/* Prompt Library — self-optimization prompts */}
-          <NavLink
-            to="/prompt-library"
-            end
-            onClick={() => setOpen(false)}
-            className={({ isActive }) => cn(
-              "flex items-center gap-2.5 rounded-lg px-2.5 py-2 text-sm transition-colors",
-              isActive ? "bg-amber-400/10 text-amber-600 font-semibold" : "text-black hover:bg-black/5"
-            )}
-          >
-            <Brain className="h-4 w-4 shrink-0" />
-            Prompt Library
-          </NavLink>
 
           {/* Lead Engine — autonomous scraping + outreach system */}
           {(hasFullAccess || hasAccessToPage(userCaps, LEAD_ENGINE.to)) && (
@@ -285,69 +240,13 @@ export default function Layout() {
             onClick={() => setOpen(false)}
             className={({ isActive }) => cn(
               "flex items-center gap-2.5 rounded-lg px-2.5 py-2 text-sm transition-colors",
-              isActive ? "bg-amber-400/10 text-amber-600 font-semibold" : "text-black hover:bg-black/5"
+              isActive ? "bg-amber-400/10 text-amber-400 font-semibold" : "text-white hover:bg-white/5"
             )}
           >
             <Radar className="h-4 w-4 shrink-0" />
             {LEAD_ENGINE.label}
           </NavLink>
           )}
-
-          {/* Visualizer Inbox — customer floor visualizer sessions & estimates */}
-          <NavLink
-            to={VISUALIZER_INBOX.to}
-            end={VISUALIZER_INBOX.end}
-            onClick={() => setOpen(false)}
-            className={({ isActive }) => cn(
-              "flex items-center gap-2.5 rounded-lg px-2.5 py-2 text-sm transition-colors",
-              isActive ? "bg-amber-400/10 text-amber-600 font-semibold" : "text-black hover:bg-black/5"
-            )}
-          >
-            <Eye className="h-4 w-4 shrink-0" />
-            {VISUALIZER_INBOX.label}
-          </NavLink>
-
-          {/* Bid Engine — XPS-powered professional quote generator */}
-          <NavLink
-            to="/bid-engine"
-            end
-            onClick={() => setOpen(false)}
-            className={({ isActive }) => cn(
-              "flex items-center gap-2.5 rounded-lg px-2.5 py-2 text-sm transition-colors",
-              isActive ? "bg-amber-400/10 text-amber-600 font-semibold" : "text-black hover:bg-black/5"
-            )}
-          >
-            <ClipboardList className="h-4 w-4 shrink-0" />
-            Bid Engine
-          </NavLink>
-
-          {/* API Key Generator — manage external access keys */}
-          <NavLink
-            to="/api-keys"
-            end
-            onClick={() => setOpen(false)}
-            className={({ isActive }) => cn(
-              "flex items-center gap-2.5 rounded-lg px-2.5 py-2 text-sm transition-colors",
-              isActive ? "bg-amber-400/10 text-amber-600 font-semibold" : "text-black hover:bg-black/5"
-            )}
-          >
-            <Key className="h-4 w-4 shrink-0" />
-            API Key Generator
-          </NavLink>
-
-          {/* Connect AI — link ChatGPT/Claude/Cursor to operate this system */}
-          <NavLink
-            to="/connect"
-            end
-            onClick={() => setOpen(false)}
-            className={({ isActive }) => cn(
-              "flex items-center gap-2.5 rounded-lg px-2.5 py-2 text-sm transition-colors",
-              isActive ? "bg-amber-400/10 text-amber-600 font-semibold" : "text-black hover:bg-black/5"
-            )}
-          >
-            <Bot className="h-4 w-4 shrink-0" />
-            AUTO BUILDER
-          </NavLink>
 
           {/* Council Chamber — multi-agent council debate + simulation lab */}
           <NavLink
@@ -356,7 +255,7 @@ export default function Layout() {
             onClick={() => setOpen(false)}
             className={({ isActive }) => cn(
               "flex items-center gap-2.5 rounded-lg px-2.5 py-2 text-sm transition-colors",
-              isActive ? "bg-amber-400/10 text-amber-600 font-semibold" : "text-black hover:bg-black/5"
+              isActive ? "bg-amber-400/10 text-amber-400 font-semibold" : "text-white hover:bg-white/5"
             )}
           >
             <Brain className="h-4 w-4 shrink-0" />
@@ -370,7 +269,7 @@ export default function Layout() {
             onClick={() => setOpen(false)}
             className={({ isActive }) => cn(
               "flex items-center gap-2.5 rounded-lg px-2.5 py-2 text-sm transition-colors",
-              isActive ? "bg-amber-400/10 text-amber-600 font-semibold" : "text-black hover:bg-black/5"
+              isActive ? "bg-amber-400/10 text-amber-400 font-semibold" : "text-white hover:bg-white/5"
             )}
           >
             <Users className="h-4 w-4 shrink-0" />
@@ -379,14 +278,14 @@ export default function Layout() {
 
           {/* Timeline header — prominent, with a gradient accent rule */}
           <div className="mt-5 mb-2 flex items-center gap-2 px-1">
-            <span className="text-xs font-bold uppercase tracking-[0.22em] text-amber-600">Autonomous Pipeline</span>
-            <div className="h-px flex-1 bg-gradient-to-r from-amber-400/40 via-black/10 to-transparent" />
+            <span className="text-xs font-bold uppercase tracking-[0.22em] text-amber-400">Autonomous Pipeline</span>
+            <div className="h-px flex-1 bg-gradient-to-r from-amber-400/40 via-white/10 to-transparent" />
           </div>
 
           {/* Vertical step-by-step timeline */}
           <div className="relative mt-2">
             {/* Connecting line — gradient tying the step colors together */}
-            <div className="absolute left-[28px] top-7 bottom-7 w-0.5 rounded-full bg-gradient-to-b from-violet-400/30 via-black/10 to-rose-400/30" />
+            <div className="absolute left-[28px] top-7 bottom-7 w-0.5 rounded-full bg-gradient-to-b from-violet-400/30 via-white/10 to-rose-400/30" />
             {filterNav(PIPELINE_STEPS).map((step) => {
               const Icon = step.icon;
               const isAutoBuilder = step.to === "/auto-builder";
@@ -398,7 +297,7 @@ export default function Layout() {
                     onClick={() => setOpen(false)}
                     className={({ isActive }) => cn(
                       "relative flex items-center gap-3.5 rounded-lg px-1 py-2.5 transition-colors",
-                      isActive ? "" : "hover:bg-black/5"
+                      isActive ? "" : "hover:bg-white/5"
                     )}
                   >
                     {({ isActive }) => {
@@ -408,19 +307,19 @@ export default function Layout() {
                       <>
                         <div className={cn(
                           "relative z-10 flex h-12 w-12 shrink-0 items-center justify-center rounded-full border-2 text-base font-bold transition-all duration-200",
-                          active ? c.ring : cn("border-black/15 bg-white", c.idle)
+                          active ? c.ring : cn("border-white/15 bg-zinc-900", c.idle)
                         )}>
                           {step.step}
                         </div>
                         <div>
                           <div className={cn(
                             "flex items-center gap-2 text-sm font-semibold transition-colors",
-                            active ? c.text : "text-black"
+                            active ? c.text : "text-white"
                           )}>
-                            <Icon className={cn("h-5 w-5 shrink-0 transition-colors", active ? c.icon : "text-black/50")} />
+                            <Icon className={cn("h-5 w-5 shrink-0 transition-colors", active ? c.icon : "text-white/50")} />
                             {step.label}
                           </div>
-                          <div className="text-[11px] leading-tight text-black/40">{step.desc}</div>
+                          <div className="text-[11px] leading-tight text-white/40">{step.desc}</div>
                         </div>
                       </>
                       );
@@ -428,7 +327,7 @@ export default function Layout() {
                   </NavLink>
                   {/* Auto Builder sub-timeline — expands when active */}
                   {isAutoBuilder && showAutoBuilderSub && (
-                    <div className="relative ml-[26px] mt-1 mb-2 border-l border-black/10 pl-5">
+                    <div className="relative ml-[26px] mt-1 mb-2 border-l border-white/10 pl-5">
                       {AUTOBUILDER_STEPS.map((sub, j) => {
                         const SubIcon = sub.icon;
                         const subActive = location.pathname === sub.to;
@@ -437,21 +336,21 @@ export default function Layout() {
                             key={sub.to}
                             to={sub.to}
                             onClick={() => setOpen(false)}
-                            className="relative flex items-center gap-2.5 rounded-lg px-1 py-1.5 transition-colors hover:bg-black/5"
+                            className="relative flex items-center gap-2.5 rounded-lg px-1 py-1.5 transition-colors hover:bg-white/5"
                           >
                             <div className={cn(
                               "flex h-7 w-7 shrink-0 items-center justify-center rounded-full border text-[10px] font-bold transition-all",
                               subActive
                                 ? "border-amber-400 bg-amber-400 text-black shadow-[0_0_8px_1px_rgba(255,234,0,0.4)]"
-                                : "border-black/15 bg-white text-black/40"
+                                : "border-white/15 bg-zinc-900 text-white/40"
                             )}>
                               {sub.number}
                             </div>
                             <span className={cn(
                               "flex items-center gap-1.5 text-[13px] font-medium",
-                              subActive ? "text-amber-600" : "text-black/60"
+                              subActive ? "text-amber-400" : "text-white/60"
                             )}>
-                              <SubIcon className={cn("h-4 w-4 shrink-0", subActive ? "text-amber-600" : "text-black/50")} />
+                              <SubIcon className={cn("h-4 w-4 shrink-0", subActive ? "text-amber-400" : "text-white/50")} />
                               {sub.label}
                             </span>
                           </NavLink>
@@ -465,10 +364,10 @@ export default function Layout() {
           </div>
 
           {/* Archive — collapsed by default, still accessible */}
-          <div className="mt-6 border-t border-black/10 pt-3">
+          <div className="mt-6 border-t border-white/10 pt-3">
             <button
               onClick={() => setArchiveOpen((v) => !v)}
-              className="flex w-full items-center gap-2 rounded-lg px-2.5 py-2 text-sm text-black/40 transition-colors hover:bg-black/5 hover:text-black/70"
+              className="flex w-full items-center gap-2 rounded-lg px-2.5 py-2 text-sm text-white/40 transition-colors hover:bg-white/5 hover:text-white/70"
             >
               <Archive className="h-4 w-4 shrink-0" />
               <span className="text-[10px] font-semibold uppercase tracking-wider">Archive</span>
@@ -478,7 +377,7 @@ export default function Layout() {
               <div className="mt-1 space-y-0.5">
                 {filterNav(ARCHIVE_ITEMS).map((item, i) => {
                   if (item.section) {
-                    return <div key={i} className="mt-3 mb-1 px-2.5 text-[9px] font-semibold uppercase tracking-wider text-black/25">{item.section}</div>;
+                    return <div key={i} className="mt-3 mb-1 px-2.5 text-[9px] font-semibold uppercase tracking-wider text-white/25">{item.section}</div>;
                   }
                   const Icon = item.icon;
                   return (
@@ -489,7 +388,7 @@ export default function Layout() {
                       onClick={() => setOpen(false)}
                       className={({ isActive }) => cn(
                         "flex items-center gap-2.5 rounded-lg px-2.5 py-1.5 text-[13px] transition-colors",
-                        isActive ? "bg-black/10 text-black" : "text-black/40 hover:bg-black/5 hover:text-black/70"
+                        isActive ? "bg-white/10 text-white" : "text-white/40 hover:bg-white/5 hover:text-white/70"
                       )}
                     >
                       <Icon className="h-3.5 w-3.5 shrink-0" />
@@ -507,21 +406,22 @@ export default function Layout() {
 
       {/* Main */}
       <div className="flex flex-1 flex-col overflow-hidden">
-        <header className="flex h-14 items-center gap-3 border-b border-black/10 bg-white px-4 backdrop-blur">
+        <header className="flex h-14 items-center gap-3 border-b border-amber-400/40 bg-white px-4 backdrop-blur">
           <button onClick={() => setOpen(true)} className="md:hidden text-black/50 hover:text-black"><Menu className="h-5 w-5" /></button>
           <div className="flex items-center gap-2 text-xs">
-            <span className="rounded-md bg-black px-2 py-1 font-mono text-white font-semibold">{user?.role === "admin" ? "XTREME AI PIPELINE" : "BUSINESS GENERATOR"}</span>
+            <span className="rounded-md border border-amber-400 bg-amber-400 px-2 py-1 font-mono text-black font-semibold">{user?.role === "admin" ? "XTREME AI PIPELINE" : "BUSINESS GENERATOR"}</span>
             <span className="hidden text-black/50 sm:inline">{user?.role === "admin" ? "Autonomous growth factory · AI-driven pipeline" : "AI-powered business generation workflow"}</span>
           </div>
           <div className="ml-auto flex items-center gap-3">
             <span className="hidden text-xs text-black/60 sm:inline">{user?.email || ""}</span>
-            <a href="/?view=site" target="_blank" rel="noopener noreferrer" className="flex items-center gap-1.5 rounded-lg border border-black/15 px-2.5 py-1.5 text-xs text-black font-medium hover:bg-black/5">
+            <a href="/?view=site" target="_blank" rel="noopener noreferrer" className="flex items-center gap-1.5 rounded-lg border border-amber-400 px-2.5 py-1.5 text-xs text-black font-medium hover:bg-amber-400/10">
               <Globe className="h-3.5 w-3.5" /> View Public Site
             </a>
-            <button onClick={() => setShowPreviewModal(true)} className="flex items-center gap-1.5 rounded-lg border border-black/15 px-2.5 py-1.5 text-xs text-black font-medium hover:bg-black/5">
+            <button onClick={() => setShowPreviewModal(true)} className="flex items-center gap-1.5 rounded-lg border border-amber-400 px-2.5 py-1.5 text-xs text-black font-medium hover:bg-amber-400/10">
               <Eye className="h-3.5 w-3.5" /> Preview as Client
             </button>
-            <button onClick={logout} className="flex items-center gap-1.5 rounded-lg border border-black/15 px-2.5 py-1.5 text-xs text-black font-medium hover:bg-black/5">
+            <ThemeToggle className="flex items-center gap-1.5 rounded-lg border border-amber-400 px-2.5 py-1.5 text-xs text-black font-medium hover:bg-amber-400/10" />
+            <button onClick={logout} className="flex items-center gap-1.5 rounded-lg border border-amber-400 px-2.5 py-1.5 text-xs text-black font-medium hover:bg-amber-400/10">
               <LogOut className="h-3.5 w-3.5" /> Sign out
             </button>
           </div>

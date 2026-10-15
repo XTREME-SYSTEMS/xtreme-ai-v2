@@ -40,7 +40,7 @@ const TABS = [
   {
     key: "evangelize", label: "Evangelize", title: "Create fans, not just customers",
     desc: "Everything you need to turn happy customers into reviews, referrals and buzz.",
-    img: "https://images.unsplash.com/photo-1556761175-b413da4baf72?auto=format&fit=crop&w=900&q=80",
+    img: "https://images.unsplash.com/photo-1554224155-6726b0148b8c?auto=format&fit=crop&w=900&q=80",
     features: [
       "Reputation Management", "Automated Review Requests", "Affiliate Manager (for referral tracking)",
       "Website Review Widgets", "Video Review Capture", "Video Review Widgets",
@@ -65,7 +65,7 @@ export default function AllInOneTabs() {
   const tab = TABS[active];
 
   return (
-    <section id="features" className="bg-white py-20 sm:py-28">
+    <section id="features" className="bg-zinc-50 py-20 sm:py-28">
       <div className="mx-auto max-w-7xl px-4 sm:px-6">
         <div className="text-center">
           <h2 className="text-3xl font-bold tracking-tight text-black sm:text-4xl lg:text-5xl">Your all-in-one solution for business growth</h2>
